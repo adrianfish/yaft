@@ -245,7 +245,7 @@ ${yaft_forums_label}
 			<th width="5px"></th>
 			<th colspan="3">${yaft_discussion_label}</th>
 			<th width="5px"></th>
-			<th colspan="4">${yaft_message_label}</th>
+			<th colspan="3">${yaft_message_label}</th>
 		</tr>
 		<tr class="listHier">
 			<th align="left">Role</th>
@@ -259,7 +259,6 @@ ${yaft_forums_label}
 			<th style="text-align:center;">delete.any</th>
 			<th style="background: white;"></th>
 			<th style="text-align:center;">create</th>
-			<th style="text-align:center;">censor</th>
 			<th style="text-align:center;">delete.own</th>
 			<th style="text-align:center;">delete.any</th>
 		</tr>
@@ -278,7 +277,6 @@ ${yaft_forums_label}
 	<td align="center"><input type="checkbox" {if p.discussionDeleteAny}checked="checked"{/if}" name="${p.role}:DiscussionDeleteAny"/></td>
 	<td></td>
 	<td align="center"><input type="checkbox" {if p.messageCreate}checked="checked"{/if}" name="${p.role}:MessageCreate"/></td>
-	<td align="center"><input type="checkbox" {if p.messageCensor}checked="checked"{/if}" name="${p.role}:MessageCensor"/></td>
 	<td align="center"><input type="checkbox" {if p.messageDeleteOwn}checked="checked"{/if}" name="${p.role}:MessageDeleteOwn"/></td>
 	<td align="center"><input type="checkbox" {if p.messageDeleteAny}checked="checked"{/if}" name="${p.role}:MessageDeleteAny"/></td>
 </tr>
@@ -316,7 +314,6 @@ ${yaft_forums_label}
 			<br />
 			<div>
 			{if yaftCurrentUserPermissions.messageDeleteAny && !isFirstMessage}<span><a href="#" onclick="return YaftUtils.deleteMessage('${id}');">Delete</a></span>{/if}
-			{if yaftCurrentUserPermissions.messageCensor}<span><a href="#" onClick="return YaftUtils.uncensorMessage('${id}');">Uncensor</a></span>{/if}
 			</div>
 			</div>
 		</div>
@@ -364,7 +361,6 @@ ${yaft_forums_label}
 					{if yaftCurrentUserPermissions.messageCreate && status == 'READY'}
 						<span><a href="#" onClick="return switchState('reply',{'messageBeingRepliedTo':'${id}'});">${yaft_reply_label}</a></span>
 					{/if}
-					{if yaftCurrentUserPermissions.messageCensor && !isFirstMessage && status == 'READY'}<span><a href="#" onclick="return YaftUtils.censorMessage('${id}');">${yaft_censor_label}</a></span>{/if}
 					{if ((yaftCurrentUserPermissions.messageDeleteOwn && (yaftCurrentUser.id == creatorId)) || yaftCurrentUserPermissions.messageDeleteAny) && !isFirstMessage && status != 'DELETED'}<span><a href="#" onClick="return YaftUtils.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
 					{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YaftUtils.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
 					{if children.length > 0 && yaftViewMode != 'minimal'}<span><a href="#" onclick="YaftUtils.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
@@ -404,7 +400,6 @@ ${yaft_forums_label}
 			<br />
 			<div>
 			{if yaftCurrentUserPermissions.messageDeleteAny && !message.isFirstMessage}<span><a href="#" onclick="return YaftUtils.deleteMessage('${message.id}');">Delete</a></span>{/if}
-			{if yaftCurrentUserPermissions.messageCensor}<span><a href="#" onClick="return YaftUtils.uncensorMessage('${message.id}');">Uncensor</a></span>{/if}
 			</div>
 			</div>
 		</div>
@@ -452,7 +447,6 @@ ${yaft_forums_label}
 					{if yaftCurrentUserPermissions.messageCreate && message.status == 'READY'}
 						<span><a href="#" onClick="return switchState('reply',{'messageBeingRepliedTo':'${message.id}'});">${yaft_reply_label}</a></span>
 					{/if}
-					{if yaftCurrentUserPermissions.messageCensor && !message.isFirstMessage && message.status == 'READY'}<span><a href="#" onclick="return YaftUtils.censorMessage('${message.id}');">${yaft_censor_label}</a></span>{/if}
 					{if ((yaftCurrentUserPermissions.messageDeleteOwn && (yaftCurrentUser.id == message.creatorId)) || yaftCurrentUserPermissions.messageDeleteAny) && !message.isFirstMessage && message.status != 'DELETED'}<span><a href="#" onClick="return YaftUtils.deleteMessage('${message.id}');">${yaft_delete_label}</a></span>{/if}
 					{if message.status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YaftUtils.undeleteMessage('${message.id}');">${yaft_undelete_label}</a></span>{/if}
 					{if message.children.length > 0}<span><a href="#" onclick="YaftUtils.toggleMessage(this,'${message.id}');">${yaft_collapse_label}</a></span>{/if}
