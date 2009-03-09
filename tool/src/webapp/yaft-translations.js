@@ -74,3 +74,4 @@ yaft_add_attachments_label = 'Add Attachments:';
 yaft_empty_message_subject_message = "You didn't add a subject for your message. If you click 'OK' the subject of the message being replied to will be used.";
 yaft_mark_message_read_label = 'Mark as Read';
 yaft_mark_message_unread_label = 'Mark as Unread';
+yaft_unread_label = 'Unread';

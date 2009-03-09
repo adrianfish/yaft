@@ -100,7 +100,7 @@ function switchState(state,arg)
 	 						cssDesc:'yaftSortableTableHeaderSortDown',
 	 						headers:
 	 							{
-	 								4: {sorter: false}
+	 								5: {sorter: false}
 	 							}
 	 					});
 	 			});
