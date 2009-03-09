@@ -100,6 +100,7 @@ function switchState(state,arg)
 	 						cssDesc:'yaftSortableTableHeaderSortDown',
 	 						headers:
 	 							{
+	 								4: {sorter: "isoDate"},
 	 								5: {sorter: false}
 	 							}
 	 					});
