@@ -4,7 +4,8 @@ public class OracleGenerator extends DefaultSqlGenerator
 {
 	public OracleGenerator()
 	{
-		VARCHAR = "VARCHAR2";
+		VARCHAR   = "VARCHAR2";
 		TIMESTAMP = "TIMESTAMP";
+		TEXT      = "LONG";
 	}
 }

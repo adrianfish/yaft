@@ -236,6 +236,7 @@ public class YaftPersistenceManager
 
 			statement = sqlGenerator.getAddOrUpdateForumStatement(forum,connection);
 			statement.executeUpdate();
+			connection.commit();
 		}
 		catch (Exception e)
 		{
@@ -442,7 +443,7 @@ public class YaftPersistenceManager
 		return discussion;
 	}
 	
-	public Discussion getDiscussion(String discussionId)
+	public Discussion getDiscussion(String discussionId,boolean fully)
 	{
 		Connection connection = null;
 		Statement st = null;
@@ -457,7 +458,7 @@ public class YaftPersistenceManager
 			ResultSet rs = st.executeQuery(sql);
 			
 			if(rs.next())
-				discussion = getDiscussionFromResults(rs,true, connection);
+				discussion = getDiscussionFromResults(rs,fully, connection);
 			else
 				logger.error("No discussion with id: " + discussionId);
 			
@@ -1358,6 +1359,63 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 	}
+	
+	public boolean markDiscussionRead(String discussionId,String forumId)
+	{
+		if(logger.isInfoEnabled())
+			logger.info("markDiscussionRead(" + discussionId + "," + forumId + ")");
+		
+		Connection connection = null;
+		Statement statement = null;
+		
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			try
+			{
+				statement = connection.createStatement();
+				
+				List<String> updateSql = sqlGenerator.getMarkDiscussionReadStatements(sakaiProxy.getCurrentUser().getId(),discussionId,forumId,connection);
+				
+				for(String sql : updateSql)
+					statement.executeUpdate(sql);
+				
+				connection.commit();
+				return true;
+			}
+			catch (Exception e)
+			{
+				logger.error("Caught exception whilst marking discussion read. Rolling back ...", e);
+				connection.rollback();
+				return false;
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst marking discussion unread", e);
+			return false;
+		}
+		finally
+		{
+			try
+			{
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+	}
 
 	public List<String> getReadMessageIds(String discussionId)
 	{
@@ -1620,5 +1678,50 @@ public class YaftPersistenceManager
 		}
 		
 		return counts;
+	}
+
+	/**
+	 * @param title The title of the forum that the caller is looking for
+	 * @param state One of the ForumPopulatedState states, currently FULL or PART
+	 * @return The first forum with that title, or null if no forum with the
+	 * 			supplied title could be found
+	 */
+	public Forum getForumForTitle(String title,String state)
+	{
+		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title);
+		
+		Connection connection = null;
+		Statement statement = null;
+		ResultSet rs = null;
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			statement = connection.createStatement();
+			rs = statement.executeQuery(sql);
+			String forumId = null;
+			
+			if(rs.next())
+				forumId = rs.getString("FORUM_ID");
+			else
+				return null;
+			
+			return getForum(forumId,state);
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting forum id for title.", e);
+			return null;
+		}
+		finally
+		{
+			try
+			{
+				if(rs != null) rs.close();
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
 	}
 }

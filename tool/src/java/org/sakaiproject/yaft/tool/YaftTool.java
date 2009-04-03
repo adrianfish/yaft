@@ -179,6 +179,22 @@ public class YaftTool extends HttpServlet
 								response.getWriter().close();
 								return;
 							}
+							else if ("markRead".equals(discussionOp))
+							{
+								if(yaftForumService.markDiscussionRead(discussionId, forumId))
+								{
+									response.setContentType("text/plain");
+									response.getWriter().write("success");
+									response.getWriter().close();
+								}
+								else
+								{
+									response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+									response.getWriter().close();
+								}
+								
+								return;
+							}
 						}
 					}
 				}
@@ -503,7 +519,7 @@ public class YaftTool extends HttpServlet
 					if (parts.length == 3)
 					{
 						// This is a request for a particular discussion
-						Discussion discussion = yaftForumService.getDiscussion(discussionId);
+						Discussion discussion = yaftForumService.getDiscussion(discussionId,true);
 						JsonConfig config = new JsonConfig();
 						config.setExcludes(new String[] {"properties","reference"});
 						JSONObject json = JSONObject.fromObject(discussion,config);
@@ -794,7 +810,7 @@ public class YaftTool extends HttpServlet
 		}
 		else if (function.equals("createMessage"))
 		{
-			//String status = request.getParameter("status");
+			String status = request.getParameter("status");
 			String subject = request.getParameter("subject");
 			String content = request.getParameter("content");
 			String forumId = request.getParameter("forumId");
@@ -805,7 +821,7 @@ public class YaftTool extends HttpServlet
 
 			if (logger.isDebugEnabled())
 			{
-				//logger.debug("Status: " + status);
+				logger.debug("Status: " + status);
 				logger.debug("Subject: " + subject);
 				logger.debug("Content: " + content);
 				logger.debug("Forum ID: " + forumId);
@@ -818,7 +834,7 @@ public class YaftTool extends HttpServlet
 				viewMode = "full";
 			
 			Message message = new Message();
-			//message.setStatus(status);
+			message.setStatus(status);
 			message.setSubject(subject);
 			message.setContent(content);
 			message.setSiteId(sakaiProxy.getCurrentSiteId());

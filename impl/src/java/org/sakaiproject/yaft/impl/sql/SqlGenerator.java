@@ -10,6 +10,8 @@ import org.sakaiproject.yaft.api.Message;
 
 public interface SqlGenerator
 {
+	public String TEXT  = "TEXT";
+	
 	List<String> getSetupStatements();
 
 	String getForumSelectStatement(String forumId);
@@ -61,6 +63,8 @@ public interface SqlGenerator
 
 	List<String> getMarkMessageUnReadStatements(String id, String messageId,String forumId,String discussionId);
 	
+	List<String> getMarkDiscussionReadStatements(String userId, String discussionId,String forumId,Connection conn) throws SQLException;
+	
 	public String getSelectMessageReadStatement(String userId, String messageId);
 
 	String getSelectReadMessageIds(String id, String discussionId);
@@ -80,4 +84,6 @@ public interface SqlGenerator
 	String getSelectDiscussionIdsForForumStatement(String forumId);
 
 	String getMarkForumDeletedStatement(String forumId);
+
+	String getSelectForumIdForTitleStatement(String title);
 }

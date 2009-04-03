@@ -35,13 +35,15 @@ public interface YaftForumService extends EntityProducer
 	 */
 	public Forum getForum(String forumId,String state);
 	
-	public Discussion getDiscussion(String discussionId);
+	public Forum getForumForTitle(String title,String state);
+	
+	public Discussion getDiscussion(String discussionId,boolean fully);
 	
 	public SakaiProxy getSakaiProxy();
 
 	public void addOrUpdateForum(Forum forum);
 	
-	public void addDiscussion(String forumId,Message firstMessage,boolean sendMail);
+	public Discussion addDiscussion(String forumId,Message firstMessage,boolean sendMail);
 
 	public void addOrUpdateMessage(String forumId,Message message,boolean sendMail);
 
@@ -82,6 +84,8 @@ public interface YaftForumService extends EntityProducer
 	public boolean markMessageRead(String messageId,String forumId,String discussionId);
 
 	public boolean markMessageUnRead(String messageId,String forumId,String discussionId);
+	
+	public boolean markDiscussionRead(String discussionId,String forumId);
 
 	public List<String> getReadMessageIds(String discussionId);
 

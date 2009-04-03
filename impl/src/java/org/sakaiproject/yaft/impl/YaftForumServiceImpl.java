@@ -70,11 +70,11 @@ public class YaftForumServiceImpl implements YaftForumService
 		return forum;
 	}
 	
-	public Discussion getDiscussion(String discussionId)
+	public Discussion getDiscussion(String discussionId,boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
 		
-		return persistenceManager.getDiscussion(discussionId);
+		return persistenceManager.getDiscussion(discussionId,fully);
 	}
 
 	public List<Forum> getSiteForums(String siteId,boolean fully)
@@ -113,7 +113,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		if(sendMail && "READY".equals(message.getStatus()))
 		{
-			Discussion discussion = persistenceManager.getDiscussion(discussionId);
+			Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
 		
 			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
 		
@@ -125,7 +125,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		}
 	}
 	
-	public void addDiscussion(String forumId,Message message,boolean sendMail)
+	public Discussion addDiscussion(String forumId,Message message,boolean sendMail)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addDiscussion()");
 		
@@ -137,18 +137,20 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		String discussionId = message.getId();
 		
+		Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
+		
 		if(sendMail)
 		{
-		Discussion discussion = persistenceManager.getDiscussion(discussionId);
+			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
 		
-		List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
-		
-		String url = sakaiProxy.getDirectUrl("/messages/"
+			String url = sakaiProxy.getDirectUrl("/messages/"
 							+ message.getId());
 		
-		sakaiProxy.sendEmailMessageToSiteUsers("New Sakai Forum Message",message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "'"
+			sakaiProxy.sendEmailMessageToSiteUsers("New Sakai Forum Message",message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "'"
 													,unsubscribers);
 		}
+		
+		return discussion;
 	}
 	
 	public List<Forum> getFora()
@@ -269,6 +271,11 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		return persistenceManager.markMessageUnRead(messageId,forumId,discussionId);
 	}
+	
+	public boolean markDiscussionRead(String discussionId,String forumId)
+	{
+		return persistenceManager.markDiscussionRead(discussionId,forumId);
+	}
 
 	public List<String> getReadMessageIds(String discussionId)
 	{
@@ -284,7 +291,7 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		persistenceManager.publishMessage(forumId,message.getId());
 		
-		Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId());
+		Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
 		
 		List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
 		
@@ -539,5 +546,8 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getReadMessageCountForForum(sakaiProxy.getCurrentUser().getId(),forumId);
 	}
 
-	
+	public Forum getForumForTitle(String title,String state)
+	{
+		return persistenceManager.getForumForTitle(title,state);
+	}
 }

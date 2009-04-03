@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,6 @@ import org.sakaiproject.email.api.EmailService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.cover.NotificationService;
 import org.sakaiproject.exception.IdUnusedException;
@@ -48,8 +48,6 @@ import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
 import org.sakaiproject.yaft.api.YaftPermissions;
-
-import sun.text.CompactShortArray.Iterator;
 
 /**
  * All Sakai API calls go in here. If Sakai changes all we have to do if mod
@@ -251,6 +249,16 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		Site site = siteService.getSite(siteId);
 		AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
+		
+		Set roles = realm.getRoles();
+		
+		for(Iterator i = roles.iterator();i.hasNext();)
+		{
+			Role role = (Role) i.next();
+			
+			if(!permissionMap.containsKey(role.getId()))
+				permissionMap.put(role.getId(), new YaftPermissions());
+		}
 		
 		for(String roleName : permissionMap.keySet())
 		{

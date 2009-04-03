@@ -23,6 +23,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 	
 	protected String VARCHAR = "VARCHAR";
 	protected String TIMESTAMP = "DATETIME";
+	protected String TEXT = "TEXT";
 	
 	public List<String> getSetupStatements()
 	{
@@ -35,7 +36,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "SITE_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "CREATOR_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "TITLE " + VARCHAR + "(255) NOT NULL,"
-				+ "DESCRIPTION TEXT NOT NULL,"
+				+ "DESCRIPTION " + TEXT + " NOT NULL,"
 				+ "DISCUSSION_COUNT INT NOT NULL,"
 				+ "MESSAGE_COUNT INT NOT NULL,"
 				+ "LAST_MESSAGE_DATE " + TIMESTAMP + ","
@@ -60,7 +61,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "PARENT_MESSAGE_ID CHAR(36),"
 				+ "DISCUSSION_ID CHAR(36),"
 				+ "SUBJECT " + VARCHAR + "(255) NOT NULL,"
-				+ "CONTENT TEXT NOT NULL,"
+				+ "CONTENT " + TEXT + " NOT NULL,"
 				+ "CREATOR_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "CREATED_DATE " + TIMESTAMP + " NOT NULL,"
 				+ "STATUS " + VARCHAR + "(36),"
@@ -71,7 +72,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "CHILD_MESSAGE_ID CHAR(36) NOT NULL,"
 				+ "PRIMARY KEY (MESSAGE_ID,CHILD_MESSAGE_ID))");
 		
-		statements.add("CREATE TABLE YAFT_DISCUSSION_UNSUBSCRIPTIONS (" 
+		statements.add("CREATE TABLE YAFT_DISCUSSION_UNSUBS (" 
 				+ "DISCUSSION_ID CHAR(36) NOT NULL,"
 				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "PRIMARY KEY (DISCUSSION_ID,USER_ID))");
@@ -393,7 +394,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE MESSAGE_ID  = '" + messageId + "'");
 		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE FORUM_ID = '" + forumId + "'");
 		statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
-		statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "')");
+		statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
 		return statements;
 	}
@@ -418,22 +419,22 @@ public class DefaultSqlGenerator implements SqlGenerator
 	
 	public String getDiscussionUnsubscribersStatement(String discussionId)
 	{
-		return "SELECT USER_ID FROM YAFT_DISCUSSION_UNSUBSCRIPTIONS WHERE DISCUSSION_ID = '" + discussionId + "'";
+		return "SELECT USER_ID FROM YAFT_DISCUSSION_UNSUBS WHERE DISCUSSION_ID = '" + discussionId + "'";
 	}
 	
 	public String getUnsubscribeFromDiscussionStatement(String userId, String discussionId)
 	{
-		return "INSERT INTO YAFT_DISCUSSION_UNSUBSCRIPTIONS (DISCUSSION_ID,USER_ID) VALUES('" + discussionId + "','" + userId + "')";
+		return "INSERT INTO YAFT_DISCUSSION_UNSUBS (DISCUSSION_ID,USER_ID) VALUES('" + discussionId + "','" + userId + "')";
 	}
 	
 	public String getDiscussionUnsubscriptionsStatement(String userId)
 	{
-		return "SELECT DISCUSSION_ID FROM YAFT_DISCUSSION_UNSUBSCRIPTIONS"
+		return "SELECT DISCUSSION_ID FROM YAFT_DISCUSSION_UNSUBS"
 				+ " WHERE USER_ID = '" + userId + "'";
 	}
 	public String getSubscribeToDiscussionStatement(String userId, String discussionId)
 	{
-		return "DELETE FROM YAFT_DISCUSSION_UNSUBSCRIPTIONS WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'";
+		return "DELETE FROM YAFT_DISCUSSION_UNSUBS WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'";
 	}
 	public String getDeleteAttachmentStatement(String resourceId, String messageId)
 	{
@@ -471,20 +472,19 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public List<String> getMarkMessageReadStatements(String userId, String messageId,String forumId,String discussionId,Connection conn) throws SQLException
 	{
 		List<String> statements = new ArrayList<String>();
-		statements.add("INSERT INTO YAFT_READ_MESSAGES VALUES('" + userId + "','" + messageId + "')");
+		statements.add("INSERT INTO YAFT_READ_MESSAGES (USER_ID,MESSAGE_ID) VALUES('" + userId + "','" + messageId + "')");
 		
-		String testSql = "SELECT * FROM YAFT_FORUM_READ WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'";
 		Statement st = null;
 		ResultSet rs = null;
 		
 		try
 		{
 			st = conn.createStatement();
-			rs = st.executeQuery(testSql);
+			rs = st.executeQuery("SELECT * FROM YAFT_FORUM_READ WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'");
 			if(rs.next())
 				statements.add("UPDATE YAFT_FORUM_READ SET NUMBER_READ = NUMBER_READ + 1 WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'");
 			else
-				statements.add("INSERT INTO YAFT_FORUM_READ VALUES('" + forumId + "','" + userId + "',1)");
+				statements.add("INSERT INTO YAFT_FORUM_READ (FORUM_ID,USER_ID,NUMBER_READ) VALUES('" + forumId + "','" + userId + "',1)");
 			
 			rs.close();
 			
@@ -492,7 +492,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 			if(rs.next())
 				statements.add("UPDATE YAFT_DISCUSSION_READ SET NUMBER_READ = NUMBER_READ + 1 WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'");
 			else
-				statements.add("INSERT INTO YAFT_DISCUSSION_READ VALUES('" + discussionId + "','" + userId + "',1)");
+				statements.add("INSERT INTO YAFT_DISCUSSION_READ (DISCUSSION_ID,USER_ID,NUMBER_READ) VALUES('" + discussionId + "','" + userId + "',1)");
 		}
 		finally
 		{
@@ -509,6 +509,60 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("DELETE FROM YAFT_READ_MESSAGES WHERE USER_ID = '" + userId + "' AND MESSAGE_ID = '" + messageId + "'");
 		statements.add("UPDATE YAFT_FORUM_READ SET NUMBER_READ = NUMBER_READ - 1 WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'");
 		statements.add("UPDATE YAFT_DISCUSSION_READ SET NUMBER_READ = NUMBER_READ - 1 WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'");
+		return statements;
+	}
+	
+	public List<String> getMarkDiscussionReadStatements(String userId, String discussionId,String forumId,Connection conn) throws SQLException
+	{
+		List<String> statements = new ArrayList<String>();
+		
+		Statement st = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			st = conn.createStatement();
+			// Get a count of the current read messages in this discussion
+			rs = st.executeQuery("SELECT COUNT(*) AS CURRENT_READ"
+								+ " FROM YAFT_READ_MESSAGES,YAFT_MESSAGE"
+								+ " WHERE YAFT_READ_MESSAGES.MESSAGE_ID = YAFT_MESSAGE.MESSAGE_ID"
+								+ " AND DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'");
+			rs.next();
+			int currentRead = rs.getInt("CURRENT_READ");
+			rs.close();
+			
+			// Now delete the current read messages for this discussion
+			statements.add("DELETE FROM YAFT_READ_MESSAGES WHERE MESSAGE_ID IN (SELECT MESSAGE_ID FROM YAFT_MESSAGE WHERE DISCUSSION_ID = '" + discussionId + "') AND USER_ID = '" + userId + "'");
+			
+			rs = st.executeQuery("SELECT MESSAGE_ID FROM YAFT_MESSAGE WHERE DISCUSSION_ID = '" + discussionId + "'");
+			int count = 0;
+			while(rs.next())
+			{
+				statements.add("INSERT INTO YAFT_READ_MESSAGES (MESSAGE_ID,USER_ID) VALUES('" + rs.getString("MESSAGE_ID") + "','" + userId + "')");
+				count++;
+			}
+			rs.close();
+			
+			int diff = count - currentRead;
+			
+			rs = st.executeQuery("SELECT * FROM YAFT_FORUM_READ WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'");
+			if(rs.next())
+				statements.add("UPDATE YAFT_FORUM_READ SET NUMBER_READ = NUMBER_READ + " + diff + " WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId +"'");
+			else
+				statements.add("INSERT INTO YAFT_FORUM_READ (FORUM_ID,USER_ID,NUMBER_READ) VALUES('" + forumId + "','" + userId + "'," + diff +")");
+			rs.close();
+			
+			rs = st.executeQuery("SELECT * FROM YAFT_DISCUSSION_READ WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'");
+			if(rs.next())
+				statements.add("UPDATE YAFT_DISCUSSION_READ SET NUMBER_READ = NUMBER_READ + " + diff + " WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId +"'");
+			else
+				statements.add("INSERT INTO YAFT_DISCUSSION_READ (DISCUSSION_ID,USER_ID,NUMBER_READ) VALUES('" + discussionId + "','" + userId + "'," + diff +")");
+		}
+		finally
+		{
+			if(st != null) st.close();
+		}
+		
 		return statements;
 	}
 	
@@ -575,5 +629,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public String getMarkForumDeletedStatement(String forumId)
 	{
 		return "UPDATE YAFT_FORUM SET STATUS = 'DELETED' WHERE FORUM_ID = '" + forumId + "'";
+	}
+	
+	public String getSelectForumIdForTitleStatement(String title)
+	{
+		return "SELECT FORUM_ID FROM YAFT_FORUM WHERE TITLE = '" + title + "' AND STATUS <> 'DELETED'";
 	}
 }

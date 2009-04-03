@@ -199,8 +199,8 @@ var YaftUtils;
 	
 	YaftUtils.publishMessage = function(messageId)
 	{
-		if(!confirm(yaft_publish_message_message))
-			return false;
+		//if(!confirm(yaft_publish_message_message))
+		//	return false;
 		
 		jQuery.ajax(
 		{
@@ -445,6 +445,33 @@ var YaftUtils;
 			message.collapsed = true;
 		}
     }
+
+    YaftUtils.markCurrentDiscussionRead = function(read)
+	{
+		jQuery.ajax(
+		{
+	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/markRead",
+	   		dataType : "text",
+	   		async : false,
+			cache: false,
+		   	success : function(text,status)
+			{
+				for(var i=0;i<yaftCurrentForum.discussions.length;i++)
+				{
+					var discussion = yaftCurrentForum.discussions[i];
+					if(discussion.id == yaftCurrentDiscussion.id)
+						discussion['unread'] = 0;
+				}
+				
+				switchState('forum');
+			},
+			error : function(xmlHttpRequest,status,error)
+			{
+			}
+	  	});
+
+		return false;
+	}
     
     YaftUtils.markMessageRead = function(message,read)
 	{
