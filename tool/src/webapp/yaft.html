@@ -77,7 +77,7 @@ ${yaft_forums_label}
 	<tbody>
 	{for forum in items}
    	<tr class="yaftForumRow">
-		<td style="max-width: 200px;"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
+		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
 		<br/>
 		<span class="yaftForumDescription">${forum.description}</span></td>
 		<td align="center">${forum.discussionCount}</td>
