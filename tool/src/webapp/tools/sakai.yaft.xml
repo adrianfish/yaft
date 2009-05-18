@@ -6,5 +6,7 @@
     
     	<category name="course" />
         <category name="project" />
+
+		<configuration name="functions.require"/>
     </tool>
 </registration>
