@@ -653,10 +653,12 @@ public class YaftPersistenceManager
 		}
 	}
 
-	public boolean deleteDiscussion(String forumId,String discussionId)
+	public boolean deleteDiscussion(String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
+		
+		String forumId = getDiscussion(discussionId, false).getForumId();
 
 		try
 		{

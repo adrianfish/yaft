@@ -52,6 +52,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_CENSOR);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_OWN);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
+		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_READ);
 		
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
@@ -189,11 +190,16 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.postEvent(YAFT_FORUM_DELETED,reference,true);
 	}
 
-	public void deleteDiscussion(String forumId,String discussionId)
+	public boolean deleteDiscussion(String discussionId)
 	{
-		persistenceManager.deleteDiscussion(forumId,discussionId);
-		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
-		sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
+		if(persistenceManager.deleteDiscussion(discussionId))
+		{
+			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
+			sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
+			return true;
+		}
+		
+		return false;
 	}
 
 	public void censorMessage(String messageId)

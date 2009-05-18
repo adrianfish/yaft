@@ -13,4 +13,5 @@ public class YaftFunctions
 	public static  final String YAFT_MESSAGE_CENSOR = "yaft.message.censor";
 	public static  final String YAFT_MESSAGE_DELETE_OWN = "yaft.message.deleteOwn";
 	public static  final String YAFT_MESSAGE_DELETE_ANY = "yaft.message.deleteAny";
+	public static  final String YAFT_MESSAGE_READ = "yaft.message.read";
 }

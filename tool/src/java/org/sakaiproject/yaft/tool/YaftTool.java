@@ -154,7 +154,7 @@ public class YaftTool extends HttpServlet
 							String discussionOp = parts[2];
 							if ("delete".equals(discussionOp))
 							{
-								yaftForumService.deleteDiscussion(forumId, discussionId);
+								yaftForumService.deleteDiscussion(discussionId);
 								response.setStatus(HttpServletResponse.SC_OK);
 								response.setContentType("text/plain");
 								response.getWriter().write("success");
