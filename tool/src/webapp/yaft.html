@@ -86,7 +86,7 @@ ${yaft_forums_label}
 		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toUTCString()}{/if}</td>
 		<td align="center">
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
-			<a href="#" onclick="return YaftUtils.deleteForum('${forum.id}','${forum.title}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
+			<a href="#" onclick="return YaftUtils.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
 		{/if}
 		</td>
 	</tr>
@@ -129,7 +129,9 @@ ${yaft_forums_label}
 		<td>${discussion.unread}</td>
 		<td>${new Date(discussion.lastMessageDate).toUTCString()}</td>
 		<td align="center">
+		{if (yaftCurrentUserPermissions.forumCreate && yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id) || (yaftCurrentUserPermissions.discussionDeleteAny && yaftCurrentUserPermissions.forumCreate)}
 		<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>
+		{/if}
 		{if discussion.unsubscribed}
 		<a href="#" onClick="return YaftUtils.subscribeToDiscussion('${discussion.id}','${id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
 		{else}
