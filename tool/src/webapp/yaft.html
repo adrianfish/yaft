@@ -138,7 +138,7 @@ ${yaft_forums_label}
 		<a href="#" onClick="return YaftUtils.unsubscribeFromDiscussion('${discussion.id}','${id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
-			<a href="#" onClick="return YaftUtils.deleteDiscussion('${discussion.id}','${discussion.subject}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+			<a href="#" onClick="return YaftUtils.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
 		{/if}
 		</td>
 	</tr>
