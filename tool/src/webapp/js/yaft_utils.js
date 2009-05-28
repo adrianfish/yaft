@@ -14,6 +14,18 @@ var YaftUtils;
 		$('#yaft_hide_deleted_link').show();
 	}
 
+	YaftUtils.validateDiscussionForm = function()
+	{
+		if($('#yaft_subject').val() == '')
+		{
+			var alert = $('#yaft_alert');
+			alert.html(yaft_missing_subject_message);
+			alert.show();
+			return false;
+		}
+		else return true;
+	}
+
 	YaftUtils.hideDeleted = function()
 	{
 		$(".yaft_deleted_message").hide();

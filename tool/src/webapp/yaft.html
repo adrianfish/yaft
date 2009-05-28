@@ -201,32 +201,37 @@ ${yaft_forums_label}
 
 <div id="yaft_start_discussion_content_template"><!--
 <div id="yaft_reply_container">
-	<form id="yaft_start_discussion_form" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
-	<fieldset id="yaft_reply_fieldset">
-	<legend>Type your message</legend>
-	<br />
-	<span>Subject:</span>
-	<br />
-	<input name="subject" type="text" size="48"/>
-	<br />
-	<br />
-	<span>Message</span>
-	<br />
-	<textarea name="content" id="fck" cols="100" rows="5"></textarea>
-	<br />
-	</fieldset>
-	<br />
+	<form id="yaft_start_discussion_form"
+			action="/portal/tool/${yaftPlacementId}"
+			method="POST"
+			enctype="multipart/form-data"
+			onsubmit="return YaftUtils.validateDiscussionForm();">
+		<div id="yaft_alert" class="yaftAlert"></div>
+		<fieldset id="yaft_reply_fieldset">
+		<legend>Type your message</legend>
+		<br />
+		<span>Subject:</span>
+		<br />
+		<input id="yaft_subject" name="subject" type="text" size="48"/>
+		<br />
+		<br />
+		<span>Message</span>
+		<br />
+		<textarea name="content" id="fck" cols="100" rows="5"></textarea>
+		<br />
+		</fieldset>
+		<br />
 	
-	<span>Add Attachments:</span>
-	<br />
-	<input name="attachment" type="file" class="multi"/><br clear="all"/><br/>
+		<span>Add Attachments:</span>
+		<br />
+		<input name="attachment" type="file" class="multi"/><br clear="all"/><br/>
 	
-	<input type="submit" value="${yaft_save_label}"/>
-	<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
+		<input type="submit" value="${yaft_save_label}"/>
+		<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
 	
-	<input type="hidden" name="function" value="startDiscussion"/>
-	<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
-	<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
+		<input type="hidden" name="function" value="startDiscussion"/>
+		<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
+		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
 	</form>
 </div>
 -->

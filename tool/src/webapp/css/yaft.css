@@ -76,3 +76,9 @@ th.yaftSortableTableHeaderSortDown {
 	font-size: 8pt;
 	color: #666;
 }
+
+.yaftAlert{
+	display: none;
+	color: red;
+	font-weight: bold;
+}

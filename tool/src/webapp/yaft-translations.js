@@ -78,3 +78,4 @@ yaft_mark_message_read_label = 'Mark as Read';
 yaft_mark_message_unread_label = 'Mark as Unread';
 yaft_unread_label = 'Unread';
 yaft_mark_discussion_read_message = 'Are you sure you want to mark the current discussion as read?';
+yaft_missing_subject_message = 'You must specify a subject.';
