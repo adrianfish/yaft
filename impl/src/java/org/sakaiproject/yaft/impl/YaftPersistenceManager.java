@@ -1690,7 +1690,7 @@ public class YaftPersistenceManager
 	 */
 	public Forum getForumForTitle(String title,String state)
 	{
-		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title);
+		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title,sakaiProxy.getCurrentSiteId());
 		
 		Connection connection = null;
 		Statement statement = null;

@@ -85,5 +85,5 @@ public interface SqlGenerator
 
 	String getMarkForumDeletedStatement(String forumId);
 
-	String getSelectForumIdForTitleStatement(String title);
+	String getSelectForumIdForTitleStatement(String title,String siteId);
 }

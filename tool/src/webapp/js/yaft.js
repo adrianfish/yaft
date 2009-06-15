@@ -30,7 +30,6 @@ var yaftShowingDeleted = false;
 	// Stuff that we always expect to be setup
 	yaftPlacementId = arg.placementId;
 	yaftSiteId = arg.siteId;
-	
 	yaftCurrentUser = YaftUtils.getCurrentUser(arg.placementId);
 	yaftCurrentUserPermissions = YaftUtils.getUserPermissions(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
@@ -48,15 +47,6 @@ var yaftShowingDeleted = false;
 
 function switchState(state,arg)
 {
-	// If a forum id has been specified we need to refresh the current forum
-	// state
-	if(arg && arg.forumId)
-	{
-		yaftCurrentForum = YaftUtils.getForum(arg.forumId,"part");
-		YaftUtils.setUnreadMessageCountForCurrentForum();
-		YaftUtils.setupCurrentForumUnsubscriptions();
-	}
-
 	if(state == 'forums')
 	{
 		if(yaftCurrentUserPermissions.forumCreate)
@@ -90,7 +80,7 @@ function switchState(state,arg)
 						
 				YaftUtils.render('yaft_forums_content_template',forums,'yaft_content');
 				
-	 			jQuery(document).ready(function()
+	 			$(document).ready(function()
 	 			{
 	 				setMainFrameHeight(window.frameElement.id);
 	 					
@@ -114,6 +104,15 @@ function switchState(state,arg)
 	}
 	else if(state == 'forum') 
 	{
+		// If a forum id has been specified we need to refresh the current forum
+		// state
+		if(arg && arg.forumId)
+		{
+			yaftCurrentForum = YaftUtils.getForum(arg.forumId,"part");
+			YaftUtils.setUnreadMessageCountForCurrentForum();
+			YaftUtils.setupCurrentForumUnsubscriptions();
+		}
+		
 		if(yaftCurrentUserPermissions.discussionCreate)
 			$("#yaft_add_discussion_link").show();
 		else

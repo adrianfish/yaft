@@ -631,8 +631,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "UPDATE YAFT_FORUM SET STATUS = 'DELETED' WHERE FORUM_ID = '" + forumId + "'";
 	}
 	
-	public String getSelectForumIdForTitleStatement(String title)
+	public String getSelectForumIdForTitleStatement(String title,String siteId)
 	{
-		return "SELECT FORUM_ID FROM YAFT_FORUM WHERE TITLE = '" + title + "' AND STATUS <> 'DELETED'";
+		return "SELECT FORUM_ID FROM YAFT_FORUM WHERE TITLE = '" + title + "' AND SITE_ID = '" + siteId + "' AND STATUS <> 'DELETED'";
 	}
 }
