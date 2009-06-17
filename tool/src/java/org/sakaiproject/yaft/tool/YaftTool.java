@@ -131,6 +131,24 @@ public class YaftTool extends HttpServlet
 								response.getWriter().close();
 								return;
 							}
+							else if ("subscribe".equals(forumOp))
+							{
+								yaftForumService.subscribeToForum(forumId);
+								response.setStatus(HttpServletResponse.SC_OK);
+								response.setContentType("text/plain");
+								response.getWriter().write("success");
+								response.getWriter().close();
+								return;
+							}
+							else if ("unsubscribe".equals(forumOp))
+							{
+								yaftForumService.unsubscribeFromForum(forumId);
+								response.setStatus(HttpServletResponse.SC_OK);
+								response.setContentType("text/plain");
+								response.getWriter().write("success");
+								response.getWriter().close();
+								return;
+							}
 						}
 					}
 				}
@@ -584,11 +602,12 @@ public class YaftTool extends HttpServlet
 		// This is a request for all forums in the current site
 		List<Forum> forums = yaftForumService.getSiteForums(sakaiProxy.getCurrentSiteId(),false);
 
-		JSONArray items = new JSONArray();
-		items.addAll(forums);
+		JsonConfig config = new JsonConfig();
+		config.setExcludes(new String[] {"properties","reference"});
+		JSONArray items = JSONArray.fromObject(forums,config);
 		JSONObject container = new JSONObject();
 		container.put("items", items);
-		JSON json = JSONSerializer.toJSON(container);
+		JSON json = JSONSerializer.toJSON(container,config);
 		if (logger.isDebugEnabled())
 			logger.debug("Forums JSON: " + json.toString());
 
@@ -716,6 +735,18 @@ public class YaftTool extends HttpServlet
 					List<String> unsubscriptions = yaftForumService.getDiscussionUnsubscriptions(userId);
 					JSONArray items = new JSONArray();
 					items.addAll(unsubscriptions);
+					JSON json = JSONSerializer.toJSON(items);
+					if (logger.isDebugEnabled())
+						logger.debug("Unsubscriptions JSON: " + json.toString());
+					response.setContentType("text/javascript");
+					json.write(response.getWriter());
+					response.getWriter().close();
+					return;
+				}
+				else if ("forumUnsubscriptions".equals(userOp))
+				{
+					List<String> unsubscriptions = yaftForumService.getForumUnsubscriptions(userId);
+					JSONArray items = JSONArray.fromObject(unsubscriptions);
 					JSON json = JSONSerializer.toJSON(items);
 					if (logger.isDebugEnabled())
 						logger.debug("Unsubscriptions JSON: " + json.toString());

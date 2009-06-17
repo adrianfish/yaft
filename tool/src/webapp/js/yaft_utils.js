@@ -63,6 +63,26 @@ var YaftUtils;
 		});
 	}
 	
+	YaftUtils.renderCurrentForums = function()
+	{
+		YaftUtils.render('yaft_forums_content_template',yaftCurrentForums,'yaft_content');
+	 	$(document).ready(function()
+	 	{
+	 		setMainFrameHeight(window.frameElement.id);
+	 			
+	 		$("#yaft_forum_table").tablesorter({
+	 			cssHeader:'yaftSortableTableHeader',
+	 			cssAsc:'yaftSortableTableHeaderSortUp',
+	 			cssDesc:'yaftSortableTableHeaderSortDown',
+	 			headers:
+	 				{
+	 					4: {sorter: "isoDate"},
+	 					5: {sorter: false}
+	 				}
+	 		});
+	 	});
+	}
+	
 	YaftUtils.validateMessageSubmission = function(originalSubject)
 	{
 		originalSubject = unescape(originalSubject);
@@ -134,6 +154,48 @@ var YaftUtils;
 	  	return data;
 	}
 	
+	YaftUtils.getForumUnsubscriptions = function()
+	{
+		var data = null;
+		jQuery.ajax(
+		{
+	   		url : "/portal/tool/" + yaftPlacementId + "/data/users/" + yaftCurrentUser.id + "/forumUnsubscriptions",
+	   		dataType : "json",
+	   		async : false,
+	   		cache : false,
+	   		success : function(unsubscriptions,status)
+			{
+				data = unsubscriptions;
+			},
+			error : function(xmlHttpRequest,textStatus,errorThrown)
+			{
+				alert("Failed to get forum unsubscription data. Reason: " + errorThrown);
+			}
+	  	});
+	  	
+	  	return data;
+	}
+
+	YaftUtils.setupForumUnsubscriptions = function()
+	{
+		var forums = yaftCurrentForums.items;
+
+		for(var i = 0;i < forums.length;i++)
+		{
+			var forum = forums[i];
+			forum["unsubscribed"] = false;
+			for(var k = 0;k < yaftForumUnsubscriptions.length;k++)
+			{
+				var f = yaftForumUnsubscriptions[k];
+				if(f == forum.id)
+				{
+					forum["unsubscribed"] = true;
+					break;
+				}
+			}
+		}
+	}
+	
 	YaftUtils.setupCurrentForumUnsubscriptions = function()
 	{
 		for(var i = 0;i < yaftCurrentForum.discussions.length;i++)
@@ -175,45 +237,10 @@ var YaftUtils;
 		return discussion;
 	}
 	
-	YaftUtils.printAttachments = function(message)
-    {
-        for(var i = 0;i<message.attachments.length;i++)
-        {
-            var attachment = message.attachments[i];
-            document.write("<a href=\"" + attachment.url + "\" title=\"" + attachment.name + "\">");
-
-            if(attachment.mimeType == 'application/pdf')
-                document.write("<img src=\"/library/image/silk/page_white_acrobat.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType.match(/excel$/))
-                document.write("<img src=\"/library/image/silk/page_white_excel.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType == 'application/msword' || attachment.name.match(/\.doc$/))
-                document.write("<img src=\"/library/image/silk/page_white_word.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType == 'application/vnd.ms-powerpoint')
-                document.write("<img src=\"/library/image/silk/page_white_powerpoint.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType == 'text/plain')
-                document.write("<img src=\"/library/image/silk/page_white_text.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType == 'text/html')
-                document.write("<img src=\"/library/image/silk/html.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            else if(attachment.mimeType.match(/^image/))
-            {
-                document.write("<img src=\"/library/image/silk/picture.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            }
-            else
-            {
-                document.write("<img src=\"/library/image/silk/error.png\" width=\"16\" height=\"16\" alt=\"" + attachment.name + "\"/>");
-            }
-
-            document.write("</a>");
-        }   
-    }
-	
 	/* START MESSAGE OPERATIONS */
 	
 	YaftUtils.publishMessage = function(messageId)
 	{
-		//if(!confirm(yaft_publish_message_message))
-		//	return false;
-		
 		jQuery.ajax(
 		{
 	   		url : "/portal/tool/" + yaftPlacementId + "/messages/" + messageId + "/publish",
@@ -232,12 +259,7 @@ var YaftUtils;
 						testDiscussion['messageCount'] = testDiscussion['messageCount'] + 1;
 				}
 				
-				if(message.id == yaftCurrentDiscussion.firstMessage.id)
-					message['isFirstMessage'] = true;
-				else
-					message['isFirstMessage'] = false;
-					
-				YaftUtils.render('yaft_message_content_template',message,message.id);
+				YaftUtils.render('yaft_message_template',message,message.id);
 				
 				$(document).ready(function()
 				{
@@ -279,7 +301,7 @@ var YaftUtils;
 					message['isFirstMessage'] = true;
 				else
 					message['isFirstMessage'] = false;
-				YaftUtils.render('yaft_message_content_template',message,message.id);
+				YaftUtils.render('yaft_message_template',message,message.id);
 				$(document).ready(function()
 				{
 					$('a.profile').cluetip({local: true
@@ -324,7 +346,7 @@ var YaftUtils;
 					
 				if(yaftViewMode == 'full')
 				{
-					YaftUtils.render('yaft_message_content_template',message,message.id);
+					YaftUtils.render('yaft_message_template',message,message.id);
 					$(document).ready(function()
 					{
 						$('a.profile').cluetip({local: true
@@ -370,7 +392,7 @@ var YaftUtils;
 					message['isFirstMessage'] = true;
 				else
 					message['isFirstMessage'] = false;
-				YaftUtils.render('yaft_message_content_template',message,message.id);
+				YaftUtils.render('yaft_message_template',message,message.id);
 				$(document).ready(function()
 				{
 					$('a.profile').cluetip({local: true
@@ -411,7 +433,7 @@ var YaftUtils;
 					message['isFirstMessage'] = true;
 				else
 					message['isFirstMessage'] = false;
-				YaftUtils.render('yaft_message_content_template',message,message.id);
+				YaftUtils.render('yaft_message_template',message,message.id);
 				$(document).ready(function()
 				{
 					$('a.profile').cluetip({local: true
@@ -511,10 +533,10 @@ var YaftUtils;
 					else
 						$("#" + message.id + "_read").hide();
 
-					YaftUtils.render('yaft_message_content_template',message,'yaftMessage');
+					YaftUtils.render('yaft_message_template',message,'yaftMessage');
 				}
 				else
-					YaftUtils.render('yaft_message_content_template',message,message.id);
+					YaftUtils.render('yaft_message_template',message,message.id);
 					
 			},
 			error : function(xmlHttpRequest,status,error)
@@ -647,6 +669,78 @@ var YaftUtils;
 		
 		return false;
 	}
+
+	YaftUtils.subscribeToForum = function(forumId)
+	{
+		jQuery.ajax(
+		{
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums/" + forumId + "/subscribe",
+	   		dataType : "text",
+   			async : false,
+			cache: false,
+		   	success : function(text,status)
+			{
+				for(var i=0;i<yaftCurrentForums.items.length;i++)
+				{
+					var forum = yaftCurrentForums.items[i];
+					if(forum.id == forumId)
+					{
+						for(var j=0;j<forum.discussions.length;j++)
+							forum.discussions[j]['unsubscribed'] = false;
+
+						forum['unsubscribed'] = false;
+					}
+				}
+
+				yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
+				yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
+
+				YaftUtils.renderCurrentForums();
+			},
+			error : function(xmlHttpRequest,status,error)
+			{
+				alert("Failed to subscribe to forum. Reason: " + status);
+			}
+		});
+
+		return false;
+	}
+
+	YaftUtils.unsubscribeFromForum = function(forumId)
+	{
+		jQuery.ajax(
+		{
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums/" + forumId + "/unsubscribe",
+	   		dataType : "text",
+   			async : false,
+			cache: false,
+		   	success : function(text,status)
+			{
+				for(var i=0;i<yaftCurrentForums.items.length;i++)
+				{
+					var forum = yaftCurrentForums.items[i];
+					if(forum.id == forumId)
+					{
+						for(var j=0;j<forum.discussions.length;j++)
+							forum.discussions[j]['unsubscribed'] = true;
+
+						forum['unsubscribed'] = true;
+					}
+				}
+
+				yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
+				yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
+				
+				YaftUtils.renderCurrentForums();
+			},
+			error : function(xmlHttpRequest,status,error)
+			{
+				alert("Failed to unsubscribe to forum. Reason: " + status);
+			}
+		});
+
+		return false;
+	}
     
     YaftUtils.getDescendantIds = function(messageId,testMessage,descendantIds)
     {
@@ -721,7 +815,7 @@ var YaftUtils;
 		return false;
 	}
 	
-	YaftUtils.markReadMessagesInFora = function(fora)
+	YaftUtils.markReadMessagesInFora = function()
 	{
 		var readMessages = null;
 			
@@ -743,6 +837,8 @@ var YaftUtils;
 			
 		if(readMessages != null)
 		{
+			var fora = yaftCurrentForums.items;
+
 			for(var i=0;i<fora.length;i++)
 			{
 				var forum = fora[i];
@@ -854,24 +950,18 @@ var YaftUtils;
 	
 	YaftUtils.recursiveFindMessage = function(messages,wantedId)
 	{
-		//alert("findMessage()");
 		for(var i=0;i<messages.length;i++)
         {
 			var message = messages[i];
-			//alert(message.id + "\n" + wantedId);
-			//alert("Content: " + message.content);
             if(message.id == wantedId)
             {
-				//alert("Matched !!!!");
 				message["isFirstMessage"] = false;
                 return message;
            	}
           	else
           	{
-				//alert("Not Matched.");
           		if(message.children.length > 0)
           		{
-          			//alert("Recursing into children ...");
           			var test = YaftUtils.recursiveFindMessage(message.children,wantedId);
           			if(test == null)
           				continue;
@@ -883,12 +973,10 @@ var YaftUtils;
           		}
           		else
           		{
-          			//alert("No children.");
           		}
           	}
         }
         
-        //alert("ID '" + wantedId + "' not found"); 
         return null;
 	}
 	

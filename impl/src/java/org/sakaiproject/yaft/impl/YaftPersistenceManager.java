@@ -490,6 +490,7 @@ public class YaftPersistenceManager
 		Message message = new Message();
 		message.setId(rs.getString(ColumnNames.MESSAGE_ID));
 		message.setSubject(rs.getString(ColumnNames.SUBJECT));
+		message.setParent(rs.getString(ColumnNames.PARENT_MESSAGE_ID));
 		message.setSiteId(rs.getString(ColumnNames.SITE_ID));
 		message.setDiscussionId(rs.getString(ColumnNames.DISCUSSION_ID));
 		message.setContent(rs.getString(ColumnNames.CONTENT));
@@ -1725,5 +1726,141 @@ public class YaftPersistenceManager
 			
 			sakaiProxy.returnConnection(connection);
 		}
+	}
+
+	public void subscribeToForum(String userId, String forumId)
+	{
+		Connection connection = null;
+		Statement statement = null;
+		try
+		{
+			Forum forum = getForum(forumId, ForumPopulatedStates.PART);
+			connection = sakaiProxy.borrowConnection();
+			statement = connection.createStatement();
+			
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			try
+			{
+				List<String> sqls = sqlGenerator.getSubscribeToForumStatements(userId,forum);
+				
+				for(String sql : sqls)
+					statement.executeUpdate(sql);
+				
+				connection.commit();
+			}
+			catch (Exception e)
+			{
+				logger.error("Caught exception whilst subscribing to forum. Rolling back ...", e);
+				connection.rollback();
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst subscribing to forum.", e);
+		}
+		finally
+		{
+			try
+			{
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+	}
+
+	public void unsubscribeFromForum(String userId, String forumId)
+	{
+		Connection connection = null;
+		Statement statement = null;
+		try
+		{
+			Forum forum = getForum(forumId, ForumPopulatedStates.PART);
+			connection = sakaiProxy.borrowConnection();
+			statement = connection.createStatement();
+			
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			try
+			{
+				List<String> sqls = sqlGenerator.getUnsubscribeFromForumStatements(userId,forum);
+				
+				for(String sql : sqls)
+					statement.executeUpdate(sql);
+				
+				connection.commit();
+			}
+			catch (Exception e)
+			{
+				logger.error("Caught exception whilst unsubscribing from forum. Rolling back ...", e);
+				connection.rollback();
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst unsubscribing from forum.", e);
+		}
+		finally
+		{
+			try
+			{
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+	}
+
+	public List<String> getForumUnsubscriptions(String userId)
+	{
+		List<String> forums = new ArrayList<String>();
+		
+		String sql = sqlGenerator.getForumUnsubscriptionsStatement(userId);
+		
+		Connection connection = null;
+		Statement statement = null;
+		ResultSet rs = null;
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			statement = connection.createStatement();
+			rs = statement.executeQuery(sql);
+			
+			while(rs.next())
+				forums.add(rs.getString(ColumnNames.FORUM_ID));
+			
+			rs.close();
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting forum unsubscribers.", e);
+		}
+		finally
+		{
+			try
+			{
+				if(rs != null) rs.close();
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return forums;
 	}
 }

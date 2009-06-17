@@ -4,6 +4,8 @@ var yaftSiteId = null;
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
 var yaftUnsubscriptions = null;
+var yaftForumUnsubscriptions = null;
+var yaftCurrentForums = null;
 
 /* State specific stuff */
 var yaftCurrentForum = null;
@@ -33,6 +35,7 @@ var yaftShowingDeleted = false;
 	yaftCurrentUser = YaftUtils.getCurrentUser(arg.placementId);
 	yaftCurrentUserPermissions = YaftUtils.getUserPermissions(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
+	yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
 	
 	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null)
 	{
@@ -47,6 +50,16 @@ var yaftShowingDeleted = false;
 
 function switchState(state,arg)
 {
+	// If a forum id has been specified we need to refresh the current forum
+	// state. We need to do it here as the breadcrumb in various states uses
+	// the information.
+	if(arg && arg.forumId)
+	{
+		yaftCurrentForum = YaftUtils.getForum(arg.forumId,"part");
+		YaftUtils.setUnreadMessageCountForCurrentForum();
+		YaftUtils.setupCurrentForumUnsubscriptions();
+	}
+
 	if(state == 'forums')
 	{
 		if(yaftCurrentUserPermissions.forumCreate)
@@ -74,27 +87,15 @@ function switchState(state,arg)
 			cache: false,
 	  		success : function(forums,status)
 			{
-				YaftUtils.markReadMessagesInFora(forums.items);
+				yaftCurrentForums = forums;
+
+				YaftUtils.markReadMessagesInFora();
+
+				YaftUtils.setupForumUnsubscriptions();
 				
 				$("#yaft_breadcrumb").html(yaft_forums_label);
 						
-				YaftUtils.render('yaft_forums_content_template',forums,'yaft_content');
-				
-	 			$(document).ready(function()
-	 			{
-	 				setMainFrameHeight(window.frameElement.id);
-	 					
-	 				$("#yaft_forum_table").tablesorter({
-	 						cssHeader:'yaftSortableTableHeader',
-	 						cssAsc:'yaftSortableTableHeaderSortUp',
-	 						cssDesc:'yaftSortableTableHeaderSortDown',
-	 						headers:
-	 							{
-	 								4: {sorter: "isoDate"},
-	 								5: {sorter: false}
-	 							}
-	 					});
-	 			});
+				YaftUtils.renderCurrentForums();
 			},
 			error : function(xmlHttpRequest,textStatus,errorThrown)
 			{
@@ -170,9 +171,10 @@ function switchState(state,arg)
 		
 		if(yaftCurrentDiscussion != null)		
 		{
-	  		yaftCurrentDiscussion.firstMessage["isFirstMessage"] = true;
 			YaftUtils.render('yaft_discussion_breadcrumb_template',yaftCurrentDiscussion,'yaft_breadcrumb');
 			YaftUtils.render('yaft_discussion_content_template',yaftCurrentDiscussion,'yaft_content');
+			YaftUtils.render('yaft_message_template',yaftCurrentDiscussion.firstMessage,yaftCurrentDiscussion.firstMessage.id);
+			renderChildMessages(yaftCurrentDiscussion.firstMessage);
 			
 			if(yaftCurrentUserPermissions.messageDeleteAny)
 			{
@@ -229,14 +231,9 @@ function switchState(state,arg)
 			message = YaftUtils.findMessage(arg.messageId);
 		else
 			message = yaftCurrentDiscussion.firstMessage;
-	  		
-	  	if(message.id == yaftCurrentDiscussion.firstMessage.id)
-	  		message["isFirstMessage"] = true;
-	  	else
-	  		message["isFirstMessage"] = false;
 					
 		YaftUtils.render('yaft_message_view_content_template',yaftCurrentDiscussion,'yaft_content');
-		YaftUtils.render('yaft_message_content_template',message,'yaftMessage');
+		YaftUtils.render('yaft_message_template',message,'yaftMessage');
 		$("#" + message.id + "_cursor").show();
 		$("#yaft_minimal_link").hide();
 		$("#yaft_full_link").show();
@@ -379,6 +376,18 @@ function switchState(state,arg)
 	return false;
 }
 
+function renderChildMessages(parent)
+{
+	var children = parent.children;
+	
+	for(var i=0;i<children.length;i++)
+	{
+		var message = children[i];
+		YaftUtils.render('yaft_message_template',message,message.id);
+		renderChildMessages(message);
+	}
+}
+
 /**
  *	Used when in the minimal view
  */
@@ -386,7 +395,7 @@ function yaftShowMessage(messageId)
 {
 	var message = YaftUtils.findMessage(messageId);
 	YaftUtils.render('yaft_message_view_breadcrumb_template',message,'yaft_breadcrumb');
-	YaftUtils.render('yaft_message_content_template',message,'yaftMessage');
+	YaftUtils.render('yaft_message_template',message,'yaftMessage');
 	// Hide all of the message cursors
 	$(".messageCursor").hide();
 	// Show the cursor for this message

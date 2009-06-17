@@ -98,4 +98,10 @@ public interface YaftForumService extends EntityProducer
 	public Map<String,Integer> getReadMessageCountForAllFora();
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId);
+
+	public void subscribeToForum(String forumId);
+	
+	public void unsubscribeFromForum(String forumId);
+
+	public List<String> getForumUnsubscriptions(String userId);
 }

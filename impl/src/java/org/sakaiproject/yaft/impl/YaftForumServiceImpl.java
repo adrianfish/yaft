@@ -242,6 +242,20 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		persistenceManager.subscribeToDiscussion(userId,discussionId);
 	}
+	
+	public void subscribeToForum(String forumId)
+	{
+		String userId = sakaiProxy.getCurrentUser().getId();
+		
+		persistenceManager.subscribeToForum(userId,forumId);
+	}
+	
+	public void unsubscribeFromForum(String forumId)
+	{
+		String userId = sakaiProxy.getCurrentUser().getId();
+		
+		persistenceManager.unsubscribeFromForum(userId,forumId);
+	}
 
 	public void showMessage(Message message)
 	{
@@ -555,5 +569,13 @@ public class YaftForumServiceImpl implements YaftForumService
 	public Forum getForumForTitle(String title,String state)
 	{
 		return persistenceManager.getForumForTitle(title,state);
+	}
+
+	public List<String> getForumUnsubscriptions(String userId)
+	{
+		if(userId == null)
+			userId = sakaiProxy.getCurrentUser().getId();
+		
+		return persistenceManager.getForumUnsubscriptions(userId);
 	}
 }

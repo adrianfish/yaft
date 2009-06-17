@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.yaft.api.Attachment;
+import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
 
@@ -76,6 +77,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "DISCUSSION_ID CHAR(36) NOT NULL,"
 				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "PRIMARY KEY (DISCUSSION_ID,USER_ID))");
+		
+		statements.add("CREATE TABLE YAFT_FORUM_UNSUBS (" 
+				+ "FORUM_ID CHAR(36) NOT NULL,"
+				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
+				+ "PRIMARY KEY (FORUM_ID,USER_ID))");
 		
 		statements.add("CREATE TABLE YAFT_READ_MESSAGES (" 
 				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
@@ -634,5 +640,36 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public String getSelectForumIdForTitleStatement(String title,String siteId)
 	{
 		return "SELECT FORUM_ID FROM YAFT_FORUM WHERE TITLE = '" + title + "' AND SITE_ID = '" + siteId + "' AND STATUS <> 'DELETED'";
+	}
+	
+	public List<String> getSubscribeToForumStatements(String userId, Forum forum)
+	{
+		List<String> sqls = new ArrayList<String>();
+		List<Discussion> discussions = forum.getDiscussions();
+		
+		for(Discussion discussion : discussions)
+			sqls.add(getSubscribeToDiscussionStatement(userId, discussion.getId()));
+		
+		sqls.add("DELETE FROM YAFT_FORUM_UNSUBS WHERE USER_ID = '" + userId + "' AND FORUM_ID = '" + forum.getId() + "'");
+		
+		return sqls;
+	}
+	
+	public List<String> getUnsubscribeFromForumStatements(String userId, Forum forum)
+	{
+		List<String> sqls = new ArrayList<String>();
+		List<Discussion> discussions = forum.getDiscussions();
+		
+		for(Discussion discussion : discussions)
+			sqls.add(getUnsubscribeFromDiscussionStatement(userId, discussion.getId()));
+		
+		sqls.add("INSERT INTO YAFT_FORUM_UNSUBS (FORUM_ID,USER_ID) VALUES('" + forum.getId() + "','" + userId + "')");
+		
+		return sqls;
+	}
+	
+	public String getForumUnsubscriptionsStatement(String userId)
+	{
+		return "SELECT FORUM_ID FROM YAFT_FORUM_UNSUBS WHERE USER_ID = '" + userId + "'";
 	}
 }

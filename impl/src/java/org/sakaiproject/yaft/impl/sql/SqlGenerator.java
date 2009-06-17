@@ -86,4 +86,10 @@ public interface SqlGenerator
 	String getMarkForumDeletedStatement(String forumId);
 
 	String getSelectForumIdForTitleStatement(String title,String siteId);
+
+	List<String> getSubscribeToForumStatements(String userId, Forum forum);
+
+	List<String> getUnsubscribeFromForumStatements(String userId, Forum forum);
+
+	String getForumUnsubscriptionsStatement(String userId);
 }
