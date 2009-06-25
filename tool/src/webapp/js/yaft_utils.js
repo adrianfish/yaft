@@ -14,16 +14,14 @@ var YaftUtils;
 		$('#yaft_hide_deleted_link').show();
 	}
 
-	YaftUtils.validateDiscussionForm = function()
+	YaftUtils.clearDates = function()
 	{
-		if($('#yaft_subject').val() == '')
-		{
-			var alert = $('#yaft_alert');
-			alert.html(yaft_missing_subject_message);
-			alert.show();
-			return false;
-		}
-		else return true;
+		$('#yaft_start_date').val('');
+		$('#yaft_end_date').val('');
+		$('#yaft_start_hour_selector').get(0).selectedIndex = 0;
+		$('#yaft_start_minute_selector').get(0).selectedIndex = 0;
+		$('#yaft_end_hour_selector').get(0).selectedIndex = 0;
+		$('#yaft_end_minute_selector').get(0).selectedIndex = 0;
 	}
 
 	YaftUtils.hideDeleted = function()
@@ -41,6 +39,8 @@ var YaftUtils;
 			
 		$(document).ready(function()
 		{
+			YaftUtils.applyBanding();
+		
   			$('a.profile').cluetip({
 									local: true
 									,width: '320px'
@@ -62,6 +62,29 @@ var YaftUtils;
 			setMainFrameHeight(window.frameElement.id);
 		});
 	}
+
+	YaftUtils.applyBanding = function()
+	{
+		$("tr:even").attr('class', function(indexArray)
+									{
+										var clz = this.getAttribute('class');
+
+										if(clz == null)
+										{
+											var clzNode = this.attributes['class'];
+											if(clzNode)
+												clz = clzNode.nodeValue;
+										}
+
+										if(clz == null)
+											return 'yaftEvenRow';
+
+										if(clz.indexOf('yaftInvisible') != -1)
+											return clz;
+										else
+											return clz + ' yaftEvenRow';
+									} );
+	}
 	
 	YaftUtils.renderCurrentForums = function()
 	{
@@ -80,6 +103,8 @@ var YaftUtils;
 	 					5: {sorter: false}
 	 				}
 	 		});
+
+			YaftUtils.applyBanding();
 	 	});
 	}
 	
@@ -321,6 +346,32 @@ var YaftUtils;
 		});
 		
 		return false;
+	}
+
+	YaftUtils.findForum = function(id)
+	{
+		var forums = yaftCurrentForums.items;
+
+		for(var i=0;i<forums.length;i++)
+		{
+			if(forums[i].id == id)
+				return forums[i];
+		}
+
+		return null;
+	}
+
+	YaftUtils.findDiscussion = function(id)
+	{
+		var discussions = yaftCurrentForum.discussions;
+
+		for(var i=0;i<discussions.length;i++)
+		{
+			if(discussions[i].id == id)
+				return discussions[i];
+		}
+
+		return null;
 	}
 	
 	YaftUtils.censorMessage = function(messageId)

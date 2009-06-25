@@ -19,6 +19,10 @@ import org.sakaiproject.authz.api.FunctionManager;
 import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.api.SecurityAdvisor;
+import org.sakaiproject.calendar.api.Calendar;
+import org.sakaiproject.calendar.api.CalendarEvent;
+import org.sakaiproject.calendar.api.CalendarEventEdit;
+import org.sakaiproject.calendar.api.CalendarService;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.content.api.ContentHostingService;
@@ -36,6 +40,8 @@ import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.site.api.ToolConfiguration;
+import org.sakaiproject.time.api.TimeRange;
+import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
@@ -72,6 +78,8 @@ public class SakaiProxyImpl implements SakaiProxy
 	private SecurityService securityService;
 	private EntityManager entityManager;
 	private EventTrackingService eventTrackingService;
+	private CalendarService calendarService;
+	private TimeService timeService;
 	
 	public SakaiProxyImpl()
 	{
@@ -90,6 +98,8 @@ public class SakaiProxyImpl implements SakaiProxy
 		securityService = (SecurityService) componentManager.get(SecurityService.class);
 		contentHostingService = (ContentHostingService) componentManager.get(ContentHostingService.class);
 		eventTrackingService = (EventTrackingService) componentManager.get(EventTrackingService.class);
+		timeService = (TimeService) componentManager.get(TimeService.class);
+		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
 	}
 	
@@ -162,6 +172,60 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return profileManager.getUserProfileById(userId);
 	} 
+	
+	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate)
+	{
+		try
+		{
+			Calendar cal = calendarService.getCalendar("/calendar/calendar/" + getCurrentSiteId() + "/main");
+			CalendarEventEdit edit = cal.addEvent();
+			TimeRange range = timeService.newTimeRange(startDate, endDate - startDate);
+			edit.setRange(range);
+			edit.setDescriptionFormatted(description);
+			edit.setDisplayName(title);
+			edit.setType(type);
+			cal.commitEvent(edit);
+		
+			return true;
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to add calendar entry. Returning false ...",e);
+			return false;
+		}
+	}
+	
+	public boolean removeCalendarEntry(String title,String description)
+	{
+		try
+		{
+			Calendar cal = calendarService.getCalendar("/calendar/calendar/" + getCurrentSiteId() + "/main");
+			List<CalendarEvent> events = cal.getEvents(null,null);
+			for(CalendarEvent event : events)
+			{
+				if(event.getDisplayName().equals(title) && event.getDescription().equals(description))
+				{
+					CalendarEventEdit edit = cal.getEditEvent(event.getId(), CalendarService.SECURE_REMOVE);
+					cal.removeEvent(edit);
+					return true;
+				}
+			}
+			
+			return true;
+		
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to add calendar entry. Returning false ...",e);
+			return false;
+		}
+	}
+	
+	public String getServerUrl()
+	{
+		return serverConfigurationService.getServerUrl();
+	}
+	
 	public List<YaftPermissions> getPermissions(String siteId)
 	{
 		try
@@ -192,6 +256,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
 				permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
 				permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
+				permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
 				
 				list.add(permissions);
 			}
@@ -233,6 +298,7 @@ public class SakaiProxyImpl implements SakaiProxy
 			permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
 			permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
 			permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
+			permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
 				
 			return permissions;
 				
@@ -319,6 +385,10 @@ public class SakaiProxyImpl implements SakaiProxy
 			else
 				role.disallowFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
 			
+			if(permissions.isViewInvisible())
+				role.allowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
+			else
+				role.disallowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 		}
 		
 		authzGroupService.save(realm);

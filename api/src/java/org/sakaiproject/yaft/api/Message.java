@@ -136,6 +136,9 @@ public class Message implements Entity
 
 	public String getDiscussionId()
 	{
+		if("".equals(parent))
+			return id;
+		
 		return discussionId;
 	}
 

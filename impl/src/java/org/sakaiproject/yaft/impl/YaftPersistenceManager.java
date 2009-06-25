@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +224,7 @@ public class YaftPersistenceManager
 		this.sakaiProxy = sakaiProxy;
 	}
 
-	public void addOrUpdateForum(Forum forum)
+	public boolean addOrUpdateForum(Forum forum)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateForum()");
 		
@@ -235,12 +236,15 @@ public class YaftPersistenceManager
 			connection = sakaiProxy.borrowConnection();
 
 			statement = sqlGenerator.getAddOrUpdateForumStatement(forum,connection);
-			statement.executeUpdate();
+			int rowCount = statement.executeUpdate();
 			connection.commit();
+			
+			return rowCount == 1;
 		}
 		catch (Exception e)
 		{
 			logger.error("Caught exception whilst adding or updating forum", e);
+			return false;
 		}
 		finally
 		{
@@ -438,8 +442,33 @@ public class YaftPersistenceManager
 		discussion.setFirstMessage(firstMessage);
 		discussion.setForumId(rs.getString(ColumnNames.FORUM_ID));
 		discussion.setStatus(rs.getString("STATUS"));
+		
+		Timestamp startStamp = rs.getTimestamp("START");
+		if(startStamp != null)
+			discussion.setStart(startStamp.getTime());
+		
+		Timestamp endStamp = rs.getTimestamp("END");
+		if(endStamp != null)
+			discussion.setEnd(endStamp.getTime());
+		
 		discussion.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 		discussion.setLastMessageDate(rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE).getTime());
+		
+		long start = discussion.getStart();
+		long end = discussion.getEnd();
+
+		if(start == -1 || end == -1)
+			discussion.setVisible(true);
+		else
+		{
+			long currentDate = new Date().getTime();
+
+			if(start <= currentDate && currentDate <= end)
+				discussion.setVisible(true);
+			else
+				discussion.setVisible(false);
+		}
+		
 		return discussion;
 	}
 	
@@ -458,7 +487,10 @@ public class YaftPersistenceManager
 			ResultSet rs = st.executeQuery(sql);
 			
 			if(rs.next())
+			{
 				discussion = getDiscussionFromResults(rs,fully, connection);
+				
+			}
 			else
 				logger.error("No discussion with id: " + discussionId);
 			
@@ -550,9 +582,33 @@ public class YaftPersistenceManager
 			forum.setLastMessageDate(ts.getTime());
 		else
 			forum.setLastMessageDate(-1);
+		
+		Timestamp startStamp = rs.getTimestamp("START");
+		if(startStamp != null)
+			forum.setStart(startStamp.getTime());
+		
+		Timestamp endStamp = rs.getTimestamp("END");
+		if(endStamp != null)
+			forum.setEnd(endStamp.getTime());
+		
 		forum.setDiscussionCount(rs.getInt(ColumnNames.DISCUSSION_COUNT));
 		forum.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 		forum.setStatus(rs.getString("STATUS"));
+		
+		long start = forum.getStart();
+		long end = forum.getEnd();
+
+		if(start == -1 || end == -1)
+			forum.setVisible(true);
+		else
+		{
+			long currentDate = new Date().getTime();
+
+			if(start <= currentDate && currentDate <= end)
+				forum.setVisible(true);
+			else
+				forum.setVisible(false);
+		}
 		return forum;
 	}
 
@@ -1862,5 +1918,43 @@ public class YaftPersistenceManager
 		}
 		
 		return forums;
+	}
+
+	public void addDiscussion(String forumId, Discussion discussion)
+	{
+		addOrUpdateMessage(forumId, discussion.getFirstMessage());
+		
+		PreparedStatement statement = null;
+		Connection connection = null;
+		
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			statement = sqlGenerator.getSetDiscussionDatesStatement(discussion,connection);
+			statement.executeUpdate();
+			
+			long start = discussion.getStart();
+			long end = discussion.getEnd();
+			
+			if(start > 0L && end > 0L)
+			{
+				String url = sakaiProxy.getServerUrl() + discussion.getUrl();
+				sakaiProxy.addCalendarEntry(discussion.getSubject(),"<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">" + discussion.getSubject() + " (Click to launch discussion)</a>","Activity",start,end);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting forum unsubscribers.", e);
+		}
+		finally
+		{
+			try
+			{
+				if(statement != null) statement.close();
+			}
+			catch (SQLException e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
 	}
 }

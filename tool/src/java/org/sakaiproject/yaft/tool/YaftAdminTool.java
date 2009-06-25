@@ -118,15 +118,17 @@ public class YaftAdminTool extends HttpServlet
 							
 							while(discussionRS.next())
 							{
-								org.sakaiproject.yaft.api.Message yaftDiscussion
+								org.sakaiproject.yaft.api.Message firstMessage
 									= new org.sakaiproject.yaft.api.Message();
-								yaftDiscussion.setSubject(discussionRS.getString("TITLE"));
-								yaftDiscussion.setContent(discussionRS.getString("BODY"));
+								firstMessage.setSubject(discussionRS.getString("TITLE"));
+								firstMessage.setContent(discussionRS.getString("BODY"));
 								//yaftDiscussion.setPlacementId(tc.getId());
-								yaftDiscussion.setCreatorId(discussionRS.getString("CREATED_BY"));
-								yaftDiscussion.setCreatedDate(discussionRS.getTimestamp("CREATED").getTime());
-								yaftForumService.addDiscussion(yaftForum.getId(), yaftDiscussion,false);
-								addChildMessages(conn,yaftForum.getId(),yaftDiscussion.getId(),tc.getId(),yaftDiscussion.getId(),discussionRS.getInt("ID"));
+								firstMessage.setCreatorId(discussionRS.getString("CREATED_BY"));
+								firstMessage.setCreatedDate(discussionRS.getTimestamp("CREATED").getTime());
+								org.sakaiproject.yaft.api.Discussion discussion = new org.sakaiproject.yaft.api.Discussion();
+								discussion.setFirstMessage(firstMessage);
+								yaftForumService.addDiscussion(yaftForum.getId(), discussion,false);
+								addChildMessages(conn,yaftForum.getId(),firstMessage.getId(),tc.getId(),firstMessage.getId(),discussionRS.getInt("ID"));
 							}
 						}
 						

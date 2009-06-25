@@ -16,6 +16,7 @@
 <script type="text/javascript" language="JavaScript" src="lib/jquery.MultiFile.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.localisation.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="lib/jquery-ui-1.7.1.custom.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.scrollTo-1.4.0-min.js"></script>
 <script type="text/javascript" language="JavaScript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" language="JavaScript" src="js/yaft_utils.js"></script>
@@ -24,6 +25,7 @@
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
 <link rel="stylesheet" type="text/css" href="/library/skin/default/tool.css" />
 <link rel="stylesheet" type="text/css" href="css/yaft.css" />
+<link rel="stylesheet" type="text/css" href="css/smoothness/jquery-ui-1.7.1.custom.css" />
 <script type="text/javascript" language="JavaScript">
 var arg = YaftUtils.getParameters();
 if(arg['language'])
@@ -39,6 +41,8 @@ else
 <br />
 <div id="yaft_container">
 	<div id="yaft_breadcrumb"></div>
+	<br />
+	<div id="yaft_message">sdsdsdsd</div>
 	<br />
 	<div id="yaft_content"></div>
 </div>
@@ -76,15 +80,19 @@ ${yaft_forums_label}
 	</thead>
 	<tbody>
 	{for forum in items}
-   	<tr class="yaftForumRow">
+	{if forum.visible || yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id}
+   	<tr class="yaftForumRow {if !forum.visible} yaftInvisible{/if}">
 		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
 		<br/>
 		<span class="yaftForumDescription">${forum.description}</span></td>
 		<td align="center">${forum.discussionCount}</td>
 		<td align="center">${forum.messageCount}</td>
 		<td align="center">${forum.unread}</td>
-		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toUTCString()}{/if}</td>
+		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toLocaleString()}{/if}</td>
 		<td align="center">
+		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
+			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
+		{/if}
 		{if forum.unsubscribed}
 		<a href="#" onClick="return YaftUtils.subscribeToForum('${forum.id}');" title="${yaft_subscribe_to_forum_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
 		{else}
@@ -95,6 +103,7 @@ ${yaft_forums_label}
 		{/if}
 		</td>
 	</tr>
+	{/if}
 	{/for}
 	</tbody>
 </table>
@@ -121,19 +130,23 @@ ${yaft_forums_label}
 	</thead>
 	<tbody>
 	{for discussion in discussions}
+	{if discussion.visible || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
 	<div id="${discussion.creatorId}_profile" class="yaft_profile_popup">
 		<img class="yaft_profile_popup_img" src="/portal/tool/${yaftPlacementId}/data/users/${discussion.creatorId}/picture" width="100px"/>
 		<div class="yaft_profile_popup_name">${discussion.creatorDisplayName}</div>
 		<br/>
 		<p class="yaft_profile_popup_bio">${discussion.firstMessage.creatorBio}</p>
 	</div>
-	<tr>
+	<tr{if !discussion.visible} class="yaftInvisible"{/if}>
 		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a></td>
 		<td><a href="#${discussion.creatorId}_profile" class="profile" rel="#${discussion.creatorId}_profile">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
 		<td>${discussion.unread}</td>
-		<td>${new Date(discussion.lastMessageDate).toUTCString()}</td>
+		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
 		<td align="center">
+		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
+			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
+		{/if}
 		{if (yaftCurrentUserPermissions.forumCreate && yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id) || (yaftCurrentUserPermissions.discussionDeleteAny && yaftCurrentUserPermissions.forumCreate)}
 		<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>
 		{/if}
@@ -147,6 +160,7 @@ ${yaft_forums_label}
 		{/if}
 		</td>
 	</tr>
+	{/if}
 	{/for}
 	</tbody>
 </table>
@@ -200,7 +214,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_start_discussion_breadcrumb_template" style="display:none;"><!--
-<a href="#" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;Start Discussion
+<a href="#" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;${yaft_add_discussion_label}
 -->
 </div>
 
@@ -211,20 +225,96 @@ ${yaft_forums_label}
 			method="POST"
 			enctype="multipart/form-data"
 			onsubmit="return YaftUtils.validateDiscussionForm();">
-		<div id="yaft_alert" class="yaftAlert"></div>
+		<input type="hidden" name="id" value="${id}"/>
 		<fieldset id="yaft_reply_fieldset">
 		<legend>Type your message</legend>
 		<br />
-		<span>Subject:</span>
+		<span>Subject: *</span>
 		<br />
-		<input id="yaft_subject" name="subject" type="text" size="48"/>
+		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${subject}"/>
 		<br />
 		<br />
 		<span>Message</span>
 		<br />
-		<textarea name="content" id="fck" cols="100" rows="5"></textarea>
+		<textarea name="content" id="fck" cols="100" rows="5">${firstMessage.content}</textarea>
 		<br />
 		</fieldset>
+		<br />
+		<table cols="2">
+		<tr>
+			<td style="padding-right: 10px;">Start: </td><td><input id="yaft_start_date" type="text" name="startDate"/>
+		<select style="background-color: grey;" id="yaft_start_hour_selector" name="startHour" disabled>
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select style="background-color: grey;" id="yaft_start_minute_selector" name="startMinute" disabled>
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+			</td>
+		</tr>
+		<tr>
+		<td style="padding-right: 10px;">End: </td><td><input style="background-color: grey;"  id="yaft_end_date" type="text" name="endDate" disabled/>
+	<select style="background-color: grey;" id="yaft_end_hour_selector" name="endHour" disabled>
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select style="background-color: grey;" id="yaft_end_minute_selector" name="endMinute" disabled>
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+			</td>
+		</tr>
+		</table>
+<br />
+<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+<br />
 		<br />
 	
 		<span>Add Attachments:</span>
@@ -251,7 +341,7 @@ ${yaft_forums_label}
 <form action="/portal/tool/${yaftPlacementId}" method="POST">
 <input type="hidden" name="function" value="savePermissions"/>
 <input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
-<table>
+<table id="yaft_permissions_table">
 	<thead>
 		<tr>
 			<th></th>
@@ -261,6 +351,8 @@ ${yaft_forums_label}
 			<th colspan="3">${yaft_discussion_label}</th>
 			<th width="5px"></th>
 			<th colspan="3">${yaft_message_label}</th>
+			<th width="5px"></th>
+			<th colspan="2">Other</th>
 		</tr>
 		<tr class="listHier">
 			<th align="left">Role</th>
@@ -276,6 +368,8 @@ ${yaft_forums_label}
 			<th style="text-align:center;">create</th>
 			<th style="text-align:center;">delete.own</th>
 			<th style="text-align:center;">delete.any</th>
+			<th style="background: white;"></th>
+			<th style="text-align:center;">view.invisible</th>
 		</tr>
 	</thead>
 <tbody>
@@ -294,6 +388,8 @@ ${yaft_forums_label}
 	<td align="center"><input type="checkbox" {if p.messageCreate}checked="checked"{/if}" name="${p.role}:MessageCreate"/></td>
 	<td align="center"><input type="checkbox" {if p.messageDeleteOwn}checked="checked"{/if}" name="${p.role}:MessageDeleteOwn"/></td>
 	<td align="center"><input type="checkbox" {if p.messageDeleteAny}checked="checked"{/if}" name="${p.role}:MessageDeleteAny"/></td>
+	<td></td>
+	<td align="center"><input type="checkbox" {if p.viewInvisible}checked="checked"{/if}" name="${p.role}:ViewInvisible"/></td>
 </tr>
 {/for}
 </tbody>
@@ -402,6 +498,11 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_discussion_content_template" style="display:none"><!--
+	{if !visible && !yaftCurrentUserPermissions.viewInvisible}
+	<h3>This discussion is not available at this time</h3>
+	{elseif 'DELETED' == status}
+	<h3>This discussion has been deleted</h3>
+	{else}
 	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
 	<br />
 	<br />
@@ -427,6 +528,7 @@ ${yaft_forums_label}
 	<br />
 	
 	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
+	{/if}
 -->
 </div>
 
@@ -436,11 +538,84 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_edit_forum_content_template" style="display:none;"><!--
-<form action="/portal/tool/${yaftPlacementId}" method="POST">
+<form id="yaft_edit_forum_form" action="/portal/tool/${yaftPlacementId}" method="POST">
+<input type="hidden" name="id" value="${id}"/>
 <table>
-<tr><td id="yaft_forum_title_label">[yaft_forum_title_label]</td><td><input type="text" name="title"/></td></tr>
-<tr><td id="yaft_description_label">[yaft_description_label]</td><td><input type="text" name="description"/></td></tr>
+<tr><td>${yaft_forum_title_label}: *</td><td><input id="yaft_title_field" type="text" name="title" value="${title}"/></td></tr>
+<tr><td>${yaft_description_label}</td><td><input type="text" name="description" value="${description}"/></td></tr>
+<tr>
+	<td style="padding-right: 10px;">Start: </td><td><input id="yaft_start_date" type="text" name="startDate"/>
+	<select style="background-color: grey;" id="yaft_start_hour_selector" name="startHour" disabled>
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select style="background-color: grey;" id="yaft_start_minute_selector" name="startMinute" disabled>
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+	</td>
+</tr>
+<tr>
+	<td style="padding-right: 10px;">End: </td><td><input style="background-color: grey;"  id="yaft_end_date" type="text" name="endDate" disabled/>
+	<select style="background-color: grey;" id="yaft_end_hour_selector" name="endHour" disabled>
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select style="background-color: grey;" id="yaft_end_minute_selector" name="endMinute" disabled>
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+	</td>
+</tr>
 </table>
+<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+<br />
 <br />
 <input type="submit" value="${yaft_save_label}"/>
 <input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
@@ -456,6 +631,11 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_message_view_content_template" style="display:none"><!--
+	{if !visible && !yaftCurrentUserPermissions.viewInvisible}
+	<h3>This discussion is not available at this time</h3>
+	{elseif 'DELETED' == status}
+	<h3>This discussion has been deleted</h3>
+	{else}
 	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
     <br />
     <br />
@@ -486,6 +666,7 @@ ${yaft_forums_label}
 	{/macro}
 	
 	${displayMinimum(firstMessage,0)}
+	{/if}
 -->
 </div>
 

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
 
@@ -92,4 +93,6 @@ public interface SqlGenerator
 	List<String> getUnsubscribeFromForumStatements(String userId, Forum forum);
 
 	String getForumUnsubscriptionsStatement(String userId);
+
+	PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception;
 }

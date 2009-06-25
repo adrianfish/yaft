@@ -2,8 +2,18 @@
 	padding-left: 25px;
 }
 
+.yaftEvenRow{
+	background-color: #FFFFC0;
+}
+
 #yaft_toolbar_items{
 	float: left;
+}
+
+#yaft_message{
+	color: red;
+	font-weight: bold;
+	display: none;
 }
 
 #yaft_search_bar{
@@ -14,8 +24,8 @@
 	margin: 5px;
 }
 
-#yaft_forum_table tr:hover { background: #ffffc0; }
-#yaft_discussion_table tr:hover { background: #ffffc0; }
+/*#yaft_forum_table tr:hover { background: #ffffc0; }
+#yaft_discussion_table tr:hover { background: #ffffc0; }*/
 
 .yaft_profile_popup{
 	display: none;
@@ -75,6 +85,10 @@ th.yaftSortableTableHeaderSortDown {
 	font-style: italic;
 	font-size: 8pt;
 	color: #666;
+}
+
+.yaftInvisible{
+	background-color: orange !important;
 }
 
 .yaftAlert{

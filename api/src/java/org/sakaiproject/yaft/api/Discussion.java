@@ -25,10 +25,15 @@ public class Discussion
 	
 	private String status = "READY";
 	
+	private boolean visible = true;
+	
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	
 	// We need this to build direct urls in the rendered pages. Bogus, but necessary.
 	private String pageId;
+	
+	private long start = -1L;
+	private long end = -1L;
 	
 	public void setFirstMessage(Message firstMessage)
 	{
@@ -161,5 +166,35 @@ public class Discussion
 	public String getStatus()
 	{
 		return status;
+	}
+
+	public void setStart(long start)
+	{
+		this.start = start;
+	}
+
+	public long getStart()
+	{
+		return start;
+	}
+
+	public void setEnd(long end)
+	{
+		this.end = end;
+	}
+
+	public long getEnd()
+	{
+		return end;
+	}
+
+	public void setVisible(boolean visible)
+	{
+		this.visible = visible;
+	}
+
+	public boolean isVisible()
+	{
+		return visible;
 	}
 }

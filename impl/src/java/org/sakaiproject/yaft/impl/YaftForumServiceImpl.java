@@ -1,6 +1,7 @@
 package org.sakaiproject.yaft.impl;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +54,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_OWN);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_READ);
+		sakaiProxy.registerFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 		
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
@@ -66,9 +68,7 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		if(logger.isDebugEnabled()) logger.debug("getForum()");
 		
-		Forum forum = persistenceManager.getForum(forumId,state);
-		
-		return forum;
+		return persistenceManager.getForum(forumId,state);
 	}
 	
 	public Discussion getDiscussion(String discussionId,boolean fully)
@@ -81,18 +81,28 @@ public class YaftForumServiceImpl implements YaftForumService
 	public List<Forum> getSiteForums(String siteId,boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getSiteForums()");
-		List<Forum> fora = persistenceManager.getFora(siteId,fully);
-		return fora;
+		return persistenceManager.getFora(siteId,fully);
 	}
 	
-	public void addOrUpdateForum(Forum forum)
+	public boolean addOrUpdateForum(Forum forum)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateForum()");
 		
-		persistenceManager.addOrUpdateForum(forum);
+		// Every forum needs a title
+		if(forum.getTitle() == null || forum.getTitle().length() <= 0)
+			return false;
 		
-		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forum.getId();
-		sakaiProxy.postEvent(YAFT_FORUM_CREATED,reference,true);
+		boolean creating = (forum.getId().length() == 0);
+		
+		boolean succeeded = persistenceManager.addOrUpdateForum(forum);
+		
+		if(succeeded && creating)
+		{
+			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forum.getId();
+			sakaiProxy.postEvent(YAFT_FORUM_CREATED,reference,true);
+		}
+		
+		return succeeded;
 	}
 	
 	public SakaiProxy getSakaiProxy()
@@ -126,19 +136,24 @@ public class YaftForumServiceImpl implements YaftForumService
 		}
 	}
 	
-	public Discussion addDiscussion(String forumId,Message message,boolean sendMail)
+	public Discussion addDiscussion(String forumId,Discussion discussion,boolean sendMail)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addDiscussion()");
 		
-		persistenceManager.addOrUpdateMessage(forumId,message);
-		//persistenceManager.markMessageRead(message.getId(), forumId, message.getId());
+		Message message = discussion.getFirstMessage();
 		
-		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + message.getId();
-		sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED,reference,true);
+		persistenceManager.addDiscussion(forumId,discussion);
 		
-		String discussionId = message.getId();
+		if(discussion.getId().length() == 0)
+		{
+			// From the empty id we know this is a new discussion
+			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + message.getId();
+			sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED,reference,true);
+		}
 		
-		Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
+		String discussionId = discussion.getId();
+		
+		//discussion = persistenceManager.getDiscussion(discussionId,false);
 		
 		if(sendMail)
 		{
@@ -192,8 +207,12 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public boolean deleteDiscussion(String discussionId)
 	{
+		Discussion discussion = getDiscussion(discussionId,false);
+		
 		if(persistenceManager.deleteDiscussion(discussionId))
 		{
+			sakaiProxy.removeCalendarEntry(discussion.getSubject(), discussion.getSubject() + " (Click to launch discussion)");
+			
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
 			sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
 			return true;

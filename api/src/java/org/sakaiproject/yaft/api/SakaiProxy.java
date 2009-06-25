@@ -37,6 +37,10 @@ public interface SakaiProxy
 	public Profile getProfile(String userId);
 
 	public void registerFunction(String yaftForumCreate);
+	
+	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate);
+	
+	public boolean removeCalendarEntry(String title,String description);
 
 	public List<YaftPermissions> getPermissions(String siteId);
 
@@ -49,6 +53,8 @@ public interface SakaiProxy
 	public User getCurrentUser();
 
 	public String getPortalUrl();
+	
+	public String getServerUrl();
 
 	public String getCurrentPageId();
 

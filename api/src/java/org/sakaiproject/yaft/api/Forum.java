@@ -21,11 +21,14 @@ public class Forum
 	private int discussionCount = 0;
 	private int messageCount = 0;
 	private long lastMessageDate;
+	private long start = -1L;
+	private long end = -1L;
 	private String siteId = "";
 	private String status = "READY";
 	private String creatorId = "";
 	private List<Discussion> discussions= new ArrayList<Discussion>();
 	private String url = "";
+	private boolean visible = true;
 	
 	public Forum()
 	{
@@ -192,5 +195,35 @@ public class Forum
 	public String getStatus()
 	{
 		return status;
+	}
+
+	public void setStart(long start)
+	{
+		this.start = start;
+	}
+
+	public long getStart()
+	{
+		return start;
+	}
+
+	public void setEnd(long end)
+	{
+		this.end = end;
+	}
+
+	public long getEnd()
+	{
+		return end;
+	}
+
+	public void setVisible(boolean visible)
+	{
+		this.visible = visible;
+	}
+
+	public boolean isVisible()
+	{
+		return visible;
 	}
 }

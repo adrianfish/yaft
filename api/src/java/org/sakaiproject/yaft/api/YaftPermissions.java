@@ -14,6 +14,7 @@ public class YaftPermissions
 	private boolean messageUnDelete = false;
 	private boolean messageDeleteAny = false;
 	private boolean canModifyPermissions = false;
+	private boolean viewInvisible = false;
 	private String role = "";
 	
 	public void setRole(String role)
@@ -134,5 +135,15 @@ public class YaftPermissions
 	public boolean isMessageDeleteAny()
 	{
 		return messageDeleteAny;
+	}
+
+	public void setViewInvisible(boolean viewInvisible)
+	{
+		this.viewInvisible = viewInvisible;
+	}
+
+	public boolean isViewInvisible()
+	{
+		return viewInvisible;
 	}
 }

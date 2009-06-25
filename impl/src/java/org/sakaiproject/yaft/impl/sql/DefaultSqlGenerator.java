@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +43,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "DISCUSSION_COUNT INT NOT NULL,"
 				+ "MESSAGE_COUNT INT NOT NULL,"
 				+ "LAST_MESSAGE_DATE " + TIMESTAMP + ","
+				+ "START " + TIMESTAMP + ","
+				+ "END " + TIMESTAMP + ","
 				+ "STATUS " + VARCHAR + "(36) NOT NULL,"
 				+ "PRIMARY KEY (FORUM_ID))");
 		
@@ -54,6 +58,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "LAST_MESSAGE_DATE " + TIMESTAMP + " NOT NULL,"
 				+ "MESSAGE_COUNT INT NOT NULL,"
 				+ "STATUS " + VARCHAR + "(36) NOT NULL,"
+				+ "START " + TIMESTAMP + ","
+				+ "END " + TIMESTAMP + ","
 				+ "PRIMARY KEY (DISCUSSION_ID))");
 		
 		statements.add("CREATE TABLE YAFT_MESSAGE (" 
@@ -127,33 +133,60 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 	public PreparedStatement getAddOrUpdateForumStatement(Forum forum,Connection connection) throws SQLException
 	{
-		String testSql = "SELECT * FROM YAFT_FORUM WHERE FORUM_ID = '" + forum.getId() + "'";
-		Statement statement = connection.createStatement();
-		if(statement.executeQuery(testSql).next())
+		if(forum.getId().length() > 0)
 		{
-			String updateSql = "UPDATE YAFT_FORUM SET " 
-								+ ColumnNames.TITLE + " = ?,"
-								+ ColumnNames.DESCRIPTION + " = ?";
+			String updateSql = "UPDATE YAFT_FORUM SET TITLE = ?, DESCRIPTION = ?";
+			
+			long start = forum.getStart();
+			long end = forum.getEnd();
+			
+			//if(start > -1 && end > -1)
+				updateSql += ",START = ?,END = ?";
+			
+			updateSql += " WHERE FORUM_ID = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(updateSql);
 			ps.setString(1,forum.getTitle());
 			ps.setString(2,forum.getDescription());
 			
-			statement.close();
+			//if(start > -1 && end > -1)
+			//{
+				if(start > -1 && end > -1)
+				{
+				ps.setTimestamp(3, new Timestamp(start));
+				ps.setTimestamp(4, new Timestamp(end));
+				ps.setString(5, forum.getId());
+				}
+				else
+				{
+				ps.setNull(3, Types.NULL);
+				ps.setNull(4, Types.NULL);
+				ps.setString(5, forum.getId());
+				}
+			//}
+			//else
+				//ps.setString(3, forum.getId());
 			
 			return ps;
 		}
 		else
 		{
-			String insertSql = "INSERT INTO YAFT_FORUM (" 
-								+ ColumnNames.FORUM_ID + ","
-								+ ColumnNames.SITE_ID + ","
-								+ ColumnNames.CREATOR_ID + ","
-								+ ColumnNames.TITLE + ","
-								+ ColumnNames.DESCRIPTION + ","
-								+ "STATUS,"
-								+ ColumnNames.MESSAGE_COUNT + ","
-								+ ColumnNames.DISCUSSION_COUNT + ") VALUES(?,?,?,?,?,?,0,0)";
+			forum.setId(UUID.randomUUID().toString());
+			
+			String insertSql = "INSERT INTO YAFT_FORUM (FORUM_ID,SITE_ID,CREATOR_ID,TITLE,DESCRIPTION,";
+			
+			long start = forum.getStart();
+			long end = forum.getEnd();
+			
+			if(start > -1 && end > -1)
+				insertSql += "START,END,";
+			
+			insertSql += "STATUS,MESSAGE_COUNT,DISCUSSION_COUNT) VALUES(?,?,?,?,?,";
+			
+			if(start > -1 && end > -1)
+				insertSql += "?,?,";
+			
+			insertSql += "?,0,0)";
 			
 			PreparedStatement ps = connection.prepareStatement(insertSql);
 			ps.setString(1,forum.getId());
@@ -161,9 +194,15 @@ public class DefaultSqlGenerator implements SqlGenerator
 			ps.setString(3,forum.getCreatorId());
 			ps.setString(4,forum.getTitle());
 			ps.setString(5,forum.getDescription());
-			ps.setString(6,forum.getStatus());
 			
-			statement.close();
+			if(start > -1 && end > -1)
+			{
+				ps.setTimestamp(6, new Timestamp(start));
+				ps.setTimestamp(7, new Timestamp(end));
+				ps.setString(8, forum.getStatus());
+			}
+			else
+				ps.setString(6,forum.getStatus());
 			
 			return ps;
 		}
@@ -206,15 +245,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
 		
-		String testSql = "SELECT * FROM YAFT_MESSAGE WHERE MESSAGE_ID = '" + message.getId() + "'";
-		Statement testStatement = connection.createStatement();
-		ResultSet testRS = testStatement.executeQuery(testSql);
-		if(testRS.next())
+		if(message.getId().length() > 0)
 		{
 			// This is an existing message
-			
-			testRS.close();
-			testStatement.close();
 				
 			// This is an existing message
 			String updateSql = "UPDATE YAFT_MESSAGE SET " 
@@ -231,8 +264,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		{
 			// This is a new message
 			
-			testRS.close();
-			testStatement.close();
+			message.setId(UUID.randomUUID().toString());
 			
 			String insertSql = "INSERT INTO YAFT_MESSAGE (" 
 								+ "MESSAGE_ID,";
@@ -314,6 +346,22 @@ public class DefaultSqlGenerator implements SqlGenerator
 				statements.add(forumDiscussionCountPS);
 				
 				statements.add(getIncrementForumMessageCountStatement(forumId,message,connection));
+				
+				Statement testST = null;
+				
+				try
+				{
+					testST = connection.createStatement();
+					ResultSet rs = testST.executeQuery("SELECT USER_ID FROM YAFT_FORUM_UNSUBS WHERE FORUM_ID = '" + forumId + "'");
+					while(rs.next())
+						statements.add(connection.prepareStatement(getUnsubscribeFromDiscussionStatement(rs.getString("USER_ID"), message.getId())));
+				
+					rs.close();
+				}
+				finally
+				{
+					if(testST != null) testST.close();
+				}
 			}
 			
 			statements.add(insertMessagePS);
@@ -671,5 +719,27 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public String getForumUnsubscriptionsStatement(String userId)
 	{
 		return "SELECT FORUM_ID FROM YAFT_FORUM_UNSUBS WHERE USER_ID = '" + userId + "'";
+	}
+	
+	public PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception
+	{
+		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START = ?,END = ? WHERE DISCUSSION_ID = ?");
+		long start = discussion.getStart();
+		long end = discussion.getEnd();
+		
+		if(start > -1L && end > start)
+		{
+			st.setTimestamp(1,new Timestamp(discussion.getStart()));
+			st.setTimestamp(2,new Timestamp(discussion.getEnd()));
+		}
+		else
+		{
+			st.setNull(1,Types.NULL);
+			st.setNull(2,Types.NULL);
+		}
+		
+		st.setString(3,discussion.getId());
+		
+		return st;
 	}
 }

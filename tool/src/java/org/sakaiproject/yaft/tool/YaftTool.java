@@ -2,7 +2,11 @@ package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -770,24 +774,116 @@ public class YaftTool extends HttpServlet
 
 		if (function.equals("createForum"))
 		{
+			String id = request.getParameter("id");
 			String title = request.getParameter("title");
 			String description = request.getParameter("description");
-
+			String startDateString = request.getParameter("startDate");
+			String endDateString = request.getParameter("endDate");
+			String startHourString = request.getParameter("startHour");
+			String startMinuteString = request.getParameter("startMinute");
+			String endHourString = request.getParameter("endHour");
+			String endMinuteString = request.getParameter("endMinute");
+			
 			if (logger.isDebugEnabled())
 			{
 				logger.debug("Title: " + title);
 				logger.debug("Description: " + description);
 			}
-
+			
+			if(title == null || title.length() <= 0)
+			{
+				logger.error("Title must be supplied. Returning BAD REQUEST ...");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().close();
+				return;
+			}
+			
 			Forum forum = new Forum();
+			
+			if(id != null)
+				forum.setId(id);
+			
 			forum.setTitle(title);
 			forum.setDescription(description);
 			forum.setSiteId(sakaiProxy.getCurrentSiteId());
 			forum.setCreatorId(sakaiProxy.getCurrentUser().getId());
+			
+			if(startDateString != null && startDateString.length() > 0
+					&& startHourString != null && startHourString.length() > 0
+					&& startMinuteString != null && startMinuteString.length() > 0
+					&& endDateString != null && endDateString.length() > 0
+					&& endHourString != null && endHourString.length() > 0
+					&& endMinuteString != null && endMinuteString.length() > 0)
+			{
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yyyy");
+				
+			Date startDate = null;
+			Date endDate = null;
+				
+			try
+			{
+				startDate = dateFormat.parse(startDateString);
+				endDate = dateFormat.parse(endDateString);
+			}
+			catch(ParseException pe)
+			{
+					logger.error("The start and end dates MUST be in dd MM yyyy format. Returning BAD REQUEST ...");
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					response.getWriter().close();
+					return;
+			}
+			
+			int startHours,startMinutes,endHours,endMinutes;
+			
+			try
+			{
+				startHours = Integer.parseInt(startHourString);
+				startMinutes = Integer.parseInt(startMinuteString);
+				endHours = Integer.parseInt(endHourString);
+				endMinutes = Integer.parseInt(endMinuteString);
+			}
+			catch(NumberFormatException nfe)
+			{
+				logger.error("The hours and minutes MUST be integers. Returning BAD REQUEST ...");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().close();
+				return;
+			}
+			
+			Calendar startCal = Calendar.getInstance();
+			startCal.setTime(startDate);
+			
+			startCal.set(Calendar.HOUR_OF_DAY, startHours);
+			startCal.set(Calendar.MINUTE, startMinutes);
+			
+			Calendar endCal = Calendar.getInstance();
+			endCal.setTime(endDate);
+			
+			endCal.set(Calendar.HOUR_OF_DAY, endHours);
+			endCal.set(Calendar.MINUTE, endMinutes);
 
-			yaftForumService.addOrUpdateForum(forum);
 
-			response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/forums/" + forum.getId());
+			forum.setStart(startCal.getTimeInMillis());
+			forum.setEnd(endCal.getTimeInMillis());
+			}
+
+			if(yaftForumService.addOrUpdateForum(forum))
+			{
+				if(id.length() == 0)
+					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/forums/" + forum.getId());
+				else
+					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
+			}
+			else
+			{
+				logger.error("Failed to add or update forum. Returning INTERNAl SERVER ERROR ...");
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().close();
+				return;
+				
+			}
+			
 			return;
 		}
 		else if (function.equals("moveDiscussion"))
@@ -809,9 +905,16 @@ public class YaftTool extends HttpServlet
 		}
 		else if (function.equals("startDiscussion"))
 		{
+			String id = request.getParameter("id");
 			String subject = request.getParameter("subject");
 			String content = request.getParameter("content");
 			String forumId = request.getParameter("forumId");
+			String startDateString = request.getParameter("startDate");
+			String endDateString = request.getParameter("endDate");
+			String startHourString = request.getParameter("startHour");
+			String startMinuteString = request.getParameter("startMinute");
+			String endHourString = request.getParameter("endHour");
+			String endMinuteString = request.getParameter("endMinute");
 
 			if (logger.isDebugEnabled())
 			{
@@ -819,8 +922,20 @@ public class YaftTool extends HttpServlet
 				logger.debug("Content: " + content);
 				logger.debug("Forum ID: " + forumId);
 			}
+			
+			if(subject == null || subject.length() <= 0)
+			{
+				logger.error("Subject must be supplied. Returning BAD REQUEST ...");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().close();
+				return;
+			}
 
 			Message message = new Message();
+			
+			if(id != null)
+				message.setId(id);
+			
 			message.setSubject(subject);
 			message.setContent(content);
 			message.setSiteId(sakaiProxy.getCurrentSiteId());
@@ -833,9 +948,83 @@ public class YaftTool extends HttpServlet
 			message.setDiscussionId(message.getId());
 			
 			message.setStatus("READY");
+			
+			Discussion discussion = new Discussion();
+			discussion.setFirstMessage(message);
+			
+			if(startDateString != null && startDateString.length() > 0
+					&& startHourString != null && startHourString.length() > 0
+					&& startMinuteString != null && startMinuteString.length() > 0
+					&& endDateString != null && endDateString.length() > 0
+					&& endHourString != null && endHourString.length() > 0
+					&& endMinuteString != null && endMinuteString.length() > 0)
+			{
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yyyy");
+				
+			Date startDate = null;
+			Date endDate = null;
+				
+			try
+			{
+				startDate = dateFormat.parse(startDateString);
+				endDate = dateFormat.parse(endDateString);
+			}
+			catch(ParseException pe)
+			{
+					logger.error("The start and end dates MUST be in dd MM yyyy format. Returning BAD REQUEST ...");
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					response.getWriter().close();
+					return;
+			}
+			
+			int startHours,startMinutes,endHours,endMinutes;
+			
+			try
+			{
+				startHours = Integer.parseInt(startHourString);
+				startMinutes = Integer.parseInt(startMinuteString);
+				endHours = Integer.parseInt(endHourString);
+				endMinutes = Integer.parseInt(endMinuteString);
+			}
+			catch(NumberFormatException nfe)
+			{
+				logger.error("The hours and minutes MUST be integers. Returning BAD REQUEST ...");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().close();
+				return;
+			}
+			
+			Calendar startCal = Calendar.getInstance();
+			startCal.setTime(startDate);
+			
+			startCal.set(Calendar.HOUR_OF_DAY, startHours);
+			startCal.set(Calendar.MINUTE, startMinutes);
+			
+			Calendar endCal = Calendar.getInstance();
+			endCal.setTime(endDate);
+			
+			endCal.set(Calendar.HOUR_OF_DAY, endHours);
+			endCal.set(Calendar.MINUTE, endMinutes);
 
-			yaftForumService.addDiscussion(forumId, message, true);
-			response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/discussions/" + message.getId());
+			discussion.setStart(startCal.getTimeInMillis());
+			discussion.setEnd(endCal.getTimeInMillis());
+			}
+
+			if(yaftForumService.addDiscussion(forumId, discussion, true) != null)
+			{
+				if(id.length() == 0)
+					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/discussions/" + discussion.getId());
+				else
+				response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/forums/" + forumId);
+			}
+			else
+			{
+				logger.error("Failed to add discussion. Returning INTERNAl SERVER ERROR ...");
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().close();
+				return;
+			}
 
 			return;
 		}
@@ -873,6 +1062,9 @@ public class YaftTool extends HttpServlet
 			message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(sakaiProxy.getCurrentUser().getId()));
 			message.setDiscussionId(discussionId);
 			message.setAttachments(getAttachments(request));
+			
+			if(messageId == null)
+				message.setId("");
 
 			if (messageBeingRepliedTo != null && messageBeingRepliedTo.length() > 0)
 			{
