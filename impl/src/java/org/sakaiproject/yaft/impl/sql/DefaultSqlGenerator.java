@@ -659,11 +659,6 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return statements;
 	}
 	
-	public String getSelectProfile2Picture(String userId)
-	{
-		return "select RESOURCE_THUMB from PROFILE_IMAGES_T where USER_UUID = '" + userId + "' and IS_CURRENT = true order by ID DESC";
-	}
-	
 	public String getSelectReadMessageCountForAllForaStatement(String userId)
 	{
 		return "SELECT FORUM_ID,NUMBER_READ FROM YAFT_FORUM_READ WHERE USER_ID = '" + userId + "'";

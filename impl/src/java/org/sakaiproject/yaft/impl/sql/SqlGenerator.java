@@ -74,8 +74,6 @@ public interface SqlGenerator
 
 	List<PreparedStatement> getPublishMessageStatements(String forumId,Message message,Connection connection) throws SQLException;
 
-	String getSelectProfile2Picture(String userId);
-
 	String getShowMessageStatement(Message message);
 
 	String getSelectReadMessageCountForAllForaStatement(String userId);

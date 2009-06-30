@@ -700,31 +700,13 @@ public class YaftTool extends HttpServlet
 						return;
 					}
 
-					// Try and get it from Profile2's area. This is a TEMPORARY HACK!
-					byte[] bytes = yaftForumService.getProfile2Picture(userId);
-
+					byte[] bytes = profile.getInstitutionalPicture();
+						
 					if (bytes == null || bytes.length == 0)
 					{
-						// Try and get it from the standard profile
-						bytes = profile.getInstitutionalPicture();
-						
-						if (bytes == null || bytes.length == 0)
-						{
-							/*
-							String url = profile.getPictureUrl();
-							
-							if(url != null)
-							{
-								RequestDispatcher disp = request.getRequestDispatcher("http://btc224000006.lancs.ac.uk/access/content/user/user2/austin_007_small.jpg");
-								disp.include(request, response);
-								return;
-							}
-							*/
-							
-							RequestDispatcher disp = request.getRequestDispatcher("/images/no_image.gif");
-							disp.include(request, response);
-							return;
-						}
+						RequestDispatcher disp = request.getRequestDispatcher("/images/no_image.gif");
+						disp.include(request, response);
+						return;
 					}
 
 					response.setContentType("image/jpeg");

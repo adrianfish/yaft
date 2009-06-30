@@ -1606,46 +1606,6 @@ public class YaftPersistenceManager
 		}
 	}
 
-	public byte[] getProfile2Picture(String userId)
-	{
-		// TODO Auto-generated method stub
-		String sql = sqlGenerator.getSelectProfile2Picture(userId);
-		
-		byte[] bytes = null;
-		
-		Connection connection = null;
-		Statement statement = null;
-		ResultSet rs = null;
-		try
-		{
-			connection = sakaiProxy.borrowConnection();
-			statement = connection.createStatement();
-			rs = statement.executeQuery(sql);
-			if(rs.next())
-			{
-				String thumbResourceId = rs.getString("RESOURCE_THUMB");
-				bytes = sakaiProxy.getResourceBytes(thumbResourceId);
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error("Caught exception whilst getting profile 2 picture. Reason:" + e.getMessage());
-		}
-		finally
-		{
-			try
-			{
-				if(rs != null) rs.close();
-				if(statement != null) statement.close();
-			}
-			catch (SQLException e) {}
-			
-			sakaiProxy.returnConnection(connection);
-		}
-		
-		return bytes;
-	}
-
 	public Map<String,Integer> getReadMessageCountForAllFora(String userId)
 	{
 		String sql = sqlGenerator.getSelectReadMessageCountForAllForaStatement(userId);

@@ -341,11 +341,6 @@ public class YaftForumServiceImpl implements YaftForumService
 												,unsubscribers);
 	}
 	
-	public byte[] getProfile2Picture(String userId)
-	{
-		return persistenceManager.getProfile2Picture(userId);
-	}
-	
 	/** START EntityProducer IMPLEMENTATION */
 
 	public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments)

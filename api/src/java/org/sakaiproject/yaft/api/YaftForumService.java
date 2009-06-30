@@ -93,8 +93,6 @@ public interface YaftForumService extends EntityProducer
 
 	public void publishMessage(String forumId,Message message);
 
-	public byte[] getProfile2Picture(String userId);
-
 	public Map<String,Integer> getReadMessageCountForAllFora();
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId);
