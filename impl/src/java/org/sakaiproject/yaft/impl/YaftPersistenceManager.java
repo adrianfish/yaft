@@ -98,7 +98,7 @@ public class YaftPersistenceManager
 			}
 			catch (SQLException sqle)
 			{
-				logger.error("Caught exception whilst setting up tables. Rolling back ...", sqle);
+				logger.error("Caught exception whilst setting up tables. Rolling back ...");
 				connection.rollback();
 			}
 			finally
@@ -108,7 +108,7 @@ public class YaftPersistenceManager
 		}
 		catch (Exception e)
 		{
-			logger.error("Caught exception whilst setting up tables", e);
+			logger.error("Caught exception whilst setting up tables");
 		}
 		finally
 		{
