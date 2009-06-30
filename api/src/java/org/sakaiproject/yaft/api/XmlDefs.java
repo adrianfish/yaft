@@ -15,7 +15,7 @@ public class XmlDefs
 	public static final String LAST_MESSAGE_DATE = "last-message-date";
 	public static final String MESSAGE_COUNT = "message-count";
 	public static final String DISCUSSION_COUNT = "discussion-count";
-	public static final String TITLE = "TITLE";
+	public static final String TITLE = "title";
 	public static final String DESCRIPTION = "description";
 	public static final String DISCUSSION = "discussion";
 	public static final String DISCUSSIONS = "discussions";

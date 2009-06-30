@@ -138,14 +138,9 @@ public class Discussion
 		discussionElement.setAttribute(XmlDefs.ID, getId());
 		discussionElement.setAttribute(XmlDefs.CREATED_DATE, Long.toString(getCreatedDate()));
 		discussionElement.setAttribute(XmlDefs.CREATOR_ID, getCreatorId());
+		discussionElement.setAttribute(XmlDefs.SUBJECT, getSubject());
 		discussionElement.setAttribute(XmlDefs.LAST_MESSAGE_DATE, Long.toString(lastMessageDate));
 		discussionElement.setAttribute(XmlDefs.MESSAGE_COUNT, Integer.toString(messageCount));
-		
-		/*
-		Element subjectElement = doc.createElement(XmlDefs.SUBJECT);
-		subjectElement.setTextContent(getSubject());
-		discussionElement.appendChild(subjectElement);
-		*/
 		
 		Element messagesElement = doc.createElement(XmlDefs.MESSAGES);
 		discussionElement.appendChild(messagesElement);
