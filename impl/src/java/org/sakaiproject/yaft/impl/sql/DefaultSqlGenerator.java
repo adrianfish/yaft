@@ -45,6 +45,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "LAST_MESSAGE_DATE " + TIMESTAMP + ","
 				+ "START " + TIMESTAMP + ","
 				+ "END " + TIMESTAMP + ","
+				+ "LOCKED_FOR_WRITING BOOL NOT NULL,"
+				+ "LOCKED_FOR_READING BOOL NOT NULL,"
 				+ "STATUS " + VARCHAR + "(36) NOT NULL,"
 				+ "PRIMARY KEY (FORUM_ID))");
 		
@@ -60,6 +62,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "STATUS " + VARCHAR + "(36) NOT NULL,"
 				+ "START " + TIMESTAMP + ","
 				+ "END " + TIMESTAMP + ","
+				+ "LOCKED_FOR_WRITING BOOL NOT NULL,"
+				+ "LOCKED_FOR_READING BOOL NOT NULL,"
 				+ "PRIMARY KEY (DISCUSSION_ID))");
 		
 		statements.add("CREATE TABLE YAFT_MESSAGE (" 
@@ -113,6 +117,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		
 		return statements;
 	}
+	
 	public String getForaSelectStatement()
 	{
 		return getForaSelectStatement(null);
@@ -135,37 +140,30 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		if(forum.getId().length() > 0)
 		{
-			String updateSql = "UPDATE YAFT_FORUM SET TITLE = ?, DESCRIPTION = ?";
-			
-			long start = forum.getStart();
-			long end = forum.getEnd();
-			
-			//if(start > -1 && end > -1)
-				updateSql += ",START = ?,END = ?";
-			
-			updateSql += " WHERE FORUM_ID = ?";
+			String updateSql = "UPDATE YAFT_FORUM SET TITLE = ?, DESCRIPTION = ?,START = ?,END = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ? WHERE FORUM_ID = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(updateSql);
 			ps.setString(1,forum.getTitle());
 			ps.setString(2,forum.getDescription());
 			
-			//if(start > -1 && end > -1)
-			//{
-				if(start > -1 && end > -1)
-				{
+			long start = forum.getStart();
+			long end = forum.getEnd();
+			
+			if(start > -1 && end > -1)
+			{
 				ps.setTimestamp(3, new Timestamp(start));
 				ps.setTimestamp(4, new Timestamp(end));
-				ps.setString(5, forum.getId());
-				}
-				else
-				{
+			}
+			else
+			{
 				ps.setNull(3, Types.NULL);
 				ps.setNull(4, Types.NULL);
-				ps.setString(5, forum.getId());
-				}
-			//}
-			//else
-				//ps.setString(3, forum.getId());
+			}
+			
+			ps.setBoolean(5, forum.isLockedForWriting());
+			ps.setBoolean(6, forum.isLockedForReading());
+			
+			ps.setString(7, forum.getId());
 			
 			return ps;
 		}
@@ -173,20 +171,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 		{
 			forum.setId(UUID.randomUUID().toString());
 			
-			String insertSql = "INSERT INTO YAFT_FORUM (FORUM_ID,SITE_ID,CREATOR_ID,TITLE,DESCRIPTION,";
+			String insertSql = "INSERT INTO YAFT_FORUM (FORUM_ID,SITE_ID,CREATOR_ID,TITLE,DESCRIPTION,START,END,LOCKED_FOR_WRITING,LOCKED_FOR_READING,STATUS,MESSAGE_COUNT,DISCUSSION_COUNT) VALUES(?,?,?,?,?,?,?,?,?,?,0,0)";
 			
 			long start = forum.getStart();
 			long end = forum.getEnd();
-			
-			if(start > -1 && end > -1)
-				insertSql += "START,END,";
-			
-			insertSql += "STATUS,MESSAGE_COUNT,DISCUSSION_COUNT) VALUES(?,?,?,?,?,";
-			
-			if(start > -1 && end > -1)
-				insertSql += "?,?,";
-			
-			insertSql += "?,0,0)";
 			
 			PreparedStatement ps = connection.prepareStatement(insertSql);
 			ps.setString(1,forum.getId());
@@ -199,10 +187,17 @@ public class DefaultSqlGenerator implements SqlGenerator
 			{
 				ps.setTimestamp(6, new Timestamp(start));
 				ps.setTimestamp(7, new Timestamp(end));
-				ps.setString(8, forum.getStatus());
 			}
 			else
-				ps.setString(6,forum.getStatus());
+			{
+				ps.setNull(6, Types.NULL);
+				ps.setNull(7, Types.NULL);
+			}
+			
+			ps.setBoolean(8, forum.isLockedForWriting());
+			ps.setBoolean(9, forum.isLockedForReading());
+			
+			ps.setString(10, forum.getStatus());
 			
 			return ps;
 		}
@@ -327,11 +322,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 				insertMessagePS.setString(7,message.getCreatorId());
 				insertMessagePS.setTimestamp(8,new Timestamp(message.getCreatedDate()));
 				
-				
-				insertSql = "INSERT INTO YAFT_DISCUSSION (DISCUSSION_ID,LAST_MESSAGE_DATE,MESSAGE_COUNT,STATUS) VALUES(?,?,1,'READY')";
+				insertSql = "INSERT INTO YAFT_DISCUSSION (DISCUSSION_ID,LAST_MESSAGE_DATE,MESSAGE_COUNT,STATUS,LOCKED_FOR_WRITING,LOCKED_FOR_READING) VALUES(?,?,1,'READY',0,0)";
 				PreparedStatement discussionPS = connection.prepareStatement(insertSql);
 				discussionPS.setString(1, message.getId());
 				discussionPS.setTimestamp(2, new Timestamp(message.getCreatedDate()));
+				
 				statements.add(discussionPS);
 				
 				insertSql = "INSERT INTO YAFT_FORUM_DISCUSSION VALUES(?,?)";
@@ -718,22 +713,26 @@ public class DefaultSqlGenerator implements SqlGenerator
 	
 	public PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception
 	{
-		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START = ?,END = ? WHERE DISCUSSION_ID = ?");
+		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START = ?,END = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ? WHERE DISCUSSION_ID = ?");
+		
 		long start = discussion.getStart();
 		long end = discussion.getEnd();
-		
-		if(start > -1L && end > start)
+	
+		if(start > -1 && end > -1)
 		{
-			st.setTimestamp(1,new Timestamp(discussion.getStart()));
-			st.setTimestamp(2,new Timestamp(discussion.getEnd()));
+			st.setTimestamp(1, new Timestamp(start));
+			st.setTimestamp(2, new Timestamp(end));
 		}
 		else
 		{
-			st.setNull(1,Types.NULL);
-			st.setNull(2,Types.NULL);
+			st.setNull(1, Types.NULL);
+			st.setNull(2, Types.NULL);
 		}
 		
-		st.setString(3,discussion.getId());
+		st.setBoolean(3, discussion.isLockedForWriting());
+		st.setBoolean(4, discussion.isLockedForReading());
+		
+		st.setString(5,discussion.getId());
 		
 		return st;
 	}

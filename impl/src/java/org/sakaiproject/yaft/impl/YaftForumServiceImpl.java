@@ -211,7 +211,8 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		if(persistenceManager.deleteDiscussion(discussionId))
 		{
-			sakaiProxy.removeCalendarEntry(discussion.getSubject(), discussion.getSubject() + " (Click to launch discussion)");
+			sakaiProxy.removeCalendarEntry("Start of '" + discussion.getSubject() + "'", "Start of '" + discussion.getSubject() + "' Discussion (Click to launch)");
+			sakaiProxy.removeCalendarEntry("End of '" + discussion.getSubject() + "'", "End of '" + discussion.getSubject() + "' Discussion");
 			
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
 			sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);

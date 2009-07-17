@@ -80,8 +80,8 @@ ${yaft_forums_label}
 	</thead>
 	<tbody>
 	{for forum in items}
-	{if forum.visible || yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id}
-   	<tr class="yaftForumRow {if !forum.visible} yaftInvisible{/if}">
+	{if !forum.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id}
+   	<tr class="yaftForumRow {if (yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id) && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable)} yaftInvisible{/if}">
 		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
 		<br/>
 		<span class="yaftForumDescription">${forum.description}</span></td>
@@ -130,14 +130,14 @@ ${yaft_forums_label}
 	</thead>
 	<tbody>
 	{for discussion in discussions}
-	{if discussion.visible || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
+	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
 	<div id="${discussion.creatorId}_profile" class="yaft_profile_popup">
 		<img class="yaft_profile_popup_img" src="/portal/tool/${yaftPlacementId}/data/users/${discussion.creatorId}/picture" width="100px"/>
 		<div class="yaft_profile_popup_name">${discussion.creatorDisplayName}</div>
 		<br/>
 		<p class="yaft_profile_popup_bio">${discussion.firstMessage.creatorBio}</p>
 	</div>
-	<tr{if !discussion.visible} class="yaftInvisible"{/if}>
+   	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
 		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a></td>
 		<td><a href="#${discussion.creatorId}_profile" class="profile" rel="#${discussion.creatorId}_profile">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
@@ -226,8 +226,7 @@ ${yaft_forums_label}
 			enctype="multipart/form-data"
 			onsubmit="return YaftUtils.validateDiscussionForm();">
 		<input type="hidden" name="id" value="${id}"/>
-		<fieldset id="yaft_reply_fieldset">
-		<legend>Type your message</legend>
+		<h4>Type your message</h4>
 		<br />
 		<span>Subject: *</span>
 		<br />
@@ -238,88 +237,100 @@ ${yaft_forums_label}
 		<br />
 		<textarea name="content" id="fck" cols="100" rows="5">${firstMessage.content}</textarea>
 		<br />
-		</fieldset>
-		<br />
-		<table cols="2">
-		<tr>
-			<td style="padding-right: 10px;">Start: </td><td><input id="yaft_start_date" type="text" name="startDate"/>
-		<select style="background-color: grey;" id="yaft_start_hour_selector" name="startHour" disabled>
-			<option>00</option>
-			<option>01</option>
-			<option>02</option>
-			<option>03</option>
-			<option>04</option>
-			<option>05</option>
-			<option>06</option>
-			<option>07</option>
-			<option>08</option>
-			<option>09</option>
-			<option>10</option>
-			<option>11</option>
-			<option>12</option>
-			<option>13</option>
-			<option>14</option>
-			<option>15</option>
-			<option>16</option>
-			<option>17</option>
-			<option>18</option>
-			<option>19</option>
-			<option>20</option>
-			<option>21</option>
-			<option>22</option>
-			<option>23</option>
-		</select> : <select style="background-color: grey;" id="yaft_start_minute_selector" name="startMinute" disabled>
-						<option>00</option>
-						<option>15</option>
-						<option>30</option>
-						<option>45</option>
-					</select>
-			</td>
-		</tr>
-		<tr>
-		<td style="padding-right: 10px;">End: </td><td><input style="background-color: grey;"  id="yaft_end_date" type="text" name="endDate" disabled/>
-	<select style="background-color: grey;" id="yaft_end_hour_selector" name="endHour" disabled>
-			<option>00</option>
-			<option>01</option>
-			<option>02</option>
-			<option>03</option>
-			<option>04</option>
-			<option>05</option>
-			<option>06</option>
-			<option>07</option>
-			<option>08</option>
-			<option>09</option>
-			<option>10</option>
-			<option>11</option>
-			<option>12</option>
-			<option>13</option>
-			<option>14</option>
-			<option>15</option>
-			<option>16</option>
-			<option>17</option>
-			<option>18</option>
-			<option>19</option>
-			<option>20</option>
-			<option>21</option>
-			<option>22</option>
-			<option>23</option>
-		</select> : <select style="background-color: grey;" id="yaft_end_minute_selector" name="endMinute" disabled>
-						<option>00</option>
-						<option>15</option>
-						<option>30</option>
-						<option>45</option>
-					</select>
-			</td>
-		</tr>
-		</table>
-<br />
-<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
 <br />
 		<br />
 	
 		<span>Add Attachments:</span>
 		<br />
-		<input name="attachment" type="file" class="multi"/><br clear="all"/><br/>
+		<input name="attachment" type="file" class="multi"/><br clear="all"/>
+
+<a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
+<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YaftUtils.hideAdvancedOptions();">Hide advanced options</a>
+<br />
+<fieldset id="yaft_availability_fieldset" style="display: none;">
+<legend>Availability</legend>
+<input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
+<br />
+<input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>Lock for reading
+<br />
+<br />
+<span>Except between ...</span>
+<br />
+<br />
+<input id="yaft_start_date" type="text" name="startDate"/>
+	<select id="yaft_start_hour_selector" name="startHour">
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select id="yaft_start_minute_selector" name="startMinute">
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+					<br />
+					<br />
+<span>... and ...</span>
+<br />
+<br />
+<input id="yaft_end_date" type="text" name="endDate"/>
+	<select id="yaft_end_hour_selector" name="endHour">
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select id="yaft_end_minute_selector" name="endMinute">
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+<br />
+<br />
+<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+</fieldset>
+<br />
 	
 		<input type="submit" value="${yaft_save_label}"/>
 		<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
@@ -498,7 +509,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_discussion_content_template" style="display:none"><!--
-	{if !visible && !yaftCurrentUserPermissions.viewInvisible}
+	{if lockedForReadingAndUnavailable && !yaftCurrentUserPermissions.viewInvisible && creatorId != yaftCurrentUser.id}
 	<h3>This discussion is not available at this time</h3>
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
@@ -543,78 +554,93 @@ ${yaft_forums_label}
 <table>
 <tr><td>${yaft_forum_title_label}: *</td><td><input id="yaft_title_field" type="text" name="title" value="${title}"/></td></tr>
 <tr><td>${yaft_description_label}</td><td><input type="text" name="description" value="${description}"/></td></tr>
-<tr>
-	<td style="padding-right: 10px;">Start: </td><td><input id="yaft_start_date" type="text" name="startDate"/>
-	<select style="background-color: grey;" id="yaft_start_hour_selector" name="startHour" disabled>
-			<option>00</option>
-			<option>01</option>
-			<option>02</option>
-			<option>03</option>
-			<option>04</option>
-			<option>05</option>
-			<option>06</option>
-			<option>07</option>
-			<option>08</option>
-			<option>09</option>
-			<option>10</option>
-			<option>11</option>
-			<option>12</option>
-			<option>13</option>
-			<option>14</option>
-			<option>15</option>
-			<option>16</option>
-			<option>17</option>
-			<option>18</option>
-			<option>19</option>
-			<option>20</option>
-			<option>21</option>
-			<option>22</option>
-			<option>23</option>
-		</select> : <select style="background-color: grey;" id="yaft_start_minute_selector" name="startMinute" disabled>
-						<option>00</option>
-						<option>15</option>
-						<option>30</option>
-						<option>45</option>
-					</select>
-	</td>
-</tr>
-<tr>
-	<td style="padding-right: 10px;">End: </td><td><input style="background-color: grey;"  id="yaft_end_date" type="text" name="endDate" disabled/>
-	<select style="background-color: grey;" id="yaft_end_hour_selector" name="endHour" disabled>
-			<option>00</option>
-			<option>01</option>
-			<option>02</option>
-			<option>03</option>
-			<option>04</option>
-			<option>05</option>
-			<option>06</option>
-			<option>07</option>
-			<option>08</option>
-			<option>09</option>
-			<option>10</option>
-			<option>11</option>
-			<option>12</option>
-			<option>13</option>
-			<option>14</option>
-			<option>15</option>
-			<option>16</option>
-			<option>17</option>
-			<option>18</option>
-			<option>19</option>
-			<option>20</option>
-			<option>21</option>
-			<option>22</option>
-			<option>23</option>
-		</select> : <select style="background-color: grey;" id="yaft_end_minute_selector" name="endMinute" disabled>
-						<option>00</option>
-						<option>15</option>
-						<option>30</option>
-						<option>45</option>
-					</select>
-	</td>
-</tr>
 </table>
+<br />
+<a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
+<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YaftUtils.hideAdvancedOptions();">Hide advanced options</a>
+<fieldset id="yaft_availability_fieldset" style="display: none;">
+<legend>Availability</legend>
+<input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
+<br />
+<input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>Lock for reading
+<br />
+<br />
+<span>Except between ...</span>
+<br />
+<br />
+<input id="yaft_start_date" type="text" name="startDate"/>
+	<select id="yaft_start_hour_selector" name="startHour">
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select id="yaft_start_minute_selector" name="startMinute">
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+<br />
+					<br />
+<span>... and ...</span>
+<br />
+<br />
+<input id="yaft_end_date" type="text" name="endDate"/>
+	<select id="yaft_end_hour_selector" name="endHour">
+			<option>00</option>
+			<option>01</option>
+			<option>02</option>
+			<option>03</option>
+			<option>04</option>
+			<option>05</option>
+			<option>06</option>
+			<option>07</option>
+			<option>08</option>
+			<option>09</option>
+			<option>10</option>
+			<option>11</option>
+			<option>12</option>
+			<option>13</option>
+			<option>14</option>
+			<option>15</option>
+			<option>16</option>
+			<option>17</option>
+			<option>18</option>
+			<option>19</option>
+			<option>20</option>
+			<option>21</option>
+			<option>22</option>
+			<option>23</option>
+		</select> : <select id="yaft_end_minute_selector" name="endMinute">
+						<option>00</option>
+						<option>15</option>
+						<option>30</option>
+						<option>45</option>
+					</select>
+<br />
+<br />
 <a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+</fieldset>
 <br />
 <br />
 <input type="submit" value="${yaft_save_label}"/>
@@ -631,7 +657,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_message_view_content_template" style="display:none"><!--
-	{if !visible && !yaftCurrentUserPermissions.viewInvisible}
+	{if lockedForReadingAndUnavailable && !yaftCurrentUserPermissions.viewInvisible && creatorId != yaftCurrentUser.id}
 	<h3>This discussion is not available at this time</h3>
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
@@ -693,8 +719,7 @@ ${yaft_forums_label}
 <br />
 <div id="yaft_reply_container">
 	<form id="main_form" onSubmit="return YaftUtils.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
-	<fieldset id="yaft_reply_fieldset">
-	<legend>${yaft_type_your_message_label}</legend>
+	<h4>${yaft_type_your_message_label}</h4>
 	<br />
 	<span>${yaft_subject_label}</span>
 	<br />
@@ -705,7 +730,6 @@ ${yaft_forums_label}
 	<br />
 	<textarea name="content" id="fck" cols="100" rows="5"></textarea>
 	<br />
-	</fieldset>
 	<br />
 	
 	<span>${yaft_add_attachments_label}</span>
@@ -732,8 +756,7 @@ ${yaft_forums_label}
 <div id="yaft_edit_message_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
     <form id="main_form" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
-    <fieldset id="yaft_reply_fieldset">
-    <legend>Type your message</legend>
+    <h4>Type your message</h4>
     <br />
     <span>Subject:</span>
     <br />
@@ -744,7 +767,6 @@ ${yaft_forums_label}
     <br />
     <textarea name="content" id="fck" cols="100" rows="5">${content}</textarea>
     <br />
-    </fieldset>
     <br />
     <span id="current_attachments_label">${yaft_current_attachments_label}</span>
     <br />

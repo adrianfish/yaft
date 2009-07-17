@@ -23,12 +23,13 @@ public class Forum
 	private long lastMessageDate;
 	private long start = -1L;
 	private long end = -1L;
+	private boolean lockedForWriting = false;
+	private boolean lockedForReading = false;
 	private String siteId = "";
 	private String status = "READY";
 	private String creatorId = "";
 	private List<Discussion> discussions= new ArrayList<Discussion>();
 	private String url = "";
-	private boolean visible = true;
 	
 	public Forum()
 	{
@@ -217,13 +218,48 @@ public class Forum
 		return end;
 	}
 
-	public void setVisible(boolean visible)
+	public boolean isCurrent()
 	{
-		this.visible = visible;
+		if(start == -1 || end == -1)
+			return false;
+		else
+		{
+			long currentDate = new Date().getTime();
+
+			if(start <= currentDate && currentDate <= end)
+				return true;
+			else
+				return false;
+		}
 	}
 
-	public boolean isVisible()
+	public void setLockedForWriting(boolean lockedForWriting)
 	{
-		return visible;
+		this.lockedForWriting = lockedForWriting;
+	}
+	
+	public boolean isLockedForWriting()
+	{
+		return lockedForWriting;
+	}
+
+	public boolean isLockedForWritingAndUnavailable()
+	{
+		return lockedForWriting && !isCurrent();
+	}
+
+	public void setLockedForReading(boolean lockedForReading)
+	{
+		this.lockedForReading = lockedForReading;
+	}
+
+	public boolean isLockedForReading()
+	{
+		return lockedForReading;
+	}
+	
+	public boolean isLockedForReadingAndUnavailable()
+	{
+		return lockedForReading && !isCurrent();
 	}
 }

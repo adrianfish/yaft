@@ -24,6 +24,28 @@ var YaftUtils;
 		$('#yaft_end_minute_selector').get(0).selectedIndex = 0;
 	}
 
+	YaftUtils.showAdvancedOptions = function()
+	{
+		$('#yaft_availability_fieldset').show();
+		$('#yaft_show_advanced_options_link').hide();
+		$('#yaft_hide_advanced_options_link').show();
+	 	$(document).ready(function()
+	 	{
+	 		setMainFrameHeight(window.frameElement.id);
+		});
+	}
+
+	YaftUtils.hideAdvancedOptions = function()
+	{
+		$('#yaft_availability_fieldset').hide();
+		$('#yaft_show_advanced_options_link').show();
+		$('#yaft_hide_advanced_options_link').hide();
+	 	$(document).ready(function()
+	 	{
+	 		setMainFrameHeight(window.frameElement.id);
+		});
+	}
+
 	YaftUtils.hideDeleted = function()
 	{
 		$(".yaft_deleted_message").hide();

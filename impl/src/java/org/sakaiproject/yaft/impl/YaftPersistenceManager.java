@@ -442,6 +442,8 @@ public class YaftPersistenceManager
 		discussion.setFirstMessage(firstMessage);
 		discussion.setForumId(rs.getString(ColumnNames.FORUM_ID));
 		discussion.setStatus(rs.getString("STATUS"));
+		discussion.setLockedForReading(rs.getBoolean("LOCKED_FOR_READING"));
+		discussion.setLockedForWriting(rs.getBoolean("LOCKED_FOR_WRITING"));
 		
 		Timestamp startStamp = rs.getTimestamp("START");
 		if(startStamp != null)
@@ -453,21 +455,6 @@ public class YaftPersistenceManager
 		
 		discussion.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 		discussion.setLastMessageDate(rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE).getTime());
-		
-		long start = discussion.getStart();
-		long end = discussion.getEnd();
-
-		if(start == -1 || end == -1)
-			discussion.setVisible(true);
-		else
-		{
-			long currentDate = new Date().getTime();
-
-			if(start <= currentDate && currentDate <= end)
-				discussion.setVisible(true);
-			else
-				discussion.setVisible(false);
-		}
 		
 		return discussion;
 	}
@@ -591,24 +578,13 @@ public class YaftPersistenceManager
 		if(endStamp != null)
 			forum.setEnd(endStamp.getTime());
 		
+		forum.setLockedForReading(rs.getBoolean("LOCKED_FOR_READING"));
+		forum.setLockedForWriting(rs.getBoolean("LOCKED_FOR_WRITING"));
+		
 		forum.setDiscussionCount(rs.getInt(ColumnNames.DISCUSSION_COUNT));
 		forum.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 		forum.setStatus(rs.getString("STATUS"));
-		
-		long start = forum.getStart();
-		long end = forum.getEnd();
 
-		if(start == -1 || end == -1)
-			forum.setVisible(true);
-		else
-		{
-			long currentDate = new Date().getTime();
-
-			if(start <= currentDate && currentDate <= end)
-				forum.setVisible(true);
-			else
-				forum.setVisible(false);
-		}
 		return forum;
 	}
 
@@ -1899,7 +1875,8 @@ public class YaftPersistenceManager
 			if(start > 0L && end > 0L)
 			{
 				String url = sakaiProxy.getServerUrl() + discussion.getUrl();
-				sakaiProxy.addCalendarEntry(discussion.getSubject(),"<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">" + discussion.getSubject() + " (Click to launch discussion)</a>","Activity",start,end);
+				sakaiProxy.addCalendarEntry("Start of '" + discussion.getSubject() + "'","<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">Start of '" + discussion.getSubject() + "' Discussion (Click to launch)</a>","Activity",start + 32400000,start + 32460000);
+				sakaiProxy.addCalendarEntry("End of '" + discussion.getSubject() + "'","End of '" + discussion.getSubject() + "' Discussion","Activity",end + 32400000,end + 32460000);
 			}
 		}
 		catch (Exception e)

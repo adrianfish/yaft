@@ -1,6 +1,7 @@
 package org.sakaiproject.yaft.api;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
@@ -25,8 +26,6 @@ public class Discussion
 	
 	private String status = "READY";
 	
-	private boolean visible = true;
-	
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	
 	// We need this to build direct urls in the rendered pages. Bogus, but necessary.
@@ -34,6 +33,9 @@ public class Discussion
 	
 	private long start = -1L;
 	private long end = -1L;
+	
+	private boolean lockedForWriting = false;
+	private boolean lockedForReading = false;
 	
 	public void setFirstMessage(Message firstMessage)
 	{
@@ -49,6 +51,11 @@ public class Discussion
 	{
 		this.messageCount = messageCount;
 	}
+	
+	public String getContent()
+	{
+		return firstMessage.getContent();
+	}
 
 	public int getMessageCount()
 	{
@@ -58,6 +65,11 @@ public class Discussion
 	public String getSubject()
 	{
 		return firstMessage.getSubject();
+	}
+	
+	public void setSubject(String subject)
+	{
+		firstMessage.setSubject(subject);
 	}
 
 	public long getCreatedDate()
@@ -182,14 +194,49 @@ public class Discussion
 	{
 		return end;
 	}
-
-	public void setVisible(boolean visible)
+	
+	public boolean isCurrent()
 	{
-		this.visible = visible;
+		if(start == -1 || end == -1)
+			return false;
+		else
+		{
+			long currentDate = new Date().getTime();
+
+			if(start <= currentDate && currentDate <= end)
+				return true;
+			else
+				return false;
+		}
+	}
+	
+	public void setLockedForWriting(boolean lockedForWriting)
+	{
+		this.lockedForWriting = lockedForWriting;
 	}
 
-	public boolean isVisible()
+	public boolean isLockedForWriting()
 	{
-		return visible;
+		return lockedForWriting;
+	}
+	
+	public boolean isLockedForWritingAndUnavailable()
+	{
+		return lockedForWriting && !isCurrent();
+	}
+
+	public void setLockedForReading(boolean lockedForReading)
+	{
+		this.lockedForReading = lockedForReading;
+	}
+
+	public boolean isLockedForReading()
+	{
+		return lockedForReading;
+	}
+	
+	public boolean isLockedForReadingAndUnavailable()
+	{
+		return lockedForReading && !isCurrent();
 	}
 }

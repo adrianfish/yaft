@@ -766,6 +766,22 @@ public class YaftTool extends HttpServlet
 			String endHourString = request.getParameter("endHour");
 			String endMinuteString = request.getParameter("endMinute");
 			
+			String lockWritingString = request.getParameter("lockWriting");
+			String lockReadingString = request.getParameter("lockReading");
+			
+			boolean lockWriting = true;
+			boolean lockReading = true;
+			
+			if(lockWritingString != null)
+				lockWriting = lockWritingString.equals("true");
+			else
+				lockWriting = false;
+			
+			if(lockReadingString != null)
+				lockReading = lockReadingString.equals("true");
+			else
+				lockReading = false;
+			
 			if (logger.isDebugEnabled())
 			{
 				logger.debug("Title: " + title);
@@ -789,6 +805,8 @@ public class YaftTool extends HttpServlet
 			forum.setDescription(description);
 			forum.setSiteId(sakaiProxy.getCurrentSiteId());
 			forum.setCreatorId(sakaiProxy.getCurrentUser().getId());
+			forum.setLockedForWriting(lockWriting);
+			forum.setLockedForReading(lockReading);
 			
 			if(startDateString != null && startDateString.length() > 0
 					&& startHourString != null && startHourString.length() > 0
@@ -848,6 +866,7 @@ public class YaftTool extends HttpServlet
 
 			forum.setStart(startCal.getTimeInMillis());
 			forum.setEnd(endCal.getTimeInMillis());
+			
 			}
 
 			if(yaftForumService.addOrUpdateForum(forum))
@@ -897,6 +916,21 @@ public class YaftTool extends HttpServlet
 			String startMinuteString = request.getParameter("startMinute");
 			String endHourString = request.getParameter("endHour");
 			String endMinuteString = request.getParameter("endMinute");
+			String lockWritingString = request.getParameter("lockWriting");
+			String lockReadingString = request.getParameter("lockReading");
+			
+			boolean lockWriting = true;
+			boolean lockReading = true;
+			
+			if(lockWritingString != null)
+				lockWriting = lockWritingString.equals("true");
+			else
+				lockWriting = false;
+			
+			if(lockReadingString != null)
+				lockReading = lockReadingString.equals("true");
+			else
+				lockReading = false;
 
 			if (logger.isDebugEnabled())
 			{
@@ -933,6 +967,8 @@ public class YaftTool extends HttpServlet
 			
 			Discussion discussion = new Discussion();
 			discussion.setFirstMessage(message);
+			discussion.setLockedForWriting(lockWriting);
+			discussion.setLockedForReading(lockReading);
 			
 			if(startDateString != null && startDateString.length() > 0
 					&& startHourString != null && startHourString.length() > 0

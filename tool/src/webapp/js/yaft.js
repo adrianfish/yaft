@@ -116,7 +116,7 @@ function switchState(state,arg)
 			YaftUtils.setupCurrentForumUnsubscriptions();
 		}
 		
-		if(yaftCurrentUserPermissions.discussionCreate)
+		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentUser.id == yaftCurrentForum.creatorId))
 			$("#yaft_add_discussion_link").show();
 		else
 			$("#yaft_add_discussion_link").hide();
@@ -176,7 +176,7 @@ function switchState(state,arg)
 			YaftUtils.render('yaft_discussion_breadcrumb_template',yaftCurrentDiscussion,'yaft_breadcrumb');
 			YaftUtils.render('yaft_discussion_content_template',yaftCurrentDiscussion,'yaft_content');
 
-			if(yaftCurrentDiscussion.visible || yaftCurrentUserPermissions.viewInvisible)
+			if(!yaftCurrentDiscussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentDiscussion.creatorId == yaftCurrentUser.id)
 			{
 				YaftUtils.render('yaft_message_template',yaftCurrentDiscussion.firstMessage,yaftCurrentDiscussion.firstMessage.id);
 				renderChildMessages(yaftCurrentDiscussion.firstMessage);
@@ -240,7 +240,7 @@ function switchState(state,arg)
 
 		YaftUtils.render('yaft_message_view_content_template',yaftCurrentDiscussion,'yaft_content');
 					
-		if(yaftCurrentDiscussion.visible || yaftCurrentUserPermissions.viewInvisible)
+		if(!yaftCurrentDiscussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentDiscussion.creatorId == yaftCurrentUser.id)
 		{
 			YaftUtils.render('yaft_message_template',message,'yaftMessage');
 			$("#" + message.id + "_cursor").show();
@@ -251,7 +251,7 @@ function switchState(state,arg)
 	}
 	else if(state == 'editForum')
 	{
-		var forum = {'id':'','title':'','description':''};
+		var forum = {'id':'','title':'','description':'',start: -1,end: -1};
 
 		if(arg && arg.forumId)
 			forum = YaftUtils.findForum(arg.forumId);
@@ -272,71 +272,7 @@ function switchState(state,arg)
 											return true;
 									});
 
-		if(arg && arg.forumId && forum.start != -1 && forum.end != -1)
-		{
-			$('#yaft_start_hour_selector').attr('disabled',false);
-			$('#yaft_start_hour_selector').css('background-color','white');
-			$('#yaft_start_minute_selector').attr('disabled',false);
-			$('#yaft_start_minute_selector').css('background-color','white');
-			$('#yaft_end_date').attr('disabled',false);
-			$('#yaft_end_date').css('background-color','white');
-			$('#yaft_end_hour_selector').attr('disabled',false);
-			$('#yaft_end_hour_selector').css('background-color','white');
-			$('#yaft_end_minute_selector').attr('disabled',false);
-			$('#yaft_end_minute_selector').css('background-color','white');
-
-			var startDate = new Date(forum.start);
-			$('#yaft_start_date').val(startDate.getDate() + ' ' + (1 + startDate.getMonth()) + ' ' + startDate.getFullYear());
-
-			var hours = startDate.getHours();
-			if(hours < 10)  hours = '0' + hours;
-			var minutes = startDate.getMinutes();
-			if(minutes == 0) minutes += '0';
-
-			$('#yaft_start_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-			$('#yaft_start_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
-
-			var endDate = new Date(forum.end);
-			$('#yaft_end_date').val(endDate.getDate() + ' ' + (1 + endDate.getMonth()) + ' ' + endDate.getFullYear());
-
-			hours = endDate.getHours();
-			if(hours < 10)  hours = '0' + hours;
-			minutes = endDate.getMinutes();
-			if(minutes == 0) minutes += '0';
-
-			$('#yaft_end_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-			$('#yaft_end_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
-		}
-
-		$('#yaft_start_date').datepicker({
-			dateFormat: 'dd mm yy',
-			defaultDate: new Date(),
-			minDate: new Date(),
-			hideIfNoPrevNext: true,
-			onSelect: function (dateText)
-			{
-				$('#yaft_start_hour_selector').attr('disabled',false);
-				$('#yaft_start_hour_selector').css('background-color','white');
-				$('#yaft_start_minute_selector').attr('disabled',false);
-				$('#yaft_start_minute_selector').css('background-color','white');
-				$('#yaft_end_date').attr('disabled',false);
-				$('#yaft_end_date').css('background-color','white');
-			}
-		});
-
-		$('#yaft_end_date').datepicker({
-			dateFormat: 'dd mm yy',
-			defaultDate: new Date(),
-			minDate: new Date(),
-			hideIfNoPrevNext: true,
-			onSelect: function (dateText)
-			{
-				$('#yaft_end_hour_selector').attr('disabled',false);
-				$('#yaft_end_hour_selector').css('background-color','white');
-				$('#yaft_end_minute_selector').attr('disabled',false);
-				$('#yaft_end_minute_selector').css('background-color','white');
-			}
-		});
+		setupAvailability(forum);
 
 		$("#yaft_permissions_link").hide();
 	
@@ -393,7 +329,7 @@ function switchState(state,arg)
 	{
 		$("#yaft_permissions_link").hide();
 
-		var discussion = {'id':'','subject':'','firstMessage':{'content':''}};
+		var discussion = {'id':'','subject':'',lockedForWriting:yaftCurrentForum.lockedForWriting,lockedForReading:yaftCurrentForum.lockedForReading,start: yaftCurrentForum.start,end: yaftCurrentForum.end,'firstMessage':{'content':''}};
 
 		if(arg && arg.discussionId)
 			discussion = YaftUtils.findDiscussion(arg.discussionId);
@@ -414,71 +350,7 @@ function switchState(state,arg)
 											return true;
 									});
 
-		if(arg && arg.discussionId && discussion.start != -1 && discussion.end != -1)
-		{
-			$('#yaft_start_hour_selector').attr('disabled',false);
-			$('#yaft_start_hour_selector').css('background-color','white');
-			$('#yaft_start_minute_selector').attr('disabled',false);
-			$('#yaft_start_minute_selector').css('background-color','white');
-			$('#yaft_end_date').attr('disabled',false);
-			$('#yaft_end_date').css('background-color','white');
-			$('#yaft_end_hour_selector').attr('disabled',false);
-			$('#yaft_end_hour_selector').css('background-color','white');
-			$('#yaft_end_minute_selector').attr('disabled',false);
-			$('#yaft_end_minute_selector').css('background-color','white');
-
-			var startDate = new Date(discussion.start);
-			$('#yaft_start_date').val(startDate.getDate() + ' ' + (1 + startDate.getMonth()) + ' ' + startDate.getFullYear());
-
-			var hours = startDate.getHours();
-			if(hours < 10)  hours = '0' + hours;
-			var minutes = startDate.getMinutes();
-			if(minutes == 0) minutes += '0';
-
-			$('#yaft_start_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-			$('#yaft_start_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
-
-			var endDate = new Date(discussion.end);
-			$('#yaft_end_date').val(endDate.getDate() + ' ' + (1 + endDate.getMonth()) + ' ' + endDate.getFullYear());
-
-			hours = endDate.getHours();
-			if(hours < 10)  hours = '0' + hours;
-			minutes = endDate.getMinutes();
-			if(minutes == 0) minutes += '0';
-
-			$('#yaft_end_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-			$('#yaft_end_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
-		}
-
-		$('#yaft_start_date').datepicker({
-			dateFormat: 'dd mm yy',
-			defaultDate: new Date(),
-			minDate: new Date(),
-			hideIfNoPrevNext: true,
-			onSelect: function (dateText)
-			{
-				$('#yaft_start_hour_selector').attr('disabled',false);
-				$('#yaft_start_hour_selector').css('background-color','white');
-				$('#yaft_start_minute_selector').attr('disabled',false);
-				$('#yaft_start_minute_selector').css('background-color','white');
-				$('#yaft_end_date').attr('disabled',false);
-				$('#yaft_end_date').css('background-color','white');
-			}
-		});
-
-		$('#yaft_end_date').datepicker({
-			dateFormat: 'dd mm yy',
-			defaultDate: new Date(),
-			minDate: new Date(),
-			hideIfNoPrevNext: true,
-			onSelect: function (dateText)
-			{
-				$('#yaft_end_hour_selector').attr('disabled',false);
-				$('#yaft_end_hour_selector').css('background-color','white');
-				$('#yaft_end_minute_selector').attr('disabled',false);
-				$('#yaft_end_minute_selector').css('background-color','white');
-			}
-		});
+		setupAvailability(discussion);
 
    		$(document).ready(function()
    		{
@@ -585,4 +457,72 @@ function yaftShowMessage(messageId)
 	$("#" + message.id + "_cursor").show();
 	//YaftUtils.markMessageRead(message,true);
    	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+}
+
+function setupAvailability(element)
+{
+	var startDate = $('#yaft_start_date');
+	var endDate = $('#yaft_end_date');
+
+	if(element.start != -1 && element.end != -1)
+	{
+		startDate.attr('disabled',false);
+		startDate.css('background-color','white');
+		$('#yaft_start_hour_selector').attr('disabled',false);
+		$('#yaft_start_hour_selector').css('background-color','white');
+		$('#yaft_start_minute_selector').attr('disabled',false);
+		$('#yaft_start_minute_selector').css('background-color','white');
+		endDate.attr('disabled',false);
+		endDate.css('background-color','white');
+		$('#yaft_end_hour_selector').attr('disabled',false);
+		$('#yaft_end_hour_selector').css('background-color','white');
+		$('#yaft_end_minute_selector').attr('disabled',false);
+		$('#yaft_end_minute_selector').css('background-color','white');
+
+		var start = new Date(element.start);
+		startDate.val(start.getDate() + ' ' + (1 + start.getMonth()) + ' ' + start.getFullYear());
+
+		var hours = start.getHours();
+		if(hours < 10)  hours = '0' + hours;
+		var minutes = start.getMinutes();
+		if(minutes == 0) minutes += '0';
+
+		$('#yaft_start_hour_selector option:contains(' + hours + ')').attr('selected','selected');
+		$('#yaft_start_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
+
+		var end = new Date(element.end);
+		endDate.val(end.getDate() + ' ' + (1 + end.getMonth()) + ' ' + end.getFullYear());
+
+		hours = end.getHours();
+		if(hours < 10)  hours = '0' + hours;
+			minutes = end.getMinutes();
+		if(minutes == 0) minutes += '0';
+
+		$('#yaft_end_hour_selector option:contains(' + hours + ')').attr('selected','selected');
+		$('#yaft_end_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
+	}
+
+	var writingCheckbox = $('#yaft_lock_writing_checkbox');
+
+	var readingCheckbox = $('#yaft_lock_reading_checkbox');
+
+	if(element.lockedForWriting)
+		$('#yaft_lock_writing_checkbox').attr('checked',true);
+
+	if(element.lockedForReading)
+		$('#yaft_lock_reading_checkbox').attr('checked',true);
+
+	startDate.datepicker({
+		dateFormat: 'dd mm yy',
+		defaultDate: new Date(),
+		minDate: new Date(),
+		hideIfNoPrevNext: true
+	});
+
+	endDate.datepicker({
+		dateFormat: 'dd mm yy',
+		defaultDate: new Date(),
+		minDate: new Date(),
+		hideIfNoPrevNext: true
+	});
 }
