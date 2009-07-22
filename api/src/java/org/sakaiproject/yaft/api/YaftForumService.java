@@ -3,8 +3,6 @@ package org.sakaiproject.yaft.api;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONObject;
-
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityProducer;
 
@@ -102,4 +100,8 @@ public interface YaftForumService extends EntityProducer
 	public void unsubscribeFromForum(String forumId);
 
 	public List<String> getForumUnsubscriptions(String userId);
+
+	public boolean savePreferences(YaftPreferences preferences);
+
+	public YaftPreferences getPreferencesForCurrentUserAndSite();
 }

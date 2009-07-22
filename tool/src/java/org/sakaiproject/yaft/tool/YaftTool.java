@@ -42,6 +42,7 @@ import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.SearchResult;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftPermissions;
+import org.sakaiproject.yaft.api.YaftPreferences;
 
 public class YaftTool extends HttpServlet
 {
@@ -404,6 +405,22 @@ public class YaftTool extends HttpServlet
 		
 	}
 	
+	private void handleCurrentUserPreferencesRequest(HttpServletResponse response)  throws ServletException, IOException
+	{
+		YaftPreferences preferences = yaftForumService.getPreferencesForCurrentUserAndSite();
+
+		JSONObject json = JSONObject.fromObject(preferences);
+		if (logger.isDebugEnabled())
+			logger.debug("Preferences JSON: " + json.toString());
+
+		response.setContentType("text/javascript");
+		json.write(response.getWriter());
+		response.getWriter().close();
+		return;
+		
+	}
+	
+	
 	private void handleDataRequest(HttpServletRequest request, HttpServletResponse response, String[] parts, String pathInfo) throws ServletException, IOException
 	{
 		if (parts.length >= 2)
@@ -420,6 +437,13 @@ public class YaftTool extends HttpServlet
 			{
 				if (logger.isDebugEnabled()) logger.debug("userPermissions");
 				handleCurrentUserPermissionsRequest(response);
+				return;
+			}
+			
+			else if ("userPreferences".equals(part1))
+			{
+				if (logger.isDebugEnabled()) logger.debug("userPermissions");
+				handleCurrentUserPreferencesRequest(response);
 				return;
 			}
 
@@ -885,6 +909,23 @@ public class YaftTool extends HttpServlet
 				
 			}
 			
+			return;
+		}
+		else if (function.equals("setPreferences"))
+		{
+			String emailPreference = request.getParameter("emailPreference");
+			String viewPreference = request.getParameter("viewPreference");
+			if (logger.isDebugEnabled())
+			{
+				logger.debug("emailPreference: " + emailPreference);
+				logger.debug("viewPreference: " + viewPreference);
+			}
+			
+			YaftPreferences preferences = new YaftPreferences(emailPreference,viewPreference);
+			
+			yaftForumService.savePreferences(preferences);
+			
+			response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
 			return;
 		}
 		else if (function.equals("moveDiscussion"))

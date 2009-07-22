@@ -29,6 +29,7 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.db.api.SqlService;
+import org.sakaiproject.email.api.DigestService;
 import org.sakaiproject.email.api.EmailService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
@@ -47,8 +48,6 @@ import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.util.BaseResourceProperties;
-import org.sakaiproject.util.StringUtil;
-import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
@@ -74,6 +73,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	private FunctionManager functionManager;
 	private AuthzGroupService authzGroupService;
 	private EmailService emailService;
+	private DigestService digestService;
 	private ContentHostingService contentHostingService;
 	private SecurityService securityService;
 	private EntityManager entityManager;
@@ -95,6 +95,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		functionManager = (FunctionManager) componentManager.get(FunctionManager.class);
 		authzGroupService = (AuthzGroupService) componentManager.get(AuthzGroupService.class);
 		emailService = (EmailService) componentManager.get(EmailService.class);
+		digestService = (DigestService) componentManager.get(DigestService.class);
 		securityService = (SecurityService) componentManager.get(SecurityService.class);
 		contentHostingService = (ContentHostingService) componentManager.get(ContentHostingService.class);
 		eventTrackingService = (EventTrackingService) componentManager.get(EventTrackingService.class);
@@ -406,151 +407,51 @@ public class SakaiProxyImpl implements SakaiProxy
 			return ""; // this can happen if the user does not longer exist in the system
 		}
 	}
-
-	public void sendEmailMessageToSiteUsers(String subject,String message, List<String> exclusions)
+	
+	public void sendEmailMessage(String subject,String body, String user)
 	{
-		class EmailSender implements Runnable
+		try
 		{
-			public final String MULTIPART_BOUNDARY = "======sakai-multi-part-boundary======";
-			public final String BOUNDARY_LINE = "\n\n--"+MULTIPART_BOUNDARY+"\n";
-			public final String TERMINATION_LINE = "\n\n--"+MULTIPART_BOUNDARY+"--\n\n";
-			public final String MIME_ADVISORY = "This message is for MIME-compliant mail readers.";
-			public final String PLAIN_TEXT_HEADERS= "Content-Type: text/plain\n\n";
-			public final String HTML_HEADERS = "Content-Type: text/html; charset=ISO-8859-1\n\n";
-			public final String HTML_END = "\n  </body>\n</html>\n";
+			List<String> additionalHeader = new ArrayList<String>();
+			additionalHeader.add("Content-Type: text/html; charset=ISO-8859-1");
 
-			private Thread runner;
-
-			private String sender;
-
-			private String subject;
-
-			private String text;
-
-			private Set<String> participants;
-
-			public EmailSender(String from, Set<String> to, String subject, String text)
+			String emailParticipant = getEmailForTheUser(user);
+			try
 			{
-				this.sender = from;
-				this.participants = to;
-				this.text = text;
-				this.subject = subject;
-				runner = new Thread(this,"Yaft Emailer Thread");
-				runner.start();
+				String sender = "sakai-forum@" + serverConfigurationService.getServerName();
+				emailService.send(sender, emailParticipant, subject, body, emailParticipant, sender, additionalHeader);
 			}
-
-			public synchronized void run()
+			catch (Exception e)
 			{
-				try
-				{
-					String emailText = "<html><body>";
-					emailText += text;
-					emailText += "</body></html>";
-
-					List<String> additionalHeader = new ArrayList<String>();
-					additionalHeader.add("Content-Type: text/html; charset=ISO-8859-1");
-					
-					String formattedSubject = formatSubject(subject);
-					String formattedMessage = formatMessage(subject,text);
-
-					for (String userId : participants)
-					{
-						String emailParticipant = getEmailForTheUser(userId);
-						try
-						{
-							// TODO: This should all be parameterised and internationalised.
-							// logger.info("Sending email to " + participantId + " ...");
-							//emailService.send(sender, emailParticipant, formattedSubject, emailText, emailParticipant, sender, getHeaders(emailParticipant, formattedSubject));
-							emailService.send(sender, emailParticipant, subject, emailText, emailParticipant, sender, additionalHeader);
-						}
-						catch (Exception e)
-						{
-							System.out.println("Failed to send email to '" + userId + "'. Message: " + e.getMessage());
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				System.out.println("Failed to send email to '" + user + "'. Message: " + e.getMessage());
 			}
-			
-			private List<String> getHeaders(String emailTo, String subject){
-				List<String> headers = new ArrayList<String>();
-				headers.add("MIME-Version: 1.0");
-				headers.add("Content-Type: multipart/alternative; boundary=\""+MULTIPART_BOUNDARY+"\"");
-				headers.add(subject);
-				headers.add(getFrom());
-				if (StringUtil.trimToNull(emailTo) != null) {
-					headers.add("To: " + emailTo);
-				}
-				
-				return headers;
-			}
-			
-			private String getFrom(){
-				StringBuilder sb = new StringBuilder();
-				sb.append("From: ");
-				sb.append(serverConfigurationService.getString("ui.service","Sakai"));
-				sb.append(" <sakai-forum@");
-				sb.append(serverConfigurationService.getServerName());
-				sb.append(">");
-				
-				return sb.toString();
-			}
-			
-			private String formatSubject(String subject) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Subject: ");
-				sb.append(subject);
-				
-				return sb.toString();
-			}
-			
-			private String htmlPreamble(String subject) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n");
-				sb.append("\"http://www.w3.org/TR/html4/loose.dtd\">\n");
-				sb.append("<html>\n");
-				sb.append("<head><title>");
-				sb.append(subject);
-				sb.append("</title></head>\n");
-				sb.append("<body>\n");
-				
-				return sb.toString();
-			}
-
-			
-			/** helper methods for formatting the message */
-			private String formatMessage(String subject, String message) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(MIME_ADVISORY);
-				sb.append(BOUNDARY_LINE);
-				sb.append(PLAIN_TEXT_HEADERS);
-				sb.append(Validator.escapeHtmlFormattedText(message));
-				sb.append(BOUNDARY_LINE);
-				sb.append(HTML_HEADERS);
-				sb.append(htmlPreamble(subject));
-				sb.append(message);
-				sb.append(HTML_END);
-				sb.append(TERMINATION_LINE);
-				
-				return sb.toString();
-			}
-
 		}
-		
-		Set<String> siteUsers = getSiteUsers();
-		
-		if(exclusions != null && exclusions.size() > 0)
+		catch (Exception e)
 		{
-			for(String excludedId : exclusions)
-				siteUsers.remove(excludedId);
+			e.printStackTrace();
 		}
-		
-		new EmailSender("sakai-forum@" + serverConfigurationService.getServerName(), siteUsers, subject, message);
 	}
-	private Set<String> getSiteUsers()
+	
+	public void addDigestMessage(String user,String subject, String body)
+	{
+		try
+		{
+			try
+			{
+				digestService.digest(user, subject, body);
+			}
+			catch (Exception e)
+			{
+				System.out.println("Failed to add message to digest. Message: " + e.getMessage());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public Set<String> getSiteUsers()
 	{
 		try
 		{

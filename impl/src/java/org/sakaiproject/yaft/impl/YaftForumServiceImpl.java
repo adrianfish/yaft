@@ -1,13 +1,10 @@
 package org.sakaiproject.yaft.impl;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.entity.api.Entity;
@@ -22,6 +19,7 @@ import org.sakaiproject.yaft.api.SearchResult;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
+import org.sakaiproject.yaft.api.YaftPreferences;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -125,14 +123,16 @@ public class YaftForumServiceImpl implements YaftForumService
 		if(sendMail && "READY".equals(message.getStatus()))
 		{
 			Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
+			
+			Set<String> users = sakaiProxy.getSiteUsers();
 		
 			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
+			
+			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
 		
-			String url = sakaiProxy.getDirectUrl("/messages/"
-							+ message.getId());
-		
-			sakaiProxy.sendEmailMessageToSiteUsers("New Sakai Forum Message",message.getCreatorDisplayName() + " updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'"
-													,unsubscribers);
+			String body = message.getCreatorDisplayName() + " updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
+			
+			new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
 		}
 	}
 	
@@ -157,13 +157,15 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		if(sendMail)
 		{
+			Set<String> users = sakaiProxy.getSiteUsers();
+			
 			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
-		
-			String url = sakaiProxy.getDirectUrl("/messages/"
-							+ message.getId());
-		
-			sakaiProxy.sendEmailMessageToSiteUsers("New Sakai Forum Message",message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "'"
-													,unsubscribers);
+			
+			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
+			
+			String body = message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "'";
+			
+			new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
 		}
 		
 		return discussion;
@@ -333,13 +335,21 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
 		
-		List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
+		Set<String> recipients = sakaiProxy.getSiteUsers();
 		
-		String url = sakaiProxy.getDirectUrl("/messages/"
-						+ message.getId());
+		List<String> exclusions = persistenceManager.getDiscussionUnsubscribers(discussion.getId());
 		
-		sakaiProxy.sendEmailMessageToSiteUsers("New Sakai Forum Message",message.getCreatorDisplayName() + " added a message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'"
-												,unsubscribers);
+		if(exclusions != null && exclusions.size() > 0)
+		{
+			for(String excludedId : exclusions)
+				recipients.remove(excludedId);
+		}
+		
+		String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
+		
+		String body = message.getCreatorDisplayName() + " added a message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
+		
+		new EmailSender(recipients, exclusions, body,sakaiProxy.getCurrentSiteId());
 	}
 	
 	/** START EntityProducer IMPLEMENTATION */
@@ -592,5 +602,70 @@ public class YaftForumServiceImpl implements YaftForumService
 			userId = sakaiProxy.getCurrentUser().getId();
 		
 		return persistenceManager.getForumUnsubscriptions(userId);
+	}
+
+	public boolean savePreferences(YaftPreferences preferences)
+	{
+		return persistenceManager.savePreferences(preferences);
+	}
+	
+	public YaftPreferences getPreferencesForUser(String user,String siteId)
+	{
+		return persistenceManager.getPreferencesForUser(user,siteId);
+	}
+
+	public YaftPreferences getPreferencesForCurrentUserAndSite()
+	{
+		return persistenceManager.getPreferencesForCurrentUserAndSite();
+	}
+	
+	private class EmailSender implements Runnable
+	{
+		private Thread runner;
+
+		private String body;
+		
+		private String siteId;
+
+		private Set<String> participants;
+
+		public EmailSender(Set<String> to, List<String> exclusions,String body,String siteId)
+		{
+			this.participants = to;
+			this.body = body;
+			this.siteId = siteId;
+			
+			if(exclusions != null && exclusions.size() > 0)
+			{
+				for(String excludedId : exclusions)
+					participants.remove(excludedId);
+			}
+			
+			runner = new Thread(this,"Yaft Emailer Thread");
+			runner.start();
+		}
+
+		public synchronized void run()
+		{
+			try
+			{
+				for (String user : participants)
+				{
+					YaftPreferences prefs = getPreferencesForUser(user,siteId);
+		
+					if(YaftPreferences.EACH.equals(prefs.getEmail()))
+					{
+						String emailBody = "<html><body>" + body + "</body></html>";
+						sakaiProxy.sendEmailMessage("New Sakai Forum Message",emailBody,user);
+					}
+					else if(YaftPreferences.DIGEST.equals(prefs.getEmail()))
+						sakaiProxy.addDigestMessage(user,"New Sakai Forum Message",body);
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -3,6 +3,7 @@ var yaftPlacementId = null;
 var yaftSiteId = null;
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
+var yaftCurrentUserPreferences = null;
 var yaftUnsubscriptions = null;
 var yaftForumUnsubscriptions = null;
 var yaftCurrentForums = null;
@@ -34,6 +35,7 @@ var yaftShowingDeleted = false;
 	yaftSiteId = arg.siteId;
 	yaftCurrentUser = YaftUtils.getCurrentUser(arg.placementId);
 	yaftCurrentUserPermissions = YaftUtils.getUserPermissions(arg.placementId);
+	yaftCurrentUserPreferences = YaftUtils.getUserPreferences(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
 	yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
 	
@@ -426,6 +428,14 @@ function switchState(state,arg)
 				alert("Failed to get permissions. Reason: " + errorThrown);
 			}
 	   	});
+	}
+	else if(state == 'preferences')
+	{
+		YaftUtils.render('yaft_preferences_breadcrumb_template',arg,'yaft_breadcrumb');
+		YaftUtils.render('yaft_preferences_template',{},'yaft_content');
+		$('#yaft_email_' + yaftCurrentUserPreferences.email + '_option').attr('checked',true);
+		$('#yaft_view_' + yaftCurrentUserPreferences.view + '_option').attr('checked',true);
+	 	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
 	}
 	
 	return false;

@@ -25,6 +25,7 @@ import org.sakaiproject.yaft.api.ForumPopulatedStates;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.SearchResult;
+import org.sakaiproject.yaft.api.YaftPreferences;
 import org.sakaiproject.yaft.impl.sql.ColumnNames;
 import org.sakaiproject.yaft.impl.sql.DefaultSqlGenerator;
 import org.sakaiproject.yaft.impl.sql.HypersonicGenerator;
@@ -1893,5 +1894,134 @@ public class YaftPersistenceManager
 			
 			sakaiProxy.returnConnection(connection);
 		}
+	}
+
+	public boolean savePreferences(YaftPreferences preferences)
+	{
+		Connection connection = null;
+		Statement statement = null;
+
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			String sql = sqlGenerator.getSavePreferencesStatement(preferences,sakaiProxy.getCurrentUser().getId(),sakaiProxy.getCurrentSiteId(),connection);
+			
+			statement = connection.createStatement();
+				
+			statement.executeUpdate(sql);
+				
+			return true;
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst saving preferences", e);
+			return false;
+		}
+		finally
+		{
+			try
+			{
+				statement.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+	}
+
+	public YaftPreferences getPreferencesForCurrentUserAndSite()
+	{
+		YaftPreferences yaftPreferences = new YaftPreferences();
+		
+		Connection connection = null;
+		Statement statement = null;
+
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			String sql = sqlGenerator.getSelectPreferencesStatement(sakaiProxy.getCurrentUser().getId(),sakaiProxy.getCurrentSiteId());
+			
+			statement = connection.createStatement();
+				
+			ResultSet rs = statement.executeQuery(sql);
+			
+			if(rs.next())
+			{
+				yaftPreferences.setEmail(rs.getString("EMAIL_ALERTS"));
+				yaftPreferences.setView(rs.getString("VIEW_MODE"));
+			}
+			
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting preferences", e);
+		}
+		finally
+		{
+			try
+			{
+				statement.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return yaftPreferences;
+	}
+
+	public YaftPreferences getPreferencesForUser(String user,String siteId)
+	{
+		YaftPreferences yaftPreferences = new YaftPreferences();
+		
+		Connection connection = null;
+		Statement statement = null;
+		
+		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
+
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			String sql = sqlGenerator.getSelectPreferencesStatement(user,siteId);
+			
+			statement = connection.createStatement();
+				
+			ResultSet rs = statement.executeQuery(sql);
+			
+			if(rs.next())
+			{
+				yaftPreferences.setEmail(rs.getString("EMAIL_ALERTS"));
+				yaftPreferences.setView(rs.getString("VIEW_MODE"));
+			}
+			
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting preferences", e);
+		}
+		finally
+		{
+			try
+			{
+				statement.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return yaftPreferences;
 	}
 }

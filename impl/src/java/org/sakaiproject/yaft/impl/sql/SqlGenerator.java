@@ -8,6 +8,7 @@ import java.util.List;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.YaftPreferences;
 
 public interface SqlGenerator
 {
@@ -93,4 +94,8 @@ public interface SqlGenerator
 	String getForumUnsubscriptionsStatement(String userId);
 
 	PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception;
+
+	String getSavePreferencesStatement(YaftPreferences preferences, String id, String currentSiteId,Connection conn) throws Exception;
+
+	String getSelectPreferencesStatement(String userId, String siteId);
 }

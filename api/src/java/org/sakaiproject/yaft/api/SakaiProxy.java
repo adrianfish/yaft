@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.entity.api.EntityProducer;
-import org.sakaiproject.event.api.Event;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.user.api.User;
@@ -47,10 +47,12 @@ public interface SakaiProxy
 	public YaftPermissions getPermissionsForCurrentUser(String siteId);
 
 	public void savePermissions(String siteId,Map<String, YaftPermissions> permissionMap) throws Exception;
-
-	public void sendEmailMessageToSiteUsers(String subject,String message, List<String> exclusions);
+	
+	public void sendEmailMessage(String subject,String body, String user);
 
 	public User getCurrentUser();
+	
+	public Set<String> getSiteUsers();
 
 	public String getPortalUrl();
 	
@@ -83,4 +85,6 @@ public interface SakaiProxy
 	public void postEvent(String event,String reference,boolean modify);
 
 	public byte[] getResourceBytes(String resourceId);
+
+	public void addDigestMessage(String user,String subject, String body);
 }

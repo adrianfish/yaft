@@ -1074,6 +1074,28 @@ var YaftUtils;
 	  	
 	  	return permissions;
 	}
+
+	YaftUtils.getUserPreferences = function(placementId)
+	{
+		var preferences = null;
+		jQuery.ajax(
+		{
+	 		url : "/portal/tool/" + placementId + "/data/userPreferences",
+	   		dataType : "json",
+	   		async : false,
+	   		cache : false,
+		   	success : function(prefs)
+			{
+				preferences = prefs;
+			},
+			error : function(xmlHttpRequest,status,error)
+			{
+				alert("Failed to get the user preferences. Reason: " + error);
+			}
+	  	});
+	  	
+	  	return preferences;
+	}
 	
 	YaftUtils.getCurrentUser = function(placementId)
 	{

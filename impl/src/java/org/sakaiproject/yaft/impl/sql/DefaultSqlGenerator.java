@@ -11,14 +11,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.YaftPreferences;
 
 public class DefaultSqlGenerator implements SqlGenerator
 {
@@ -114,6 +113,13 @@ public class DefaultSqlGenerator implements SqlGenerator
 				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
 				+ "NUMBER_READ INT NOT NULL,"
 				+ "PRIMARY KEY (DISCUSSION_ID,USER_ID))");
+		
+		statements.add("CREATE TABLE YAFT_PREFERENCES (" 
+				+ "USER_ID " + VARCHAR + "(99) NOT NULL,"
+				+ "SITE_ID " + VARCHAR + "(99) NOT NULL,"
+				+ "EMAIL_ALERTS VARCHAR(24) NOT NULL,"
+				+ "VIEW_MODE VARCHAR(16) NOT NULL,"
+				+ "PRIMARY KEY (USER_ID,SITE_ID))");
 		
 		return statements;
 	}
@@ -735,5 +741,30 @@ public class DefaultSqlGenerator implements SqlGenerator
 		st.setString(5,discussion.getId());
 		
 		return st;
+	}
+
+	public String getSavePreferencesStatement(YaftPreferences preferences, String userId, String siteId,Connection conn) throws Exception
+	{
+		Statement testST = null;
+		
+		try
+		{
+			testST = conn.createStatement();
+			ResultSet rs = testST.executeQuery("SELECT * FROM YAFT_PREFERENCES WHERE USER_ID = '" + userId + "' AND SITE_ID = '" + siteId + "'");
+			
+			if(rs.next())
+				return "UPDATE YAFT_PREFERENCES SET EMAIL_ALERTS = '" + preferences.getEmail() + "',VIEW_MODE = '" + preferences.getView() + "' WHERE USER_ID = '" + userId + "' AND SITE_ID = '" + siteId + "'";
+			else
+				return "INSERT INTO YAFT_PREFERENCES (USER_ID,SITE_ID,EMAIL_ALERTS,VIEW_MODE) VALUES('" + userId + "','" + siteId + "','" + preferences.getEmail() + "','" + preferences.getView() + "')";
+		}
+		finally
+		{
+			if(testST != null) testST.close();
+		}
+	}
+
+	public String getSelectPreferencesStatement(String userId, String siteId)
+	{
+		return "SELECT * FROM YAFT_PREFERENCES WHERE USER_ID = '" + userId + "' AND SITE_ID = '" + siteId + "'";
 	}
 }
