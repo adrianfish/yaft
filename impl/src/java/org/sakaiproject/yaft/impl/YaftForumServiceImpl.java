@@ -11,6 +11,7 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
@@ -69,7 +70,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getForum(forumId,state);
 	}
 	
-	public Discussion getDiscussion(String discussionId,boolean fully)
+	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception
 	{
 		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
 		
@@ -122,17 +123,24 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		if(sendMail && "READY".equals(message.getStatus()))
 		{
-			Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
+			try
+			{
+				Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
 			
-			Set<String> users = sakaiProxy.getSiteUsers();
+				Set<String> users = sakaiProxy.getSiteUsers();
 		
-			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
+				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
 			
-			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
+				String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
 		
-			String body = message.getCreatorDisplayName() + " updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
+				String body = message.getCreatorDisplayName() + " updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
 			
-			new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
+				new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
+			}
+			catch(Exception e)
+			{
+				logger.error("Failed to send message email.",e);
+			}
 		}
 	}
 	
@@ -209,16 +217,23 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public boolean deleteDiscussion(String discussionId)
 	{
-		Discussion discussion = getDiscussion(discussionId,false);
-		
-		if(persistenceManager.deleteDiscussion(discussionId))
+		try
 		{
-			sakaiProxy.removeCalendarEntry("Start of '" + discussion.getSubject() + "'", "Start of '" + discussion.getSubject() + "' Discussion (Click to launch)");
-			sakaiProxy.removeCalendarEntry("End of '" + discussion.getSubject() + "'", "End of '" + discussion.getSubject() + "' Discussion");
+			Discussion discussion = getDiscussion(discussionId,false);
+		
+			if(persistenceManager.deleteDiscussion(discussionId))
+			{
+				sakaiProxy.removeCalendarEntry("Start of '" + discussion.getSubject() + "'", "Start of '" + discussion.getSubject() + "' Discussion (Click to launch)");
+				sakaiProxy.removeCalendarEntry("End of '" + discussion.getSubject() + "'", "End of '" + discussion.getSubject() + "' Discussion");
 			
-			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
-			sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
-			return true;
+				String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
+				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
+				return true;
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to delete discussion.",e);
 		}
 		
 		return false;
@@ -333,23 +348,30 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		persistenceManager.publishMessage(forumId,message.getId());
 		
-		Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
-		
-		Set<String> recipients = sakaiProxy.getSiteUsers();
-		
-		List<String> exclusions = persistenceManager.getDiscussionUnsubscribers(discussion.getId());
-		
-		if(exclusions != null && exclusions.size() > 0)
+		try
 		{
-			for(String excludedId : exclusions)
-				recipients.remove(excludedId);
+			Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
+		
+			Set<String> recipients = sakaiProxy.getSiteUsers();
+		
+			List<String> exclusions = persistenceManager.getDiscussionUnsubscribers(discussion.getId());
+		
+			if(exclusions != null && exclusions.size() > 0)
+			{
+				for(String excludedId : exclusions)
+					recipients.remove(excludedId);
+			}
+		
+			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
+		
+			String body = message.getCreatorDisplayName() + " added a message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
+		
+			new EmailSender(recipients, exclusions, body,sakaiProxy.getCurrentSiteId());
 		}
-		
-		String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-		
-		String body = message.getCreatorDisplayName() + " added a message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
-		
-		new EmailSender(recipients, exclusions, body,sakaiProxy.getCurrentSiteId());
+		catch(Exception e)
+		{
+			logger.error("Failed to publish message.",e);
+		}
 	}
 	
 	/** START EntityProducer IMPLEMENTATION */

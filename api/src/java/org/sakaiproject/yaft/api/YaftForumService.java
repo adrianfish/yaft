@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityProducer;
+import org.sakaiproject.exception.IdUnusedException;
 
 public interface YaftForumService extends EntityProducer
 {
@@ -35,7 +36,7 @@ public interface YaftForumService extends EntityProducer
 	
 	public Forum getForumForTitle(String title,String state);
 	
-	public Discussion getDiscussion(String discussionId,boolean fully);
+	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception;
 	
 	public SakaiProxy getSakaiProxy();
 

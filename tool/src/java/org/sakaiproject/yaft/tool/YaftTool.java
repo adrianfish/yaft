@@ -30,6 +30,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.component.api.ComponentManager;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
@@ -44,6 +45,12 @@ import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftPermissions;
 import org.sakaiproject.yaft.api.YaftPreferences;
 
+/**
+ * This servlet handles all of the REST type stuff. At some point this may all
+ * move into an EntityProvider.
+ * 
+ * @author Adrian Fish (a.fish@lancaster.ac.uk)
+ */
 public class YaftTool extends HttpServlet
 {
 	private Logger logger = Logger.getLogger(YaftTool.class);
@@ -77,6 +84,7 @@ public class YaftTool extends HttpServlet
 		String siteId = sakaiProxy.getCurrentSiteId();
 		String placementId = sakaiProxy.getCurrentToolId();
 		
+		// We need to pass the language code to the JQuery code in the pages.
 		Locale locale = (new ResourceLoader(user.getId())).getLocale();
 		String languageCode = locale.getLanguage();
 
@@ -84,6 +92,7 @@ public class YaftTool extends HttpServlet
 
 		if (pathInfo == null || pathInfo.length() < 1)
 		{
+			// There's no path info, so this is the initial state
 			response.sendRedirect("/sakai-yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode);
 			return;
 		}
@@ -565,16 +574,30 @@ public class YaftTool extends HttpServlet
 					if (parts.length == 3)
 					{
 						// This is a request for a particular discussion
-						Discussion discussion = yaftForumService.getDiscussion(discussionId,true);
-						JsonConfig config = new JsonConfig();
-						config.setExcludes(new String[] {"properties","reference"});
-						JSONObject json = JSONObject.fromObject(discussion,config);
+						
+						try
+						{
+							Discussion discussion = yaftForumService.getDiscussion(discussionId,true);
+							JsonConfig config = new JsonConfig();
+							config.setExcludes(new String[] {"properties","reference"});
+							JSONObject json = JSONObject.fromObject(discussion,config);
 
-						if (logger.isDebugEnabled())
-							logger.debug("Discussion JSON: " + json.toString());
+							if (logger.isDebugEnabled())
+								logger.debug("Discussion JSON: " + json.toString());
 
-						response.setContentType("text/javascript");
-						json.write(response.getWriter());
+							response.setContentType("text/javascript");
+							json.write(response.getWriter());
+						}
+						catch(IdUnusedException ide)
+						{
+							logger.error("A valid discussion id must be supplied. Returning BAD REQUEST ...");
+							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						}
+						catch(Exception e)
+						{
+							logger.error("Failed to get discussion.",e);
+						}
+						
 						response.getWriter().close();
 						return;
 					}

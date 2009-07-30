@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
@@ -460,7 +461,7 @@ public class YaftPersistenceManager
 		return discussion;
 	}
 	
-	public Discussion getDiscussion(String discussionId,boolean fully)
+	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception
 	{
 		Connection connection = null;
 		Statement st = null;
@@ -480,13 +481,12 @@ public class YaftPersistenceManager
 				
 			}
 			else
+			{
 				logger.error("No discussion with id: " + discussionId);
+				throw new IdUnusedException("No discussion with id: " + discussionId);
+			}
 			
 			rs.close();
-		}
-		catch (Exception e)
-		{
-			logger.error("Caught exception whilst deleting comment.", e);
 		}
 		finally
 		{
@@ -691,11 +691,10 @@ public class YaftPersistenceManager
 	{
 		Connection connection = null;
 		Statement statement = null;
-		
-		String forumId = getDiscussion(discussionId, false).getForumId();
 
 		try
 		{
+			String forumId = getDiscussion(discussionId, false).getForumId();
 			connection = sakaiProxy.borrowConnection();
 			boolean oldAutoCommitFlag = connection.getAutoCommit();
 			connection.setAutoCommit(false);
@@ -723,6 +722,11 @@ public class YaftPersistenceManager
 			{
 				connection.setAutoCommit(oldAutoCommitFlag);
 			}
+		}
+		catch (IdUnusedException iue)
+		{
+			logger.error("No discussion with id '" + discussionId + "' exists");
+			return false;
 		}
 		catch (Exception e)
 		{
