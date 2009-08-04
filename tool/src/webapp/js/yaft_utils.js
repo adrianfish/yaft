@@ -1197,7 +1197,7 @@ var YaftUtils;
 	oFCKeditor.Height = "500" ;
 	oFCKeditor.ToolbarSet = 'Default' ;
 		
-	var collectionId = "/group/" + siteId;
+	var collectionId = "/group/" + siteId + "/";
 		
 	oFCKeditor.Config['ImageBrowserURL'] = oFCKeditor.BasePath + "editor/filemanager/browser/default/browser.html?Connector=/sakai-fck-connector/filemanager/connector&Type=Image&CurrentFolder=" + collectionId;
 	oFCKeditor.Config['LinkBrowserURL'] = oFCKeditor.BasePath + "editor/filemanager/browser/default/browser.html?Connector=/sakai-fck-connector/filemanager/connector&Type=Link&CurrentFolder=" + collectionId;
