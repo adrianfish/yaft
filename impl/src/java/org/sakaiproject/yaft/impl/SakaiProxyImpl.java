@@ -35,6 +35,8 @@ import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.EventTrackingService;
+import org.sakaiproject.event.api.UsageSession;
+import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.event.cover.NotificationService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
@@ -80,6 +82,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	private EventTrackingService eventTrackingService;
 	private CalendarService calendarService;
 	private TimeService timeService;
+	private UsageSessionService usageSessionService;
 	
 	public SakaiProxyImpl()
 	{
@@ -102,6 +105,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		timeService = (TimeService) componentManager.get(TimeService.class);
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
+		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 	}
 	
 	public boolean isAutoDDL()
@@ -663,5 +667,42 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 		
 		return null;
+	}
+
+	public List<String> getOfflineYaftUserIds()
+	{
+		List<String> yaftUserIds = new ArrayList<String>();
+		
+		List<Site> allSites = siteService.getSites(SiteService.SelectionType.ANY, null, null, null, SiteService.SortType.NONE, null);
+		
+		for(Site site : allSites)
+		{
+			if(site.getToolForCommonId("sakai.yaft") != null)
+			{
+				// This site contains yaft. Get it's user ids.
+				Set<String> userIds = site.getUsers();
+				yaftUserIds.addAll(userIds);
+			}
+		}
+		
+		List<UsageSession> openSessions = usageSessionService.getOpenSessions();
+		
+		List<String> offlineYaftUserIds = new ArrayList<String>(); 
+		
+		for(String yaftUserId : yaftUserIds)
+		{
+			boolean offline = true;
+			
+			for(UsageSession session : openSessions)
+			{
+				if(session.getUserId().equals(yaftUserId))
+					offline = false;
+			}
+			
+			if(offline)
+				offlineYaftUserIds.add(yaftUserId);
+		}
+		
+		return offlineYaftUserIds;
 	}
 }

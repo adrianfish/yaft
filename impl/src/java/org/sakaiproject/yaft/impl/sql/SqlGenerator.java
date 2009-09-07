@@ -98,4 +98,8 @@ public interface SqlGenerator
 	String getSavePreferencesStatement(YaftPreferences preferences, String id, String currentSiteId,Connection conn) throws Exception;
 
 	String getSelectPreferencesStatement(String userId, String siteId);
+
+	String getSelectActiveDiscussionsStatement(String id);
+
+	List<PreparedStatement> getAddNewMessageStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
 }

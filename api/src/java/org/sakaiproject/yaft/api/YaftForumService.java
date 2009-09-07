@@ -105,4 +105,6 @@ public interface YaftForumService extends EntityProducer
 	public boolean savePreferences(YaftPreferences preferences);
 
 	public YaftPreferences getPreferencesForCurrentUserAndSite();
+
+	public List<ActiveDiscussion> getActiveDiscussions();
 }

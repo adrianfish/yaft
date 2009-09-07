@@ -87,4 +87,6 @@ public interface SakaiProxy
 	public byte[] getResourceBytes(String resourceId);
 
 	public void addDigestMessage(String user,String subject, String body);
+
+	public List<String> getOfflineYaftUserIds();
 }

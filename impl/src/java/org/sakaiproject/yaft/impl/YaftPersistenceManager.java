@@ -19,6 +19,9 @@ import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
+import org.sakaiproject.site.api.ToolConfiguration;
+import org.sakaiproject.site.cover.SiteService;
+import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
@@ -277,6 +280,8 @@ public class YaftPersistenceManager
 			connection = sakaiProxy.borrowConnection();
 			boolean oldAutoCommitFlag = connection.getAutoCommit();
 			connection.setAutoCommit(false);
+			List<PreparedStatement> messageStatements = null;
+			List<PreparedStatement> newStatements = null;
 
 			try
 			{
@@ -289,15 +294,27 @@ public class YaftPersistenceManager
 					}
 				}
 				
-				List<PreparedStatement> statements = sqlGenerator.getAddOrUpdateMessageStatements(forumId,message,connection);
+				messageStatements = sqlGenerator.getAddOrUpdateMessageStatements(forumId,message,connection);
 				
-				for(PreparedStatement statement : statements)
+				for(PreparedStatement statement : messageStatements)
 					statement.executeUpdate();
 				
 				connection.commit();
 				
 				if(!"DRAFT".equals(message.getStatus()))
 					markMessageRead(message.getId(), forumId, message.getDiscussionId());
+				
+				// We need to get user ids for every user who is both a member
+				// of a site containing yaft, and is currently offline ...
+				
+				List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds();
+				
+				newStatements = sqlGenerator.getAddNewMessageStatements(message,offlineUserIds,connection);
+				
+				for(PreparedStatement statement : newStatements)
+					statement.executeUpdate();
+				
+				connection.commit();
 			}
 			catch (Exception e)
 			{
@@ -306,6 +323,18 @@ public class YaftPersistenceManager
 			}
 			finally
 			{
+				if(messageStatements != null)
+				{
+					for(PreparedStatement st : messageStatements)
+						st.close();
+				}
+				
+				if(newStatements != null)
+				{
+					for(PreparedStatement st : newStatements)
+						st.close();
+				}
+				
 				connection.setAutoCommit(oldAutoCommitFlag);
 			}
 		}
@@ -1880,7 +1909,7 @@ public class YaftPersistenceManager
 			if(start > 0L && end > 0L)
 			{
 				String url = sakaiProxy.getServerUrl() + discussion.getUrl();
-				sakaiProxy.addCalendarEntry("Start of '" + discussion.getSubject() + "'","<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">Start of '" + discussion.getSubject() + "' Discussion (Click to launch)</a>","Activity",start + 32400000,start + 32460000);
+				sakaiProxy.addCalendarEntry("Start of '" + discussion.getSubject() + "'","<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,scrollbars=1,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">Start of '" + discussion.getSubject() + "' Discussion (Click to launch)</a>","Activity",start + 32400000,start + 32460000);
 				sakaiProxy.addCalendarEntry("End of '" + discussion.getSubject() + "'","End of '" + discussion.getSubject() + "' Discussion","Activity",end + 32400000,end + 32460000);
 			}
 		}
@@ -2027,5 +2056,60 @@ public class YaftPersistenceManager
 		}
 		
 		return yaftPreferences;
+	}
+
+	public List<ActiveDiscussion> getActiveDiscussions()
+	{
+		List<ActiveDiscussion> discussions = new ArrayList<ActiveDiscussion>();
+		
+		Connection connection = null;
+		Statement statement = null;
+		
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			String sql = sqlGenerator.getSelectActiveDiscussionsStatement(sakaiProxy.getCurrentUser().getId());
+			
+			statement = connection.createStatement();
+				
+			ResultSet rs = statement.executeQuery(sql);
+			
+			while(rs.next())
+			{
+				ActiveDiscussion discussion = new ActiveDiscussion();
+				
+				discussion.setNewMessages(rs.getInt("NEW_MESSAGES"));
+				
+				String discussionId = rs.getString("DISCUSSION_ID"); 
+				String siteId = rs.getString("SITE_ID"); 
+				Site site = SiteService.getSite(siteId);
+				ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
+				String url = "/portal/tool/" + tc.getId() + "/discussions/" + discussionId;
+				discussion.setUrl(url);
+				discussion.setSubject(rs.getString("SUBJECT"));
+				discussion.setLastMessageDate(rs.getTimestamp("LAST_MESSAGE_DATE").getTime());
+				discussions.add(discussion);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting active discussions", e);
+		}
+		finally
+		{
+			try
+			{
+				statement.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return discussions;
 	}
 }

@@ -12,6 +12,7 @@ import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
@@ -689,5 +690,10 @@ public class YaftForumServiceImpl implements YaftForumService
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public List<ActiveDiscussion> getActiveDiscussions()
+	{
+		return persistenceManager.getActiveDiscussions();
 	}
 }
