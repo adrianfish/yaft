@@ -2089,6 +2089,7 @@ public class YaftPersistenceManager
 				discussion.setUrl(url);
 				discussion.setSubject(rs.getString("SUBJECT"));
 				discussion.setLastMessageDate(rs.getTimestamp("LAST_MESSAGE_DATE").getTime());
+				discussion.setLatestMessageSubject(rs.getString("LATEST_MESSAGE_SUBJECT"));
 				discussions.add(discussion);
 			}
 		}

@@ -59,6 +59,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("CREATE TABLE YAFT_DISCUSSION_READ (" + "DISCUSSION_ID CHAR(36) NOT NULL," + "USER_ID " + VARCHAR + "(99) NOT NULL," + "NUMBER_READ INT NOT NULL," + "PRIMARY KEY (DISCUSSION_ID,USER_ID))");
 
 		statements.add("CREATE TABLE YAFT_PREFERENCES (" + "USER_ID " + VARCHAR + "(99) NOT NULL," + "SITE_ID " + VARCHAR + "(99) NOT NULL," + "EMAIL_ALERTS VARCHAR(24) NOT NULL," + "VIEW_MODE VARCHAR(16) NOT NULL," + "PRIMARY KEY (USER_ID,SITE_ID))");
+		
+		statements.add("CREATE TABLE YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID CHAR(36) NOT NULL,USER_ID " + VARCHAR + "(99) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,SUBJECT " + VARCHAR + "(255) NOT NULL,NEW_MESSAGES INT NOT NULL,LAST_MESSAGE_DATE " + TIMESTAMP + " NOT NULL,LATEST_MESSAGE_SUBJECT " + VARCHAR + "(255) NOT NULL,PRIMARY KEY (DISCUSSION_ID,USER_ID))");
 
 		return statements;
 	}
@@ -713,23 +715,25 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 				if (rs.next())
 				{
-					String sql = "UPDATE YAFT_ACTIVE_DISCUSSIONS SET NEW_MESSAGES = NEW_MESSAGES + 1,LAST_MESSAGE_DATE = ? WHERE DISCUSSION_ID = ? AND USER_ID = ?";
+					String sql = "UPDATE YAFT_ACTIVE_DISCUSSIONS SET NEW_MESSAGES = NEW_MESSAGES + 1,LATEST_MESSAGE_SUBJECT = ?,LAST_MESSAGE_DATE = ? WHERE DISCUSSION_ID = ? AND USER_ID = ?";
 					PreparedStatement statement = connection.prepareStatement(sql);
-					statement.setTimestamp(1, new Timestamp(message.getCreatedDate()));
-					statement.setString(2, message.getDiscussionId());
-					statement.setString(3, userId);
+					statement.setString(1, message.getSubject());
+					statement.setTimestamp(2, new Timestamp(message.getCreatedDate()));
+					statement.setString(3, message.getDiscussionId());
+					statement.setString(4, userId);
 					statements.add(statement);
 				}
 				else
 				{
-					String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,USER_ID,SITE_ID,SUBJECT,NEW_MESSAGES,LAST_MESSAGE_DATE) VALUES(?,?,?,?,?,?)";
+					String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,USER_ID,SITE_ID,SUBJECT,NEW_MESSAGES,LAST_MESSAGE_DATE,LATEST_MESSAGE_SUBJECT) VALUES(?,?,?,(SELECT SUBJECT FROM YAFT_MESSAGE WHERE MESSAGE_ID = ?),?,?,?)";
 					PreparedStatement statement = connection.prepareStatement(sql);
 					statement.setString(1, message.getDiscussionId());
 					statement.setString(2, userId);
 					statement.setString(3, message.getSiteId());
-					statement.setString(4, message.getSubject());
+					statement.setString(4, message.getDiscussionId());
 					statement.setInt(5, 1);
 					statement.setTimestamp(6, new Timestamp(message.getCreatedDate()));
+					statement.setString(7, message.getSubject());
 					statements.add(statement);
 				}
 

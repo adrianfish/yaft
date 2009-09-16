@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript" language="JavaScript" src="lib/trimpath.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/querystring.js"></script>
-<script type="text/javascript" language="JavaScript" src="/library/js/jquery.js"></script>
+<script type="text/javascript" language="JavaScript" src="lib/jquery-1.3.2.min.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.dimensions.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.hoverIntent.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.cluetip.js"></script> 
@@ -721,7 +721,7 @@ ${yaft_forums_label}
 	<form id="main_form" onSubmit="return YaftUtils.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
 	<h4>${yaft_type_your_message_label}</h4>
 	<br />
-	<span>${yaft_subject_label}</span>
+	<span>${yaft_subject_label}:</span>
 	<br />
 	<input id="yaft_message_subject_field" name="subject" type="text" size="48"/>
 	<br />

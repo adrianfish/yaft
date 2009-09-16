@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript" language="JavaScript" src="lib/trimpath.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/querystring.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery.js"></script>
+<script type="text/javascript" language="JavaScript" src="/library/js/jquery.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.url.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.dimensions.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.hoverIntent.js"></script> 
@@ -47,6 +47,7 @@ else
 		<th align="left">${yaft_new_label}</th>
 		<th align="left">${yaft_discussion_label}</th>
 		<th align="left">${yaft_last_message_label}</th>
+		<th align="left">${yaft_subject_label}</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -55,6 +56,7 @@ else
    		<td>${discussion.newMessages}</td>
 		<td style="max-width:250px;"><a href="${discussion.url}" onclick="window.open('${discussion.url}','discussion','location=0,width=500,height=400,resizable=1,scrollbars=1,toolbar=0,menubar=0'); return false;" title="${yaft_discussion_link_tooltip}">${discussion.subject}</a></td>
 		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
+		<td>${discussion.latestMessageSubject}</td>
 	</tr>
 	{/for}
 	</tbody>

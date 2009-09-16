@@ -5,6 +5,7 @@ public class ActiveDiscussion
 	private int newMessages = 0;
 	private String url = "";
 	private String subject = "";
+	private String latestMessageSubject = "";
 	private long lastMessageDate = 0L;
 	
 	public void setNewMessages(int newMessages)
@@ -38,5 +39,13 @@ public class ActiveDiscussion
 	public long getLastMessageDate()
 	{
 		return lastMessageDate;
+	}
+	public void setLatestMessageSubject(String latestMessageSubject)
+	{
+		this.latestMessageSubject = latestMessageSubject;
+	}
+	public String getLatestMessageSubject()
+	{
+		return latestMessageSubject;
 	}
 }
