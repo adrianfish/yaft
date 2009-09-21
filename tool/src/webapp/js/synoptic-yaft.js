@@ -41,7 +41,7 @@ var yaftPlacementId = null;
 	 							cssDesc:'yaftSortableTableHeaderSortDown',
 	 							headers:
 	 								{
-	 									2:{sorter: "isoDate"},
+	 									2:{sorter: "isoDate"}
 	 								}
 	 						});
 
