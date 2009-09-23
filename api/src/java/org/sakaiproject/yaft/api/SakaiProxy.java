@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.entity.api.EntityProducer;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.user.api.User;
@@ -88,5 +89,5 @@ public interface SakaiProxy
 
 	public void addDigestMessage(String user,String subject, String body);
 
-	public List<String> getOfflineYaftUserIds();
+	public List<String> getOfflineYaftUserIds(String siteId) throws IdUnusedException;
 }

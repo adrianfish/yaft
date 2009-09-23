@@ -669,20 +669,18 @@ public class SakaiProxyImpl implements SakaiProxy
 		return null;
 	}
 
-	public List<String> getOfflineYaftUserIds()
+	public List<String> getOfflineYaftUserIds(String siteId) throws IdUnusedException
 	{
 		List<String> yaftUserIds = new ArrayList<String>();
 		
 		List<Site> allSites = siteService.getSites(SiteService.SelectionType.ANY, null, null, null, SiteService.SortType.NONE, null);
+		Site site = siteService.getSite(siteId);
 		
-		for(Site site : allSites)
+		if(site.getToolForCommonId("sakai.yaft") != null)
 		{
-			if(site.getToolForCommonId("sakai.yaft") != null)
-			{
-				// This site contains yaft. Get it's user ids.
-				Set<String> userIds = site.getUsers();
-				yaftUserIds.addAll(userIds);
-			}
+			// This site contains yaft. Get it's user ids.
+			Set<String> userIds = site.getUsers();
+			yaftUserIds.addAll(userIds);
 		}
 		
 		List<UsageSession> openSessions = usageSessionService.getOpenSessions();

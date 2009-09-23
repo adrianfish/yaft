@@ -307,14 +307,22 @@ public class YaftPersistenceManager
 				// We need to get user ids for every user who is both a member
 				// of a site containing yaft, and is currently offline ...
 				
-				List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds();
+				try
+				{
+					List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
 				
-				newStatements = sqlGenerator.getAddNewMessageStatements(message,offlineUserIds,connection);
+					newStatements = sqlGenerator.getAddNewMessageStatements(message,offlineUserIds,connection);
 				
-				for(PreparedStatement statement : newStatements)
-					statement.executeUpdate();
+					for(PreparedStatement statement : newStatements)
+						statement.executeUpdate();
 				
-				connection.commit();
+					connection.commit();
+				}
+				catch (Exception e)
+				{
+					logger.error("Caught exception whilst updating active discussion table. Rolling back ...", e);
+					connection.rollback();
+				}
 			}
 			catch (Exception e)
 			{
