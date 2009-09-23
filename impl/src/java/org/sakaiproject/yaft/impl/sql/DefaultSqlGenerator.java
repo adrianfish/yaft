@@ -365,11 +365,6 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return statements;
 	}
 
-	public String getCensorMessageStatement(String messageId)
-	{
-		return "UPDATE YAFT_MESSAGE SET " + ColumnNames.STATUS + " = 'CENSORED' WHERE " + ColumnNames.MESSAGE_ID + " = '" + messageId + "'";
-	}
-
 	public List<String> getDeleteMessageStatements(Message message, String forumId)
 	{
 		String messageId = message.getId();
@@ -747,5 +742,13 @@ public class DefaultSqlGenerator implements SqlGenerator
 		}
 
 		return statements;
+	}
+
+	public String getDeleteFromActiveDiscussionStatement(String discussionId, String userId)
+	{
+		if(userId != null)
+			return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'";
+		else
+			return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "'";
 	}
 }

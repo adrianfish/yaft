@@ -44,7 +44,6 @@ public interface SqlGenerator
 	
 	List<String> getUndeleteMessageStatements(Message message,String forumId);
 	
-	String getCensorMessageStatement(String messageId);
 	String getDiscussionUnsubscribersStatement(String discussionId);
 
 	String getUnsubscribeFromDiscussionStatement(String userId, String discussionId);
@@ -102,4 +101,6 @@ public interface SqlGenerator
 	String getSelectActiveDiscussionsStatement(String id);
 
 	List<PreparedStatement> getAddNewMessageStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
+
+	String getDeleteFromActiveDiscussionStatement(String discussionId, String userId);
 }

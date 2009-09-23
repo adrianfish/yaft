@@ -75,7 +75,10 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
 		
-		return persistenceManager.getDiscussion(discussionId,fully);
+		Discussion discussion = persistenceManager.getDiscussion(discussionId,fully);
+		persistenceManager.deleteFromActiveDiscussions(discussionId, sakaiProxy.getCurrentUser().getId());
+		
+		return discussion;
 	}
 
 	public List<Forum> getSiteForums(String siteId,boolean fully)
@@ -229,6 +232,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			
 				String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
 				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
+				
 				return true;
 			}
 		}
@@ -238,11 +242,6 @@ public class YaftForumServiceImpl implements YaftForumService
 		}
 		
 		return false;
-	}
-
-	public void censorMessage(String messageId)
-	{
-		persistenceManager.censorMessage(messageId);
 	}
 	
 	public void deleteMessage(Message message,String forumId)

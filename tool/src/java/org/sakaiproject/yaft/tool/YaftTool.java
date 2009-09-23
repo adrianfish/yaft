@@ -307,24 +307,6 @@ public class YaftTool extends HttpServlet
 							return;
 
 						}
-						else if ("censor".equals(messageOp))
-						{
-							yaftForumService.censorMessage(messageId);
-							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("text/plain");
-							response.getWriter().write("success");
-							response.getWriter().close();
-							return;
-						}
-						else if ("uncensor".equals(messageOp))
-						{
-							yaftForumService.showMessage(message);
-							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("text/plain");
-							response.getWriter().write("success");
-							response.getWriter().close();
-							return;
-						}
 						else if ("publish".equals(messageOp))
 						{
 							yaftForumService.publishMessage(forum.getId(),message);

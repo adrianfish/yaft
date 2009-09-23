@@ -515,7 +515,6 @@ public class YaftPersistenceManager
 			if(rs.next())
 			{
 				discussion = getDiscussionFromResults(rs,fully, connection);
-				
 			}
 			else
 			{
@@ -540,6 +539,36 @@ public class YaftPersistenceManager
 		}
 		
 		return discussion;
+	}
+	
+	public boolean deleteFromActiveDiscussions(String discussionId,String userId)
+	{
+		Connection connection = null;
+		Statement st = null;
+
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			st = connection.createStatement();
+			String sql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId,userId);
+			st.executeUpdate(sql);
+			return true;
+		}
+		catch(Exception e)
+		{
+			logger.error("Caught exception whilst deleting from active discussions",e);
+			return  false;
+		}
+		finally
+		{
+			try
+			{
+				st.close();
+			}
+			catch(Exception e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
 	}
 	
 	private Message getMessageFromResults(ResultSet rs, Connection connection) throws Exception
@@ -691,18 +720,50 @@ public class YaftPersistenceManager
 	{
 		Connection connection = null;
 		Statement statement = null;
+		Statement deleteDiscussionST = null;
 
 		try
 		{
 			connection = sakaiProxy.borrowConnection();
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+			
+			try
+			{
 
-			String sql = sqlGenerator.getMarkForumDeletedStatement(forumId);
+				String sql = sqlGenerator.getMarkForumDeletedStatement(forumId);
 				
-			statement = connection.createStatement();
+				statement = connection.createStatement();
 				
-			statement.executeUpdate(sql);
+				statement.executeUpdate(sql);
+			
+				String selectDiscussionsSql = sqlGenerator.getSelectDiscussionIdsForForumStatement(forumId);
+			
+				ResultSet rs = statement.executeQuery(selectDiscussionsSql);
+			
+				deleteDiscussionST = connection.createStatement();
+			
+				while(rs.next())
+				{
+					String discussionId = rs.getString("DISCUSSION_ID");
+					String deleteDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId, null);
+					deleteDiscussionST.executeUpdate(deleteDiscussionSql);
+				}
 				
-			return true;
+				connection.commit();
+				
+				return true;
+			}
+			catch (SQLException sqle)
+			{
+				logger.error("Caught exception whilst deleting forum. Rolling back ...", sqle);
+				connection.rollback();
+				return false;
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
 		}
 		catch (Exception e)
 		{
@@ -714,11 +775,9 @@ public class YaftPersistenceManager
 			try
 			{
 				statement.close();
+				deleteDiscussionST.close();
 			}
-			catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
+			catch (Exception e) {}
 			
 			sakaiProxy.returnConnection(connection);
 		}
@@ -744,6 +803,9 @@ public class YaftPersistenceManager
 				
 				for(String sql : statements)
 					statement.executeUpdate(sql);
+				
+				String deleteActiveDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId, null);
+				statement.executeUpdate(deleteActiveDiscussionSql);
 				
 				connection.commit();
 				
@@ -785,43 +847,6 @@ public class YaftPersistenceManager
 		}
 	}
 
-	public boolean censorMessage(String messageId)
-	{
-		Connection connection = null;
-		Statement statement = null;
-
-		try
-		{
-			connection = sakaiProxy.borrowConnection();
-			
-			String sql = sqlGenerator.getCensorMessageStatement(messageId);
-			
-			statement = connection.createStatement();
-				
-			statement.executeUpdate(sql);
-				
-			return true;
-		}
-		catch (Exception e)
-		{
-			logger.error("Caught exception whilst censoring message", e);
-			return false;
-		}
-		finally
-		{
-			try
-			{
-				statement.close();
-			}
-			catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-			
-			sakaiProxy.returnConnection(connection);
-		}
-	}
-	
 	public boolean deleteMessage(Message message,String forumId)
 	{
 		Connection connection = null;

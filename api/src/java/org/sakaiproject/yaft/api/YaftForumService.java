@@ -57,8 +57,6 @@ public interface YaftForumService extends EntityProducer
 	public void deleteForum(String forumId);
 
 	public boolean deleteDiscussion(String discussionId);
-
-	public void censorMessage(String messageId);
 	
 	public void deleteMessage(Message messageId,String forumId);
 	
