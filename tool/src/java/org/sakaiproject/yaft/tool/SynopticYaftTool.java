@@ -1,50 +1,24 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.JsonConfig;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.component.api.ComponentManager;
-import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.user.api.User;
-import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
-import org.sakaiproject.yaft.api.Attachment;
-import org.sakaiproject.yaft.api.Discussion;
-import org.sakaiproject.yaft.api.Forum;
-import org.sakaiproject.yaft.api.ForumPopulatedStates;
-import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
-import org.sakaiproject.yaft.api.SearchResult;
 import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.api.YaftPermissions;
-import org.sakaiproject.yaft.api.YaftPreferences;
 
 /**
  * This servlet handles all of the REST type stuff. At some point this may all
