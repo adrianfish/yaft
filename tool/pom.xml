@@ -4,7 +4,7 @@
   <parent>
     <artifactId>sakai-yaft-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>M2</version>
+    <version>2.7.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai Yaft Tool</name>
@@ -28,6 +28,21 @@
   <packaging>war</packaging>
 
   <dependencies>
+
+		<dependency>
+			<groupId>org.sakaiproject.kernel</groupId>
+			<artifactId>sakai-kernel-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.sakaiproject.kernel</groupId>
+		    <artifactId>sakai-component-manager</artifactId>
+	   </dependency>
+
+		<dependency>
+			<groupId>org.sakaiproject.kernel</groupId>
+			<artifactId>sakai-kernel-util</artifactId>
+		</dependency>
   
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -35,26 +50,7 @@
       <version>${sakai.servletapi.version}</version>
     </dependency>
     
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-component-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-authz-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-component</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-tool-api</artifactId>
-      <type>jar</type>
-    </dependency>
+		<!--
     	<dependency>
       		<groupId>org.sakaiproject</groupId>
       		<artifactId>sakai-messageforums-api</artifactId>
@@ -62,29 +58,18 @@
       		<type>jar</type>
       		<scope>provided</scope>
     	</dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-site-api</artifactId>
-      <type>jar</type>
-    </dependency>
+		-->
+		<!--
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-tool-servlet</artifactId>
       <type>jar</type>
     </dependency>
+	-->
+	<!--
     <dependency>
       <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-user-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-db-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-entity-api</artifactId>
+      <artifactId>sakai-util-api</artifactId>
       <type>jar</type>
     </dependency>
     <dependency>
@@ -93,18 +78,12 @@
       <type>jar</type>
 	  <version>${sakai.version}</version>
     </dependency>
+	-->
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-profile-api</artifactId>
       <type>jar</type>
     </dependency>
-    
-    <dependency>
-      <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-util-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
