@@ -16,9 +16,6 @@ var yaftShowingDeleted = false;
 
 (function()
 {
-	// We need the toolbar in a template so we can swap in the translations
-	YaftUtils.render('yaft_toolbar_template',{},'yaft_toolbar');
-	
 	// This is always showing in every state, so show it here.
 	$('#yaft_home_link').show();
 	
@@ -38,6 +35,9 @@ var yaftShowingDeleted = false;
 	yaftCurrentUserPreferences = YaftUtils.getUserPreferences(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
 	yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
+	
+	// We need the toolbar in a template so we can swap in the translations
+	YaftUtils.render('yaft_toolbar_template',{},'yaft_toolbar');
 	
 	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null)
 	{

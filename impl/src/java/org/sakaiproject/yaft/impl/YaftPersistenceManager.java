@@ -552,11 +552,11 @@ public class YaftPersistenceManager
 			discussion.setLockedForReading(rs.getBoolean("LOCKED_FOR_READING"));
 			discussion.setLockedForWriting(rs.getBoolean("LOCKED_FOR_WRITING"));
 		
-			Timestamp startStamp = rs.getTimestamp("START");
+			Timestamp startStamp = rs.getTimestamp("START_DATE");
 			if(startStamp != null)
 				discussion.setStart(startStamp.getTime());
 		
-			Timestamp endStamp = rs.getTimestamp("END");
+			Timestamp endStamp = rs.getTimestamp("END_DATE");
 			if(endStamp != null)
 				discussion.setEnd(endStamp.getTime());
 		
@@ -728,11 +728,11 @@ public class YaftPersistenceManager
 		else
 			forum.setLastMessageDate(-1);
 		
-		Timestamp startStamp = rs.getTimestamp("START");
+		Timestamp startStamp = rs.getTimestamp("START_DATE");
 		if(startStamp != null)
 			forum.setStart(startStamp.getTime());
 		
-		Timestamp endStamp = rs.getTimestamp("END");
+		Timestamp endStamp = rs.getTimestamp("END_DATE");
 		if(endStamp != null)
 			forum.setEnd(endStamp.getTime());
 		

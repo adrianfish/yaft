@@ -29,8 +29,14 @@ import net.sf.json.JsonConfig;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.api.app.profile.Profile;
+import org.sakaiproject.authz.api.PermissionsHelper;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.site.api.Site;
+import org.sakaiproject.tool.api.ActiveTool;
+import org.sakaiproject.tool.api.Tool;
+import org.sakaiproject.tool.api.ToolSession;
+import org.sakaiproject.tool.cover.ActiveToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
@@ -339,6 +345,27 @@ public class YaftTool extends HttpServlet
 							}
 						}
 					}
+				}
+				else if ("permissions".equals(part1))
+				{
+					ToolSession session = sakaiProxy.getCurrentToolSession();
+					
+					ActiveTool helperTool = ActiveToolManager.getActiveTool("sakai.permissions.helper");
+					
+					session.setAttribute(helperTool.getId() + Tool.HELPER_DONE_URL,
+							"http://www.swedenteens.com");
+					
+					Site site = sakaiProxy.getCurrentSite();
+				    
+				    session.setAttribute(PermissionsHelper.TARGET_REF, site.getReference());
+				    session.setAttribute(PermissionsHelper.DESCRIPTION, "Set permissions for " +  site.getTitle());
+				    session.setAttribute(PermissionsHelper.PREFIX, "yaft.");
+
+				    session.setAttribute("sakai.permissions.helper" + Tool.HELPER_DONE_URL, "http://www.swedenteens.com");
+				    
+				    helperTool.help(request, response, null, null);
+				    
+				    return;
 				}
 			}
 			else

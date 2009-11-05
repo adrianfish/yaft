@@ -54,6 +54,7 @@ else
 		<a style="display: none;" id="yaft_home_link" title="${yaft_home_tooltip}" href="#" onClick="return switchState('forums');">${yaft_home_label}</a>
 		<a style="display: none;" id="yaft_add_forum_link" title="${yaft_add_forum_tooltip}" href="#" onClick="return switchState('editForum');">${yaft_new_forum_label}</a>
 		<a style="display: none;" id="yaft_add_discussion_link" title="${yaft_add_discussion_tooltip}" href="#" onClick="return switchState('startDiscussion');">${yaft_new_discussion_label}</a>
+		<a style="display: none;" id="yaft_permissions2_link" title="${yaft_permissions_tooltip}" href="/portal/tool/${yaftPlacementId}/permissions">${yaft_permissions_label}</a>
 		<a style="display: none;" id="yaft_permissions_link" title="${yaft_permissions_tooltip}" href="#" onClick="return switchState('permissions');">${yaft_permissions_label}</a>
 		<a style="display: none;" id="yaft_minimal_link" title="${yaft_minimal_tooltip}" href="#" onClick="return switchState('minimal');">${yaft_minimal_label}</a>
 		<a style="display: none;" id="yaft_full_link" title="${yaft_full_tooltip}" href="#" onClick="return switchState('full');">${yaft_full_label}</a>
@@ -345,6 +346,78 @@ ${yaft_forums_label}
 
 <div id="yaft_permissions_breadcrumb_template" style="display:none;"><!--
 <a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_permissions_label}
+-->
+</div>
+
+<div id="yaft_permissions_content_template2" style="display:none"><!--
+<form action="/portal/tool/${yaftPlacementId}" method="POST">
+<input type="hidden" name="function" value="savePermissions"/>
+<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
+<table id="yaft_permissions_table" class="listHier checkGrid">
+	<thead>
+		<tr>
+			<th>Permission</th>
+			{for p in permissions}
+			<th>${p.role}</th>
+			{/for}
+		</tr>
+	</thead>
+	<tbody>
+		<tr><td>forum.create</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.forumCreate}checked="checked"{/if}" name="${p.role}:ForumCreate"/></td>
+			{/for}
+		</tr>
+		<tr><td>forum.delete.own</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.forumDeleteOwn}checked="checked"{/if}" name="${p.role}:ForumDeleteOwn"/></td>
+			{/for}
+		</tr>
+		<tr><td>forum.delete.any</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.forumDeleteAny}checked="checked"{/if}" name="${p.role}:ForumDeleteAny"/></td>
+			{/for}
+		</tr>
+		<tr><td>discussion.create</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.discussionCreate}checked="checked"{/if}" name="${p.role}:DiscussionCreate"/></td>
+			{/for}
+		</tr>
+		<tr><td>discussion.delete.own</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.discussionDeleteOwn}checked="checked"{/if}" name="${p.role}:DiscussionDeleteOwn"/></td>
+			{/for}
+		</tr>
+		<tr><td>discussion.delete.any</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.discussionDeleteAny}checked="checked"{/if}" name="${p.role}:DiscussionDeleteAny"/></td>
+			{/for}
+		</tr>
+		<tr><td>message.create</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.messageCreate}checked="checked"{/if}" name="${p.role}:MessageCreate"/></td>
+			{/for}
+		</tr>
+		<tr><td>message.delete.own</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.messageDeleteOwn}checked="checked"{/if}" name="${p.role}:MessageDeleteOwn"/></td>
+			{/for}
+		</tr>
+		<tr><td>message.delete.any</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.messageDeleteAny}checked="checked"{/if}" name="${p.role}:MessageDeleteAny"/></td>
+			{/for}
+		</tr>
+		<tr><td>view.invisible</td>
+			{for p in permissions}
+				<td align="center"><input type="checkbox" {if p.viewInvisible}checked="checked"{/if}" name="${p.role}:ViewInvisible"/></td>
+			{/for}
+		</tr>
+	</tbody>
+</table>
+<input type="submit" value="${yaft_save_label}"/>
+<input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
+</form>
 -->
 </div>
 

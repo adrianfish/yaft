@@ -46,7 +46,9 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.time.api.TimeRange;
 import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.Placement;
+import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
+import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.util.BaseResourceProperties;
@@ -83,6 +85,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	private CalendarService calendarService;
 	private TimeService timeService;
 	private UsageSessionService usageSessionService;
+	private SessionManager sessionManager;
 	
 	public SakaiProxyImpl()
 	{
@@ -106,6 +109,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
+		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
 	}
 	
 	public boolean isAutoDDL()
@@ -133,6 +137,19 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 		
 		return placement.getContext();
+	}
+	
+	public Site getCurrentSite()
+	{
+		try
+		{
+			return siteService.getSite(getCurrentSiteId());
+		}
+		catch (IdUnusedException e)
+		{
+			logger.error("No current site",e);
+			return null;
+		}
 	}
 	
 	public Connection borrowConnection() throws SQLException
@@ -559,7 +576,7 @@ public class SakaiProxyImpl implements SakaiProxy
 			ContentResourceEdit resource = contentHostingService.addResource(id);
 			resource.setContentType(mimeType);
 			resource.setContent(fileData);
-			ResourceProperties props = new BaseResourceProperties();
+			BaseResourceProperties props = new BaseResourceProperties();
 			props.addProperty(ResourceProperties.PROP_CONTENT_TYPE, mimeType);
 			props.addProperty(ResourceProperties.PROP_DISPLAY_NAME, name);
 			props.addProperty(ResourceProperties.PROP_CREATOR, creatorId);
@@ -702,5 +719,10 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 		
 		return offlineYaftUserIds;
+	}
+
+	public ToolSession getCurrentToolSession()
+	{
+		return sessionManager.getCurrentToolSession();
 	}
 }
