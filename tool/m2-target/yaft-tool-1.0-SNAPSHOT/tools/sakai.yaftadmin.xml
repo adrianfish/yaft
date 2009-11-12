@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<registration>
+    <tool id="sakai.yaftadmin" 
+    	title="Yaft Admin" 
+    	description="Yaft Admin Tool">
+    </tool>
+</registration>

@@ -1,0 +1,103 @@
+#yaft_reply_container{
+	padding-left: 25px;
+}
+
+.yaftEvenRow{
+	background-color: #FFFFC0;
+}
+
+#yaft_toolbar_items{
+	float: left;
+}
+
+fieldset {
+    border: solid 1px black;
+	padding: 5px;
+	}
+
+#yaft_message{
+	color: red;
+	font-weight: bold;
+	display: none;
+}
+
+#yaft_search_bar{
+	float: right;
+}
+
+#yaft_container{
+	margin: 5px;
+}
+
+/*#yaft_forum_table tr:hover { background: #ffffc0; }
+#yaft_discussion_table tr:hover { background: #ffffc0; }*/
+
+.yaft_profile_popup{
+	display: none;
+}
+
+.yaft_profile_popup_img{
+	float: right;
+	padding-left: 2px;
+}
+
+.yaft_profile_popup_name{
+	width: 190px;
+	font-weight: bold;
+	font-size: bigger;
+	float: left;
+	padding-left: 5px;
+}
+
+.yaft_profile_popup_name{
+	padding-left: 5px;
+}
+
+.yaft_message{
+	margin-bottom: 10px;
+	overflow: auto;
+	border: solid black 1px;
+}
+
+.yaft_deleted_message{
+	display: none;
+	filter:alpha(opacity=50);
+	opacity: 0.5;
+}
+
+th.yaftSortableTableHeader { 
+    background-image: url(../images/bg.gif);     
+    cursor: pointer; 
+    /*font-weight: bold; */
+    background-repeat: no-repeat; 
+    background-position: center right; 
+    /*padding-left: 50px; */
+    /*border-right: 1px solid #dad9c7;*/
+    /*margin-left: -100px; */
+}
+
+th.yaftSortableTableHeaderSortUp { 
+    background-image: url(../images/asc.gif); 
+    /*background-color: #3399FF;*/
+}
+
+th.yaftSortableTableHeaderSortDown { 
+    background-image: url(../images/desc.gif); 
+    /*background-color: #3399FF;*/
+} 
+
+.yaftForumDescription{
+	font-style: italic;
+	font-size: 8pt;
+	color: #666;
+}
+
+.yaftInvisible{
+	background-color: orange !important;
+}
+
+.yaftAlert{
+	display: none;
+	color: red;
+	font-weight: bold;
+}
