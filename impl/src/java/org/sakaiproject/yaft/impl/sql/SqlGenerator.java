@@ -103,4 +103,6 @@ public interface SqlGenerator
 	List<PreparedStatement> getAddNewMessageStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
 
 	String getDeleteFromActiveDiscussionStatement(String discussionId, String userId);
+
+	String getClearActiveDiscussionsStatement(String userId);
 }

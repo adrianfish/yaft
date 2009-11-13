@@ -105,4 +105,6 @@ public interface YaftForumService extends EntityProducer
 	public YaftPreferences getPreferencesForCurrentUserAndSite();
 
 	public List<ActiveDiscussion> getActiveDiscussions();
+
+	public boolean clearActiveDiscussionsForCurrentUser();
 }

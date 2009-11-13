@@ -68,7 +68,7 @@ public class SynopticYaftTool extends HttpServlet
 		if (pathInfo == null || pathInfo.length() < 1)
 		{
 			// There's no path info, so this is the initial state
-			response.sendRedirect("/sakai-yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode);
+			response.sendRedirect("/yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode);
 			return;
 		}
 		else
@@ -84,6 +84,30 @@ public class SynopticYaftTool extends HttpServlet
 				if ("data".equals(part1))
 				{
 					handleDataRequest(request, response, parts, pathInfo);
+				}
+				else if("activeDiscussions".equals(part1))
+				{
+					if (parts.length >= 2)
+					{
+						String activeDiscussionsOp = parts[1];
+						if("clear".equals(activeDiscussionsOp))
+						{
+							if(yaftForumService.clearActiveDiscussionsForCurrentUser())
+							{
+								response.setStatus(HttpServletResponse.SC_OK);
+								response.setContentType("text/plain");
+								response.getWriter().write("success");
+								response.getWriter().close();
+							}
+							else
+							{
+								response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+								response.getWriter().close();
+							}
+							
+							return;
+						}
+					}
 				}
 			}
 		}

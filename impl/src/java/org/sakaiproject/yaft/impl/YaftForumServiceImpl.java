@@ -699,4 +699,9 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		return persistenceManager.getActiveDiscussions();
 	}
+
+	public boolean clearActiveDiscussionsForCurrentUser()
+	{
+		return persistenceManager.clearActiveDiscussionsForCurrentUser();
+	}
 }

@@ -755,4 +755,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 		else
 			return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "'";
 	}
+
+	public String getClearActiveDiscussionsStatement(String userId)
+	{
+		return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE USER_ID = '" + userId + "'";
+	}
 }

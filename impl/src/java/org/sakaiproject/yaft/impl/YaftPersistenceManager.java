@@ -2257,4 +2257,38 @@ public class YaftPersistenceManager
 		
 		return discussions;
 	}
+
+	public boolean clearActiveDiscussionsForCurrentUser()
+	{
+		Connection connection = null;
+		Statement statement = null;
+		
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			statement = connection.createStatement();
+			
+			String sql = sqlGenerator.getClearActiveDiscussionsStatement(sakaiProxy.getCurrentUser().getId());
+			
+			statement.executeUpdate(sql);
+			
+			return true;
+		}
+		catch(Exception e)
+		{
+			logger.error("Caught exception whilst clearing current discussions",e);
+			return false;
+		}
+		finally
+		{
+			try
+			{
+				if(statement != null) statement.close();
+			}
+			catch(Exception e) {}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+	}
 }

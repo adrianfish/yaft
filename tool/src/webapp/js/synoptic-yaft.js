@@ -35,7 +35,7 @@ var yaftPlacementId = null;
 		{
 			YaftUtils.applyBanding();
 									
-			$("#yaft_discussion_table").tablesorter({
+			$("#yaft_active_discussion_table").tablesorter({
 	 							cssHeader:'yaftSortableTableHeader',
 	 							cssAsc:'yaftSortableTableHeaderSortUp',
 	 							cssDesc:'yaftSortableTableHeaderSortDown',

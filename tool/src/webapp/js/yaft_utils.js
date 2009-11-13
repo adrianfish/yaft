@@ -23,6 +23,25 @@ var YaftUtils;
 		$('#yaft_end_hour_selector').get(0).selectedIndex = 0;
 		$('#yaft_end_minute_selector').get(0).selectedIndex = 0;
 	}
+	
+	YaftUtils.clearActiveDiscussionsForCurrentUser = function()
+	{
+		$.ajax(
+		{
+	   		url : "/portal/tool/" + yaftPlacementId + "/activeDiscussions/clear",
+			dataType : "text",
+			cache: false,
+			async : false,
+	  		success : function(text,status)
+	  		{
+				$('.yaft_active_discussion_row').hide();
+			},
+			error : function(xmlHttpRequest,status,error)
+			{
+			alert('failed');
+			}
+		});
+	}
 
 	YaftUtils.showAdvancedOptions = function()
 	{
@@ -275,9 +294,9 @@ var YaftUtils;
 	  		{
 				discussion = d;
 	  		},
-	  		error : function(requestObj,status)
+			error : function(xmlHttpRequest,textStatus,errorThrown)
 	  		{
-				alert("Failed to get discussion. Reason: " + requestObj.statusText);
+				alert("Failed to get discussion. Reason: " + xmlHttpRequest.statusText);
 	 		}
 		});
 		
@@ -781,7 +800,7 @@ var YaftUtils;
 				YaftUtils.render('yaft_search_results_content_template',params,'yaft_content');
 	 			$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
         	},
-        	error : function(xmlHttpRequest,status)
+        	error : function(xmlHttpRequest,status,error)
 			{
 			}
 		});
@@ -811,9 +830,9 @@ var YaftUtils;
 			{
 				readMessages = read;
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown)
+			error : function(xmlHttpRequest,textStatus,error)
 			{
-				alert("Failed to get read messages. Reason: " + errorThrown);
+				alert("Failed to get read messages. Reason: " + error);
 			}
 		});
 			

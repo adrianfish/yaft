@@ -41,7 +41,10 @@ else
 <!--  Templates Start -->
 
 <div id="synoptic_yaft_content_template" style="display:none"><!--
-<table id="yaft_discussion_table" class="listHier">
+<div class="navIntraTool">
+	<a href="#" onclick="return YaftUtils.clearActiveDiscussionsForCurrentUser();">Clear</a>
+</div>
+<table id="yaft_active_discussion_table" class="listHier">
 	<thead>
 	<tr>
 		<th align="left">${yaft_new_label}</th>
@@ -52,7 +55,7 @@ else
 	</thead>
 	<tbody>
 	{for discussion in discussions}
-   	<tr>
+   	<tr class="yaft_active_discussion_row">
    		<td>${discussion.newMessages}</td>
 		<td style="max-width:250px;"><a href="${discussion.url}" onclick="window.open('${discussion.url}','discussion','location=0,width=500,height=400,resizable=1,scrollbars=1,toolbar=0,menubar=0'); return false;" title="${yaft_discussion_link_tooltip}">${discussion.subject}</a></td>
 		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
