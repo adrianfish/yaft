@@ -100,7 +100,7 @@ public interface SqlGenerator
 
 	String getSelectActiveDiscussionsStatement(String id);
 
-	List<PreparedStatement> getAddNewMessageStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
+	List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
 
 	String getDeleteFromActiveDiscussionStatement(String discussionId, String userId);
 

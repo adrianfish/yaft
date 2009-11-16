@@ -325,7 +325,7 @@ public class YaftPersistenceManager
 				
 				List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
 			
-				newStatements = sqlGenerator.getAddNewMessageStatements(message,offlineUserIds,connection);
+				newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
 			
 				for(PreparedStatement statement : newStatements)
 					statement.executeUpdate();

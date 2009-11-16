@@ -699,7 +699,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "SELECT * FROM YAFT_ACTIVE_DISCUSSIONS WHERE USER_ID = '" + userId + "'";
 	}
 
-	public List<PreparedStatement> getAddNewMessageStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception
+	public List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception
 	{
 		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
 
