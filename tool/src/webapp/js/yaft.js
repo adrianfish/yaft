@@ -241,12 +241,11 @@ function switchState(state,arg)
 			message = yaftCurrentDiscussion.firstMessage;
 
 		YaftUtils.render('yaft_message_view_content_template',yaftCurrentDiscussion,'yaft_content');
+		YaftUtils.render('yaft_message_template',yaftCurrentDiscussion.firstMessage,yaftCurrentDiscussion.firstMessage.id);
+		renderChildMessages(yaftCurrentDiscussion.firstMessage,true);
+
+		$('#' + message.id).show();
 					
-		if(!yaftCurrentDiscussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentDiscussion.creatorId == yaftCurrentUser.id)
-		{
-			YaftUtils.render('yaft_message_template',message,'yaftMessage');
-			$("#" + message.id + "_cursor").show();
-		}
 		$("#yaft_minimal_link").hide();
 		$("#yaft_full_link").show();
   		$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
@@ -441,15 +440,19 @@ function switchState(state,arg)
 	return false;
 }
 
-function renderChildMessages(parent)
+function renderChildMessages(parent,skipDeleted)
 {
 	var children = parent.children;
 	
-	for(var i=0;i<children.length;i++)
+	for(var i=0,j=children.length;i<j;i++)
 	{
 		var message = children[i];
-		YaftUtils.render('yaft_message_template',message,message.id);
-		renderChildMessages(message);
+
+		if(message.status !== 'DELETED' || !skipDeleted) {
+			YaftUtils.render('yaft_message_template',message,message.id);
+		}
+
+		renderChildMessages(message,skipDeleted);
 	}
 }
 
@@ -459,13 +462,8 @@ function renderChildMessages(parent)
 function yaftShowMessage(messageId)
 {
 	var message = YaftUtils.findMessage(messageId);
-	YaftUtils.render('yaft_message_view_breadcrumb_template',message,'yaft_breadcrumb');
-	YaftUtils.render('yaft_message_template',message,'yaftMessage');
-	// Hide all of the message cursors
-	$(".messageCursor").hide();
-	// Show the cursor for this message
-	$("#" + message.id + "_cursor").show();
-	//YaftUtils.markMessageRead(message,true);
+	$('.yaft_full_message').hide();
+	$('#' + message.id).show();
    	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
 }
 

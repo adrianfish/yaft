@@ -21,6 +21,8 @@ fieldset {
 	display: none;
 }
 
+.yaft_messages{margin-left: 20px;}
+
 #yaft_search_bar{
 	float: right;
 }

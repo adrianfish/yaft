@@ -246,11 +246,11 @@ var YaftUtils;
 	{
 		var forums = yaftCurrentForums.items;
 
-		for(var i = 0;i < forums.length;i++)
+		for(var i=0,j=forums.length;i<j;i++)
 		{
 			var forum = forums[i];
 			forum["unsubscribed"] = false;
-			for(var k = 0;k < yaftForumUnsubscriptions.length;k++)
+			for(var k=0,m=yaftForumUnsubscriptions.length;k<m;k++)
 			{
 				var f = yaftForumUnsubscriptions[k];
 				if(f == forum.id)
@@ -264,13 +264,13 @@ var YaftUtils;
 	
 	YaftUtils.setupCurrentForumUnsubscriptions = function()
 	{
-		for(var i = 0;i < yaftCurrentForum.discussions.length;i++)
+		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 		{
 			var discussion = yaftCurrentForum.discussions[i];
 			discussion["unsubscribed"] = false;
-			for(var j = 0;j < yaftUnsubscriptions.length;j++)
+			for(var k=0,m=yaftUnsubscriptions.length;k<m;k++)
 			{
-				var d = yaftUnsubscriptions[j];
+				var d = yaftUnsubscriptions[k];
 				if(d == discussion.id)
 				{
 					discussion["unsubscribed"] = true;
@@ -318,7 +318,7 @@ var YaftUtils;
 				var message = YaftUtils.findMessage(messageId);
 				
 				message.status = 'READY';
-				for(var i = 0;i<yaftCurrentForum.discussions.length;i++)
+				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 				{
 					var testDiscussion = yaftCurrentForum.discussions[i];
 					if(testDiscussion.id == yaftCurrentDiscussion.id)
@@ -326,6 +326,8 @@ var YaftUtils;
 				}
 				
 				YaftUtils.render('yaft_message_template',message,message.id);
+
+				$('#' + message.id + '_draft_label').hide();
 				
 				$(document).ready(function()
 				{
@@ -368,6 +370,10 @@ var YaftUtils;
 				else
 					message['isFirstMessage'] = false;
 				YaftUtils.render('yaft_message_template',message,message.id);
+				if(yaftViewMode === 'minimal') {
+					$('#' + message.id + '_link').hide();
+					$('#' + message.id).hide();
+				}
 				$(document).ready(function()
 				{
 					$('a.profile').cluetip({local: true
@@ -393,7 +399,7 @@ var YaftUtils;
 	{
 		var forums = yaftCurrentForums.items;
 
-		for(var i=0;i<forums.length;i++)
+		for(var i=0,j=forums.length;i<j;i++)
 		{
 			if(forums[i].id == id)
 				return forums[i];
@@ -406,7 +412,7 @@ var YaftUtils;
 	{
 		var discussions = yaftCurrentForum.discussions;
 
-		for(var i=0;i<discussions.length;i++)
+		for(var i=0,j=discussions.length;i<j;i++)
 		{
 			if(discussions[i].id == id)
 				return discussions[i];
@@ -465,7 +471,7 @@ var YaftUtils;
 
 		if(message.collapsed)
 		{
-    		for(var i=0;i<descendantIds.length;i++)
+    		for(var i=0,j=descendantIds.length;i<j;i++)
     			$("#" + descendantIds[i]).show();
 
 			e.innerHTML = yaft_collapse_label;
@@ -473,7 +479,7 @@ var YaftUtils;
 		}
 		else
 		{
-    		for(var i=0;i<descendantIds.length;i++)
+    		for(var i=0,j=descendantIds.length;i<j;i++)
     			$("#" + descendantIds[i]).hide();
 
 			e.innerHTML = yaft_expand_label + ' (' + descendantIds.length + ')';
@@ -491,7 +497,7 @@ var YaftUtils;
 			cache: false,
 		   	success : function(text,status)
 			{
-				for(var i=0;i<yaftCurrentForum.discussions.length;i++)
+				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 				{
 					var discussion = yaftCurrentForum.discussions[i];
 					if(discussion.id == yaftCurrentDiscussion.id)
@@ -533,11 +539,9 @@ var YaftUtils;
 						$("#" + message.id + "_read").show();
 					else
 						$("#" + message.id + "_read").hide();
-
-					YaftUtils.render('yaft_message_template',message,'yaftMessage');
 				}
-				else
-					YaftUtils.render('yaft_message_template',message,message.id);
+
+				YaftUtils.render('yaft_message_template',message,message.id);
 					
 			},
 			error : function(xmlHttpRequest,status,error)
@@ -609,17 +613,17 @@ var YaftUtils;
 			cache: false,
 		   	success : function(text,status)
 			{
-				for(var i=0;i<yaftCurrentForum.discussions.length;i++)
+				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 				{
 					if(yaftCurrentForum.discussions[i].id == discussionId)
 					{
 						yaftCurrentForum.discussions[i].unsubscribed = false;
 						
 						// Remove this discussion id from the unsubscriptions list
-						for(var j=0;j<yaftUnsubscriptions.length;j++)
+						for(var k=0,m=yaftUnsubscriptions.length;k<m;k++)
 						{
-							if(yaftUnsubscriptions[j] == discussionId)
-								yaftUnsubscriptions.splice(j,1);
+							if(yaftUnsubscriptions[k] == discussionId)
+								yaftUnsubscriptions.splice(k,1);
 						}
 					}
 				}
@@ -647,7 +651,7 @@ var YaftUtils;
 			cache: false,
 		   	success : function(text,status)
 			{
-				for(var i=0;i<yaftCurrentForum.discussions.length;i++)
+				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 				{
 					if(yaftCurrentForum.discussions[i].id == discussionId)
 					{
@@ -681,13 +685,13 @@ var YaftUtils;
 			cache: false,
 		   	success : function(text,status)
 			{
-				for(var i=0;i<yaftCurrentForums.items.length;i++)
+				for(var i=0,j=yaftCurrentForums.items.length;i<j;i++)
 				{
 					var forum = yaftCurrentForums.items[i];
 					if(forum.id == forumId)
 					{
-						for(var j=0;j<forum.discussions.length;j++)
-							forum.discussions[j]['unsubscribed'] = false;
+						for(var k=0,m=forum.discussions.length;k<m;k++)
+							forum.discussions[k]['unsubscribed'] = false;
 
 						forum['unsubscribed'] = false;
 					}
@@ -717,13 +721,13 @@ var YaftUtils;
 			cache: false,
 		   	success : function(text,status)
 			{
-				for(var i=0;i<yaftCurrentForums.items.length;i++)
+				for(var i=0,j=yaftCurrentForums.items.length;i<j;i++)
 				{
 					var forum = yaftCurrentForums.items[i];
 					if(forum.id == forumId)
 					{
-						for(var j=0;j<forum.discussions.length;j++)
-							forum.discussions[j]['unsubscribed'] = true;
+						for(var k=0,m=forum.discussions.length;k<m;k++)
+							forum.discussions[k]['unsubscribed'] = true;
 
 						forum['unsubscribed'] = true;
 					}
@@ -745,7 +749,7 @@ var YaftUtils;
     
     YaftUtils.getDescendantIds = function(messageId,testMessage,descendantIds)
     {
-    	for(var i=0;i<testMessage.children.length;i++)
+    	for(var i=0,j=testMessage.children.length;i<j;i++)
     	{
     		descendantIds.push(testMessage.children[i].id);
     		YaftUtils.getDescendantIds(messageId,testMessage.children[i],descendantIds);
@@ -808,7 +812,7 @@ var YaftUtils;
 	
 	YaftUtils.contains = function(list,test)
 	{
-		for(var i = 0;i < list.length;i++)
+		for(var i=0,j=list.length;i<j;i++)
 		{
 			if(test == list[i]) return true;
 		}
@@ -840,7 +844,7 @@ var YaftUtils;
 		{
 			var fora = yaftCurrentForums.items;
 
-			for(var i=0;i<fora.length;i++)
+			for(var i=0,j=fora.length;i<j;i++)
 			{
 				var forum = fora[i];
 				var count = readMessages[forum.id];
@@ -876,7 +880,7 @@ var YaftUtils;
 			
 		if(readMessages != null)
 		{
-			for(var i=0;i<yaftCurrentForum.discussions.length;i++)
+			for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++)
 			{
 				var discussion = yaftCurrentForum.discussions[i];
 				var count = readMessages[discussion.id];
@@ -925,7 +929,7 @@ var YaftUtils;
 
 	YaftUtils.markReadMessages = function(messages,readMessages)
 	{
-		for(var i=0;i<messages.length;i++)
+		for(var i=0,j=messages.length;i<j;i++)
         {
             if(YaftUtils.contains(readMessages,messages[i].id) || messages[i].creatorId == yaftCurrentUser.id)
 				messages[i]["read"] = true;
@@ -951,7 +955,7 @@ var YaftUtils;
 	
 	YaftUtils.recursiveFindMessage = function(messages,wantedId)
 	{
-		for(var i=0;i<messages.length;i++)
+		for(var i=0,j=messages.length;i<j;i++)
         {
 			var message = messages[i];
             if(message.id == wantedId)

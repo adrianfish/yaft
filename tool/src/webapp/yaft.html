@@ -433,16 +433,7 @@ ${yaft_forums_label}
 			<div class="yaft_message">
 		{/if}
 		
-		{if status == 'CENSORED'}
-			<div style="margin:5px;overflow:hidden;">
-			<div>${yaft_censored_message}</div>
-			<br />
-			<div>
-			{if yaftCurrentUserPermissions.messageDeleteAny && parent}<span><a href="#" onclick="return YaftUtils.deleteMessage('${id}');">Delete</a></span>{/if}
-			</div>
-			</div>
-		</div>
-		{elseif (status != 'DELETED' && status != 'DRAFT') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny) || (status == 'DRAFT' && yaftCurrentUser.id == creatorId)}
+		{if (status != 'DELETED' && status != 'DRAFT') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny) || (status == 'DRAFT' && yaftCurrentUser.id == creatorId)}
 			<div style="margin:5px;overflow:hidden;">
 				<a href="#${creatorId}_profile" class="profile" rel="#${creatorId}_profile"><img style="float:left;margin-right:2px;" src="/portal/tool/${yaftPlacementId}/data/users/${creatorId}/picture" width="35"/></a>
 				<div style="display: none;" id="${creatorId}_profile">
@@ -514,17 +505,14 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
+	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
 	<br />
 	<br />
 
 	{macro display(message,indent)}
-		{if message.status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}
-		<div id="${message.id}" style="overflow: auto; margin-left: ${indent*20}px;">
-		{else}
-		<div id="${message.id}" style="overflow: auto; margin-left: ${indent*20}px;">
-		{/if}
+		<div id="${message.id}" style="overflow: auto;">
 		</div>
+		<div class="yaft_messages">
 		{for child in message.children}
 			{if message.status == 'DELETED'}
 				${display(child,indent)}
@@ -532,13 +520,14 @@ ${yaft_forums_label}
 				${display(child,indent+1)}
 			{/if}
 		{/for}
+		</div>
 	{/macro}
 	
 	${display(firstMessage,0)}
 	
 	<br />
 	
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
+	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
 	{/if}
 -->
 </div>
@@ -662,26 +651,20 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark the '${yaftCurrentDiscussion.subject}' discussion as read</a>
+	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
     <br />
     <br />
-	<div id="yaftMessage"></div>
-
-	<br />
 
 	{macro displayMinimum(message,indent)}
 		{if message.status == 'READY' || (message.status == 'DRAFT' && yaftCurrentUser.id == message.creatorId)}
-			<div style="margin-left: ${indent*20}px">
-				<a href="#" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'} - ${yaft_draft_label}{/if} - <span>by ${message.creatorDisplayName}</span> at <span>${new Date(message.createdDate).toLocaleString()}</span>
-				<img {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
-				<img style="display:none" class="messageCursor" id="${message.id}_cursor" src="/library/image/silk/arrow_left.png" width="16" height="16"/>
+			<div id="${message.id}_link">
+				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by ${message.creatorDisplayName}</span> at <span>${new Date(message.createdDate).toLocaleString()}</span>
+				<img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
 			</div>
-		{elseif message.status == 'CENSORED'}
-			<div style="margin-left: ${indent*20}px">
-				<span>${yaft_censored_message}</span>
-			</div>
+			<div class="yaft_full_message" id="${message.id}" style="display: none;overflow: auto;margin-top:5px;"></div>
 		{/if}
 		
+		<div class="yaft_messages">
 		{for child in message.children}
 			{if message.status == 'DELETED'}
 				${displayMinimum(child,indent)}
@@ -689,6 +672,7 @@ ${yaft_forums_label}
 				${displayMinimum(child,indent+1)}
 			{/if}
 		{/for}
+		</div>
 	{/macro}
 	
 	${displayMinimum(firstMessage,0)}
