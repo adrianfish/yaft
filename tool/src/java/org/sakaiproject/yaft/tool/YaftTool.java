@@ -1222,19 +1222,19 @@ public class YaftTool extends HttpServlet
 
 			try
 			{
-				FileItem attachment1 = (FileItem) request.getAttribute("attachment_");
+				FileItem attachment1 = (FileItem) request.getAttribute("attachment_0");
 				if (attachment1 != null && attachment1.getSize() > 0)
 					fileItems.add(attachment1);
-				FileItem attachment2 = (FileItem) request.getAttribute("attachment__1");
+				FileItem attachment2 = (FileItem) request.getAttribute("attachment_1");
 				if (attachment2 != null && attachment2.getSize() > 0)
 					fileItems.add(attachment2);
-				FileItem attachment3 = (FileItem) request.getAttribute("attachment__2");
+				FileItem attachment3 = (FileItem) request.getAttribute("attachment_2");
 				if (attachment3 != null && attachment3.getSize() > 0)
 					fileItems.add(attachment3);
-				FileItem attachment4 = (FileItem) request.getAttribute("attachment__3");
+				FileItem attachment4 = (FileItem) request.getAttribute("attachment_3");
 				if (attachment4 != null && attachment4.getSize() > 0)
 					fileItems.add(attachment4);
-				FileItem attachment5 = (FileItem) request.getAttribute("attachment__4");
+				FileItem attachment5 = (FileItem) request.getAttribute("attachment_4");
 				if (attachment5 != null && attachment5.getSize() > 0)
 					fileItems.add(attachment5);
 			}

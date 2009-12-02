@@ -548,9 +548,14 @@ public class SakaiProxyImpl implements SakaiProxy
 		if(name == null | name.length()  == 0)
 			throw new IllegalArgumentException("The name argument must be populated.");
 		
-		String uuid = UUID.randomUUID().toString();
+		if(name.endsWith(".doc"))
+			mimeType = "application/msword";
+		else if(name.endsWith(".xls"))
+			mimeType = "application/excel";
 		
-		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + uuid;
+		//String uuid = UUID.randomUUID().toString();
+		
+		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + name;
 
 		try
 		{
@@ -568,13 +573,12 @@ public class SakaiProxyImpl implements SakaiProxy
 			contentHostingService.commitResource(resource, NotificationService.NOTI_NONE);
 			
 			//return resource.getId();
-			return uuid;
+			return name;
 		}
 		catch(IdUsedException e)
 		{
 			if(logger.isInfoEnabled()) logger.info("A resource with id '" + id + "' exists already. Returning id without recreating ...");
-			return uuid;
-			//return id;
+			return name;
 		}
 	}
 	

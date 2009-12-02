@@ -292,7 +292,7 @@ function switchState(state,arg)
 
 		jQuery(document).ready(function()
 	    {
-	    	$.MultiFile(
+	    	$('#yaft_attachment').MultiFile(
 		            {
 		            	max: 5,
 					    namePattern: '$name_$i'
@@ -316,7 +316,7 @@ function switchState(state,arg)
 		YaftUtils.render('yaft_reply_message_content_template',messageBeingRepliedTo,'yaft_content');
 	  	jQuery(document).ready(function()
 	  	{
-			$.MultiFile(
+			$('#yaft_attachment').MultiFile(
 			{
 				max: 5,
 				namePattern: '$name_$i'
@@ -355,7 +355,7 @@ function switchState(state,arg)
 
    		$(document).ready(function()
    		{
-	    	$.MultiFile(
+	    	$('#yaft_attachment').MultiFile(
 		            {
 		            	max: 5,
 					    namePattern: '$name_$i'

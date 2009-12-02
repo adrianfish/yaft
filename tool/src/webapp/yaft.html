@@ -12,7 +12,7 @@
 <script type="text/javascript" language="JavaScript" src="lib/jquery.dimensions.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.hoverIntent.js"></script> 
 <script type="text/javascript" language="JavaScript" src="lib/jquery.cluetip.js"></script> 
-<script type="text/javascript" language="JavaScript" src="lib/jquery.MultiFile.js"></script>
+<script type="text/javascript" language="JavaScript" src="lib/jquery.MultiFile.pack.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.localisation.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="lib/jquery-ui-1.7.1.custom.min.js"></script>
@@ -242,7 +242,7 @@ ${yaft_forums_label}
 	
 		<span>Add Attachments:</span>
 		<br />
-		<input name="attachment" type="file" class="multi"/><br clear="all"/>
+		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
 
 <a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
 <a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YaftUtils.hideAdvancedOptions();">Hide advanced options</a>
@@ -718,7 +718,7 @@ ${yaft_forums_label}
 	
 	<span>${yaft_add_attachments_label}</span>
 	<br />
-	<input name="attachment" type="file" class="multi"/>
+	<input id="yaft_attachment" name="attachment" type="file" class="multi"/>
 	<br/>
 
 	<input type="hidden" name="function" value="createMessage"/>
@@ -768,7 +768,7 @@ ${yaft_forums_label}
 
     <span>Add Attachments:</span>
     <br />
-    <input name="attachment" type="file" class="multi"/>
+    <input id="yaft_attachment" name="attachment" type="file" class="multi"/>
     <br/>
 
     <input type="submit" value="${yaft_save_label}"/>
