@@ -46,7 +46,7 @@ public interface YaftForumService extends EntityProducer
 
 	public boolean addOrUpdateMessage(String forumId,Message message,boolean sendMail);
 
-	public List<Forum> getFora();
+	public List<Forum> getFora(boolean fully);
 
 	//public List<Discussion> getDiscussions();
 
@@ -107,4 +107,6 @@ public interface YaftForumService extends EntityProducer
 	public List<ActiveDiscussion> getActiveDiscussions();
 
 	public boolean clearActiveDiscussionsForCurrentUser();
+	
+	public String getIdOfSiteContainingMessage(String messageId);
 }

@@ -2291,4 +2291,44 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 	}
+	
+	public String getIdOfSiteContainingMessage(String messageId)
+	{
+		Connection connection = null;
+		Statement statement = null;
+		
+		try
+		{
+			connection = sakaiProxy.borrowConnection();
+			
+			String sql = sqlGenerator.getSelectIdOfSiteContainingMessage(messageId);
+			
+			statement = connection.createStatement();
+				
+			ResultSet rs = statement.executeQuery(sql);
+			
+			if(rs.next())
+				return rs.getString("SITE_ID");
+			
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst getting site id", e);
+		}
+		finally
+		{
+			if(statement != null)
+			{
+				try
+				{
+					statement.close();
+				}
+				catch (SQLException e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return null;
+	}
 }

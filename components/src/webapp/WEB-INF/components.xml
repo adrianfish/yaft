@@ -2,9 +2,20 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
+
       <bean id="org.sakaiproject.yaft.api.YaftForumService"
     	class="org.sakaiproject.yaft.impl.YaftForumServiceImpl"
     	init-method="init">
+    </bean>
+    
+      <bean id="org.sakaiproject.yaft.impl.YaftContentProducer"
+    	class="org.sakaiproject.yaft.impl.YaftContentProducer"
+    	init-method="init">
+    	
+    	<property name="forumService"><ref bean="org.sakaiproject.yaft.api.YaftForumService"/></property>
+    	<property name="searchService"><ref bean="org.sakaiproject.search.api.SearchService"/></property>
+     	<property name="searchIndexBuilder"><ref bean="org.sakaiproject.search.api.SearchIndexBuilder" /></property>
+     	
     </bean>
 
 </beans>

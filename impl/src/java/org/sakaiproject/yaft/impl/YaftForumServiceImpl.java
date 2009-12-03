@@ -187,7 +187,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		return discussion;
 	}
 	
-	public List<Forum> getFora()
+	public List<Forum> getFora(boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getFora()");
 		
@@ -195,7 +195,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		for(Forum forum : fora)
 		{
-			forum.setDiscussions(getForumDiscussions(forum.getId(), false));
+			forum.setDiscussions(getForumDiscussions(forum.getId(), fully));
 			//forum.setUrl(sakaiProxy.getDirectUrl("/forums/" + forum.getId()));
 		}
 		
@@ -703,5 +703,10 @@ public class YaftForumServiceImpl implements YaftForumService
 	public boolean clearActiveDiscussionsForCurrentUser()
 	{
 		return persistenceManager.clearActiveDiscussionsForCurrentUser();
+	}
+	
+	public String getIdOfSiteContainingMessage(String messageId)
+	{
+		return persistenceManager.getIdOfSiteContainingMessage(messageId);
 	}
 }

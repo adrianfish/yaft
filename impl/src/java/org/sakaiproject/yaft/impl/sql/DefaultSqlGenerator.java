@@ -760,4 +760,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE USER_ID = '" + userId + "'";
 	}
+	
+	public String getSelectIdOfSiteContainingMessage(String messageId)
+	{
+		return "SELECT SITE_ID FROM YAFT_MESSAGE WHERE MESSAGE_ID = '" + messageId + "'";
+	}
 }

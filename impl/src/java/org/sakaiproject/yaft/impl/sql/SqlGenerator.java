@@ -105,4 +105,6 @@ public interface SqlGenerator
 	String getDeleteFromActiveDiscussionStatement(String discussionId, String userId);
 
 	String getClearActiveDiscussionsStatement(String userId);
+	
+	String getSelectIdOfSiteContainingMessage(String messageId);
 }
