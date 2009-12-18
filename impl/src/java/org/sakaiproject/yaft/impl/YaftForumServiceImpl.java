@@ -34,6 +34,8 @@ public class YaftForumServiceImpl implements YaftForumService
 	private SakaiProxy sakaiProxy = null;
 	private YaftPersistenceManager persistenceManager = null;
 	
+	private boolean useSynopticFunctionality = true;
+	
 	public void init()
 	{
 		if(logger.isDebugEnabled()) logger.debug("init()");
@@ -60,6 +62,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		persistenceManager.setSakaiProxy(sakaiProxy);
 		persistenceManager.init();
 		persistenceManager.setupTables();
+		persistenceManager.setUseSynopticFunctionality(useSynopticFunctionality);
 		
 		sakaiProxy.registerEntityProducer(this);
 	}
@@ -708,5 +711,15 @@ public class YaftForumServiceImpl implements YaftForumService
 	public String getIdOfSiteContainingMessage(String messageId)
 	{
 		return persistenceManager.getIdOfSiteContainingMessage(messageId);
+	}
+
+	public void setUseSynopticFunctionality(boolean useSynopticFunctionality)
+	{
+		this.useSynopticFunctionality = useSynopticFunctionality;
+	}
+
+	public boolean isUseSynopticFunctionality()
+	{
+		return useSynopticFunctionality;
 	}
 }

@@ -41,6 +41,8 @@ public class YaftPersistenceManager
 	
 	private SakaiProxy sakaiProxy = null;
 	private SqlGenerator sqlGenerator = null;
+
+	private boolean useSynopticFunctionality = true;
 	
 	public YaftPersistenceManager()
 	{
@@ -323,12 +325,15 @@ public class YaftPersistenceManager
 				if(!"DRAFT".equals(message.getStatus()))
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
-				List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
+				if(useSynopticFunctionality)
+				{
+					List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
 			
-				newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
+					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
 			
-				for(PreparedStatement statement : newStatements)
-					statement.executeUpdate();
+					for(PreparedStatement statement : newStatements)
+						statement.executeUpdate();
+				}
 				
 				connection.commit();
 				
@@ -2330,5 +2335,10 @@ public class YaftPersistenceManager
 		}
 		
 		return null;
+	}
+
+	public void setUseSynopticFunctionality(boolean useSynopticFunctionality)
+	{
+		this.useSynopticFunctionality = useSynopticFunctionality;
 	}
 }
