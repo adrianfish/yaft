@@ -323,16 +323,18 @@ public class YaftPersistenceManager
 					statement.executeUpdate();
 			
 				if(!"DRAFT".equals(message.getStatus()))
+				{
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
-				if(useSynopticFunctionality)
-				{
-					List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
+					if(useSynopticFunctionality)
+					{
+						List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
 			
-					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
+						newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
 			
-					for(PreparedStatement statement : newStatements)
-						statement.executeUpdate();
+						for(PreparedStatement statement : newStatements)
+							statement.executeUpdate();
+					}
 				}
 				
 				connection.commit();
@@ -964,7 +966,7 @@ public class YaftPersistenceManager
 
 			try
 			{
-				List<String> statements = sqlGenerator.getDeleteMessageStatements(message,forumId);
+				List<String> statements = sqlGenerator.getDeleteMessageStatements(message,forumId,connection);
 				
 				statement = connection.createStatement();
 				
@@ -1489,6 +1491,7 @@ public class YaftPersistenceManager
 
 	private void markMessageRead(String messageId,String forumId,String discussionId,Connection connection) throws Exception
 	{
+		// Has this message already been read?
 		String testSql = sqlGenerator.getSelectMessageReadStatement(sakaiProxy.getCurrentUser().getId(),messageId);
 		
 		Statement statement = null;
@@ -1711,6 +1714,7 @@ public class YaftPersistenceManager
 	{
 		Connection connection = null;
 		List<PreparedStatement> statements = null;
+		List<PreparedStatement> newStatements = null;
 
 		try
 		{
@@ -1726,9 +1730,19 @@ public class YaftPersistenceManager
 				for(PreparedStatement statement : statements)
 					statement.execute();
 				
-				connection.commit();
+				markMessageRead(messageId, forumId, message.getDiscussionId(),connection);
 				
-				markMessageRead(messageId, forumId, message.getDiscussionId());
+				if(useSynopticFunctionality)
+				{
+					List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
+			
+					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
+			
+					for(PreparedStatement statement : newStatements)
+						statement.executeUpdate();
+				}
+				
+				connection.commit();
 				
 				return true;
 			}
@@ -1759,6 +1773,18 @@ public class YaftPersistenceManager
 						st.close();
 					}
 					catch(Exception e) {}
+				}
+			}
+			
+			if(newStatements != null)
+			{
+				for(PreparedStatement st : newStatements)
+				{
+					try
+					{
+						st.close();
+					}
+					catch (Exception e) {}
 				}
 			}
 			

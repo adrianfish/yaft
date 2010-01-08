@@ -40,7 +40,7 @@ public interface SqlGenerator
 
 	List<String> getDeleteDiscussionStatements(String forumId,String discussionId);
 
-	List<String> getDeleteMessageStatements(Message message,String forumId);
+	List<String> getDeleteMessageStatements(Message message,String forumId,Connection conn);
 	
 	List<String> getUndeleteMessageStatements(Message message,String forumId);
 	

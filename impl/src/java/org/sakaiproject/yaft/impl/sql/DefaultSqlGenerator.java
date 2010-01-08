@@ -357,19 +357,16 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		List<String> statements = new ArrayList<String>();
 
-		// statements.add("DELETE FROM YAFT_MESSAGE WHERE DISCUSSION_ID = '" + discussionId + "'");
-		// statements.add("DELETE FROM YAFT_FORUM_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "'");
 		statements.add("UPDATE YAFT_FORUM SET DISCUSSION_COUNT = DISCUSSION_COUNT - 1 WHERE FORUM_ID = '" + forumId + "' AND DISCUSSION_COUNT > 0");
 		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + forumId + "'");
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = NULL WHERE FORUM_ID = '" + forumId + "' AND MESSAGE_COUNT  = 0");
-		// statements.add("DELETE FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "'");
 		statements.add("UPDATE YAFT_DISCUSSION SET STATUS = 'DELETED' WHERE DISCUSSION_ID = '" + discussionId + "'");
 
 		return statements;
 	}
 
-	public List<String> getDeleteMessageStatements(Message message, String forumId)
+	public List<String> getDeleteMessageStatements(Message message, String forumId,Connection conn)
 	{
 		String messageId = message.getId();
 		String discussionId = message.getDiscussionId();
@@ -379,6 +376,38 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
 		statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
+		
+		Statement st = null;
+		
+		try
+		{
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery("SELECT USER_ID FROM YAFT_READ_MESSAGES WHERE MESSAGE_ID = '" + message.getId() + "'");
+			
+			while(rs.next())
+			{
+				String userId = rs.getString("USER_ID");
+				statements.add("UPDATE YAFT_FORUM_READ SET NUMBER_READ = NUMBER_READ - 1 WHERE FORUM_ID = '" + forumId + "' AND USER_ID = '" + userId + "'");
+				statements.add("UPDATE YAFT_DISCUSSION_READ SET NUMBER_READ = NUMBER_READ - 1 WHERE DISCUSSION_ID = '" + message.getDiscussionId() + "' AND USER_ID = '" + userId + "'");
+			}
+			
+			rs.close();
+		}
+		catch(Exception e)
+		{
+			logger.error("Caught exception whilst selecting user ids from YAFT_READ_MESSAGES",e);
+		}
+		finally
+		{
+			try
+			{
+				if(st != null) st.close();
+			}
+			catch(Exception e1) {}
+		}
+		
+		statements.add("DELETE FROM YAFT_READ_MESSAGES WHERE MESSAGE_ID = '" + message.getId() + "'");
+		
 		return statements;
 	}
 
@@ -724,15 +753,14 @@ public class DefaultSqlGenerator implements SqlGenerator
 				}
 				else
 				{
-					String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,USER_ID,SITE_ID,SUBJECT,NEW_MESSAGES,LAST_MESSAGE_DATE,LATEST_MESSAGE_SUBJECT) VALUES(?,?,?,(SELECT SUBJECT FROM YAFT_MESSAGE WHERE MESSAGE_ID = ?),?,?,?)";
+					String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,USER_ID,SITE_ID,SUBJECT,NEW_MESSAGES,LAST_MESSAGE_DATE,LATEST_MESSAGE_SUBJECT) VALUES(?,?,?,(SELECT SUBJECT FROM YAFT_MESSAGE WHERE MESSAGE_ID = ?),1,?,?)";
 					PreparedStatement statement = connection.prepareStatement(sql);
 					statement.setString(1, message.getDiscussionId());
 					statement.setString(2, userId);
 					statement.setString(3, message.getSiteId());
 					statement.setString(4, message.getDiscussionId());
-					statement.setInt(5, 1);
-					statement.setTimestamp(6, new Timestamp(message.getCreatedDate()));
-					statement.setString(7, message.getSubject());
+					statement.setTimestamp(5, new Timestamp(message.getCreatedDate()));
+					statement.setString(6, message.getSubject());
 					statements.add(statement);
 				}
 

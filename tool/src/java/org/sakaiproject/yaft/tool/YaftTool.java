@@ -1127,26 +1127,23 @@ public class YaftTool extends HttpServlet
 			message.setDiscussionId(discussionId);
 			message.setAttachments(getAttachments(request));
 			
+			// If no message id has been supplied this must be a new message, so
+			// we set the message id to empty
 			if(messageId == null)
 				message.setId("");
 
 			if (messageBeingRepliedTo != null && messageBeingRepliedTo.length() > 0)
-			{
-				// This is a reply message
 				message.setParent(messageBeingRepliedTo);
-				if(yaftForumService.addOrUpdateMessage(forumId, message, true))
-					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/messages/" + message.getId() + "/" + viewMode);
-				else
-					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
-			}
 			else if (messageBeingRepliedTo == null || messageBeingRepliedTo.length() <= 0)
 			{
+				// This is a discussion, or top level message
 				message.setId(messageId);
-				if(yaftForumService.addOrUpdateMessage(forumId, message, true))
-					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/messages/" + message.getId() + "/" + viewMode);
-				else
-					response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
 			}
+			
+			if(yaftForumService.addOrUpdateMessage(forumId, message, true))
+				response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/messages/" + message.getId() + "/" + viewMode);
+			else
+				response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
 
 			return;
 		}

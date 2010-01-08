@@ -308,8 +308,10 @@ function switchState(state,arg)
 		}
 		$("#yaft_permissions_link").hide();
 		
+		// Look up the message that we are replying to in the current cache
 		var messageBeingRepliedTo = YaftUtils.findMessage(arg.messageBeingRepliedTo);
 						
+		// We need to pass a few extra things to the template, so set them.
 		messageBeingRepliedTo["mode"] = arg.mode;
 		messageBeingRepliedTo["editMode"] = 'REPLY';
 		YaftUtils.render('yaft_edit_message_breadcrumb_template',messageBeingRepliedTo,'yaft_breadcrumb');
