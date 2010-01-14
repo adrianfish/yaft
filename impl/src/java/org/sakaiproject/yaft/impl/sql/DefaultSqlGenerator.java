@@ -362,6 +362,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
 		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = NULL WHERE FORUM_ID = '" + forumId + "' AND MESSAGE_COUNT  = 0");
 		statements.add("UPDATE YAFT_DISCUSSION SET STATUS = 'DELETED' WHERE DISCUSSION_ID = '" + discussionId + "'");
+		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE DISCUSSION_ID = '" + discussionId + "'");
 
 		return statements;
 	}
@@ -372,10 +373,13 @@ public class DefaultSqlGenerator implements SqlGenerator
 		String discussionId = message.getDiscussionId();
 		List<String> statements = new ArrayList<String>();
 		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE MESSAGE_ID  = '" + messageId + "'");
-		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE FORUM_ID = '" + forumId + "'");
-		statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
-		statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");
-		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
+		if(message.getStatus() == "READY")
+		{
+			statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE FORUM_ID = '" + forumId + "'");
+			statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
+			statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");
+			statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
+		}
 		
 		Statement st = null;
 		
