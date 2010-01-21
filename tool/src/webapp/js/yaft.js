@@ -279,6 +279,7 @@ function switchState(state,arg)
 	
 	 	$(document).ready(function()
 	 		{
+	 			$('#yaft_title_field').focus();
 	 			setMainFrameHeight(window.frameElement.id);
 	 		});
 	}
@@ -363,6 +364,7 @@ function switchState(state,arg)
 					    namePattern: '$name_$i'
 					});
 			YaftUtils.yaftSetupEditor('fck',yaftSiteId);
+			$('#yaft_subject_field').focus();
    			setMainFrameHeight(window.frameElement.id);
    		});
 	}
