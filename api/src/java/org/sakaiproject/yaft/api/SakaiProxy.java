@@ -27,6 +27,8 @@ public interface SakaiProxy
 	
 	public String getCurrentSiteId();
 	
+	public Site getCurrentSite();
+	
 	public Connection borrowConnection() throws SQLException;
 	
 	public void returnConnection(Connection connection);

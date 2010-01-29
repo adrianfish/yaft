@@ -12,6 +12,7 @@ import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.site.api.Site;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
@@ -128,29 +129,11 @@ public class YaftForumServiceImpl implements YaftForumService
 		//persistenceManager.markMessageRead(message.getId(), forumId, message.getDiscussionId());
 		
 		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/messages/" + message.getId();
+		
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED,reference,true);
 		
 		if(sendMail && "READY".equals(message.getStatus()))
-		{
-			try
-			{
-				Discussion discussion = persistenceManager.getDiscussion(discussionId,false);
-			
-				Set<String> users = sakaiProxy.getSiteUsers();
-		
-				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
-			
-				String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-		
-				String body = message.getCreatorDisplayName() + " updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
-			
-				new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
-			}
-			catch(Exception e)
-			{
-				logger.error("Failed to send message email.",e);
-			}
-		}
+			sendEmail(message,false);
 		
 		return true;
 	}
@@ -170,22 +153,8 @@ public class YaftForumServiceImpl implements YaftForumService
 			sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED,reference,true);
 		}
 		
-		String discussionId = discussion.getId();
-		
-		//discussion = persistenceManager.getDiscussion(discussionId,false);
-		
 		if(sendMail)
-		{
-			Set<String> users = sakaiProxy.getSiteUsers();
-			
-			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(discussionId);
-			
-			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-			
-			String body = message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "'";
-			
-			new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
-		}
+			sendEmail(message,true);
 		
 		return discussion;
 	}
@@ -350,35 +319,45 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		persistenceManager.moveDiscussion(discussionId,currentForumId,newForumId);
 	}
+	
+	private void sendEmail(Message message,boolean newDiscussion)
+	{
+			try
+			{
+				Site site = sakaiProxy.getCurrentSite();
+		
+				String siteTitle = "";
+		
+				if(site != null) siteTitle = site.getTitle();
+				
+				Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
+			
+				Set<String> users = sakaiProxy.getSiteUsers();
+		
+				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
+			
+				String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
+		
+				String body = "";
+				if(newDiscussion)
+					body = message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "</a>' in site '" + siteTitle + "'";
+				else
+					body = message.getCreatorDisplayName() + " added/updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "' in site '" + siteTitle + "'";
+			
+				new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
+			}
+			catch(Exception e)
+			{
+				logger.error("Failed to send message email.",e);
+			}
+		
+	}
 
 	public void publishMessage(String forumId,Message message)
 	{
 		persistenceManager.publishMessage(forumId,message.getId());
 		
-		try
-		{
-			Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
-		
-			Set<String> recipients = sakaiProxy.getSiteUsers();
-		
-			List<String> exclusions = persistenceManager.getDiscussionUnsubscribers(discussion.getId());
-		
-			if(exclusions != null && exclusions.size() > 0)
-			{
-				for(String excludedId : exclusions)
-					recipients.remove(excludedId);
-			}
-		
-			String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-		
-			String body = message.getCreatorDisplayName() + " added a message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "'";
-		
-			new EmailSender(recipients, exclusions, body,sakaiProxy.getCurrentSiteId());
-		}
-		catch(Exception e)
-		{
-			logger.error("Failed to publish message.",e);
-		}
+		sendEmail(message,false);
 	}
 	
 	/** START EntityProducer IMPLEMENTATION */

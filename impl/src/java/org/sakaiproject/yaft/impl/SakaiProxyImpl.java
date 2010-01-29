@@ -123,6 +123,19 @@ public class SakaiProxyImpl implements SakaiProxy
 		return sqlService.getVendor();
 	}
 	
+	public Site getCurrentSite()
+	{
+		try
+		{
+			return siteService.getSite(getCurrentSiteId());
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to get current site.",e);
+			return null;
+		}
+	}
+	
 	public String getCurrentSiteId()
 	{
 		Placement placement = toolManager.getCurrentPlacement();
