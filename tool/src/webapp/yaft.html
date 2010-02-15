@@ -202,7 +202,7 @@ ${yaft_forums_label}
 	<input type="hidden" name="currentForumId" value="${discussion.forumId}"/>
 	<select name="forumId">
 	{for forum in items}
-		<option value="${forum.id}">${forum.title}</option>
+		{if forum.id != yaftCurrentForum.id}<option value="${forum.id}">${forum.title}</option>{/if}
 	{/for}
 	</select>
 	<br />
