@@ -584,17 +584,57 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "SELECT MESSAGE_ID FROM YAFT_MESSAGE WHERE DISCUSSION_ID = '" + discussionId + "' AND MESSAGE_ID IN (SELECT MESSAGE_ID FROM YAFT_READ_MESSAGES WHERE USER_ID = '" + userId + "')";
 	}
 
-	public List<String> getMoveDiscussionStatements(String discussionId, String currentForumId, String newForumId)
+	public List<String> getMoveDiscussionStatements(String discussionId, String currentForumId, String newForumId,Connection conn)
 	{
 		List<String> statements = new ArrayList<String>();
-		statements.add("UPDATE YAFT_FORUM_DISCUSSION SET FORUM_ID = '" + newForumId + "' WHERE DISCUSSION_ID = '" + discussionId + "'");
-		statements.add("UPDATE YAFT_FORUM SET DISCUSSION_COUNT = DISCUSSION_COUNT - 1 WHERE FORUM_ID = '" + currentForumId + "'");
-		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + currentForumId + "'");
-		statements.add("UPDATE YAFT_FORUM SET DISCUSSION_COUNT = DISCUSSION_COUNT + 1 WHERE FORUM_ID = '" + newForumId + "'");
-		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT + (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + newForumId + "'");
-		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = NULL WHERE DISCUSSION_COUNT = 0 AND FORUM_ID = '" + currentForumId + "'");
-		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT LAST_MESSAGE_DATE FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + newForumId + "' AND (SELECT LAST_MESSAGE_DATE FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') > LAST_MESSAGE_DATE");
-		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + currentForumId + "') WHERE FORUM_ID = '" + currentForumId + "'");
+		
+		Statement st = null;
+		Statement st1 = null;
+		
+		try
+		{
+			st = conn.createStatement();
+			st1 = conn.createStatement();
+			ResultSet rs = st.executeQuery("SELECT * FROM YAFT_FORUM_READ WHERE FORUM_ID = '" + currentForumId + "'");
+			while(rs.next())
+			{
+				String userId = rs.getString("USER_ID");
+				int currentNumberRead = rs.getInt("NUMBER_READ");
+				ResultSet rs1 = st1.executeQuery("SELECT * FROM YAFT_FORUM_READ WHERE FORUM_ID = '" + newForumId + "' AND USER_ID = '" + userId + "'");
+				if (rs1.next())
+					statements.add("UPDATE YAFT_FORUM_READ SET NUMBER_READ = NUMBER_READ + " + currentNumberRead + " WHERE FORUM_ID = '" + newForumId + "' AND USER_ID = '" + userId + "'");
+				else
+					statements.add("INSERT INTO YAFT_FORUM_READ (FORUM_ID,USER_ID,NUMBER_READ) VALUES('" + newForumId + "','" + userId + "'," + currentNumberRead + ")");
+
+				rs1.close();
+			}
+		
+			rs.close();
+		
+			statements.add("UPDATE YAFT_FORUM_DISCUSSION SET FORUM_ID = '" + newForumId + "' WHERE DISCUSSION_ID = '" + discussionId + "'");
+			statements.add("UPDATE YAFT_FORUM SET DISCUSSION_COUNT = DISCUSSION_COUNT - 1 WHERE FORUM_ID = '" + currentForumId + "'");
+			statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + currentForumId + "'");
+			statements.add("UPDATE YAFT_FORUM SET DISCUSSION_COUNT = DISCUSSION_COUNT + 1 WHERE FORUM_ID = '" + newForumId + "'");
+			statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT + (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + newForumId + "'");
+			statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = NULL WHERE DISCUSSION_COUNT = 0 AND FORUM_ID = '" + currentForumId + "'");
+			statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT LAST_MESSAGE_DATE FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') WHERE FORUM_ID = '" + newForumId + "' AND (SELECT LAST_MESSAGE_DATE FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') > LAST_MESSAGE_DATE");
+			statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + currentForumId + "') WHERE FORUM_ID = '" + currentForumId + "'");
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to get move discussion statements",e);
+			
+		}
+		finally
+		{
+			try
+			{
+				if(st != null) st.close();
+				if(st1 != null) st1.close();
+			}
+			catch(Exception e1) {}
+		}
+		
 		return statements;
 	}
 

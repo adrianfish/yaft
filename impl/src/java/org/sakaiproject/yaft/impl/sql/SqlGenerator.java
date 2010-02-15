@@ -70,7 +70,7 @@ public interface SqlGenerator
 
 	String getSelectReadMessageIds(String id, String discussionId);
 
-	List<String> getMoveDiscussionStatements(String discussionId, String currentForumId,String newForumId);
+	List<String> getMoveDiscussionStatements(String discussionId, String currentForumId,String newForumId,Connection conn);
 
 	List<PreparedStatement> getPublishMessageStatements(String forumId,Message message,Connection connection) throws SQLException;
 

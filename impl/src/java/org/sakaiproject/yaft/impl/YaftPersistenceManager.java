@@ -1675,7 +1675,7 @@ public class YaftPersistenceManager
 
 			try
 			{
-				List<String> statements = sqlGenerator.getMoveDiscussionStatements(discussionId, currentForumId, newForumId);
+				List<String> statements = sqlGenerator.getMoveDiscussionStatements(discussionId, currentForumId, newForumId,connection);
 				
 				statement = connection.createStatement();
 				
