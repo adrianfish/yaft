@@ -6,8 +6,8 @@ public class OracleGenerator extends DefaultSqlGenerator
 	{
 		VARCHAR    = "VARCHAR2";
 		TIMESTAMP  = "TIMESTAMP";
-		TEXT       = "LONG";
+		TEXT       = "CLOB";
 		BOOL = "char(1)";
-		MEDIUMTEXT = "LONG";
+		MEDIUMTEXT = "CLOB";
 	}
 }
