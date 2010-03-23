@@ -18,6 +18,41 @@ var yaftShowingDeleted = false;
 {
 	// We need the toolbar in a template so we can swap in the translations
 	YaftUtils.render('yaft_toolbar_template',{},'yaft_toolbar');
+
+	$('#yaft_home_link').bind('click',function(e) {
+		switchState('forums');
+	});
+
+	$('#yaft_add_forum_link').bind('click',function(e) {
+		switchState('editForum');
+	});
+
+	$('#yaft_add_discussion_link').bind('click',function(e) {
+		switchState('startDiscussion');
+	});
+
+	$('#yaft_permissions_link').bind('click',function(e) {
+		switchState('permissions');
+	});
+
+	$('#yaft_minimal_link').bind('click',function(e) {
+		switchState('minimal');
+	});
+
+	$('#yaft_full_link').bind('click',function(e) {
+		switchState('full');
+	});
+
+	$('#yaft_show_deleted_link').bind('click',YaftUtils.showDeleted);
+	$('#yaft_hide_deleted_link').bind('click',YaftUtils.hideDeleted);
+
+	$('#yaft_preferences_link').bind('click',function(e) {
+		switchState('preferences');
+	});
+
+	$('#yaft_search_field').change(function(e) {
+		YaftUtils.showSearchResults(e.target.value);
+	});
 	
 	// This is always showing in every state, so show it here.
 	$('#yaft_home_link').show();
