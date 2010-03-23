@@ -295,6 +295,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
 				permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
 				permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
+				permissions.setCanModifyPermissions(role.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS));
 
 				list.add(permissions);
 			}
@@ -314,18 +315,6 @@ public class SakaiProxyImpl implements SakaiProxy
 		try
 		{
 			String userId = userDirectoryService.getCurrentUser().getId();
-			Site site = null;
-
-			if (siteId != null)
-				site = siteService.getSite(siteId);
-			else
-				site = siteService.getSite(getCurrentSiteId());
-
-			AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
-			Role role = realm.getUserRole(userId);
-
-			AuthzGroup siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
-			Role siteHelperRole = siteHelperRealm.getRole(role.getId());
 
 			YaftPermissions permissions = new YaftPermissions();
 
@@ -336,7 +325,27 @@ public class SakaiProxyImpl implements SakaiProxy
 			}
 			else
 			{
+				Site site = null;
+
+				if (siteId != null)
+					site = siteService.getSite(siteId);
+				else
+					site = siteService.getSite(getCurrentSiteId());
+
+				AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
+
+				AuthzGroup siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
+				
+				Role role = realm.getUserRole(userId);
+				
+				if(role == null)
+				{
+					return permissions;
+				}
+				
 				permissions.setRole(role.getId());
+				
+				Role siteHelperRole = siteHelperRealm.getRole(role.getId());
 
 				if (siteHelperRole != null)
 				{
@@ -351,6 +360,7 @@ public class SakaiProxyImpl implements SakaiProxy
 					permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
 					permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
 					permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE) || siteHelperRole.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
+					permissions.setCanModifyPermissions(role.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS));
 				}
 				else
 				{
@@ -365,6 +375,7 @@ public class SakaiProxyImpl implements SakaiProxy
 					permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
 					permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
 					permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
+					permissions.setCanModifyPermissions(role.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS));
 				}
 			}
 
@@ -456,6 +467,11 @@ public class SakaiProxyImpl implements SakaiProxy
 				role.allowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
+			
+			if (permissions.isCanModifyPermissions())
+				role.allowFunction(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
+			else
+				role.disallowFunction(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
 		}
 
 		authzGroupService.save(realm);
