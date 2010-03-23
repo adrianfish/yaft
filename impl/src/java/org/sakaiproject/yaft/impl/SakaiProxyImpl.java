@@ -57,37 +57,53 @@ import org.sakaiproject.yaft.api.YaftFunctions;
 import org.sakaiproject.yaft.api.YaftPermissions;
 
 /**
- * All Sakai API calls go in here. If Sakai changes all we have to do if mod
- * this file.
+ * All Sakai API calls go in here. If Sakai changes all we have to do if mod this file.
  * 
  * @author Adrian Fish (a.fish@lancaster.ac.uk)
  */
 public class SakaiProxyImpl implements SakaiProxy
 {
 	private Logger logger = Logger.getLogger(SakaiProxyImpl.class);
-	
+
 	private ServerConfigurationService serverConfigurationService = null;
+
 	private UserDirectoryService userDirectoryService = null;
+
 	private SqlService sqlService = null;
+
 	private SiteService siteService = null;
+
 	private ToolManager toolManager;
+
 	private ProfileManager profileManager;
+
 	private FunctionManager functionManager;
+
 	private AuthzGroupService authzGroupService;
+
 	private EmailService emailService;
+
 	private DigestService digestService;
+
 	private ContentHostingService contentHostingService;
+
 	private SecurityService securityService;
+
 	private EntityManager entityManager;
+
 	private EventTrackingService eventTrackingService;
+
 	private CalendarService calendarService;
+
 	private TimeService timeService;
+
 	private UsageSessionService usageSessionService;
-	
+
 	public SakaiProxyImpl()
 	{
-		if(logger.isDebugEnabled()) logger.debug("SakaiProxy()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("SakaiProxy()");
+
 		ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
 		serverConfigurationService = (ServerConfigurationService) componentManager.get(ServerConfigurationService.class);
 		userDirectoryService = (UserDirectoryService) componentManager.get(UserDirectoryService.class);
@@ -107,56 +123,60 @@ public class SakaiProxyImpl implements SakaiProxy
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 	}
-	
+
 	public boolean isAutoDDL()
 	{
-		if(logger.isDebugEnabled()) logger.debug("isAutoDDL()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("isAutoDDL()");
+
 		String autoDDL = serverConfigurationService.getString("auto.ddl");
 		return autoDDL.equals("true");
 	}
-	
+
 	public String getDbVendor()
 	{
-		if(logger.isDebugEnabled()) logger.debug("getDbVendor()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("getDbVendor()");
+
 		return sqlService.getVendor();
 	}
-	
+
 	public Site getCurrentSite()
 	{
 		try
 		{
 			return siteService.getSite(getCurrentSiteId());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Failed to get current site.",e);
+			logger.error("Failed to get current site.", e);
 			return null;
 		}
 	}
-	
+
 	public String getCurrentSiteId()
 	{
 		Placement placement = toolManager.getCurrentPlacement();
-		if(placement == null)
+		if (placement == null)
 		{
 			logger.warn("Current tool placement is null.");
 			return null;
 		}
-		
+
 		return placement.getContext();
 	}
-	
+
 	public Connection borrowConnection() throws SQLException
 	{
-		if(logger.isDebugEnabled()) logger.debug("borrowConnection()");
+		if (logger.isDebugEnabled())
+			logger.debug("borrowConnection()");
 		return sqlService.borrowConnection();
 	}
-	
+
 	public void returnConnection(Connection connection)
 	{
-		if(logger.isDebugEnabled()) logger.debug("returnConnection()");
+		if (logger.isDebugEnabled())
+			logger.debug("returnConnection()");
 		sqlService.returnConnection(connection);
 	}
 
@@ -172,12 +192,12 @@ public class SakaiProxyImpl implements SakaiProxy
 			return creatorId; // this can happen if the user does not longer exist in the system
 		}
 	}
-	
+
 	public void registerFunction(String function)
 	{
 		List functions = functionManager.getRegisteredFunctions("yaft.");
-		
-		if(!functions.contains(function))
+
+		if (!functions.contains(function))
 			functionManager.registerFunction(function);
 	}
 
@@ -189,9 +209,9 @@ public class SakaiProxyImpl implements SakaiProxy
 	public Profile getProfile(String userId)
 	{
 		return profileManager.getUserProfileById(userId);
-	} 
-	
-	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate)
+	}
+
+	public boolean addCalendarEntry(String title, String description, String type, long startDate, long endDate)
 	{
 		try
 		{
@@ -203,64 +223,64 @@ public class SakaiProxyImpl implements SakaiProxy
 			edit.setDisplayName(title);
 			edit.setType(type);
 			cal.commitEvent(edit);
-		
+
 			return true;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Failed to add calendar entry. Returning false ...",e);
+			logger.error("Failed to add calendar entry. Returning false ...", e);
 			return false;
 		}
 	}
-	
-	public boolean removeCalendarEntry(String title,String description)
+
+	public boolean removeCalendarEntry(String title, String description)
 	{
 		try
 		{
 			Calendar cal = calendarService.getCalendar("/calendar/calendar/" + getCurrentSiteId() + "/main");
-			List<CalendarEvent> events = cal.getEvents(null,null);
-			for(CalendarEvent event : events)
+			List<CalendarEvent> events = cal.getEvents(null, null);
+			for (CalendarEvent event : events)
 			{
-				if(event.getDisplayName().equals(title) && event.getDescription().equals(description))
+				if (event.getDisplayName().equals(title) && event.getDescription().equals(description))
 				{
 					CalendarEventEdit edit = cal.getEditEvent(event.getId(), CalendarService.SECURE_REMOVE);
 					cal.removeEvent(edit);
 					return true;
 				}
 			}
-			
+
 			return true;
-		
+
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Failed to add calendar entry. Returning false ...",e);
+			logger.error("Failed to add calendar entry. Returning false ...", e);
 			return false;
 		}
 	}
-	
+
 	public String getServerUrl()
 	{
 		return serverConfigurationService.getServerUrl();
 	}
-	
+
 	public List<YaftPermissions> getPermissions(String siteId)
 	{
 		try
 		{
 			Site site = null;
-			
-			if(siteId != null)
+
+			if (siteId != null)
 				site = siteService.getSite(siteId);
 			else
 				site = siteService.getSite(getCurrentSiteId());
-			
+
 			AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
 			Set<Role> roles = realm.getRoles();
-			
+
 			List<YaftPermissions> list = new ArrayList<YaftPermissions>(roles.size());
-			
-			for(Role role : roles)
+
+			for (Role role : roles)
 			{
 				YaftPermissions permissions = new YaftPermissions();
 				permissions.setRole(role.getId());
@@ -275,17 +295,17 @@ public class SakaiProxyImpl implements SakaiProxy
 				permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
 				permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
 				permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
-				
+
 				list.add(permissions);
 			}
-			
+
 			return list;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Caught exception whilst building permissions list",e);
+			logger.error("Caught exception whilst building permissions list", e);
 		}
-		
+
 		return null;
 	}
 
@@ -295,123 +315,152 @@ public class SakaiProxyImpl implements SakaiProxy
 		{
 			String userId = userDirectoryService.getCurrentUser().getId();
 			Site site = null;
-			
-			if(siteId != null)
+
+			if (siteId != null)
 				site = siteService.getSite(siteId);
 			else
 				site = siteService.getSite(getCurrentSiteId());
-			
+
 			AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
 			Role role = realm.getUserRole(userId);
-			
+
+			AuthzGroup siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
+			Role siteHelperRole = siteHelperRealm.getRole(role.getId());
+
 			YaftPermissions permissions = new YaftPermissions();
-			permissions.setRole(role.getId());
-			permissions.setForumCreate(role.isAllowed(YaftFunctions.YAFT_FORUM_CREATE));
-			permissions.setForumDeleteOwn(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_OWN));
-			permissions.setForumDeleteAny(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_ANY));
-			permissions.setDiscussionCreate(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_CREATE));
-			permissions.setDiscussionDeleteOwn(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN));
-			permissions.setDiscussionDeleteAny(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY));
-			permissions.setMessageCreate(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CREATE));
-			permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
-			permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
-			permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
-			permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
-				
+
+			if (UserDirectoryService.ADMIN_ID.equals(userId))
+			{
+				// Special case for the super admin
+				permissions.setAll();
+			}
+			else
+			{
+				permissions.setRole(role.getId());
+
+				if (siteHelperRole != null)
+				{
+					permissions.setForumCreate(role.isAllowed(YaftFunctions.YAFT_FORUM_CREATE) || siteHelperRole.isAllowed(YaftFunctions.YAFT_FORUM_CREATE));
+					permissions.setForumDeleteOwn(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_OWN) || siteHelperRole.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_OWN));
+					permissions.setForumDeleteAny(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_ANY) || siteHelperRole.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_ANY));
+					permissions.setDiscussionCreate(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_CREATE) || siteHelperRole.isAllowed(YaftFunctions.YAFT_DISCUSSION_CREATE));
+					permissions.setDiscussionDeleteOwn(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN) || siteHelperRole.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN));
+					permissions.setDiscussionDeleteAny(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY) || siteHelperRole.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY));
+					permissions.setMessageCreate(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CREATE) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_CREATE));
+					permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
+					permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
+					permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR) || siteHelperRole.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
+					permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE) || siteHelperRole.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
+				}
+				else
+				{
+					permissions.setForumCreate(role.isAllowed(YaftFunctions.YAFT_FORUM_CREATE));
+					permissions.setForumDeleteOwn(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_OWN));
+					permissions.setForumDeleteAny(role.isAllowed(YaftFunctions.YAFT_FORUM_DELETE_ANY));
+					permissions.setDiscussionCreate(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_CREATE));
+					permissions.setDiscussionDeleteOwn(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN));
+					permissions.setDiscussionDeleteAny(role.isAllowed(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY));
+					permissions.setMessageCreate(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CREATE));
+					permissions.setMessageDeleteOwn(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_OWN));
+					permissions.setMessageDeleteAny(role.isAllowed(YaftFunctions.YAFT_MESSAGE_DELETE_ANY));
+					permissions.setMessageCensor(role.isAllowed(YaftFunctions.YAFT_MESSAGE_CENSOR));
+					permissions.setViewInvisible(role.isAllowed(YaftFunctions.YAFT_VIEW_INVISIBLE));
+				}
+			}
+
 			return permissions;
-				
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Caught exception whilst building permissions list",e);
+			logger.error("Caught exception whilst building permissions list", e);
 		}
-		
+
 		return null;
 	}
 
-	public void savePermissions(String siteId,Map<String, YaftPermissions> permissionMap) throws Exception
+	public void savePermissions(String siteId, Map<String, YaftPermissions> permissionMap) throws Exception
 	{
 		Site site = siteService.getSite(siteId);
 		AuthzGroup realm = authzGroupService.getAuthzGroup(site.getReference());
-		
+
 		Set roles = realm.getRoles();
-		
-		for(Iterator i = roles.iterator();i.hasNext();)
+
+		for (Iterator i = roles.iterator(); i.hasNext();)
 		{
 			Role role = (Role) i.next();
-			
-			if(!permissionMap.containsKey(role.getId()))
+
+			if (!permissionMap.containsKey(role.getId()))
 				permissionMap.put(role.getId(), new YaftPermissions());
 		}
-		
-		for(String roleName : permissionMap.keySet())
+
+		for (String roleName : permissionMap.keySet())
 		{
 			YaftPermissions permissions = permissionMap.get(roleName);
-			
+
 			Role role = realm.getRole(roleName);
-			
-			if(role == null)
+
+			if (role == null)
 				throw new Exception("Role '" + roleName + "' has not been setup for this site");
-			
-			if(permissions.isForumCreate())
+
+			if (permissions.isForumCreate())
 				role.allowFunction(YaftFunctions.YAFT_FORUM_CREATE);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_FORUM_CREATE);
-			
-			if(permissions.isForumDeleteAny())
+
+			if (permissions.isForumDeleteAny())
 				role.allowFunction(YaftFunctions.YAFT_FORUM_DELETE_ANY);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_FORUM_DELETE_ANY);
-			
-			if(permissions.isForumDeleteOwn())
+
+			if (permissions.isForumDeleteOwn())
 				role.allowFunction(YaftFunctions.YAFT_FORUM_DELETE_OWN);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_FORUM_DELETE_OWN);
-			
-			if(permissions.isDiscussionCreate())
+
+			if (permissions.isDiscussionCreate())
 				role.allowFunction(YaftFunctions.YAFT_DISCUSSION_CREATE);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_DISCUSSION_CREATE);
-			
-			if(permissions.isDiscussionDeleteOwn())
+
+			if (permissions.isDiscussionDeleteOwn())
 				role.allowFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN);
-			
-			if(permissions.isDiscussionDeleteAny())
+
+			if (permissions.isDiscussionDeleteAny())
 				role.allowFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY);
-			
-			if(permissions.isMessageCreate())
+
+			if (permissions.isMessageCreate())
 				role.allowFunction(YaftFunctions.YAFT_MESSAGE_CREATE);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_MESSAGE_CREATE);
-			
-			if(permissions.isMessageCensor())
+
+			if (permissions.isMessageCensor())
 				role.allowFunction(YaftFunctions.YAFT_MESSAGE_CENSOR);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_MESSAGE_CENSOR);
-			
-			if(permissions.isMessageDeleteOwn())
+
+			if (permissions.isMessageDeleteOwn())
 				role.allowFunction(YaftFunctions.YAFT_MESSAGE_DELETE_OWN);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_MESSAGE_DELETE_OWN);
-			
-			if(permissions.isMessageDeleteAny())
+
+			if (permissions.isMessageDeleteAny())
 				role.allowFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
-			
-			if(permissions.isViewInvisible())
+
+			if (permissions.isViewInvisible())
 				role.allowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 			else
 				role.disallowFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 		}
-		
+
 		authzGroupService.save(realm);
 	}
-	
+
 	private String getEmailForTheUser(String userId)
 	{
 		try
@@ -424,8 +473,8 @@ public class SakaiProxyImpl implements SakaiProxy
 			return ""; // this can happen if the user does not longer exist in the system
 		}
 	}
-	
-	public void sendEmailMessage(String subject,String body, String user)
+
+	public void sendEmailMessage(String subject, String body, String user)
 	{
 		try
 		{
@@ -448,8 +497,8 @@ public class SakaiProxyImpl implements SakaiProxy
 			e.printStackTrace();
 		}
 	}
-	
-	public void addDigestMessage(String user,String subject, String body)
+
+	public void addDigestMessage(String user, String subject, String body)
 	{
 		try
 		{
@@ -487,29 +536,30 @@ public class SakaiProxyImpl implements SakaiProxy
 		{
 			return userDirectoryService.getCurrentUser();
 		}
-		catch(Throwable t)
+		catch (Throwable t)
 		{
-			logger.error("Exception caught whilst getting current user.",t);
-			if(logger.isDebugEnabled()) logger.debug("Returning null ...");
+			logger.error("Exception caught whilst getting current user.", t);
+			if (logger.isDebugEnabled())
+				logger.debug("Returning null ...");
 			return null;
 		}
 	}
-	
+
 	public String getPortalUrl()
 	{
 		return serverConfigurationService.getServerUrl() + "/portal";
 	}
-	
+
 	public String getCurrentPageId()
 	{
 		Placement placement = toolManager.getCurrentPlacement();
-		
-		if(placement instanceof ToolConfiguration)
+
+		if (placement instanceof ToolConfiguration)
 			return ((ToolConfiguration) placement).getPageId();
-		
+
 		return null;
 	}
-	
+
 	public String getCurrentToolId()
 	{
 		return toolManager.getCurrentPlacement().getId();
@@ -521,53 +571,49 @@ public class SakaiProxyImpl implements SakaiProxy
 		String pageId = getCurrentPageId();
 		String siteId = getCurrentSiteId();
 		String toolId = getCurrentToolId();
-				
+
 		try
 		{
-			String url = portalUrl
-						+ "/site/" + siteId
-						+ "/page/" + pageId
-						+ "?toolstate-" + toolId + "="
-							+ URLEncoder.encode(string,"UTF-8");
-		
+			String url = portalUrl + "/site/" + siteId + "/page/" + pageId + "?toolstate-" + toolId + "=" + URLEncoder.encode(string, "UTF-8");
+
 			return url;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Caught exception whilst building direct URL.",e);
+			logger.error("Caught exception whilst building direct URL.", e);
 			return null;
 		}
 	}
-	
+
 	private void enableSecurityAdvisor()
-    {
+	{
 		securityService.pushAdvisor(new SecurityAdvisor()
-        {
-            public SecurityAdvice isAllowed(String userId, String function, String reference)
-            {
-                return SecurityAdvice.ALLOWED;
-            }
-        });
-    }
-	
+		{
+			public SecurityAdvice isAllowed(String userId, String function, String reference)
+			{
+				return SecurityAdvice.ALLOWED;
+			}
+		});
+	}
+
 	/**
 	 * Saves the file to Sakai's content hosting
 	 */
-	public String saveFile(String creatorId,String name,String mimeType, byte[] fileData) throws Exception
+	public String saveFile(String creatorId, String name, String mimeType, byte[] fileData) throws Exception
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("saveFile(" + name + "," + mimeType + ",[BINARY FILE DATA])");
-		
-		if(name == null | name.length()  == 0)
+
+		if (name == null | name.length() == 0)
 			throw new IllegalArgumentException("The name argument must be populated.");
-		
-		if(name.endsWith(".doc"))
+
+		if (name.endsWith(".doc"))
 			mimeType = "application/msword";
-		else if(name.endsWith(".xls"))
+		else if (name.endsWith(".xls"))
 			mimeType = "application/excel";
-		
-		//String uuid = UUID.randomUUID().toString();
-		
+
+		// String uuid = UUID.randomUUID().toString();
+
 		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + name;
 
 		try
@@ -584,35 +630,37 @@ public class SakaiProxyImpl implements SakaiProxy
 			props.addProperty(ResourceProperties.PROP_ORIGINAL_FILENAME, name);
 			resource.getPropertiesEdit().set(props);
 			contentHostingService.commitResource(resource, NotificationService.NOTI_NONE);
-			
-			//return resource.getId();
+
+			// return resource.getId();
 			return name;
 		}
-		catch(IdUsedException e)
+		catch (IdUsedException e)
 		{
-			if(logger.isInfoEnabled()) logger.info("A resource with id '" + id + "' exists already. Returning id without recreating ...");
+			if (logger.isInfoEnabled())
+				logger.info("A resource with id '" + id + "' exists already. Returning id without recreating ...");
 			return name;
 		}
 	}
-	
+
 	public void getAttachment(Attachment attachment)
 	{
 		try
 		{
 			enableSecurityAdvisor();
 			String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + attachment.getResourceId();
-			//ContentResource resource = contentHostingService.getResource(attachment.getResourceId());
+			// ContentResource resource = contentHostingService.getResource(attachment.getResourceId());
 			ContentResource resource = contentHostingService.getResource(id);
 			ResourceProperties properties = resource.getProperties();
 			attachment.setMimeType(properties.getProperty(ResourceProperties.PROP_CONTENT_TYPE));
 			attachment.setName(properties.getProperty(ResourceProperties.PROP_DISPLAY_NAME));
 			attachment.setUrl(resource.getUrl());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			if(logger.isDebugEnabled()) e.printStackTrace();
-			
-			logger.error("Caught an exception with message '" + e.getMessage()+ "'");
+			if (logger.isDebugEnabled())
+				e.printStackTrace();
+
+			logger.error("Caught an exception with message '" + e.getMessage() + "'");
 		}
 	}
 
@@ -626,9 +674,9 @@ public class SakaiProxyImpl implements SakaiProxy
 	public String getUserBio(String id)
 	{
 		Profile profile = profileManager.getUserProfileById(id);
-		if(profile != null)
+		if (profile != null)
 			return profile.getOtherInformation();
-		
+
 		return "";
 	}
 
@@ -659,15 +707,15 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return null;
 	}
-	
+
 	public void registerEntityProducer(EntityProducer entityProducer)
 	{
 		entityManager.registerEntityProducer(entityProducer, YaftForumService.ENTITY_PREFIX);
 	}
 
-	public void postEvent(String event,String reference,boolean modify)
+	public void postEvent(String event, String reference, boolean modify)
 	{
-		eventTrackingService.post(eventTrackingService.newEvent(event,reference,modify));
+		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify));
 	}
 
 	public byte[] getResourceBytes(String resourceId)
@@ -678,46 +726,46 @@ public class SakaiProxyImpl implements SakaiProxy
 			ContentResource resource = contentHostingService.getResource(resourceId);
 			return resource.getContent();
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Caught an exception with message '" + e.getMessage()+ "'");
+			logger.error("Caught an exception with message '" + e.getMessage() + "'");
 		}
-		
+
 		return null;
 	}
 
 	public List<String> getOfflineYaftUserIds(String siteId) throws IdUnusedException
 	{
 		List<String> yaftUserIds = new ArrayList<String>();
-		
+
 		List<Site> allSites = siteService.getSites(SiteService.SelectionType.ANY, null, null, null, SiteService.SortType.NONE, null);
 		Site site = siteService.getSite(siteId);
-		
-		if(site.getToolForCommonId("sakai.yaft") != null)
+
+		if (site.getToolForCommonId("sakai.yaft") != null)
 		{
 			// This site contains yaft. Get it's user ids.
 			Set<String> userIds = site.getUsers();
 			yaftUserIds.addAll(userIds);
 		}
-		
+
 		List<UsageSession> openSessions = usageSessionService.getOpenSessions();
-		
-		List<String> offlineYaftUserIds = new ArrayList<String>(); 
-		
-		for(String yaftUserId : yaftUserIds)
+
+		List<String> offlineYaftUserIds = new ArrayList<String>();
+
+		for (String yaftUserId : yaftUserIds)
 		{
 			boolean offline = true;
-			
-			for(UsageSession session : openSessions)
+
+			for (UsageSession session : openSessions)
 			{
-				if(session.getUserId().equals(yaftUserId))
+				if (session.getUserId().equals(yaftUserId))
 					offline = false;
 			}
-			
-			if(offline)
+
+			if (offline)
 				offlineYaftUserIds.add(yaftUserId);
 		}
-		
+
 		return offlineYaftUserIds;
 	}
 }

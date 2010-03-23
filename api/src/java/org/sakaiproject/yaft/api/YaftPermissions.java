@@ -146,4 +146,21 @@ public class YaftPermissions
 	{
 		return viewInvisible;
 	}
+
+	public void setAll()
+	{
+		forumCreate = true;
+		forumDeleteOwn = true;
+		forumDeleteAny = true;
+		discussionCreate = true;
+		discussionDeleteOwn = true;
+		discussionDeleteAny = true;
+		messageCreate = true;
+		messageCensor = true;
+		messageDeleteOwn = true;
+		messageUnDelete = true;
+		messageDeleteAny = true;
+		canModifyPermissions = true;
+		viewInvisible = true;
+	}
 }

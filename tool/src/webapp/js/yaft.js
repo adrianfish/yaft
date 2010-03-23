@@ -14,6 +14,9 @@ var yaftCurrentDiscussion = null;
 var yaftViewMode = "full";
 var yaftShowingDeleted = false;
 
+//var isAdmin = false;
+//var isMaintain = false;
+
 (function()
 {
 	// We need the toolbar in a template so we can swap in the translations
@@ -69,7 +72,16 @@ var yaftShowingDeleted = false;
 	yaftPlacementId = arg.placementId;
 	yaftSiteId = arg.siteId;
 	yaftCurrentUser = YaftUtils.getCurrentUser(arg.placementId);
+
+	// We set the isAdmin flag so we can switch on all the functionality
+	// for the admin user in the various states.
+	//if('admin' === yaftCurrentUser.id) isAdmin = true;
+
 	yaftCurrentUserPermissions = YaftUtils.getUserPermissions(arg.placementId);
+
+	// We set the isMaintain flag so we can enable the permissions link
+	//if('maintain' === yaftCurrentUserPermissions.role) isMaintain = true;
+
 	yaftCurrentUserPreferences = YaftUtils.getUserPreferences(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();
 	yaftForumUnsubscriptions = YaftUtils.getForumUnsubscriptions();
@@ -85,29 +97,29 @@ var yaftShowingDeleted = false;
 	}
 })();
 
-function switchState(state,arg)
-{
+function switchState(state,arg) {
+
 	$('#yaft_message').hide();
 
 	// If a forum id has been specified we need to refresh the current forum
 	// state. We need to do it here as the breadcrumb in various states uses
 	// the information.
-	if(arg && arg.forumId)
-	{
+	if(arg && arg.forumId) {
+
 		yaftCurrentForum = YaftUtils.getForum(arg.forumId,"part");
 		YaftUtils.setUnreadMessageCountForCurrentForum();
 		YaftUtils.setupCurrentForumUnsubscriptions();
 	}
 
-	if(state == 'forums')
-	{
+	if('forums' === state) {
+
 		if(yaftCurrentUserPermissions.forumCreate)
 			$("#yaft_add_forum_link").show();
 		else
 			$("#yaft_add_forum_link").hide();
 
 		// Site maintainers are the only ones who can change permissions
-		if(yaftCurrentUserPermissions.role == 'maintain')
+		if(yaftCurrentUserPermissions.canModifyPermissions)
 			$("#yaft_permissions_link").show();
 		else
 			$("#yaft_permissions_link").hide();
