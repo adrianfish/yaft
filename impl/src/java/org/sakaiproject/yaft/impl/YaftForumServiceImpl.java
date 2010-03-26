@@ -340,11 +340,11 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 				String body = "";
 				if(newDiscussion)
-					body = message.getCreatorDisplayName() + " started a new discussion titled '<a href=\"" + url + "\">" + discussion.getSubject() + "</a>' in site '" + siteTitle + "'";
+					body = "<b>" + message.getCreatorDisplayName() + "</b> started a new discussion titled '" + discussion.getSubject() + "' in '" + site.getTitle() + "'<br /><br />Click <a href=\"" + url + "\">here</a> to view it";
 				else
-					body = message.getCreatorDisplayName() + " added/updated the message titled '<a href=\"" + url + "\">" + message.getSubject() + "</a>' at discussion '" + discussion.getSubject() + "' in site '" + siteTitle + "'";
+					body = "<b>" + message.getCreatorDisplayName() + "</b> added/updated the message titled '" + message.getSubject() + "' in '" + site.getTitle() + "'<br /><br />Click <a href=\"" + url + "\">here</a> to read it";
 			
-				new EmailSender(users, unsubscribers, body,sakaiProxy.getCurrentSiteId());
+				new EmailSender(users, unsubscribers, body,message,site);
 			}
 			catch(Exception e)
 			{
@@ -634,14 +634,20 @@ public class YaftForumServiceImpl implements YaftForumService
 		private String body;
 		
 		private String siteId;
+		
+		private Site site;
+		
+		private Message message;
 
 		private Set<String> participants;
 
-		public EmailSender(Set<String> to, List<String> exclusions,String body,String siteId)
+		public EmailSender(Set<String> to, List<String> exclusions,String body,Message message,Site site)
 		{
 			this.participants = to;
 			this.body = body;
-			this.siteId = siteId;
+			this.message = message;
+			this.siteId = message.getSiteId();
+			this.site = site;
 			
 			if(exclusions != null && exclusions.size() > 0)
 			{
@@ -664,7 +670,7 @@ public class YaftForumServiceImpl implements YaftForumService
 					if(YaftPreferences.EACH.equals(prefs.getEmail()))
 					{
 						String emailBody = "<html><body>" + body + "</body></html>";
-						sakaiProxy.sendEmailMessage("New Sakai Forum Message",emailBody,user);
+						sakaiProxy.sendEmailMessage("[ " + site.getTitle() + " - Forum Message ]  " + message.getSubject(),emailBody,user);
 					}
 					else if(YaftPreferences.DIGEST.equals(prefs.getEmail()))
 						sakaiProxy.addDigestMessage(user,"New Sakai Forum Message",body);
