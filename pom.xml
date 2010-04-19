@@ -42,6 +42,7 @@
     	<module>components</module>
     	<module>tool</module>
     	<module>assembly</module>
+    	<module>help</module>
   	</modules>
 
 	<profiles>
