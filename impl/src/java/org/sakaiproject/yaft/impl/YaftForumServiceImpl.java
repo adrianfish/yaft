@@ -599,9 +599,9 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getReadMessageCountForForum(sakaiProxy.getCurrentUser().getId(),forumId);
 	}
 
-	public Forum getForumForTitle(String title,String state)
+	public Forum getForumForTitle(String title,String state,String siteId)
 	{
-		return persistenceManager.getForumForTitle(title,state);
+		return persistenceManager.getForumForTitle(title,state,siteId);
 	}
 
 	public List<String> getForumUnsubscriptions(String userId)

@@ -1891,9 +1891,9 @@ public class YaftPersistenceManager
 	 * @return The first forum with that title, or null if no forum with the
 	 * 			supplied title could be found
 	 */
-	public Forum getForumForTitle(String title,String state)
+	public Forum getForumForTitle(String title,String state,String siteId)
 	{
-		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title,sakaiProxy.getCurrentSiteId());
+		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title,siteId);
 		
 		Connection connection = null;
 		Statement statement = null;

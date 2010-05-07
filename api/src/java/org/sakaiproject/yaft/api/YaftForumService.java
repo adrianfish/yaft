@@ -34,7 +34,7 @@ public interface YaftForumService extends EntityProducer
 	 */
 	public Forum getForum(String forumId,String state);
 	
-	public Forum getForumForTitle(String title,String state);
+	public Forum getForumForTitle(String title,String state,String siteId);
 	
 	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception;
 	
