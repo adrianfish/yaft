@@ -689,9 +689,15 @@ public class SakaiProxyImpl implements SakaiProxy
 
 	public String getUserBio(String id)
 	{
-		Profile profile = profileManager.getUserProfileById(id);
-		if (profile != null)
-			return profile.getOtherInformation();
+		try
+		{
+			Profile profile = profileManager.getUserProfileById(id);
+			if (profile != null)
+				return profile.getOtherInformation();
+		}
+		catch(SecurityException se)
+		{
+		}
 
 		return "";
 	}
