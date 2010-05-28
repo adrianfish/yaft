@@ -58,8 +58,6 @@ public interface SqlGenerator
 
 	String getSelectForumContainingMessageStatement(String messageId);
 
-	String getSearchStatement(String siteId, List<String> searchTerms);
-
 	List<String> getMarkMessageReadStatements(String userId, String messageId,String forumId,String discussionId,Connection conn) throws SQLException;
 
 	List<String> getMarkMessageUnReadStatements(String id, String messageId,String forumId,String discussionId);

@@ -6,27 +6,27 @@
       lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script type="text/javascript" language="JavaScript" src="lib/trimpath.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/querystring.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery-1.3.2.min.js"></script> 
-<script type="text/javascript" language="JavaScript" src="lib/jquery.dimensions.js"></script> 
-<script type="text/javascript" language="JavaScript" src="lib/jquery.hoverIntent.js"></script> 
-<script type="text/javascript" language="JavaScript" src="lib/jquery.cluetip.js"></script> 
-<script type="text/javascript" language="JavaScript" src="lib/jquery.MultiFile.pack.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery.localisation.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery-ui-1.7.1.custom.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="lib/jquery.scrollTo-1.4.0-min.js"></script>
-<script type="text/javascript" language="JavaScript" src="/library/editor/FCKeditor/fckeditor.js"></script>
-<script type="text/javascript" language="JavaScript" src="js/yaft_utils.js"></script>
-<script type="text/javascript" language="JavaScript" src="yaft-translations.js"></script>
-<script type="text/javascript" language="JavaScript"  src="/library/js/headscripts.js"></script>
+<script type="text/javascript" src="/library/js/jquery/jquery-ui/js/jquery.js"></script>
+<script type="text/javascript" src="/library/js/jquery/jquery-ui/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/library/js/trimpath-template-latest.js"></script>
+<script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
+<script type="text/javascript" src="/library/js/headscripts.js"></script>
+<script type="text/javascript" src="lib/sakai_utils.js"></script>
+<script type="text/javascript" src="lib/querystring.js"></script>
+<script type="text/javascript" src="lib/jquery.cluetip.js"></script> 
+<script type="text/javascript" src="lib/jquery.MultiFile.pack.js"></script>
+<script type="text/javascript" src="lib/jquery.localisation.js"></script>
+<script type="text/javascript" src="lib/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="lib/jquery.scrollTo-1.4.0-min.js"></script>
+<script type="text/javascript" src="js/yaft_utils.js"></script>
+<script type="text/javascript" src="js/yaft_permissions.js"></script>
+<script type="text/javascript" src="yaft-translations.js"></script>
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
 <link rel="stylesheet" type="text/css" href="/library/skin/default/tool.css" />
+<link rel="stylesheet" type="text/css" href="/library/js/jquery/jquery-ui/css/smoothness/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="css/yaft.css" />
-<link rel="stylesheet" type="text/css" href="css/smoothness/jquery-ui-1.7.1.custom.css" />
-<script type="text/javascript" language="JavaScript">
-var arg = YaftUtils.getParameters();
+<script type="text/javascript">
+var arg = SakaiUtils.getParameters();
 if(arg['language'])
 {
 	$.localise('yaft-translations',{language:arg['language'],loadBase: true});
@@ -131,15 +131,9 @@ ${yaft_forums_label}
 	<tbody>
 	{for discussion in discussions}
 	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
-	<div id="${discussion.creatorId}_profile" class="yaft_profile_popup">
-		<img class="yaft_profile_popup_img" src="/portal/tool/${yaftPlacementId}/data/users/${discussion.creatorId}/picture" width="100px"/>
-		<div class="yaft_profile_popup_name">${discussion.creatorDisplayName}</div>
-		<br/>
-		<p class="yaft_profile_popup_bio">${discussion.firstMessage.creatorBio}</p>
-	</div>
    	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
 		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a></td>
-		<td><a href="#${discussion.creatorId}_profile" class="profile" rel="#${discussion.creatorId}_profile">${discussion.creatorDisplayName}</a></td>
+		<td><a href="javascript:;" class="profile" rel="/direct/profile/${discussion.creatorId}/formatted">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
 		<td>${discussion.unread}</td>
 		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
@@ -172,13 +166,25 @@ ${yaft_forums_label}
 -->
 </div>
 
-<div id="yaft_search_results_content_template" style="display:none;"><!--
+<div id="yaft_search_results_content_template_old" style="display:none;"><!--
 {for result in results}
         <a href="${result.url}" onClick="return switchState('minimal',{'forumId':'${result.forumId}','discussionId':'${result.discussionId}','messageId':'${result.messageId}'});">${result.title}</a>
         <br />
 		{for fragment in result.contextFragments}
         <span style="font-size: 9pt;">... ${fragment} ...</span>
 		{/for}
+        <br />
+{/for}
+-->
+</div>
+
+<div id="yaft_search_results_content_template" style="display:none;"><!--
+<h2>${yaft_search_results}</h2>
+{for result in results}
+        <b>${result.tool}:</b><a href="${result.url}">${result.title}</a>
+        <br />
+        <div class="blog_search_result">${result.searchResult}</div>
+        <br />
         <br />
 {/for}
 -->
@@ -349,9 +355,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_permissions_content_template" style="display:none"><!--
-<form action="/portal/tool/${yaftPlacementId}" method="POST">
-<input type="hidden" name="function" value="savePermissions"/>
-<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
+<form>
 <table id="yaft_permissions_table">
 	<thead>
 		<tr>
@@ -381,31 +385,33 @@ ${yaft_forums_label}
 			<th style="text-align:center;">delete.any</th>
 			<th style="background: white;"></th>
 			<th style="text-align:center;">view.invisible</th>
+			<th style="text-align:center;">modify.permissions</th>
 		</tr>
 	</thead>
 <tbody>
-{for p in permissions}
+{for p in perms}
 <tr>
 	<td align="left">${p.role}</td>
 	<td></td>
-	<td align="center"><input type="checkbox" {if p.forumCreate}checked="checked"{/if}" name="${p.role}:ForumCreate"/></td>
-	<td align="center"><input type="checkbox" {if p.forumDeleteOwn}checked="checked"{/if}" name="${p.role}:ForumDeleteOwn"/></td>
-	<td align="center"><input type="checkbox" {if p.forumDeleteAny}checked="checked"{/if}" name="${p.role}:ForumDeleteAny"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_create}checked="checked"{/if}" id="${p.role}:yaft.forum.create"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.forum.deleteOwn"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_deleteAny}checked="checked"{/if}" id="${p.role}:yaft.forum.deleteAny"/></td>
 	<td></td>
-	<td align="center"><input type="checkbox" {if p.discussionCreate}checked="checked"{/if}" name="${p.role}:DiscussionCreate"/></td>
-	<td align="center"><input type="checkbox" {if p.discussionDeleteOwn}checked="checked"{/if}" name="${p.role}:DiscussionDeleteOwn"/></td>
-	<td align="center"><input type="checkbox" {if p.discussionDeleteAny}checked="checked"{/if}" name="${p.role}:DiscussionDeleteAny"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_create}checked="checked"{/if}" id="${p.role}:yaft.discussion.create"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.discussion.deleteOwn"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_deleteAny}checked="checked"{/if}" id="${p.role}:yaft.discussion.deleteAny"/></td>
 	<td></td>
-	<td align="center"><input type="checkbox" {if p.messageCreate}checked="checked"{/if}" name="${p.role}:MessageCreate"/></td>
-	<td align="center"><input type="checkbox" {if p.messageDeleteOwn}checked="checked"{/if}" name="${p.role}:MessageDeleteOwn"/></td>
-	<td align="center"><input type="checkbox" {if p.messageDeleteAny}checked="checked"{/if}" name="${p.role}:MessageDeleteAny"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_message_create}checked="checked"{/if}" id="${p.role}:yaft.message.create"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_message_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.message.deleteOwn"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_message_deleteAny}checked="checked"{/if}" id="${p.role}:yaft.message.deleteAny"/></td>
 	<td></td>
-	<td align="center"><input type="checkbox" {if p.viewInvisible}checked="checked"{/if}" name="${p.role}:ViewInvisible"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_view_invisible}checked="checked"{/if}" id="${p.role}:yaft.view.invisible"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_modify_permissions}checked="checked"{/if}" id="${p.role}:yaft.modify.permissions"/></td>
 </tr>
 {/for}
 </tbody>
 </table>
-<input type="submit" value="${yaft_save_label}"/>
+<input id="yaft_permissions_save_button" type="button" value="${yaft_save_label}"/>
 <input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
 </form>
 -->
@@ -435,19 +441,13 @@ ${yaft_forums_label}
 		
 		{if (status != 'DELETED' && status != 'DRAFT') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny) || (status == 'DRAFT' && yaftCurrentUser.id == creatorId)}
 			<div style="margin:5px;overflow:hidden;">
-				<a href="#${creatorId}_profile" class="profile" rel="#${creatorId}_profile"><img style="float:left;margin-right:2px;" src="/portal/tool/${yaftPlacementId}/data/users/${creatorId}/picture" width="35"/></a>
-				<div style="display: none;" id="${creatorId}_profile">
-					<img style="float: right;padding-left: 2px;" src="/portal/tool/${yaftPlacementId}/data/users/${creatorId}/picture" width="100px"/>
-					<div style="width: 190px; font-weight: bold; font-size: bigger;float: left; padding-left: 5px;">${creatorDisplayName}</div>
-					<br/>
-					<p style="padding-left: 5px;">${creatorBio}</p>
-				</div>
+				<a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img style="float:left;margin-right:2px;" src="/direct/profile/${creatorId}/image" width="35"/></a>
 				<div style="margin-left:2px;overflow: hidden;">
 					<div style="float:left;">
 						<a id="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>
 						{if status == 'DRAFT'} - <span style="font-weight: bold;">${yaft_draft_message}</span>{/if}
 						<br/>
-						<span>by ${creatorDisplayName}</span> - <span>${new Date(createdDate).toLocaleString()}</span>
+						<span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${new Date(createdDate).toLocaleString()}</span>
 					</div>
 					<div style="float: right;">
 						{if attachments.length > 0}
@@ -658,7 +658,7 @@ ${yaft_forums_label}
 	{macro displayMinimum(message,indent)}
 		{if message.status == 'READY' || (message.status == 'DRAFT' && yaftCurrentUser.id == message.creatorId)}
 			<div id="${message.id}_link">
-				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by ${message.creatorDisplayName}</span> at <span>${new Date(message.createdDate).toLocaleString()}</span>
+				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${new Date(message.createdDate).toLocaleString()}</span>
 				<img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
 			</div>
 			<div class="yaft_full_message" id="${message.id}" style="display: none;overflow: auto;margin-top:5px;"></div>
@@ -688,7 +688,7 @@ ${yaft_forums_label}
 <div id="yaft_reply_message_content_template" style="display:none;"><!--
 <div style="border: solid black 1px;" class="yaft_message">
 	<div style="margin:5px;overflow:auto;">
-		<img style="float:left;margin-right:2px;" src="/portal/tool/${yaftPlacementId}/data/users/${creatorId}/picture" width="35" height="35"/>
+		<img style="float:left;margin-right:2px;" src="/direct/profile/${creatorId}/image" width="35" height="35"/>
 		<div style="margin-left:2px;overflow: auto;">
 			<div style="float:left;">
 				<span style="font-weight: bold">${subject}</span>
@@ -817,7 +817,7 @@ ${yaft_forums_label}
 
 <!--  Templates End -->
 
-<script type="text/javascript" language="JavaScript" src="js/yaft.js"></script>
+<script type="text/javascript" src="js/yaft.js"></script>
 <link rel="stylesheet" type="text/css" href="css/jquery.cluetip.css" />
 
 </body>

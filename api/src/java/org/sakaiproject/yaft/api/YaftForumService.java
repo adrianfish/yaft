@@ -76,8 +76,6 @@ public interface YaftForumService extends EntityProducer
 
 	public Forum getForumContainingMessage(String messageId);
 
-	public List<SearchResult> search(String searchTerms);
-
 	public boolean markMessageRead(String messageId,String forumId,String discussionId);
 
 	public boolean markMessageUnRead(String messageId,String forumId,String discussionId);
@@ -103,6 +101,8 @@ public interface YaftForumService extends EntityProducer
 	public boolean savePreferences(YaftPreferences preferences);
 
 	public YaftPreferences getPreferencesForCurrentUserAndSite();
+	
+	public YaftPreferences getPreferencesForUser(String userId,String siteId);
 
 	public List<ActiveDiscussion> getActiveDiscussions();
 

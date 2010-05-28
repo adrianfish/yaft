@@ -373,7 +373,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		String discussionId = message.getDiscussionId();
 		List<String> statements = new ArrayList<String>();
 		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE MESSAGE_ID  = '" + messageId + "'");
-		if(message.getStatus() == "READY")
+		if("READY".equals(message.getStatus()))
 		{
 			statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE FORUM_ID = '" + forumId + "'");
 			statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
@@ -461,20 +461,6 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public String getSelectForumContainingMessageStatement(String messageId)
 	{
 		return "SELECT FORUM_ID FROM YAFT_DISCUSSION,YAFT_FORUM_DISCUSSION" + " WHERE YAFT_DISCUSSION.DISCUSSION_ID = YAFT_FORUM_DISCUSSION.DISCUSSION_ID" + " AND YAFT_DISCUSSION.DISCUSSION_ID" + " IN (SELECT DISTINCT DISCUSSION_ID FROM YAFT_MESSAGE" + " WHERE MESSAGE_ID = '" + messageId + "')";
-	}
-
-	public String getSearchStatement(String siteId, List<String> searchTerms)
-	{
-		String sql = "SELECT * FROM YAFT_MESSAGE WHERE SITE_ID = '" + siteId + "' AND";
-
-		for (int i = 0; i < searchTerms.size(); i++)
-		{
-			sql += " CONTENT LIKE '%" + searchTerms.get(i) + "%'";
-			if (i < (searchTerms.size() - 1))
-				sql += " AND";
-		}
-
-		return sql;
 	}
 
 	public String getSelectMessageReadStatement(String userId, String messageId)

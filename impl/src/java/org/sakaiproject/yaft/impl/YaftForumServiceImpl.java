@@ -290,11 +290,6 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getForumContainingMessage(messageId);
 	}
 
-	public List<SearchResult> search(String searchTerms)
-	{
-		return persistenceManager.search(searchTerms);
-	}
-
 	public boolean markMessageRead(String messageId,String forumId,String discussionId)
 	{
 		return persistenceManager.markMessageRead(messageId,forumId,discussionId);

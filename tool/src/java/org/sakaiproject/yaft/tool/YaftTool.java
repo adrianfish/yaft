@@ -1,48 +1,33 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.JsonConfig;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.component.api.ComponentManager;
-import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
-import org.sakaiproject.yaft.api.ForumPopulatedStates;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
-import org.sakaiproject.yaft.api.SearchResult;
 import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.api.YaftPermissions;
 import org.sakaiproject.yaft.api.YaftPreferences;
 
 /**
@@ -106,12 +91,7 @@ public class YaftTool extends HttpServlet
 				if (logger.isDebugEnabled())
 					logger.debug("data=" + part1);
 
-				if ("data".equals(part1))
-				{
-					handleDataRequest(request, response, parts, pathInfo);
-				}
-				
-				else if ("forums".equals(part1))
+				if ("forums".equals(part1))
 				{
 					if(parts.length == 1)
 					{
@@ -345,431 +325,6 @@ public class YaftTool extends HttpServlet
 			{
 				response.sendRedirect("/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode);
 				return;
-			}
-		}
-	}
-
-	private void printUserJSON(HttpServletResponse response, String userId) throws IOException
-	{
-		User user = null;
-		try
-		{
-			if (userId != null)
-				user = sakaiProxy.getUser(userId);
-			else
-				user = sakaiProxy.getCurrentUser();
-		}
-		catch (Exception e)
-		{
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No user");
-		}
-		JSONObject json = new JSONObject();
-		json.put("id", user.getId());
-		json.put("eid", user.getEid());
-		json.put("email", user.getEmail());
-		json.put("firstName", user.getFirstName());
-		json.put("lastName", user.getLastName());
-		json.put("bio", sakaiProxy.getUserBio(user.getId()));
-		String jsonString = json.toString();
-		if (logger.isDebugEnabled())
-			logger.debug("User JSON: " + jsonString);
-
-		response.setStatus(HttpServletResponse.SC_OK);
-		response.setContentType("text/javascript");
-		response.setContentLength(jsonString.getBytes().length);
-		response.getWriter().write(jsonString);
-		response.getWriter().close();
-	}
-
-	private void handleCurrentUserPermissionsRequest(HttpServletResponse response)  throws ServletException, IOException
-	{
-		YaftPermissions permissions = sakaiProxy.getPermissionsForCurrentUser(null);
-
-		JSONObject json = JSONObject.fromObject(permissions);
-		if (logger.isDebugEnabled())
-			logger.debug("Permissions JSON: " + json.toString());
-
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-		
-	}
-	
-	private void handleCurrentUserPreferencesRequest(HttpServletResponse response)  throws ServletException, IOException
-	{
-		YaftPreferences preferences = yaftForumService.getPreferencesForCurrentUserAndSite();
-
-		JSONObject json = JSONObject.fromObject(preferences);
-		if (logger.isDebugEnabled())
-			logger.debug("Preferences JSON: " + json.toString());
-
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-		
-	}
-	
-	
-	private void handleDataRequest(HttpServletRequest request, HttpServletResponse response, String[] parts, String pathInfo) throws ServletException, IOException
-	{
-		if (parts.length >= 2)
-		{
-			String part1 = parts[1];
-
-			if ("currentUser".equals(part1))
-			{
-				printUserJSON(response, null);
-				return;
-			}
-
-			else if ("userPermissions".equals(part1))
-			{
-				if (logger.isDebugEnabled()) logger.debug("userPermissions");
-				handleCurrentUserPermissionsRequest(response);
-				return;
-			}
-			
-			else if ("userPreferences".equals(part1))
-			{
-				if (logger.isDebugEnabled()) logger.debug("userPermissions");
-				handleCurrentUserPreferencesRequest(response);
-				return;
-			}
-
-			else if ("users".equals(part1))
-			{
-				if (logger.isDebugEnabled()) logger.debug("users");
-				handleUsersRequest(parts,request,response);
-				return;
-			}
-			else if ("permissions".equals(part1))
-			{
-				handlePermissionsRequest(response);
-				return;
-			}
-
-			else if ("search".equals(part1))
-			{
-				if (parts.length == 3)
-				{
-					handleSearchRequest(parts,response);
-					return;
-				}
-			}
-
-			else if ("messages".equals(part1))
-			{
-				if (parts.length >= 3)
-				{
-					String messageId = parts[2];
-
-					if (logger.isDebugEnabled())
-						logger.debug("messageId=" + messageId);
-
-					if (parts.length == 3)
-					{
-						printMessageJSON(messageId,response);
-						return;
-					}
-				}
-			}
-
-			else if ("forums".equals(part1))
-			{
-				if (parts.length == 2)
-				{
-					printForumsJSON(response);
-					return;
-				}
-				else if (parts.length >= 3)
-				{
-					String forumsOp = parts[2];
-					
-					if("readMessages".equals(forumsOp))
-					{
-						Map<String,Integer> counts = yaftForumService.getReadMessageCountForAllFora();
-						JSONObject json = JSONObject.fromObject(counts);
-						response.setContentType("text/javascript");
-						json.write(response.getWriter());
-						if (logger.isDebugEnabled())
-							logger.debug("Read Messages JSON: " + json.toString());
-						response.getWriter().close();
-						return;
-					}
-
-					if (parts.length == 3)
-					{
-						printForumJSON(forumsOp,ForumPopulatedStates.EMPTY,response);
-						return;
-					}
-					else if (parts.length >= 4)
-					{
-						String forumOp = parts[3];
-
-						if (parts.length == 4)
-						{
-							// This is an operation on a particular forum
-
-							if (ForumPopulatedStates.FULL.equals(forumOp))
-							{
-								// This is a request for a forum in it's fully
-								// populated state 
-								printForumJSON(forumsOp,ForumPopulatedStates.FULL,response);
-								return;
-							}
-							
-							else if (ForumPopulatedStates.PART.equals(forumOp))
-							{
-								// This is a request for a forum in it's
-								// partially populated state 
-								printForumJSON(forumsOp,ForumPopulatedStates.PART,response);
-								return;
-							}
-							
-							else if("readMessages".equals(forumOp))
-							{
-								Map<String,Integer> counts = yaftForumService.getReadMessageCountForForum(forumsOp);
-								JSONObject json = JSONObject.fromObject(counts);
-								response.setContentType("text/javascript");
-								json.write(response.getWriter());
-								if (logger.isDebugEnabled())
-									logger.debug("Read Messages JSON: " + json.toString());
-								response.getWriter().close();
-								return;
-							}
-						}
-					}
-				}
-			}
-
-			else if ("discussions".equals(part1))
-			{
-				if (parts.length >= 3)
-				{
-					String discussionId = parts[2];
-
-					if (logger.isDebugEnabled())
-						logger.debug("discussionId=" + discussionId);
-
-					if (parts.length == 3)
-					{
-						// This is a request for a particular discussion
-						
-						try
-						{
-							Discussion discussion = yaftForumService.getDiscussion(discussionId,true);
-							JsonConfig config = new JsonConfig();
-							config.setExcludes(new String[] {"properties","reference"});
-							JSONObject json = JSONObject.fromObject(discussion,config);
-
-							if (logger.isDebugEnabled())
-								logger.debug("Discussion JSON: " + json.toString());
-
-							response.setContentType("text/javascript");
-							json.write(response.getWriter());
-						}
-						catch(IdUnusedException ide)
-						{
-							logger.error("A valid discussion id must be supplied. Returning BAD REQUEST ...");
-							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-						}
-						catch(Exception e)
-						{
-							logger.error("Failed to get discussion.",e);
-						}
-						
-						response.getWriter().close();
-						return;
-					}
-					
-					if(parts.length >= 4)
-					{
-						String discussionOp = parts[3];
-						if("readMessages".equals(discussionOp))
-						{
-							List<String> readMessageIds = yaftForumService.getReadMessageIds(discussionId);
-							JSONArray items = new JSONArray();
-							items.addAll(readMessageIds);
-							JSON json = JSONSerializer.toJSON(items);
-							if (logger.isDebugEnabled())
-								logger.debug("Read Messages JSON: " + json.toString());
-							response.setContentType("text/javascript");
-							json.write(response.getWriter());
-							response.getWriter().close();
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void printForumJSON(String forumId, String state, HttpServletResponse response) throws ServletException,IOException
-	{
-		Forum forum = yaftForumService.getForum(forumId, state);
-		
-		JSONObject json = null;
-		
-		if(state.equals(ForumPopulatedStates.FULL) || state.equals(ForumPopulatedStates.PART))
-		{
-			JsonConfig config = new JsonConfig();
-			config.setExcludes(new String[] {"properties","reference"});
-			json = JSONObject.fromObject(forum,config);
-		}
-		else
-			json = JSONObject.fromObject(forum);
-
-		if (logger.isDebugEnabled())
-			logger.debug("Forum JSON: " + json.toString());
-
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-	}
-
-	private void printForumsJSON(HttpServletResponse response) throws ServletException,IOException
-	{
-		// This is a request for all forums in the current site
-		List<Forum> forums = yaftForumService.getSiteForums(sakaiProxy.getCurrentSiteId(),false);
-
-		JsonConfig config = new JsonConfig();
-		config.setExcludes(new String[] {"properties","reference"});
-		JSONArray items = JSONArray.fromObject(forums,config);
-		JSONObject container = new JSONObject();
-		container.put("items", items);
-		JSON json = JSONSerializer.toJSON(container,config);
-		if (logger.isDebugEnabled())
-			logger.debug("Forums JSON: " + json.toString());
-
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-	}
-
-	private void printMessageJSON(String messageId, HttpServletResponse response) throws ServletException,IOException
-	{
-		Message message = yaftForumService.getMessage(messageId);
-		JsonConfig config = new JsonConfig();
-		config.setExcludes(new String[] {"properties","reference"});
-		JSONObject json = JSONObject.fromObject(message,config);
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-	}
-
-	private void handleSearchRequest(String[] parts, HttpServletResponse response) throws ServletException,IOException
-	{
-		String searchTerms = parts[2];
-
-		if (logger.isDebugEnabled())
-			logger.debug("Search Terms: " + searchTerms);
-
-		List<SearchResult> results = yaftForumService.search(searchTerms);
-
-		JSONArray items = new JSONArray();
-		items.addAll(results);
-		JSON json = JSONSerializer.toJSON(items);
-		if (logger.isDebugEnabled())
-			logger.debug("Search Results JSON: " + json.toString());
-
-		response.setContentType("text/javascript");
-		json.write(response.getWriter());
-		response.getWriter().close();
-		return;
-	}
-
-	private void handlePermissionsRequest(HttpServletResponse response) throws ServletException,IOException
-	{
-		List<YaftPermissions> permissions = sakaiProxy.getPermissions(null);
-
-		JSONArray o = JSONArray.fromObject(permissions);
-
-		logger.debug("Permissions JSON: " + o.toString());
-
-		response.setContentType("text/javascript");
-		o.write(response.getWriter());
-		response.getWriter().close();
-		return;
-	}
-
-	private void handleUsersRequest(String[] parts,HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException
-	{
-		if (parts.length >= 3)
-		{
-			String userId = parts[2];
-
-			if (parts.length == 3)
-			{
-				try
-				{
-					printUserJSON(response, userId);
-					return;
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else
-			{
-				String userOp = parts[3];
-
-				if ("picture".equals(userOp))
-				{
-					Profile profile = sakaiProxy.getProfile(userId);
-					if (profile == null)
-					{
-						RequestDispatcher disp = request.getRequestDispatcher("/images/no_image.gif");
-						disp.include(request, response);
-						return;
-					}
-
-					byte[] bytes = profile.getInstitutionalPicture();
-						
-					if (bytes == null || bytes.length == 0)
-					{
-						RequestDispatcher disp = request.getRequestDispatcher("/images/no_image.gif");
-						disp.include(request, response);
-						return;
-					}
-
-					response.setContentType("image/jpeg");
-					response.setContentLength(bytes.length);
-
-					response.getOutputStream().write(bytes);
-					response.getOutputStream().close();
-					return;
-				}
-				else if ("unsubscriptions".equals(userOp))
-				{
-					List<String> unsubscriptions = yaftForumService.getDiscussionUnsubscriptions(userId);
-					JSONArray items = new JSONArray();
-					items.addAll(unsubscriptions);
-					JSON json = JSONSerializer.toJSON(items);
-					if (logger.isDebugEnabled())
-						logger.debug("Unsubscriptions JSON: " + json.toString());
-					response.setContentType("text/javascript");
-					json.write(response.getWriter());
-					response.getWriter().close();
-					return;
-				}
-				else if ("forumUnsubscriptions".equals(userOp))
-				{
-					List<String> unsubscriptions = yaftForumService.getForumUnsubscriptions(userId);
-					JSONArray items = JSONArray.fromObject(unsubscriptions);
-					JSON json = JSONSerializer.toJSON(items);
-					if (logger.isDebugEnabled())
-						logger.debug("Unsubscriptions JSON: " + json.toString());
-					response.setContentType("text/javascript");
-					json.write(response.getWriter());
-					response.getWriter().close();
-					return;
-				}
 			}
 		}
 	}
@@ -1146,64 +701,6 @@ public class YaftTool extends HttpServlet
 				response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());
 
 			return;
-		}
-		else if ("savePermissions".equals(function))
-		{
-			String siteId = sakaiProxy.getCurrentSiteId();
-
-			Map params = request.getParameterMap();
-
-			Map<String, YaftPermissions> permissionMap = new HashMap<String, YaftPermissions>();
-
-			for (Iterator i = params.keySet().iterator(); i.hasNext();)
-			{
-				String name = (String) i.next();
-
-				if (!name.contains(":"))
-					continue;
-
-				String value = ((String[]) params.get(name))[0];
-				logger.debug("Name: " + name);
-				logger.debug("Value: " + value);
-
-				String role = name.substring(0, name.indexOf(":"));
-				logger.debug("Role: " + role);
-				String permission = name.substring(name.indexOf(":") + 1);
-				logger.debug("Permission: " + permission);
-
-				YaftPermissions permissions = permissionMap.get(role);
-
-				if (permissions == null)
-				{
-					permissions = new YaftPermissions();
-					permissions.setRole(role);
-				}
-
-				try
-				{
-					String methodName = "set" + permission;
-					if (logger.isDebugEnabled())
-						logger.debug("Calling " + methodName + " on permissions object");
-					Method setter = YaftPermissions.class.getMethod(methodName, new Class[] { boolean.class });
-					setter.invoke(permissions, value.equals("on"));
-					permissionMap.put(role, permissions);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-			try
-			{
-				sakaiProxy.savePermissions(siteId, permissionMap);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-
-			response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId());// + "/forums/" + forumId + "/discussions/" + discussionId + "/messages/" + message.getId());
 		}
 	}
 	

@@ -6,7 +6,6 @@
 	<name>YAFT Assembly</name>
 	<groupId>org.sakaiproject.yaft</groupId>
 	<artifactId>yaft-assembly</artifactId>
-	
 	<packaging>pom</packaging>
 
   	<parent>

@@ -4,6 +4,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
+
+  	<name>YAFT API</name>
+  	<artifactId>yaft-api</artifactId>
+  	<groupId>org.sakaiproject.yaft</groupId>
+  	<packaging>jar</packaging>
 	
   	<parent>
     	<artifactId>yaft</artifactId>
@@ -11,10 +16,6 @@
     	<version>1.0-SNAPSHOT</version>
   	</parent>
   	
-  	<name>YAFT API</name>
-  	<artifactId>yaft-api</artifactId>
-  	<groupId>org.sakaiproject.yaft</groupId>
-  	<packaging>jar</packaging>
   	<properties>
     	<deploy.target>shared</deploy.target>
   	</properties>
@@ -23,7 +24,6 @@
   		<dependency>
       		<groupId>log4j</groupId>
       		<artifactId>log4j</artifactId>
-      		<version>1.2.9</version>
       		<scope>provided</scope>
     	</dependency>
     	<dependency>
@@ -33,88 +33,17 @@
       		<classifier>jdk15</classifier>
       		<type>jar</type>
     	</dependency>
-  	</dependencies>
-  
-  	<profiles>
-    	<profile>
-        	<id>pre-K1</id>
-            <activation>
-                <file>
-                    <missing>../master/../kernel-deploy/pom.xml</missing>
-                </file>
-            </activation>
-            <!-- Sakai 2.5.x specific dependencies -->
-            <dependencies>
-            	<dependency>
-      			<groupId>org.sakaiproject</groupId>
-      			<artifactId>sakai-user-api</artifactId>
-      			<scope>provided</scope>
-    		</dependency>
-			<dependency>
-      			<groupId>org.sakaiproject</groupId>
-      			<artifactId>sakai-profile-api</artifactId>
-      			<scope>provided</scope>
-    		</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-util-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-entity-util</artifactId>
-      				<version>${sakai.version}</version>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-tool-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-event-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-authz-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-entity-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject</groupId>
-      				<artifactId>sakai-site-api</artifactId>
-      				<scope>provided</scope>
-    			</dependency>
-
-            </dependencies>
-		</profile>
-        <profile>
-       		<id>K1</id>
-            <activation>
-                <file>
-                    <exists>../master/../kernel-deploy/pom.xml</exists>
-                </file>
-            </activation>
-            <!-- Sakai 2.6+ specific dependencies -->
-            <dependencies>
-				<dependency>
-					<groupId>org.sakaiproject.kernel</groupId>
-					<artifactId>sakai-kernel-api</artifactId>
-				</dependency>
-				<dependency>
-					<groupId>org.sakaiproject.kernel</groupId>
-					<artifactId>sakai-kernel-util</artifactId>
-				</dependency>
-    			<dependency>
-      				<groupId>org.sakaiproject.profile</groupId>
-      				<artifactId>profile-api</artifactId>
-    			</dependency>
-            </dependencies>
-      	</profile>
-	</profiles>
+		<dependency>
+			<groupId>org.sakaiproject.kernel</groupId>
+			<artifactId>sakai-kernel-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.sakaiproject.kernel</groupId>
+			<artifactId>sakai-kernel-util</artifactId>
+		</dependency>
+   		<dependency>
+   			<groupId>org.sakaiproject.profile</groupId>
+   			<artifactId>profile-api</artifactId>
+   		</dependency>
+	</dependencies>
 </project>

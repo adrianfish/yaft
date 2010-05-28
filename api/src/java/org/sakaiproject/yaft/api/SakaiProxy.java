@@ -44,12 +44,6 @@ public interface SakaiProxy
 	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate);
 	
 	public boolean removeCalendarEntry(String title,String description);
-
-	public List<YaftPermissions> getPermissions(String siteId);
-
-	public YaftPermissions getPermissionsForCurrentUser(String siteId);
-
-	public void savePermissions(String siteId,Map<String, YaftPermissions> permissionMap) throws Exception;
 	
 	public void sendEmailMessage(String subject,String body, String user);
 
@@ -74,8 +68,6 @@ public interface SakaiProxy
 	public void deleteFile(String resourceId) throws Exception;
 
 	public String getUserBio(String id);
-
-	public User getUser(String userId) throws Exception;
 
 	public List<Site> getAllSites();
 

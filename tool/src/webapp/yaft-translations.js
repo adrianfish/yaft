@@ -93,3 +93,4 @@ yaft_email_alerts_label = 'Email Alerts';
 yaft_email_never_label = 'Never';
 yaft_email_each_label = 'Every time something happens';
 yaft_email_digest_label = 'As a digest once a day';
+yaft_search_results = 'Search Results';

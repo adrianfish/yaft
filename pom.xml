@@ -12,10 +12,20 @@
     <version>1.0-SNAPSHOT</version>
 
 	<parent>
-    	<artifactId>base</artifactId>
-    	<groupId>org.sakaiproject</groupId>
-		<version>2.8-SNAPSHOT</version> <!--  for any 2.5.x version -->
-  	</parent>
+        <groupId>org.sakaiproject.purepoms</groupId>
+        <artifactId>sakai-commons-tool</artifactId>
+        <version>2.8-SNAPSHOT</version>
+    </parent>
+
+	<properties>
+        <entitybroker-api.version>[1.3.7,1.4.0)</entitybroker-api.version>
+        <search-api.version>1.3.0-SNAPSHOT</search-api.version>
+        <log4j.version>1.2.8</log4j.version>
+        <servlet-api.version>2.4</servlet-api.version>
+        <commons-lang.version>2.4</commons-lang.version>
+        <calendar.version>2.8-SNAPSHOT</calendar.version>
+	  	<profile-api.version>2.7.0-b01</profile-api.version>
+    </properties>
   	
   	<organization>
     	<name>Lancaster Centre for e-Science</name>
@@ -33,6 +43,45 @@
     	</developer>
   	</developers>
 
+	<repositories>
+        <repository>
+            <id>sakai-maven</id>
+            <name>Sakai Maven Repo</name>
+            <layout>default</layout>
+            <url>http://source.sakaiproject.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sakai-maven2-snapshots</id>
+            <name>Sakai Maven Repo</name>
+            <layout>default</layout>
+            <url>http://source.sakaiproject.org/maven2-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>default</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
   	<modules>
     	<module>api</module>
     	<module>impl</module>
@@ -42,29 +91,91 @@
     	<module>help</module>
   	</modules>
 
-	<profiles>
+	<pluginRepositories>
+        <pluginRepository>
+            <id>maven2-central-repo</id>
+            <name>Maven2 Central Repo</name>
+            <url>http://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>Sakai Plugin Repo</id>
+            <url>http://source.sakaiproject.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
-  		<profile>
-            <!-- Binds to Sakai Kernel K1 - for Sakai 2.6.0+ -->
-            <id>K1</id>
-            <activation>
-                <file>
-                    <exists>../master/../kernel-deploy/pom.xml</exists>
-                </file>
-            </activation>
-        </profile>
+	<dependencyManagement>
+        <dependencies>
 
-        <profile>
-            <!-- Binds to Sakai pre Kernel K1 - for Sakai 2.4.x/2.5.x -->
-            <id>pre-K1</id>
-            <activation>
-                <file>
-                    <missing>../master/../kernel-deploy/pom.xml</missing>
-                </file>
-            </activation>
-        </profile>
+            <!-- EntityBroker -->
+            <dependency>
+                <groupId>org.sakaiproject.entitybroker</groupId>
+                <artifactId>entitybroker-api</artifactId>
+                <version>${entitybroker-api.version}</version>
+	  			<scope>provided</scope>
+            </dependency>
 
-	</profiles>
+            <dependency>
+                <groupId>org.sakaiproject.entitybroker</groupId>
+                <artifactId>entitybroker-utils</artifactId>
+                <version>${entitybroker-api.version}</version>
+            </dependency>
+
+            <dependency>
+      			<groupId>org.sakaiproject.profile</groupId>
+      			<artifactId>profile-api</artifactId>
+	  			<version>${profile-api.version}</version>
+	  			<scope>provided</scope>
+    		</dependency>
+
+            <dependency>
+                <groupId>org.sakaiproject.search</groupId>
+                <artifactId>search-api</artifactId>
+                <version>${search-api.version}</version>
+	  			<scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.sakaiproject</groupId>
+                <artifactId>sakai-calendar-api</artifactId>
+                <version>${calendar.version}</version>
+	  			<scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons-lang.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
 	<issueManagement>
         <system>JIRA</system>

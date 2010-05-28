@@ -103,3 +103,34 @@ th.yaftSortableTableHeaderSortDown {
 	color: red;
 	font-weight: bold;
 }
+
+.cluetip-yaft {
+	padding: 10px;
+	border: black solid 1px;
+	background-color: white;
+}
+
+.clue-right-yaft .cluetip-arrows {
+  background-image: url(../images/darrowleft.gif);
+}
+.clue-left-yaft .cluetip-arrows {
+  background-image: url(../images/darrowright.gif);
+  left: 100%;
+  margin-right: -11px;
+}
+.clue-top-yaft .cluetip-arrows {
+  background-image: url(../images/darrowdown.gif);
+  top: 100%;
+  left: 50%;
+  margin-left: -11px;
+  height: 11px;
+  width: 22px;  
+}  
+.clue-bottom-yaft .cluetip-arrows {
+  background-image: url(../images/darrowup.gif);
+  top: -11px;
+  left: 50%;
+  margin-left: -11px;
+  height: 11px;
+  width: 22px;
+}

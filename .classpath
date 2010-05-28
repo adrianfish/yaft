@@ -32,5 +32,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/sakai-util/M2/sakai-util-M2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/sakai-calendar-api/M2/sakai-calendar-api-M2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.5/junit-4.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/entitybroker/entitybroker-api/1.4.0-SNAPSHOT/entitybroker-api-1.4.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/entitybroker/entitybroker-utils/1.4.0-SNAPSHOT/entitybroker-utils-1.4.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring/2.5.6.SEC01/spring-2.5.6.SEC01.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
