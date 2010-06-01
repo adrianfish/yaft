@@ -17,9 +17,9 @@ Copyright (c) 2006. Centre for e-Science. Lancaster University. United Kingdom.
 
 <registration>
 
-	<tool id="sakai.synoptic.yaft"
-        title="Yaft Synoptic"
-    	description="Yet Another Forums Tool">
+	<tool id="sakai.sitehome.yaft"
+        title="Yaft Homepage"
+    	description="YAFT for site homepages">
     </tool>
 
 </registration>

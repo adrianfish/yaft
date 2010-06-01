@@ -1,35 +1,37 @@
 /* Stuff that we always expect to be setup */
-var yaftPlacementId = null;
+var yaftSiteId = null;
 
 (function()
 {
-	var arg = YaftUtils.getParameters();
+	var arg = SakaiUtils.getParameters();
 	
-	if(!arg || !arg.placementId)
+	if(!arg || !arg.siteId)
 	{
-		alert('The placement id MUST be supplied as a page parameter');
+		alert('The site id MUST be supplied as a page parameter');
 		return;
 	}
 	
 	// Stuff that we always expect to be setup
-	yaftPlacementId = arg.placementId;
+	yaftSiteId = arg.siteId;
+	
+	var activeDiscussions = null;
 		
 	$.ajax(
 	{
-		url : '/portal/tool/' + yaftPlacementId + '/data/activeDiscussions',
+		url : '/direct/yaft-forum/' + yaftSiteId + '/activeDiscussions.json',
 		dataType : "json",
 		cache: false,
 		async : false,
 		success : function(ads)
 		{
-			activeDiscussions = ads;
+			activeDiscussions = ads['yaft-forum_collection'];
 		},
 		error : function(xmlHttpRequest,status)
 		{
 		}
 	});
 			
-	YaftUtils.render('synoptic_yaft_content_template',activeDiscussions,'synoptic_yaft_content');
+	SakaiUtils.renderTrimpathTemplate('synoptic_yaft_content_template',{'discussions':activeDiscussions},'synoptic_yaft_content');
 	
 	$(document).ready(function()
 		{

@@ -26,9 +26,9 @@ import org.sakaiproject.yaft.api.YaftForumService;
  * 
  * @author Adrian Fish (a.fish@lancaster.ac.uk)
  */
-public class SynopticYaftTool extends HttpServlet
+public class SiteHomeYaftTool extends HttpServlet
 {
-	private Logger logger = Logger.getLogger(SynopticYaftTool.class);
+	private Logger logger = Logger.getLogger(SiteHomeYaftTool.class);
 
 	private YaftForumService yaftForumService = null;
 
@@ -57,86 +57,13 @@ public class SynopticYaftTool extends HttpServlet
 		}
 		
 		String siteId = sakaiProxy.getCurrentSiteId();
-		String placementId = sakaiProxy.getCurrentToolId();
 		
 		// We need to pass the language code to the JQuery code in the pages.
 		Locale locale = (new ResourceLoader(user.getId())).getLocale();
 		String languageCode = locale.getLanguage();
 
-		String pathInfo = request.getPathInfo();
-
-		if (pathInfo == null || pathInfo.length() < 1)
-		{
-			// There's no path info, so this is the initial state
-			response.sendRedirect("/yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode);
-			return;
-		}
-		else
-		{
-			String[] parts = pathInfo.substring(1).split("/");
-
-			if (parts.length >= 1)
-			{
-				String part1 = parts[0];
-				if (logger.isDebugEnabled())
-					logger.debug("data=" + part1);
-
-				if ("data".equals(part1))
-				{
-					handleDataRequest(request, response, parts, pathInfo);
-				}
-				else if("activeDiscussions".equals(part1))
-				{
-					if (parts.length >= 2)
-					{
-						String activeDiscussionsOp = parts[1];
-						if("clear".equals(activeDiscussionsOp))
-						{
-							if(yaftForumService.clearActiveDiscussionsForCurrentUser())
-							{
-								response.setStatus(HttpServletResponse.SC_OK);
-								response.setContentType("text/plain");
-								response.getWriter().write("success");
-								response.getWriter().close();
-							}
-							else
-							{
-								response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-								response.getWriter().close();
-							}
-							
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void handleDataRequest(HttpServletRequest request, HttpServletResponse response, String[] parts, String pathInfo) throws ServletException, IOException
-	{
-		if (parts.length >= 2)
-		{
-			String part1 = parts[1];
-			
-			if("activeDiscussions".equals(part1))
-			{
-				List<ActiveDiscussion> activeDiscussions = yaftForumService.getActiveDiscussions();
-				
-				JSONObject json = new JSONObject();
-				json.put("discussions", activeDiscussions);
-				
-				String jsonString = json.toString();
-				if (logger.isDebugEnabled())
-					logger.debug("User JSON: " + jsonString);
-
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/javascript");
-				response.setContentLength(jsonString.getBytes().length);
-				response.getWriter().write(jsonString);
-				response.getWriter().close();
-			}
-		}
+		response.sendRedirect("/yaft-tool/synoptic_yaft.html?siteId=" + siteId + "&language=" + languageCode);
+		return;
 	}
 
 	/**

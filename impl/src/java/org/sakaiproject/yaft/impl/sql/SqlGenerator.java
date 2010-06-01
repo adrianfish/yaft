@@ -96,13 +96,11 @@ public interface SqlGenerator
 
 	String getSelectPreferencesStatement(String userId, String siteId);
 
-	String getSelectActiveDiscussionsStatement(String id);
+	String getSelectActiveDiscussionsStatement(String siteId);
 
-	List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception;
+	List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, Connection connection) throws Exception;
 
-	String getDeleteFromActiveDiscussionStatement(String discussionId, String userId);
+	String getDeleteFromActiveDiscussionStatement(String discussionId);
 
-	String getClearActiveDiscussionsStatement(String userId);
-	
 	String getSelectIdOfSiteContainingMessage(String messageId);
 }

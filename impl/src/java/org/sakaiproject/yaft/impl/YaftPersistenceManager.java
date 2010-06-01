@@ -43,7 +43,8 @@ public class YaftPersistenceManager
 	private SqlGenerator sqlGenerator = null;
 
 	private boolean useSynopticFunctionality = true;
-	
+	private int activeDiscussionLimit = 5;
+
 	public YaftPersistenceManager()
 	{
 		if(logger.isDebugEnabled()) logger.debug("YaftPersistenceManager()");
@@ -326,15 +327,13 @@ public class YaftPersistenceManager
 				{
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
-					if(useSynopticFunctionality)
-					{
-						List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
-			
-						newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
+					//if(useSynopticFunctionality)
+					//{
+						newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
 			
 						for(PreparedStatement statement : newStatements)
 							statement.executeUpdate();
-					}
+					//}
 				}
 				
 				connection.commit();
@@ -625,7 +624,7 @@ public class YaftPersistenceManager
 		return discussion;
 	}
 	
-	public boolean deleteFromActiveDiscussions(String discussionId,String userId)
+	public boolean deleteFromActiveDiscussions(String discussionId)
 	{
 		Connection connection = null;
 		Statement st = null;
@@ -634,7 +633,7 @@ public class YaftPersistenceManager
 		{
 			connection = sakaiProxy.borrowConnection();
 			st = connection.createStatement();
-			String sql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId,userId);
+			String sql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId);
 			st.executeUpdate(sql);
 			return true;
 		}
@@ -841,7 +840,7 @@ public class YaftPersistenceManager
 				while(rs.next())
 				{
 					String discussionId = rs.getString("DISCUSSION_ID");
-					String deleteDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId, null);
+					String deleteDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId);
 					deleteDiscussionST.executeUpdate(deleteDiscussionSql);
 				}
 				
@@ -910,7 +909,7 @@ public class YaftPersistenceManager
 				for(String sql : statements)
 					statement.executeUpdate(sql);
 				
-				String deleteActiveDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId, null);
+				String deleteActiveDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId);
 				statement.executeUpdate(deleteActiveDiscussionSql);
 				
 				connection.commit();
@@ -1633,15 +1632,13 @@ public class YaftPersistenceManager
 				
 				markMessageRead(messageId, forumId, message.getDiscussionId(),connection);
 				
-				if(useSynopticFunctionality)
-				{
-					List<String> offlineUserIds = sakaiProxy.getOfflineYaftUserIds(message.getSiteId());
-			
-					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,offlineUserIds,connection);
+				//if(useSynopticFunctionality)
+				//{
+					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
 			
 					for(PreparedStatement statement : newStatements)
 						statement.executeUpdate();
-				}
+				//}
 				
 				connection.commit();
 				
@@ -2134,7 +2131,7 @@ public class YaftPersistenceManager
 		return yaftPreferences;
 	}
 
-	public List<ActiveDiscussion> getActiveDiscussions()
+	public List<ActiveDiscussion> getActiveDiscussions(String siteId)
 	{
 		List<ActiveDiscussion> discussions = new ArrayList<ActiveDiscussion>();
 		
@@ -2145,20 +2142,19 @@ public class YaftPersistenceManager
 		{
 			connection = sakaiProxy.borrowConnection();
 			
-			String sql = sqlGenerator.getSelectActiveDiscussionsStatement(sakaiProxy.getCurrentUser().getId());
+			String sql = sqlGenerator.getSelectActiveDiscussionsStatement(siteId);
 			
 			statement = connection.createStatement();
 				
 			ResultSet rs = statement.executeQuery(sql);
 			
-			while(rs.next())
+			int count = 0;
+			
+			while(rs.next() && count <= activeDiscussionLimit)
 			{
 				ActiveDiscussion discussion = new ActiveDiscussion();
 				
-				discussion.setNewMessages(rs.getInt("NEW_MESSAGES"));
-				
 				String discussionId = rs.getString("DISCUSSION_ID"); 
-				String siteId = rs.getString("SITE_ID"); 
 				Site site = SiteService.getSite(siteId);
 				ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 				String url = "/portal/tool/" + tc.getId() + "/discussions/" + discussionId;
@@ -2167,6 +2163,8 @@ public class YaftPersistenceManager
 				discussion.setLastMessageDate(rs.getTimestamp("LAST_MESSAGE_DATE").getTime());
 				discussion.setLatestMessageSubject(rs.getString("LATEST_MESSAGE_SUBJECT"));
 				discussions.add(discussion);
+				
+				count++;
 			}
 		}
 		catch (Exception e)
@@ -2190,40 +2188,6 @@ public class YaftPersistenceManager
 		return discussions;
 	}
 
-	public boolean clearActiveDiscussionsForCurrentUser()
-	{
-		Connection connection = null;
-		Statement statement = null;
-		
-		try
-		{
-			connection = sakaiProxy.borrowConnection();
-			
-			statement = connection.createStatement();
-			
-			String sql = sqlGenerator.getClearActiveDiscussionsStatement(sakaiProxy.getCurrentUser().getId());
-			
-			statement.executeUpdate(sql);
-			
-			return true;
-		}
-		catch(Exception e)
-		{
-			logger.error("Caught exception whilst clearing current discussions",e);
-			return false;
-		}
-		finally
-		{
-			try
-			{
-				if(statement != null) statement.close();
-			}
-			catch(Exception e) {}
-			
-			sakaiProxy.returnConnection(connection);
-		}
-	}
-	
 	public String getIdOfSiteContainingMessage(String messageId)
 	{
 		Connection connection = null;

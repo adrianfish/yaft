@@ -104,9 +104,7 @@ public interface YaftForumService extends EntityProducer
 	
 	public YaftPreferences getPreferencesForUser(String userId,String siteId);
 
-	public List<ActiveDiscussion> getActiveDiscussions();
+	public List<ActiveDiscussion> getActiveDiscussions(String siteId);
 
-	public boolean clearActiveDiscussionsForCurrentUser();
-	
 	public String getIdOfSiteContainingMessage(String messageId);
 }

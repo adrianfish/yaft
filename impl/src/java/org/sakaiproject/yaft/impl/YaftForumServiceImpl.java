@@ -79,10 +79,7 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
 		
-		Discussion discussion = persistenceManager.getDiscussion(discussionId,fully);
-		persistenceManager.deleteFromActiveDiscussions(discussionId, sakaiProxy.getCurrentUser().getId());
-		
-		return discussion;
+		return persistenceManager.getDiscussion(discussionId,fully);
 	}
 
 	public List<Forum> getSiteForums(String siteId,boolean fully)
@@ -678,16 +675,11 @@ public class YaftForumServiceImpl implements YaftForumService
 		}
 	}
 
-	public List<ActiveDiscussion> getActiveDiscussions()
+	public List<ActiveDiscussion> getActiveDiscussions(String siteId)
 	{
-		return persistenceManager.getActiveDiscussions();
+		return persistenceManager.getActiveDiscussions(siteId);
 	}
 
-	public boolean clearActiveDiscussionsForCurrentUser()
-	{
-		return persistenceManager.clearActiveDiscussionsForCurrentUser();
-	}
-	
 	public String getIdOfSiteContainingMessage(String messageId)
 	{
 		return persistenceManager.getIdOfSiteContainingMessage(messageId);

@@ -13,8 +13,8 @@
      </servlet>
      
     <servlet>
-        <servlet-name>sakai.synoptic.yaft</servlet-name>
-        <servlet-class>org.sakaiproject.yaft.tool.SynopticYaftTool</servlet-class>
+        <servlet-name>sakai.sitehome.yaft</servlet-name>
+        <servlet-class>org.sakaiproject.yaft.tool.SiteHomeYaftTool</servlet-class>
         <load-on-startup>1</load-on-startup>
      </servlet>
      

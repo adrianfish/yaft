@@ -64,7 +64,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		statements.add("CREATE TABLE YAFT_PREFERENCES (USER_ID " + VARCHAR + "(99) NOT NULL," + "SITE_ID " + VARCHAR + "(99) NOT NULL," + "EMAIL_ALERTS VARCHAR(24) NOT NULL," + "VIEW_MODE VARCHAR(16) NOT NULL," + "CONSTRAINT yaft_preferences_pk PRIMARY KEY (USER_ID,SITE_ID))");
 		
-		statements.add("CREATE TABLE YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID CHAR(36) NOT NULL,USER_ID " + VARCHAR + "(99) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,SUBJECT " + VARCHAR + "(255) NOT NULL,NEW_MESSAGES INT NOT NULL,LAST_MESSAGE_DATE " + TIMESTAMP + " NOT NULL,LATEST_MESSAGE_SUBJECT " + VARCHAR + "(255) NOT NULL,CONSTRAINT yaft_active_discussions_pk PRIMARY KEY (DISCUSSION_ID,USER_ID))");
+		statements.add("CREATE TABLE YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,SUBJECT " + VARCHAR + "(255) NOT NULL,LAST_MESSAGE_DATE " + TIMESTAMP + " NOT NULL,LATEST_MESSAGE_SUBJECT " + VARCHAR + "(255) NOT NULL)");
 		
 		return statements;
 	}
@@ -753,12 +753,12 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "SELECT * FROM YAFT_PREFERENCES WHERE USER_ID = '" + userId + "' AND SITE_ID = '" + siteId + "'";
 	}
 
-	public String getSelectActiveDiscussionsStatement(String userId)
+	public String getSelectActiveDiscussionsStatement(String siteId)
 	{
-		return "SELECT * FROM YAFT_ACTIVE_DISCUSSIONS WHERE USER_ID = '" + userId + "'";
+		return "SELECT * FROM YAFT_ACTIVE_DISCUSSIONS WHERE SITE_ID = '" + siteId + "'";
 	}
 
-	public List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, List<String> offlineUserIds, Connection connection) throws Exception
+	public List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, Connection connection) throws Exception
 	{
 		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
 
@@ -767,35 +767,18 @@ public class DefaultSqlGenerator implements SqlGenerator
 		{
 			testST = connection.createStatement();
 
-			for (String userId : offlineUserIds)
-			{
-				ResultSet rs = testST.executeQuery("SELECT * FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + message.getDiscussionId() + "' AND USER_ID = '" + userId + "'");
-
-				if (rs.next())
-				{
-					String sql = "UPDATE YAFT_ACTIVE_DISCUSSIONS SET NEW_MESSAGES = NEW_MESSAGES + 1,LATEST_MESSAGE_SUBJECT = ?,LAST_MESSAGE_DATE = ? WHERE DISCUSSION_ID = ? AND USER_ID = ?";
-					PreparedStatement statement = connection.prepareStatement(sql);
-					statement.setString(1, message.getSubject());
-					statement.setTimestamp(2, new Timestamp(message.getCreatedDate()));
-					statement.setString(3, message.getDiscussionId());
-					statement.setString(4, userId);
-					statements.add(statement);
-				}
-				else
-				{
-					String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,USER_ID,SITE_ID,SUBJECT,NEW_MESSAGES,LAST_MESSAGE_DATE,LATEST_MESSAGE_SUBJECT) VALUES(?,?,?,(SELECT SUBJECT FROM YAFT_MESSAGE WHERE MESSAGE_ID = ?),1,?,?)";
-					PreparedStatement statement = connection.prepareStatement(sql);
-					statement.setString(1, message.getDiscussionId());
-					statement.setString(2, userId);
-					statement.setString(3, message.getSiteId());
-					statement.setString(4, message.getDiscussionId());
-					statement.setTimestamp(5, new Timestamp(message.getCreatedDate()));
-					statement.setString(6, message.getSubject());
-					statements.add(statement);
-				}
-
-				rs.close();
-			}
+			String sql = "INSERT INTO YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID,SITE_ID,SUBJECT,LAST_MESSAGE_DATE,LATEST_MESSAGE_SUBJECT) VALUES(?,?,(SELECT SUBJECT FROM YAFT_MESSAGE WHERE MESSAGE_ID = ?),?,?)";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, message.getDiscussionId());
+			statement.setString(2, message.getSiteId());
+			statement.setString(3, message.getDiscussionId());
+			statement.setTimestamp(4, new Timestamp(message.getCreatedDate()));
+			statement.setString(5, message.getSubject());
+			statements.add(statement);
+			
+			sql = "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE LAST_MESSAGE_DATE < (NOW() - 86400)"; // 1 day
+			PreparedStatement st2 = connection.prepareStatement(sql);
+			statements.add(st2);
 		}
 		finally
 		{
@@ -806,19 +789,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return statements;
 	}
 
-	public String getDeleteFromActiveDiscussionStatement(String discussionId, String userId)
+	public String getDeleteFromActiveDiscussionStatement(String discussionId)
 	{
-		if(userId != null)
-			return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "' AND USER_ID = '" + userId + "'";
-		else
-			return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "'";
+		return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE DISCUSSION_ID = '" + discussionId + "'";
 	}
 
-	public String getClearActiveDiscussionsStatement(String userId)
-	{
-		return "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE USER_ID = '" + userId + "'";
-	}
-	
 	public String getSelectIdOfSiteContainingMessage(String messageId)
 	{
 		return "SELECT SITE_ID FROM YAFT_MESSAGE WHERE MESSAGE_ID = '" + messageId + "'";

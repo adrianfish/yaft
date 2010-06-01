@@ -220,6 +220,22 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 		return yaftForumService.getPreferencesForUser(userId,siteId);
 	}
 	
+	@EntityCustomAction(action = "activeDiscussions", viewKey = EntityView.VIEW_SHOW)
+	public Object handleActiveDiscussions(EntityReference ref,Map<String,Object> params)
+	{
+		String userId = developerHelperService.getCurrentUserId();
+		
+		if(userId == null)
+			throw new EntityException("Not logged in",ref.getReference(),HttpServletResponse.SC_UNAUTHORIZED);
+
+		String siteId = ref.getId();
+		
+		if (siteId == null)
+			throw new IllegalArgumentException("Invalid path provided: expect to receive the site id");
+		
+		return yaftForumService.getActiveDiscussions(siteId);
+	}
+	
 	/*
 	@EntityCustomAction(action = "title", viewKey = EntityView.VIEW_EDIT)
 	public String handleTitle(EntityReference ref,Map<String,Object> params)
