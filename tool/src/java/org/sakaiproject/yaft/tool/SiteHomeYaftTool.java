@@ -62,7 +62,7 @@ public class SiteHomeYaftTool extends HttpServlet
 		Locale locale = (new ResourceLoader(user.getId())).getLocale();
 		String languageCode = locale.getLanguage();
 
-		response.sendRedirect("/yaft-tool/synoptic_yaft.html?siteId=" + siteId + "&language=" + languageCode);
+		response.sendRedirect("/yaft-tool/sitehome_yaft.html?siteId=" + siteId + "&language=" + languageCode);
 		return;
 	}
 
