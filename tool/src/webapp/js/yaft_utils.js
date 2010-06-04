@@ -86,12 +86,17 @@ var YaftUtils;
 	
 	YaftUtils.attachProfilePopup = function() {
 		$('a.profile').cluetip({
-				width: '620px',
-				cluetipClass: 'yaft',
- 				dropShadow: false,
-				arrows: true,
-				showTitle: false
-			});
+			width: '620px',
+			cluetipClass: 'yaft',
+			sticky: true,
+ 			dropShadow: false,
+			arrows: true,
+			mouseOutClose: true,
+			closeText: '<img src="/library/image/silk/cross.png" alt="close" />',
+			closePosition: 'top',
+			showTitle: false,
+			hoverIntent: true
+		});
 	}
 
 	YaftUtils.applyBanding = function() {

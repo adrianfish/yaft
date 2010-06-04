@@ -134,3 +134,8 @@ th.yaftSortableTableHeaderSortDown {
   height: 11px;
   width: 22px;
 }
+.cluetip-yaft div#cluetip-close {
+	text-align: right;
+	margin: 0 5px 5px;
+	color: #900;
+}

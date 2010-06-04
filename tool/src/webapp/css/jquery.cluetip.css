@@ -13,7 +13,7 @@
   width: 43px;
   height: 11px;
   position: absolute;
-  background-image: url(wait.gif);
+  background-image: url(images/wait.gif);
 }
 .cluetip-arrows {
   display: none;
@@ -33,8 +33,7 @@
 -------------------------------------- */
 
 .cluetip-default {
-  /*background-color: #d9d9c2;*/
-  background-color: #C2D2DB;
+  background-color: #d9d9c2;
 }
 .cluetip-default #cluetip-outer {
   position: relative;
