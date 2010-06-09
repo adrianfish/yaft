@@ -1,22 +1,26 @@
 package org.sakaiproject.yaft.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.api.app.profile.ProfileManager;
-import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.FunctionManager;
-import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.calendar.api.Calendar;
@@ -31,6 +35,9 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.email.api.DigestService;
 import org.sakaiproject.email.api.EmailService;
+import org.sakaiproject.emailtemplateservice.model.EmailTemplate;
+import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
+import org.sakaiproject.emailtemplateservice.service.EmailTemplateService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
@@ -46,14 +53,19 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.time.api.TimeRange;
 import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.Placement;
+import org.sakaiproject.tool.api.Session;
+import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.util.BaseResourceProperties;
+import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * All Sakai API calls go in here. If Sakai changes all we have to do if mod this file.
@@ -97,7 +109,11 @@ public class SakaiProxyImpl implements SakaiProxy
 	private TimeService timeService;
 
 	private UsageSessionService usageSessionService;
-
+	
+	private SessionManager sessionManager;
+	
+	private EmailTemplateService emailTemplateService;
+	
 	public SakaiProxyImpl()
 	{
 		if (logger.isDebugEnabled())
@@ -121,6 +137,13 @@ public class SakaiProxyImpl implements SakaiProxy
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
+		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
+		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
+		
+		List<String> emailTemplates = (List<String>) componentManager.get("org.sakaiproject.yaft.api.emailtemplates.List");
+		//emailTemplateService.processEmailTemplates(emailTemplates);
+		for(String templatePath : emailTemplates)
+			processEmailTemplate(templatePath);
 	}
 
 	public boolean isAutoDDL()
@@ -297,6 +320,165 @@ public class SakaiProxyImpl implements SakaiProxy
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	public void sendEmail(final String userId, final String subject, String message)
+	{
+		class EmailSender implements Runnable
+		{
+			private Thread runner;
+			private String userId;
+			private String subject;
+			private String message;
+			
+			public final String MULTIPART_BOUNDARY = "======sakai-multi-part-boundary======";
+			public final String BOUNDARY_LINE = "\n\n--"+MULTIPART_BOUNDARY+"\n";
+			public final String TERMINATION_LINE = "\n\n--"+MULTIPART_BOUNDARY+"--\n\n";
+			public final String MIME_ADVISORY = "This message is for MIME-compliant mail readers.";
+			public final String PLAIN_TEXT_HEADERS= "Content-Type: text/plain\n\n";
+			public final String HTML_HEADERS = "Content-Type: text/html; charset=ISO-8859-1\n\n";
+			public final String HTML_END = "\n  </body>\n</html>\n";
+
+			public EmailSender(String userId, String subject, String message)
+			{
+				this.userId = userId;
+				this.subject = subject;
+				this.message = message;
+				runner = new Thread(this,"YAFT EmailSender thread");
+				runner.start();
+			}
+
+			//do it!
+			public synchronized void run()
+			{
+				try
+				{
+
+					//get User to send to
+					User user = userDirectoryService.getUser(userId);
+					
+					String email = user.getEmail();
+					
+					if (email == null || email.length() == 0)
+					{
+						logger.error("SakaiProxy.sendEmail() failed. No email for userId: " + userId);
+						return;
+					}
+					
+					List<User> receivers = new ArrayList<User>();
+					receivers.add(user);
+					
+					//do it
+					emailService.sendToUsers(receivers, getHeaders(user.getEmail(), subject), formatMessage(subject, message));
+					
+					logger.info("Email sent to: " + userId);
+				}
+				catch (Exception e)
+				{
+					logger.error("SakaiProxy.sendEmail() failed for userId: " + userId + " : " + e.getClass() + " : " + e.getMessage());
+				}
+			}
+			
+			/** helper methods for formatting the message */
+			private String formatMessage(String subject, String message)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append(MIME_ADVISORY);
+				sb.append(BOUNDARY_LINE);
+				sb.append(PLAIN_TEXT_HEADERS);
+				sb.append(Validator.escapeHtmlFormattedText(message));
+				sb.append(BOUNDARY_LINE);
+				sb.append(HTML_HEADERS);
+				sb.append(htmlPreamble(subject));
+				sb.append(message);
+				sb.append(HTML_END);
+				sb.append(TERMINATION_LINE);
+				
+				return sb.toString();
+			}
+			
+			private String htmlPreamble(String subject)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n");
+				sb.append("\"http://www.w3.org/TR/html4/loose.dtd\">\n");
+				sb.append("<html>\n");
+				sb.append("<head><title>");
+				sb.append(subject);
+				sb.append("</title></head>\n");
+				sb.append("<body>\n");
+				
+				return sb.toString();
+			}
+			
+			private List<String> getHeaders(String emailTo, String subject)
+			{
+				List<String> headers = new ArrayList<String>();
+				headers.add("MIME-Version: 1.0");
+				headers.add("Content-Type: multipart/alternative; boundary=\""+MULTIPART_BOUNDARY+"\"");
+				headers.add(formatSubject(subject));
+				headers.add(getFrom());
+				if (emailTo != null && emailTo.length() > 0)
+				{
+					headers.add("To: " + emailTo);
+				}
+				
+				return headers;
+			}
+			
+			private String getFrom()
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("From: ");
+				sb.append(serverConfigurationService.getString("ui.service", "Sakai"));
+				sb.append(" <sakai-forum@");
+				sb.append(serverConfigurationService.getServerName());
+				sb.append(">");
+				
+				return sb.toString();
+			}
+			
+			private String formatSubject(String subject) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Subject: ");
+				sb.append(subject);
+				
+				return sb.toString();
+			}
+			
+			
+		}
+		
+		//instantiate class to format, then send the mail
+		new EmailSender(userId, subject, message);
+	}
+	
+	public void sendEmail(List<String> userIds, String emailTemplateKey, Map<String,String> replacementValues)
+	{
+		//get list of Users
+		List<User> users = userDirectoryService.getUsers(userIds);
+		
+		RenderedTemplate template = null;
+		
+		//get the rendered template for each user
+		for(User user : users) {
+			logger.error("SakaiProxy.sendEmail() attempting to send email to: " + user.getId());
+			try
+			{ 
+				template = emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, user.getReference(), replacementValues); 
+				if (template == null) {
+					logger.error("SakaiProxy.sendEmail() no template with key: " + emailTemplateKey);
+					return;	//no template
+				}
+			}
+			catch (Exception e) {
+				logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + emailTemplateKey + " : " + e.getClass() + " : " + e.getMessage());
+				continue; //try next user
+			}
+			
+			//send
+			sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
 		}
 	}
 
@@ -535,5 +717,132 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Process the supplied template XML into an EmailTemplate object and save it
+	 * @param templatePath
+	 * @return
+	 * @throws IOException
+	 * @throws XMLStreamException
+	 */
+	private void processEmailTemplate(String templatePath) 
+	{
+		final String ELEM_SUBJECT = "subject";
+		final String ELEM_MESSAGE = "message";
+		final String ELEM_HTML = "html";
+		final String ELEM_LOCALE = "locale";
+		final String ELEM_VERSION = "version";
+		final String ELEM_OWNER = "owner";
+		final String ELEM_KEY = "key";
+		final String ADMIN = "admin";
+		
+		InputStream in = SakaiProxy.class.getClassLoader().getResourceAsStream(templatePath);
+		XMLInputFactory factory = (XMLInputFactory)XMLInputFactory.newInstance();
+		XMLStreamReader staxXmlReader = null;
+		EmailTemplate template = new EmailTemplate();
+
+		try
+		{
+			staxXmlReader = (XMLStreamReader) factory.createXMLStreamReader(in);
+		
+			for (int event = staxXmlReader.next(); event != XMLStreamConstants.END_DOCUMENT; event = staxXmlReader.next())
+			{
+				if (event == XMLStreamConstants.START_ELEMENT)
+				{
+					String element = staxXmlReader.getLocalName();
+			    
+				    //subject
+				    if(StringUtils.equals(element, ELEM_SUBJECT))
+				    {
+				    	template.setSubject(staxXmlReader.getElementText());
+				    }
+				    //message
+				    if(StringUtils.equals(element, ELEM_MESSAGE))
+				    {
+				    	template.setMessage(staxXmlReader.getElementText());
+				    }
+				    //html
+				    if(StringUtils.equals(element, ELEM_HTML)) {
+				    	template.setHtmlMessage(staxXmlReader.getElementText());
+				    }
+				    //locale
+				    if(StringUtils.equals(element, ELEM_LOCALE)) {
+				    	template.setLocale(staxXmlReader.getElementText());
+				    }
+				    //version - SAK-17637
+				    if(StringUtils.equals(element, ELEM_VERSION)) {
+				    	//set as integer version of value, or default to 0
+				    	template.setVersion(Integer.valueOf(NumberUtils.toInt(staxXmlReader.getElementText(), 0)));
+				    }
+				    
+				    //owner
+				    if(StringUtils.equals(element, ELEM_OWNER)) {
+				    	template.setOwner(staxXmlReader.getElementText());
+				    }
+				    //key
+				    if(StringUtils.equals(element, ELEM_KEY)) {
+				    	template.setKey(staxXmlReader.getElementText());
+				    }
+				}
+			}
+		}
+		catch (XMLStreamException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				staxXmlReader.close();
+			}
+			catch (XMLStreamException e)
+			{
+				e.printStackTrace();
+			}
+			try
+			{
+				in.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		//check if we have an existing template of this key and locale
+		EmailTemplate existingTemplate = emailTemplateService.getEmailTemplate(template.getKey(), new Locale(template.getLocale()));
+		if(existingTemplate == null)
+		{
+			//no existing, save this one
+			Session sakaiSession = sessionManager.getCurrentSession();
+			sakaiSession.setUserId(ADMIN);
+			sakaiSession.setUserEid(ADMIN);
+			emailTemplateService.saveTemplate(template);
+			sakaiSession.setUserId(null);
+			sakaiSession.setUserId(null);
+			logger.info("Saved email template: " + template.getKey() + " with locale: " + template.getLocale());
+			return;
+		} 
+		
+		//check version, if local one newer than persisted, update it - SAK-17679
+		int existingTemplateVersion = existingTemplate.getVersion() != null ? existingTemplate.getVersion().intValue() : 0;
+		if(template.getVersion() > existingTemplateVersion)
+		{
+			existingTemplate.setSubject(template.getSubject());
+			existingTemplate.setMessage(template.getMessage());
+			existingTemplate.setHtmlMessage(template.getHtmlMessage());
+			existingTemplate.setVersion(template.getVersion());
+			existingTemplate.setOwner(template.getOwner());
+
+			Session sakaiSession = sessionManager.getCurrentSession();
+			sakaiSession.setUserId(ADMIN);
+			sakaiSession.setUserEid(ADMIN);
+			emailTemplateService.updateTemplate(existingTemplate);
+			sakaiSession.setUserId(null);
+			sakaiSession.setUserId(null);
+			logger.info("Updated email template: " + template.getKey() + " with locale: " + template.getLocale());
+		}
 	}
 }

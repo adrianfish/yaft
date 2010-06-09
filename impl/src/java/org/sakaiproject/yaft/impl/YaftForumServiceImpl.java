@@ -1,6 +1,8 @@
 package org.sakaiproject.yaft.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -322,21 +324,40 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 				if(site != null) siteTitle = site.getTitle();
 				
-				Discussion discussion = persistenceManager.getDiscussion(message.getDiscussionId(),false);
-			
 				Set<String> users = sakaiProxy.getSiteUsers();
 		
 				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
+				
+				for(String excludedId : unsubscribers)
+					users.remove(excludedId);
 			
 				String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-		
-				String body = "";
+				
+				Map<String,String> replacementValues = new HashMap<String,String>();
+				
+				String templateKey = "yaft.newMessageNew";
 				if(newDiscussion)
-					body = "<b>" + message.getCreatorDisplayName() + "</b> started a new discussion titled '" + discussion.getSubject() + "' in '" + site.getTitle() + "'<br /><br />Click <a href=\"" + url + "\">here</a> to view it";
+				{
+					templateKey = "yaft.newDiscussion";
+					replacementValues.put("siteTitle", siteTitle);
+					replacementValues.put("forumMessage", "Forum Message");
+					replacementValues.put("discussionSubject", message.getSubject());
+					replacementValues.put("creator", message.getCreatorDisplayName());
+					replacementValues.put("url", url);
+					replacementValues.put("messageContent", message.getContent());
+				}
 				else
-					body = "<b>" + message.getCreatorDisplayName() + "</b> added/updated the message titled '" + message.getSubject() + "' in '" + site.getTitle() + "'<br /><br />Click <a href=\"" + url + "\">here</a> to read it";
-			
-				new EmailSender(users, unsubscribers, body,message,site);
+				{
+					templateKey = "yaft.newMessage";
+					replacementValues.put("siteTitle", siteTitle);
+					replacementValues.put("forumMessage", "Forum Message");
+					replacementValues.put("messageSubject", message.getSubject());
+					replacementValues.put("creator", message.getCreatorDisplayName());
+					replacementValues.put("url", url);
+					replacementValues.put("messageContent", message.getContent());
+				}
+				
+				sakaiProxy.sendEmail(new ArrayList<String>(users), templateKey, replacementValues);
 			}
 			catch(Exception e)
 			{
@@ -617,62 +638,6 @@ public class YaftForumServiceImpl implements YaftForumService
 	public YaftPreferences getPreferencesForCurrentUserAndSite()
 	{
 		return persistenceManager.getPreferencesForCurrentUserAndSite();
-	}
-	
-	private class EmailSender implements Runnable
-	{
-		private Thread runner;
-
-		private String body;
-		
-		private String siteId;
-		
-		private Site site;
-		
-		private Message message;
-
-		private Set<String> participants;
-
-		public EmailSender(Set<String> to, List<String> exclusions,String body,Message message,Site site)
-		{
-			this.participants = to;
-			this.body = body;
-			this.message = message;
-			this.siteId = message.getSiteId();
-			this.site = site;
-			
-			if(exclusions != null && exclusions.size() > 0)
-			{
-				for(String excludedId : exclusions)
-					participants.remove(excludedId);
-			}
-			
-			runner = new Thread(this,"Yaft Emailer Thread");
-			runner.start();
-		}
-
-		public synchronized void run()
-		{
-			try
-			{
-				for (String user : participants)
-				{
-					YaftPreferences prefs = getPreferencesForUser(user,siteId);
-		
-					if(YaftPreferences.EACH.equals(prefs.getEmail()))
-					{
-						String emailBody = "<html><body>" + body + "</body></html>";
-						sakaiProxy.sendEmailMessage("[ " + site.getTitle() + " - Forum Message ]  " + message.getSubject(),emailBody,user);
-					}
-					else if(YaftPreferences.DIGEST.equals(prefs.getEmail()))
-						sakaiProxy.addDigestMessage(user,"New Sakai Forum Message",body);
-				}
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public List<ActiveDiscussion> getActiveDiscussions(String siteId)

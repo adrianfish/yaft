@@ -35,5 +35,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/entitybroker/entitybroker-api/1.4.0-SNAPSHOT/entitybroker-api-1.4.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/entitybroker/entitybroker-utils/1.4.0-SNAPSHOT/entitybroker-utils-1.4.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring/2.5.6.SEC01/spring-2.5.6.SEC01.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/sakaiproject/emailtemplateservice/emailtemplateservice-api/0.5-SNAPSHOT/emailtemplateservice-api-0.5-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/stax/stax-api/1.0.1/stax-api-1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

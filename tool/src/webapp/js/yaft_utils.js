@@ -95,7 +95,8 @@ var YaftUtils;
 			closeText: '<img src="/library/image/silk/cross.png" alt="close" />',
 			closePosition: 'top',
 			showTitle: false,
-			hoverIntent: true
+			hoverIntent: true,
+			ajaxCache: false
 		});
 	}
 
@@ -837,7 +838,6 @@ var YaftUtils;
 	YaftUtils.getUserPreferences = function(placementId) {
 		var preferences = null;
 		jQuery.ajax( {
-	 		//url : "/portal/tool/" + placementId + "/data/userPreferences",
 	 		url : "/direct/yaft-forum/" + yaftSiteId + "/userPreferences.json",
 	   		dataType : "json",
 	   		async : false,
