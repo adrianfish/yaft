@@ -45,10 +45,6 @@ public interface SakaiProxy
 	
 	public boolean removeCalendarEntry(String title,String description);
 	
-	public void sendEmailMessage(String subject,String body, String user);
-	
-	public void sendEmail(final String userId, final String subject, String message);
-	
 	public void sendEmail(List<String> userIds, String emailTemplateKey, Map<String,String> replacementValues);
 
 	public User getCurrentUser();

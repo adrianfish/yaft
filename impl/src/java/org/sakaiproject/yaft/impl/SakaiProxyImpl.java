@@ -298,32 +298,8 @@ public class SakaiProxyImpl implements SakaiProxy
 			return ""; // this can happen if the user does not longer exist in the system
 		}
 	}
-
-	public void sendEmailMessage(String subject, String body, String user)
-	{
-		try
-		{
-			List<String> additionalHeader = new ArrayList<String>();
-			additionalHeader.add("Content-Type: text/html; charset=ISO-8859-1");
-
-			String emailParticipant = getEmailForTheUser(user);
-			try
-			{
-				String sender = "sakai-forum@" + serverConfigurationService.getServerName();
-				emailService.send(sender, emailParticipant, subject, body, emailParticipant, sender, additionalHeader);
-			}
-			catch (Exception e)
-			{
-				System.out.println("Failed to send email to '" + user + "'. Message: " + e.getMessage());
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 	
-	public void sendEmail(final String userId, final String subject, String message)
+	private void sendEmail(final String userId, final String subject, String message)
 	{
 		class EmailSender implements Runnable
 		{
@@ -730,7 +706,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		final String ELEM_SUBJECT = "subject";
 		final String ELEM_MESSAGE = "message";
-		final String ELEM_HTML = "html";
+		final String ELEM_HTML_MESSAGE = "htmlMessage";
 		final String ELEM_LOCALE = "locale";
 		final String ELEM_VERSION = "version";
 		final String ELEM_OWNER = "owner";
@@ -763,7 +739,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				    	template.setMessage(staxXmlReader.getElementText());
 				    }
 				    //html
-				    if(StringUtils.equals(element, ELEM_HTML)) {
+				    if(StringUtils.equals(element, ELEM_HTML_MESSAGE)) {
 				    	template.setHtmlMessage(staxXmlReader.getElementText());
 				    }
 				    //locale

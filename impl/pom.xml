@@ -69,5 +69,11 @@
    			<groupId>stax</groupId>
    			<artifactId>stax</artifactId>
 		</dependency>
+		<dependency>
+    <groupId>org.simpleframework</groupId>
+    <artifactId>simple-xml</artifactId>
+    <version>2.3.5</version>
+</dependency>
+		
 	</dependencies>
 </project>
