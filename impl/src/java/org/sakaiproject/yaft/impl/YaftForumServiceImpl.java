@@ -77,7 +77,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getForum(forumId,state);
 	}
 	
-	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception
+	public Discussion getDiscussion(String discussionId,boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
 		

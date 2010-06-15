@@ -581,12 +581,12 @@ public class YaftPersistenceManager
 		}
 	}
 	
-	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception
+	public Discussion getDiscussion(String discussionId,boolean fully)
 	{
 		Connection connection = null;
 		Statement st = null;
 		
-		Discussion discussion = new Discussion();
+		Discussion discussion = null;
 
 		try
 		{
@@ -601,11 +601,14 @@ public class YaftPersistenceManager
 			}
 			else
 			{
-				logger.error("No discussion with id: " + discussionId);
-				throw new IdUnusedException("No discussion with id: " + discussionId);
+				logger.error("No discussion with id: " + discussionId + ". Returning null ...");
 			}
 			
 			rs.close();
+		}
+		catch(Exception e)
+		{
+			logger.error("Caught exception whilst getting discussion.",e);
 		}
 		finally
 		{
@@ -895,7 +898,15 @@ public class YaftPersistenceManager
 
 		try
 		{
-			String forumId = getDiscussion(discussionId, false).getForumId();
+			Discussion discussion = getDiscussion(discussionId, false);
+			
+			if(discussion == null)
+			{
+				logger.error("No discussion for id: " + discussionId + ". Returning false ...");
+				return false;
+			}
+			
+			String forumId = discussion.getForumId();
 			connection = sakaiProxy.borrowConnection();
 			boolean oldAutoCommitFlag = connection.getAutoCommit();
 			connection.setAutoCommit(false);
@@ -926,11 +937,6 @@ public class YaftPersistenceManager
 			{
 				connection.setAutoCommit(oldAutoCommitFlag);
 			}
-		}
-		catch (IdUnusedException iue)
-		{
-			logger.error("No discussion with id '" + discussionId + "' exists");
-			return false;
 		}
 		catch (Exception e)
 		{

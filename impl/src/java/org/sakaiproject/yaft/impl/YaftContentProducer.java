@@ -14,6 +14,7 @@ import org.sakaiproject.search.api.SearchService;
 import org.sakaiproject.search.model.SearchBuilderItem;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.ForumPopulatedStates;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.YaftForumService;
 
@@ -22,8 +23,22 @@ import org.apache.log4j.Logger;
 public class YaftContentProducer implements EntityContentProducer
 {
 	private YaftForumService forumService = null;
+	public void setForumService(YaftForumService forumService)
+	{
+		this.forumService = forumService;
+	}
+	
 	private SearchService searchService = null;
+	public void setSearchService(SearchService searchService)
+	{
+		this.searchService = searchService;
+	}
+	
 	private SearchIndexBuilder searchIndexBuilder = null;
+	public void setSearchIndexBuilder(SearchIndexBuilder searchIndexBuilder)
+	{
+		this.searchIndexBuilder = searchIndexBuilder;
+	}
 	
 	private Logger logger = Logger.getLogger(YaftContentProducer.class);
 	
@@ -31,6 +46,10 @@ public class YaftContentProducer implements EntityContentProducer
 	{
 		searchService.registerFunction(YaftForumService.YAFT_MESSAGE_CREATED);
 		searchService.registerFunction(YaftForumService.YAFT_MESSAGE_DELETED);
+		searchService.registerFunction(YaftForumService.YAFT_DISCUSSION_CREATED);
+		searchService.registerFunction(YaftForumService.YAFT_DISCUSSION_DELETED);
+		searchService.registerFunction(YaftForumService.YAFT_FORUM_CREATED);
+		searchService.registerFunction(YaftForumService.YAFT_FORUM_DELETED);
 		searchIndexBuilder.registerEntityContentProducer(this);
 	}
 	
@@ -49,9 +68,13 @@ public class YaftContentProducer implements EntityContentProducer
 			logger.debug("getAction()");
 		
 		String eventName = event.getEvent();
-		if(YaftForumService.YAFT_MESSAGE_CREATED.equals(eventName))
+		if(YaftForumService.YAFT_MESSAGE_CREATED.equals(eventName)
+				|| YaftForumService.YAFT_DISCUSSION_CREATED.equals(eventName)
+				|| YaftForumService.YAFT_FORUM_CREATED.equals(eventName))
 			return SearchBuilderItem.ACTION_ADD;
-		else if(YaftForumService.YAFT_MESSAGE_DELETED.equals(eventName))
+		else if(YaftForumService.YAFT_MESSAGE_DELETED.equals(eventName)
+				|| YaftForumService.YAFT_DISCUSSION_DELETED.equals(eventName)
+				|| YaftForumService.YAFT_FORUM_DELETED.equals(eventName))
 			return SearchBuilderItem.ACTION_DELETE;
 		else
 			return SearchBuilderItem.ACTION_UNKNOWN;
@@ -117,6 +140,28 @@ public class YaftContentProducer implements EntityContentProducer
 		{
 			Message message = forumService.getMessage(id);
 			return message.getSubject() + " " + message.getContent();
+		}
+		else if("discussions".equals(type))
+		{
+			Discussion discussion = forumService.getDiscussion(id, false);
+			if(discussion == null)
+			{
+				logger.error("No discussion for id: " + id + ". Returning an empty title ...");
+				return "";
+			}
+			else
+				return discussion.getSubject() + " " + discussion.getContent();
+		}
+		else if("forums".equals(type))
+		{
+			Forum forum = forumService.getForum(id,ForumPopulatedStates.EMPTY);
+			if(forum == null)
+			{
+				logger.error("No forum for id: " + id + ". Returning an empty title ...");
+				return "";
+			}
+			else
+				return forum.getTitle();
 		}
 		
 		return null;
@@ -247,6 +292,29 @@ public class YaftContentProducer implements EntityContentProducer
 			return message.getSubject();
 		}
 		
+		else if("discussions".equals(type))
+		{
+			Discussion discussion = forumService.getDiscussion(id, false);
+			if(discussion == null)
+			{
+				logger.error("No discussion for id: " + id + ". Returning an empty title ...");
+				return "";
+			}
+			else
+				return discussion.getSubject();
+		}
+		else if("forums".equals(type))
+		{
+			Forum forum = forumService.getForum(id,ForumPopulatedStates.EMPTY);
+			if(forum == null)
+			{
+				logger.error("No forum for id: " + id + ". Returning an empty title ...");
+				return "";
+			}
+			else
+				return forum.getTitle();
+		}
+		
 		return "Unrecognised";
 	}
 
@@ -282,6 +350,16 @@ public class YaftContentProducer implements EntityContentProducer
 		{
 			Message message = forumService.getMessage(id);
 			return message.getUrl();
+		}
+		else if("discussions".equals(type))
+		{
+			Discussion discussion = forumService.getDiscussion(id,false);
+			return discussion.getUrl();
+		}
+		if("forums".equals(type))
+		{
+			Forum forum = forumService.getForum(id,ForumPopulatedStates.EMPTY);
+			return forum.getUrl();
 		}
 		
 		return null;
@@ -321,40 +399,13 @@ public class YaftContentProducer implements EntityContentProducer
 		String eventName = event.getEvent();
 		
 		if(YaftForumService.YAFT_MESSAGE_CREATED.equals(eventName)
-				|| YaftForumService.YAFT_MESSAGE_DELETED.equals(eventName))
+				|| YaftForumService.YAFT_MESSAGE_DELETED.equals(eventName)
+				|| YaftForumService.YAFT_DISCUSSION_CREATED.equals(eventName)
+				|| YaftForumService.YAFT_DISCUSSION_DELETED.equals(eventName)
+				|| YaftForumService.YAFT_FORUM_CREATED.equals(eventName)
+				|| YaftForumService.YAFT_FORUM_DELETED.equals(eventName))
 			return true;
 			
 		return false;
 	}
-
-	public void setForumService(YaftForumService forumService)
-	{
-		this.forumService = forumService;
-	}
-
-	public YaftForumService getForumService()
-	{
-		return forumService;
-	}
-
-	public void setSearchService(SearchService searchService)
-	{
-		this.searchService = searchService;
-	}
-
-	public SearchService getSearchService()
-	{
-		return searchService;
-	}
-
-	public void setSearchIndexBuilder(SearchIndexBuilder searchIndexBuilder)
-	{
-		this.searchIndexBuilder = searchIndexBuilder;
-	}
-
-	public SearchIndexBuilder getSearchIndexBuilder()
-	{
-		return searchIndexBuilder;
-	}
-
 }
