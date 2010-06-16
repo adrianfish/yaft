@@ -36,7 +36,7 @@ public interface YaftForumService extends EntityProducer
 	
 	public Forum getForumForTitle(String title,String state,String siteId);
 	
-	public Discussion getDiscussion(String discussionId,boolean fully) throws IdUnusedException,Exception;
+	public Discussion getDiscussion(String discussionId,boolean fully);
 	
 	public SakaiProxy getSakaiProxy();
 
