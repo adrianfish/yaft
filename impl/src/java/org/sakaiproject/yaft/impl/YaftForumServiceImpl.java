@@ -143,9 +143,12 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		Message message = discussion.getFirstMessage();
 		
+		// Get this before calling addDiscussion as it will get set by it.
+		String id = discussion.getId();
+		
 		persistenceManager.addDiscussion(forumId,discussion);
 		
-		if(discussion.getId().length() == 0)
+		if(id.length() == 0)
 		{
 			// From the empty id we know this is a new discussion
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + message.getId();

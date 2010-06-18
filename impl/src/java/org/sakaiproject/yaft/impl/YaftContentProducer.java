@@ -11,7 +11,9 @@ import org.sakaiproject.event.api.Event;
 import org.sakaiproject.search.api.EntityContentProducer;
 import org.sakaiproject.search.api.SearchIndexBuilder;
 import org.sakaiproject.search.api.SearchService;
+import org.sakaiproject.search.api.SearchUtils;
 import org.sakaiproject.search.model.SearchBuilderItem;
+import org.sakaiproject.search.util.HTMLParser;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
@@ -139,7 +141,17 @@ public class YaftContentProducer implements EntityContentProducer
 		if("messages".equals(type))
 		{
 			Message message = forumService.getMessage(id);
-			return message.getSubject() + " " + message.getContent();
+			
+			String content = "<p>" + message.getContent() + "</p>";
+			
+			StringBuilder sb = new StringBuilder();
+			
+			SearchUtils.appendCleanString(message.getSubject(), sb);
+			 
+			for (HTMLParser hp = new HTMLParser(content); hp.hasNext();)
+				 SearchUtils.appendCleanString(hp.next(), sb);
+			
+			return sb.toString();
 		}
 		else if("discussions".equals(type))
 		{
@@ -150,7 +162,19 @@ public class YaftContentProducer implements EntityContentProducer
 				return "";
 			}
 			else
-				return discussion.getSubject() + " " + discussion.getContent();
+			{
+				// Wrap in p tags otherwise search may snip the last char off.
+				String content = "<p>" + discussion.getContent() + "</p>";
+				
+				StringBuilder sb = new StringBuilder();
+			
+				SearchUtils.appendCleanString(discussion.getSubject(), sb);
+			 
+				for (HTMLParser hp = new HTMLParser(content); hp.hasNext();)
+					SearchUtils.appendCleanString(hp.next(), sb);
+				
+				return sb.toString();
+			}
 		}
 		else if("forums".equals(type))
 		{
@@ -161,7 +185,12 @@ public class YaftContentProducer implements EntityContentProducer
 				return "";
 			}
 			else
-				return forum.getTitle();
+			{
+				StringBuilder sb = new StringBuilder();
+			
+				SearchUtils.appendCleanString(forum.getTitle(), sb);
+				return sb.toString();
+			}
 		}
 		
 		return null;
@@ -172,7 +201,6 @@ public class YaftContentProducer implements EntityContentProducer
 		if(logger.isDebugEnabled())
 			logger.debug("getContentReader(" + ref + ")");
 		
-		// TODO Auto-generated method stub
 		return null;
 	}
 
