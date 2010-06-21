@@ -223,9 +223,23 @@ function switchState(state,arg) {
 	   	});
 	}
 	else if('minimal' === state) {
+
 		if(arg && arg.discussionId) {
 			yaftCurrentDiscussion = YaftUtils.getDiscussion(arg.discussionId);
 			YaftUtils.markReadMessagesInCurrentDiscussion();
+		}
+
+		if(!yaftCurrentDiscussion) {
+			if(arg && arg.messageId) {
+				yaftCurrentDiscussion = YaftUtils.getDiscussionContainingMessage(arg.messageId);
+				YaftUtils.markReadMessagesInCurrentDiscussion();
+			}
+		}
+
+		if(!yaftCurrentForum) {
+			if(arg && arg.messageId) {
+				yaftCurrentForum = YaftUtils.getForumContainingMessage(arg.messageId);
+			}
 		}
 			
 		// At this point yaftCurrentForum and yaftCurrentDiscussion must be set
@@ -418,8 +432,6 @@ function switchState(state,arg) {
 		$('#yaft_view_' + yaftCurrentUserPreferences.view + '_option').attr('checked',true);
 	 	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
 	}
-	
-	return false;
 }
 
 function renderChildMessages(parent,skipDeleted) {

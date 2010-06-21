@@ -28,6 +28,7 @@ import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
+import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.impl.SakaiProxyImpl;
@@ -228,6 +229,27 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 			throw new IllegalArgumentException("Invalid path provided: expect to receive the site id");
 		
 		return yaftForumService.getActiveDiscussions(siteId);
+	}
+	
+	@EntityCustomAction(action = "forumContainingMessage", viewKey = EntityView.VIEW_LIST)
+	public Object handleForumContainingMessage(EntityReference ref,Map<String,Object> params)
+	{
+		String userId = developerHelperService.getCurrentUserId();
+		
+		if(userId == null)
+			throw new EntityException("Not logged in",ref.getReference(),HttpServletResponse.SC_UNAUTHORIZED);
+
+		String messageId = (String) params.get("messageId");
+		
+		if (messageId == null)
+			throw new IllegalArgumentException("Invalid path provided: expect to receive the message id");
+		
+		Message message = yaftForumService.getMessage(messageId);
+		
+		if(message == null)
+			return null;
+		
+		return yaftForumService.getForumContainingMessage(messageId);
 	}
 	
 	/**

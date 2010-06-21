@@ -19,6 +19,7 @@ import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.exception.EntityException;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.yaft.api.Discussion;
+import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.impl.SakaiProxyImpl;
@@ -138,5 +139,26 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 		
 		List<String> ids = yaftForumService.getReadMessageIds(discussionId);
 		return ids;
+	}
+	
+	@EntityCustomAction(action = "discussionContainingMessage", viewKey = EntityView.VIEW_LIST)
+	public Object handleDiscussionContainingMessage(EntityReference ref,Map<String,Object> params)
+	{
+		String userId = developerHelperService.getCurrentUserId();
+		
+		if(userId == null)
+			throw new EntityException("Not logged in",ref.getReference(),HttpServletResponse.SC_UNAUTHORIZED);
+
+		String messageId = (String) params.get("messageId");
+		
+		if (messageId == null)
+			throw new IllegalArgumentException("Invalid path provided: expect to receive the message id");
+		
+		Message message = yaftForumService.getMessage(messageId);
+		
+		if(message == null)
+			return null;
+		
+		return yaftForumService.getDiscussion(message.getDiscussionId(),true);
 	}
 }

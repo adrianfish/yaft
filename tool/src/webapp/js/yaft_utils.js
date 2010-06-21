@@ -257,7 +257,6 @@ var YaftUtils;
 		var discussion = null;
 		
 		jQuery.ajax( {
-	   		//url : "/portal/tool/" + yaftPlacementId + "/data/discussions/" + discussionId,
 	   		url : "/direct/yaft-discussion/" + discussionId + ".json",
 			dataType : "json",
 			cache: false,
@@ -271,6 +270,44 @@ var YaftUtils;
 		});
 		
 		return discussion;
+	}
+
+	YaftUtils.getDiscussionContainingMessage = function(messageId) {
+		var discussion = null;
+		
+		jQuery.ajax( {
+	   		url : "/direct/yaft-discussion/discussionContainingMessage.json?messageId=" + messageId,
+			dataType : "json",
+			cache: false,
+			async : false,
+	  		success : function(d) {
+				discussion = d;
+	  		},
+			error : function(xmlHttpRequest,textStatus,errorThrown) {
+				alert("Failed to get discussion. Reason: " + xmlHttpRequest.statusText);
+	 		}
+		});
+		
+		return discussion;
+	}
+
+	YaftUtils.getForumContainingMessage = function(messageId) {
+		var forum = null;
+		
+		jQuery.ajax( {
+	   		url : "/direct/yaft-forum/forumContainingMessage.json?messageId=" + messageId,
+			dataType : "json",
+			cache: false,
+			async : false,
+	  		success : function(d) {
+				forum = d;
+	  		},
+			error : function(xmlHttpRequest,textStatus,errorThrown) {
+				alert("Failed to get forum. Reason: " + xmlHttpRequest.statusText);
+	 		}
+		});
+		
+		return forum;
 	}
 	
 	/* START MESSAGE OPERATIONS */
