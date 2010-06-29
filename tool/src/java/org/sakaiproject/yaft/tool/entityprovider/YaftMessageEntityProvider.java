@@ -1,17 +1,10 @@
 package org.sakaiproject.yaft.tool.entityprovider;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
@@ -30,19 +23,17 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.Resolvable;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.exception.EntityException;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
-import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.impl.SakaiProxyImpl;
 
-public class YaftDiscussionEntityProvider extends AbstractEntityProvider implements Resolvable, CoreEntityProvider, AutoRegisterEntityProvider, Createable, Inputable, Outputable, Describeable, ActionsExecutable
+public class YaftMessageEntityProvider extends AbstractEntityProvider implements Resolvable, CoreEntityProvider, AutoRegisterEntityProvider, Createable, Inputable, Outputable, Describeable, ActionsExecutable
 {
 	protected final Logger LOG = Logger.getLogger(getClass());
 	
-	public final static String ENTITY_PREFIX = "yaft-discussion";
+	public final static String ENTITY_PREFIX = "yaft-message";
 	
 	private YaftForumService yaftForumService = null;
 	
@@ -63,25 +54,17 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 		if (LOG.isDebugEnabled())
 			LOG.debug("entityExists(" + id + ")");
 		
-		if (id == null)
-		{
+		if (id == null || "".equals(id))
 			return false;
-		}
-
-		if ("".equals(id))
-			return false;
-		
-		if("unsubscriptions".equals(id))
-			return true;
 		
 		try
 		{
-			Discussion discussion = yaftForumService.getDiscussion(id, true);
-			return discussion != null;
+			Message message = yaftForumService.getMessage(id);
+			return message != null;
 		}
 		catch (Exception e)
 		{
-			LOG.error("Caught exception whilst getting discussion.", e);
+			LOG.error("Caught exception whilst getting message.", e);
 			return false;
 		}
 	}
@@ -99,28 +82,23 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 		String id = ref.getId();
 
 		if (id == null || "".equals(id))
-			throw new IllegalArgumentException("No forum id supplied");
+			throw new IllegalArgumentException("No message id supplied");
 		
-		if("unsubscriptions".equals(id))
-			return yaftForumService.getDiscussionUnsubscriptions(userId);
-		
-		Discussion discussion = null;
+		Message message = null;
 
 		try
 		{
-			discussion = yaftForumService.getDiscussion(id, true);
+			message = yaftForumService.getMessage(id);
 		}
 		catch (Exception e)
 		{
-			LOG.error("Caught exception whilst getting discussion.", e);
+			LOG.error("Caught exception whilst getting message.", e);
 		}
 
-		if (discussion == null)
-		{
-			throw new IllegalArgumentException("Discussion not found");
-		}
+		if (message == null)
+			throw new IllegalArgumentException("Message not found");
 
-		return discussion;
+		return message;
 	}
 	
 	public String[] getHandledInputFormats()
@@ -131,107 +109,63 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 	public String createEntity(EntityReference ref, Object entity, Map<String, Object> params)
 	{
 		String siteId = (String) params.get("siteId");
-		String id = (String) params.get("id");
+		String status = (String) params.get("status");
 		String subject = (String) params.get("subject");
 		String content = (String) params.get("content");
 		String forumId = (String) params.get("forumId");
-		String startDate= (String) params.get("startDate");
-		String endDate= (String) params.get("endDate");
-		String lockWritingString = (String) params.get("lockWriting");
-		String lockReadingString = (String) params.get("lockReading");
-		
-		boolean lockWriting = true;
-		boolean lockReading = true;
-		
-		if(lockWritingString != null)
-			lockWriting = lockWritingString.equals("true");
-		else
-			lockWriting = false;
-		
-		if(lockReadingString != null)
-			lockReading = lockReadingString.equals("true");
-		else
-			lockReading = false;
+		String viewMode = (String) params.get("viewMode");
+		String messageId = (String) params.get("messageId");
+		String messageBeingRepliedTo = (String) params.get("messageBeingRepliedTo");
+		String discussionId = (String) params.get("discussionId");
 
 		if (LOG.isDebugEnabled())
 		{
+			LOG.debug("Status: " + status);
 			LOG.debug("Subject: " + subject);
 			LOG.debug("Content: " + content);
 			LOG.debug("Forum ID: " + forumId);
+			LOG.debug("View Mode: " + viewMode);
+			LOG.debug("Discussion ID: " + discussionId);
+			LOG.debug("Message Being Replied To: " + messageBeingRepliedTo);
 		}
 		
-		if(subject == null || subject.length() <= 0)
-			throw new IllegalArgumentException("Subject must be supplied.");
-
-		Message message = new Message();
-		
-		if(id != null)
-			message.setId(id);
+		if(viewMode == null || viewMode.length() <= 0)
+			viewMode = "full";
 		
 		String currentUserId = developerHelperService.getCurrentUserId();
 		
+		Message message = new Message();
+		message.setStatus(status);
 		message.setSubject(subject);
 		message.setContent(content);
 		message.setSiteId(siteId);
 		message.setCreatorId(currentUserId);
 		message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(currentUserId));
+		message.setDiscussionId(discussionId);
 		message.setAttachments(getAttachments(params));
 		
-		// The first messages in discussions always have the same id as the
-		// discussion
-		message.setDiscussionId(message.getId());
-		
-		message.setStatus("READY");
-		
-		Discussion discussion = new Discussion();
-		discussion.setFirstMessage(message);
-		discussion.setLockedForWriting(lockWriting);
-		discussion.setLockedForReading(lockReading);
-		
-		if(startDate != null && startDate.length() > 0
-				&& endDate != null && endDate.length() > 0)
-		{
-			try
-			{
-				long start = Long.parseLong(startDate);
-				long end = Long.parseLong(endDate);
-				if(start > 0L && end > 0L)
-				{
-					if(end <= start)
-					{
-						throw new IllegalArgumentException("The end date MUST come after the start date.");
-					}
-					else
-					{
-						discussion.setStart(start);
-						discussion.setEnd(end);
-					}
-				}
-			}
-			catch(NumberFormatException pe)
-			{
-				throw new IllegalArgumentException("The start and end dates MUST be supplied in millisecond format.");
-			}
-		}
+		// If no message id has been supplied this must be a new message, so
+		// we set the message id to empty
+		if(messageId == null)
+			message.setId("");
 
-		if(yaftForumService.addDiscussion(siteId, forumId, discussion, true) != null)
+		if (messageBeingRepliedTo != null && messageBeingRepliedTo.length() > 0)
+			message.setParent(messageBeingRepliedTo);
+		else if (messageBeingRepliedTo == null || messageBeingRepliedTo.length() <= 0)
 		{
-			//try
-			//{
-				return discussion.getId();
-			//}
-			//catch(UnsupportedEncodingException e)
-			//{
-				//return URLEncoder.encode("<textarea>" + discussion.getId() + "</textarea>");
-			//}
+			// This is a discussion, or top level message
+			message.setId(messageId);
 		}
+		
+		if(yaftForumService.addOrUpdateMessage(siteId, forumId, message, true))
+			return message.getId();
 		else
-			throw new EntityException("Failed to add discussion..",id);
+			throw new EntityException("Failed to add message.",messageId);
 	}
 	
 	public Object getSampleEntity()
 	{
-		return new Discussion();
+		return new Message();
 	}
 
 	public String getEntityPrefix()
@@ -242,44 +176,6 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 	public String[] getHandledOutputFormats()
 	{
 		return new String[] { Formats.JSON };
-	}
-	
-	@EntityCustomAction(action = "readMessages", viewKey = EntityView.VIEW_SHOW)
-	public Object handleReadMessages(EntityReference ref,Map<String,Object> params)
-	{
-		String userId = developerHelperService.getCurrentUserId();
-		
-		if(userId == null)
-			throw new EntityException("Not logged in",ref.getReference(),HttpServletResponse.SC_UNAUTHORIZED);
-
-		String discussionId = ref.getId();
-		
-		if (discussionId == null)
-			throw new IllegalArgumentException("Invalid path provided: expect to receive the discussion id");
-		
-		List<String> ids = yaftForumService.getReadMessageIds(discussionId);
-		return ids;
-	}
-	
-	@EntityCustomAction(action = "discussionContainingMessage", viewKey = EntityView.VIEW_LIST)
-	public Object handleDiscussionContainingMessage(EntityReference ref,Map<String,Object> params)
-	{
-		String userId = developerHelperService.getCurrentUserId();
-		
-		if(userId == null)
-			throw new EntityException("Not logged in",ref.getReference(),HttpServletResponse.SC_UNAUTHORIZED);
-
-		String messageId = (String) params.get("messageId");
-		
-		if (messageId == null)
-			throw new IllegalArgumentException("Invalid path provided: expect to receive the message id");
-		
-		Message message = yaftForumService.getMessage(messageId);
-		
-		if(message == null)
-			return null;
-		
-		return yaftForumService.getDiscussion(message.getDiscussionId(),true);
 	}
 	
 	private List<Attachment> getAttachments(Map<String,Object> params)

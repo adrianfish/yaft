@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,9 +43,8 @@ import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.EventTrackingService;
-import org.sakaiproject.event.api.UsageSession;
+import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.event.api.UsageSessionService;
-import org.sakaiproject.event.cover.NotificationService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.site.api.Site;
@@ -63,7 +63,6 @@ import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.api.YaftFunctions;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -299,7 +298,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 	}
 	
-	private void sendEmail(final String userId, final String subject, String message)
+	public void sendEmail(final String userId, final String subject, String message)
 	{
 		class EmailSender implements Runnable
 		{
@@ -429,34 +428,6 @@ public class SakaiProxyImpl implements SakaiProxy
 		//instantiate class to format, then send the mail
 		new EmailSender(userId, subject, message);
 	}
-	
-	public void sendEmail(List<String> userIds, String emailTemplateKey, Map<String,String> replacementValues)
-	{
-		//get list of Users
-		List<User> users = userDirectoryService.getUsers(userIds);
-		
-		RenderedTemplate template = null;
-		
-		//get the rendered template for each user
-		for(User user : users) {
-			logger.error("SakaiProxy.sendEmail() attempting to send email to: " + user.getId());
-			try
-			{ 
-				template = emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, user.getReference(), replacementValues); 
-				if (template == null) {
-					logger.error("SakaiProxy.sendEmail() no template with key: " + emailTemplateKey);
-					return;	//no template
-				}
-			}
-			catch (Exception e) {
-				logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + emailTemplateKey + " : " + e.getClass() + " : " + e.getMessage());
-				continue; //try next user
-			}
-			
-			//send
-			sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
-		}
-	}
 
 	public void addDigestMessage(String user, String subject, String body)
 	{
@@ -468,25 +439,12 @@ public class SakaiProxyImpl implements SakaiProxy
 			}
 			catch (Exception e)
 			{
-				System.out.println("Failed to add message to digest. Message: " + e.getMessage());
+				logger.error("Failed to add message to digest. Message: " + e.getMessage());
 			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-	}
-
-	public Set<String> getSiteUsers()
-	{
-		try
-		{
-			Site site = siteService.getSite(getCurrentSiteId());
-			return site.getUsers();
-		}
-		catch (Exception e)
-		{
-			return null;
 		}
 	}
 
@@ -524,13 +482,53 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return toolManager.getCurrentPlacement().getId();
 	}
+	
+	public String getYaftPageId(String siteId)
+	{
+		try
+		{
+			Site site = siteService.getSite(siteId);
+			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
+			return tc.getPageId();
+		}
+		catch (Exception e)
+		{
+			return "";
+		}
+	}
+	
+	public String getYaftToolId(String siteId)
+	{
+		try
+		{
+			Site site = siteService.getSite(siteId);
+			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
+			return tc.getId();
+		}
+		catch (Exception e)
+		{
+			return "";
+		}
+	}
 
-	public String getDirectUrl(String string)
+	public String getDirectUrl(String siteId, String string)
 	{
 		String portalUrl = getPortalUrl();
-		String pageId = getCurrentPageId();
-		String siteId = getCurrentSiteId();
-		String toolId = getCurrentToolId();
+		
+		String pageId = null;
+		String toolId = null;
+		
+		if(siteId == null) 
+		{
+			siteId = getCurrentSiteId();
+			pageId = getCurrentPageId();
+			toolId = getCurrentToolId();
+		}
+		else
+		{
+			pageId = getYaftPageId(siteId);
+			toolId = getYaftToolId(siteId);
+		}
 
 		try
 		{
@@ -559,7 +557,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	/**
 	 * Saves the file to Sakai's content hosting
 	 */
-	public String saveFile(String creatorId, String name, String mimeType, byte[] fileData) throws Exception
+	public String saveFile(String siteId, String creatorId, String name, String mimeType, byte[] fileData) throws Exception
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("saveFile(" + name + "," + mimeType + ",[BINARY FILE DATA])");
@@ -573,8 +571,11 @@ public class SakaiProxyImpl implements SakaiProxy
 			mimeType = "application/excel";
 
 		// String uuid = UUID.randomUUID().toString();
+		
+		if(siteId == null)
+			siteId = getCurrentSiteId();
 
-		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + name;
+		String id = "/group/" + siteId + "/yaft-files/" + name;
 
 		try
 		{
@@ -602,12 +603,15 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 	}
 
-	public void getAttachment(Attachment attachment)
+	public void getAttachment(String siteId, Attachment attachment)
 	{
+		if(siteId == null)
+			siteId = getCurrentSiteId();
+		
 		try
 		{
 			enableSecurityAdvisor();
-			String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + attachment.getResourceId();
+			String id = "/group/" + siteId + "/yaft-files/" + attachment.getResourceId();
 			// ContentResource resource = contentHostingService.getResource(attachment.getResourceId());
 			ContentResource resource = contentHostingService.getResource(id);
 			ResourceProperties properties = resource.getProperties();
@@ -820,5 +824,28 @@ public class SakaiProxyImpl implements SakaiProxy
 			sakaiSession.setUserId(null);
 			logger.info("Updated email template: " + template.getKey() + " with locale: " + template.getLocale());
 		}
+	}
+
+	public Site getSite(String siteId)
+	{
+		try
+		{
+			return siteService.getSite(siteId);
+		}
+		catch(IdUnusedException e)
+		{
+			logger.error("No site with id of '" + siteId + "'. Returning null ...");
+			return null;
+		}
+	}
+
+	public List<User> getUsers(Collection<String> userIds)
+	{
+		return userDirectoryService.getUsers(userIds);
+	}
+
+	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String reference, Map<String, String> replacementValues)
+	{
+		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, reference, replacementValues);
 	}
 }

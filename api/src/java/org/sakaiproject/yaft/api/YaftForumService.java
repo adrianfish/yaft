@@ -42,9 +42,9 @@ public interface YaftForumService extends EntityProducer
 
 	public boolean addOrUpdateForum(Forum forum);
 	
-	public Discussion addDiscussion(String forumId,Discussion discussion,boolean sendMail);
+	public Discussion addDiscussion(String siteId, String forumId,Discussion discussion,boolean sendMail);
 
-	public boolean addOrUpdateMessage(String forumId,Message message,boolean sendMail);
+	public boolean addOrUpdateMessage(String siteId, String forumId,Message message,boolean sendMail);
 
 	public List<Forum> getFora(boolean fully);
 

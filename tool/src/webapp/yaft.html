@@ -21,6 +21,7 @@
 <script type="text/javascript" src="lib/jquery.localisation.js"></script>
 <script type="text/javascript" src="lib/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="lib/jquery.scrollTo-1.4.0-min.js"></script>
+<script type="text/javascript" language="JavaScript" src="lib/jquery.form.js"></script>
 <script type="text/javascript" src="js/yaft_utils.js"></script>
 <script type="text/javascript" src="js/yaft_permissions.js"></script>
 <script type="text/javascript" src="yaft-translations.js"></script>
@@ -173,7 +174,7 @@ ${yaft_forums_label}
 
 <div id="yaft_search_results_content_template_old" style="display:none;"><!--
 {for result in results}
-        <a href="${result.url}" onClick="return switchState('minimal',{'forumId':'${result.forumId}','discussionId':'${result.discussionId}','messageId':'${result.messageId}'});">${result.title}</a>
+        <a href="javascript:;" onClick="return switchState('minimal',{'forumId':'${result.forumId}','discussionId':'${result.discussionId}','messageId':'${result.messageId}'});">${result.title}</a>
         <br />
 		{for fragment in result.contextFragments}
         <span style="font-size: 9pt;">... ${fragment} ...</span>
@@ -212,7 +213,7 @@ ${yaft_forums_label}
 	<input type="hidden" name="discussionId" value="${discussion.id}"/>
 	<input type="hidden" name="currentForumId" value="${discussion.forumId}"/>
 	<select name="forumId">
-	{for forum in items}
+	{for forum in forums}
 		{if forum.id != yaftCurrentForum.id}<option value="${forum.id}">${forum.title}</option>{/if}
 	{/for}
 	</select>
@@ -231,22 +232,20 @@ ${yaft_forums_label}
 
 <div id="yaft_start_discussion_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
-	<form id="yaft_start_discussion_form"
-			action="/portal/tool/${yaftPlacementId}"
-			method="POST"
-			enctype="multipart/form-data"
-			onsubmit="return YaftUtils.validateDiscussionForm();">
+	<form id="yaft_discussion_form" method="POST" action="/direct/yaft-discussion/new">
 		<input type="hidden" name="id" value="${id}"/>
+		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
+		<input type="hidden" name="siteId" value="${yaftSiteId}"/>
 		<h4>Type your message</h4>
 		<br />
 		<span>Subject: *</span>
 		<br />
-		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${subject}"/>
+		<input name="subject" type="text" size="48" value="${subject}"/>
 		<br />
 		<br />
 		<span>Message</span>
 		<br />
-		<textarea name="content" id="fck" cols="100" rows="5">${firstMessage.content}</textarea>
+		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${firstMessage.content}</textarea>
 		<br />
 <br />
 		<br />
@@ -268,8 +267,8 @@ ${yaft_forums_label}
 <span>Except between ...</span>
 <br />
 <br />
-<input id="yaft_start_date" type="text" name="startDate"/>
-	<select id="yaft_start_hour_selector" name="startHour">
+<input id="yaft_start_date" type="text"/>
+	<select id="yaft_start_hours">
 			<option>00</option>
 			<option>01</option>
 			<option>02</option>
@@ -294,7 +293,7 @@ ${yaft_forums_label}
 			<option>21</option>
 			<option>22</option>
 			<option>23</option>
-		</select> : <select id="yaft_start_minute_selector" name="startMinute">
+		</select> : <select id="yaft_start_minutes">
 						<option>00</option>
 						<option>15</option>
 						<option>30</option>
@@ -305,8 +304,8 @@ ${yaft_forums_label}
 <span>... and ...</span>
 <br />
 <br />
-<input id="yaft_end_date" type="text" name="endDate"/>
-	<select id="yaft_end_hour_selector" name="endHour">
+<input id="yaft_end_date" type="text"/>
+	<select id="yaft_end_hours">
 			<option>00</option>
 			<option>01</option>
 			<option>02</option>
@@ -331,7 +330,7 @@ ${yaft_forums_label}
 			<option>21</option>
 			<option>22</option>
 			<option>23</option>
-		</select> : <select id="yaft_end_minute_selector" name="endMinute">
+		</select> : <select id="yaft_end_minutes">
 						<option>00</option>
 						<option>15</option>
 						<option>30</option>
@@ -346,9 +345,6 @@ ${yaft_forums_label}
 		<input type="submit" value="${yaft_save_label}"/>
 		<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
 	
-		<input type="hidden" name="function" value="startDiscussion"/>
-		<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
-		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
 	</form>
 </div>
 -->
@@ -468,6 +464,7 @@ ${yaft_forums_label}
 							{elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
 							{elseif attachment.mimeType == 'text/html'}<img src="/library/image/silk/html.png" width="16" height="16" alt="${attachment.name}" />
 							{elseif attachment.mimeType.match(/^image/)}<img src="/library/image/silk/picture.png" width="16" height="16" alt="${attachment.name}" />
+							{elseif attachment.mimeType.match(/^audio/)}<img src="/library/image/silk/sound.png" width="16" height="16" alt="${attachment.name}" />
 							{else}<img src="/library/image/silk/error.png" width="16" height="16" alt="${attachment.name}" />
 							{/if}
 							</a>
@@ -543,11 +540,11 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_edit_forum_content_template" style="display:none;"><!--
-<form id="yaft_edit_forum_form" action="/portal/tool/${yaftPlacementId}" method="POST">
-<input type="hidden" name="id" value="${id}"/>
+<form>
+<input id="yaft_id_field" type="hidden" name="id" value="${id}"/>
 <table>
 <tr><td>${yaft_forum_title_label}: *</td><td><input id="yaft_title_field" type="text" name="title" value="${title}"/></td></tr>
-<tr><td>${yaft_description_label}</td><td><input type="text" name="description" value="${description}"/></td></tr>
+<tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" value="${description}"/></td></tr>
 </table>
 <br />
 <a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
@@ -559,11 +556,13 @@ ${yaft_forums_label}
 <input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>Lock for reading
 <br />
 <br />
+<input type="hidden" name="startDateMillis" id="yaft_start_date_millis"/>
+<input type="hidden" name="endDateMillis" id="yaft_end_date_millis"/>
 <span>Except between ...</span>
 <br />
 <br />
 <input id="yaft_start_date" type="text" name="startDate"/>
-	<select id="yaft_start_hour_selector" name="startHour">
+	<select id="yaft_start_hours" name="startHour">
 			<option>00</option>
 			<option>01</option>
 			<option>02</option>
@@ -588,7 +587,7 @@ ${yaft_forums_label}
 			<option>21</option>
 			<option>22</option>
 			<option>23</option>
-		</select> : <select id="yaft_start_minute_selector" name="startMinute">
+		</select> : <select id="yaft_start_minutes" name="startMinute">
 						<option>00</option>
 						<option>15</option>
 						<option>30</option>
@@ -600,7 +599,7 @@ ${yaft_forums_label}
 <br />
 <br />
 <input id="yaft_end_date" type="text" name="endDate"/>
-	<select id="yaft_end_hour_selector" name="endHour">
+	<select id="yaft_end_hours" name="endHour">
 			<option>00</option>
 			<option>01</option>
 			<option>02</option>
@@ -625,7 +624,7 @@ ${yaft_forums_label}
 			<option>21</option>
 			<option>22</option>
 			<option>23</option>
-		</select> : <select id="yaft_end_minute_selector" name="endMinute">
+		</select> : <select id="yaft_end_minutes" name="endMinute">
 						<option>00</option>
 						<option>15</option>
 						<option>30</option>
@@ -637,10 +636,8 @@ ${yaft_forums_label}
 </fieldset>
 <br />
 <br />
-<input type="submit" value="${yaft_save_label}"/>
+<input type="button" id="yaft_forum_save_button" value="${yaft_save_label}"/>
 <input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
-<input type="hidden" name="function" value="createForum"/>
-<input type="hidden" name="yaftPlacementId" value="${yaftPlacementId}"/>
 </form>
 -->
 </div>
@@ -707,7 +704,7 @@ ${yaft_forums_label}
 </div>
 <br />
 <div id="yaft_reply_container">
-	<form id="main_form" onSubmit="return YaftUtils.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
+	<form id="yaft_message_form" onSubmit="return YaftUtils.validateMessageSubmission('${escape(subject)}');" action="/direct/yaft-message/new" method="POST">
 	<h4>${yaft_type_your_message_label}</h4>
 	<br />
 	<span>${yaft_subject_label}:</span>
@@ -717,7 +714,7 @@ ${yaft_forums_label}
 	<br />
 	<span>${yaft_message_label}</span>
 	<br />
-	<textarea name="content" id="fck" cols="100" rows="5"></textarea>
+	<textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
 	<br />
 	<br />
 	
@@ -728,6 +725,7 @@ ${yaft_forums_label}
 
 	<input type="hidden" name="function" value="createMessage"/>
 	<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
+	<input type="hidden" name="siteId" value="${yaftSiteId}"/>
 	<input type="hidden" name="discussionId" value="${yaftCurrentDiscussion.id}"/>
 	<input type="hidden" name="messageBeingRepliedTo" value="${id}"/>
     <input type="hidden" name="viewMode" value="${yaftViewMode}"/>
@@ -744,7 +742,7 @@ ${yaft_forums_label}
 
 <div id="yaft_edit_message_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
-    <form id="main_form" action="/portal/tool/${yaftPlacementId}" method="POST" enctype="multipart/form-data">
+	<form id="yaft_message_form" method="POST" action="/direct/yaft-message/new">
     <h4>Type your message</h4>
     <br />
     <span>Subject:</span>
@@ -754,7 +752,7 @@ ${yaft_forums_label}
     <br />
     <span>Message</span>
     <br />
-    <textarea name="content" id="fck" cols="100" rows="5">${content}</textarea>
+	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
     <br />
     <br />
     <span id="current_attachments_label">${yaft_current_attachments_label}</span>
@@ -779,8 +777,8 @@ ${yaft_forums_label}
     <input type="submit" value="${yaft_save_label}"/>
     <input type="button" value="${yaft_cancel_label}" onclick="return switchState('${yaftViewMode}',{'messageId':'${id}'})"/>
 
-    <input type="hidden" name="function" value="createMessage"/>
     <input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
+	<input type="hidden" name="siteId" value="${yaftSiteId}"/>
     <input type="hidden" name="discussionId" value="${yaftCurrentDiscussion.id}"/>
     <input type="hidden" name="messageId" value="${id}"/>
     <input type="hidden" name="viewMode" value="${yaftViewMode}"/>

@@ -8,7 +8,14 @@
 	</bean>
 	
 	<bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" 
-		class="org.sakaiproject.yaft.tool.entityprovider.YaftDiscussionEntityProvider">
+		class="org.sakaiproject.yaft.tool.entityprovider.YaftDiscussionEntityProvider"
+    	init-method="init">
+		<property name="yaftForumService"><ref bean="org.sakaiproject.yaft.api.YaftForumService"/></property>
+	</bean>
+	
+	<bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" 
+		class="org.sakaiproject.yaft.tool.entityprovider.YaftMessageEntityProvider"
+    	init-method="init">
 		<property name="yaftForumService"><ref bean="org.sakaiproject.yaft.api.YaftForumService"/></property>
 	</bean>
 </beans>

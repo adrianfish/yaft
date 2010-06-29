@@ -1,6 +1,10 @@
 package org.sakaiproject.yaft.tool.entityprovider;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +20,9 @@ import org.sakaiproject.entitybroker.entityprovider.annotations.EntityCustomActi
 import org.sakaiproject.entitybroker.entityprovider.capabilities.ActionsExecutable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.CollectionResolvable;
+import org.sakaiproject.entitybroker.entityprovider.capabilities.Createable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Describeable;
+import org.sakaiproject.entitybroker.entityprovider.capabilities.Inputable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Outputable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Resolvable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Statisticable;
@@ -33,7 +39,7 @@ import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.impl.SakaiProxyImpl;
 
-public class YaftForumEntityProvider extends AbstractEntityProvider implements Resolvable, CoreEntityProvider, AutoRegisterEntityProvider, Outputable, Describeable, ActionsExecutable,Statisticable,CollectionResolvable
+public class YaftForumEntityProvider extends AbstractEntityProvider implements Resolvable, CoreEntityProvider, Createable, Inputable, AutoRegisterEntityProvider, Outputable, Describeable, ActionsExecutable,Statisticable,CollectionResolvable
 {
 	protected final Logger LOG = Logger.getLogger(getClass());
 	
@@ -166,6 +172,83 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 
 		return fora;
 	}
+	
+	public String createEntity(EntityReference ref, Object entity, Map<String, Object> params)
+	{
+		String siteId = (String) params.get("siteId");
+		String id = (String) params.get("id");
+		String title = (String) params.get("title");
+		String description = (String) params.get("description");
+		String startDate= (String) params.get("startDate");
+		String endDate= (String) params.get("endDate");
+		String lockWritingString = (String) params.get("lockWriting");
+		String lockReadingString = (String) params.get("lockReading");
+		
+		boolean lockWriting = true;
+		boolean lockReading = true;
+		
+		if(lockWritingString != null)
+			lockWriting = lockWritingString.equals("true");
+		else
+			lockWriting = false;
+		
+		if(lockReadingString != null)
+			lockReading = lockReadingString.equals("true");
+		else
+			lockReading = false;
+		
+		if (LOG.isDebugEnabled())
+		{
+			LOG.debug("Title: " + title);
+			LOG.debug("Description: " + description);
+		}
+		
+		if(title == null || title.length() <= 4)
+			throw new IllegalArgumentException("A title of at least 4 characters must be supplied");
+		
+		Forum forum = new Forum();
+		
+		if(id != null)
+			forum.setId(id);
+		
+		forum.setTitle(title);
+		forum.setDescription(description);
+		forum.setSiteId(siteId);
+		forum.setCreatorId(developerHelperService.getCurrentUserId());
+		forum.setLockedForWriting(lockWriting);
+		forum.setLockedForReading(lockReading);
+		
+		if(startDate != null && startDate.length() > 0
+				&& endDate != null && endDate.length() > 0)
+		{
+			try
+			{
+				long start = Long.parseLong(startDate);
+				long end = Long.parseLong(endDate);
+				if(start > 0L && end > 0L)
+				{
+					if(end <= start)
+					{
+						throw new IllegalArgumentException("The end date MUST come after the start date.");
+					}
+					else
+					{
+						forum.setStart(start);
+						forum.setEnd(end);
+					}
+				}
+			}
+			catch(NumberFormatException pe)
+			{
+				throw new IllegalArgumentException("The start and end dates MUST be supplied in millisecond format.");
+			}
+		}
+
+		if(yaftForumService.addOrUpdateForum(forum))
+			return forum.getId();
+		else
+			throw new EntityException("Failed to add or update forum. Returning INTERNAl SERVER ERROR ...",id);
+	}
 
 	public Object getSampleEntity()
 	{
@@ -181,6 +264,12 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 	{
 		return new String[] { Formats.JSON };
 	}
+	
+	public String[] getHandledInputFormats()
+	{
+		return new String[] { Formats.HTML, Formats.JSON, Formats.FORM };
+	}
+
 	
 	@EntityCustomAction(action = "readMessages", viewKey = EntityView.VIEW_SHOW)
 	public Object handleReadMessages(EntityReference ref,Map<String,Object> params)
@@ -284,4 +373,5 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 		}
 		return localeEventNames;
 	}
+
 }

@@ -2,13 +2,13 @@ package org.sakaiproject.yaft.api;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.sakaiproject.api.app.profile.Profile;
+import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.EntityProducer;
-import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.user.api.User;
@@ -45,11 +45,9 @@ public interface SakaiProxy
 	
 	public boolean removeCalendarEntry(String title,String description);
 	
-	public void sendEmail(List<String> userIds, String emailTemplateKey, Map<String,String> replacementValues);
+	public void sendEmail(final String userId, final String subject, String message);
 
 	public User getCurrentUser();
-	
-	public Set<String> getSiteUsers();
 
 	public String getPortalUrl();
 	
@@ -58,12 +56,16 @@ public interface SakaiProxy
 	public String getCurrentPageId();
 
 	public String getCurrentToolId();
+	
+	public String getYaftPageId(String siteId);
+	
+	public String getYaftToolId(String siteId);
 
-	public String getDirectUrl(String string);
+	public String getDirectUrl(String siteId, String string);
 	
-	public String saveFile(String creatorId,String name,String mimeType, byte[] fileData) throws Exception;
+	public String saveFile(String siteId, String creatorId,String name,String mimeType, byte[] fileData) throws Exception;
 	
-	public void getAttachment(Attachment attachment);
+	public void getAttachment(String siteId, Attachment attachment);
 
 	public void deleteFile(String resourceId) throws Exception;
 
@@ -82,4 +84,10 @@ public interface SakaiProxy
 	public byte[] getResourceBytes(String resourceId);
 
 	public void addDigestMessage(String user,String subject, String body);
+
+	public Site getSite(String siteId);
+
+	public List<User> getUsers(Collection<String> userIds);
+
+	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String reference, Map<String, String> replacementValues);
 }

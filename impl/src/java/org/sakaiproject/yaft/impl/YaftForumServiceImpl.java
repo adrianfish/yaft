@@ -9,12 +9,15 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
+import org.sakaiproject.user.api.Preferences;
+import org.sakaiproject.user.api.User;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
@@ -33,18 +36,20 @@ import org.w3c.dom.NodeList;
 public class YaftForumServiceImpl implements YaftForumService
 {
 	private Logger logger = Logger.getLogger(YaftForumServiceImpl.class);
-	
+
 	private SakaiProxy sakaiProxy = null;
+
 	private YaftPersistenceManager persistenceManager = null;
-	
+
 	private boolean useSynopticFunctionality = true;
-	
+
 	public void init()
 	{
-		if(logger.isDebugEnabled()) logger.debug("init()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("init()");
+
 		sakaiProxy = new SakaiProxyImpl();
-		
+
 		logger.info("Registering Yaft functions ...");
 
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
@@ -60,133 +65,142 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_READ);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
-		
+
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
 		persistenceManager.init();
 		persistenceManager.setupTables();
 		persistenceManager.setUseSynopticFunctionality(useSynopticFunctionality);
-		
+
 		sakaiProxy.registerEntityProducer(this);
 	}
-	
-	public Forum getForum(String forumId,String state)
+
+	public Forum getForum(String forumId, String state)
 	{
-		if(logger.isDebugEnabled()) logger.debug("getForum()");
-		
-		return persistenceManager.getForum(forumId,state);
-	}
-	
-	public Discussion getDiscussion(String discussionId,boolean fully)
-	{
-		if(logger.isDebugEnabled()) logger.debug("getDiscussion()");
-		
-		return persistenceManager.getDiscussion(discussionId,fully);
+		if (logger.isDebugEnabled())
+			logger.debug("getForum()");
+
+		return persistenceManager.getForum(forumId, state);
 	}
 
-	public List<Forum> getSiteForums(String siteId,boolean fully)
+	public Discussion getDiscussion(String discussionId, boolean fully)
 	{
-		if(logger.isDebugEnabled()) logger.debug("getSiteForums()");
-		return persistenceManager.getFora(siteId,fully);
+		if (logger.isDebugEnabled())
+			logger.debug("getDiscussion()");
+
+		return persistenceManager.getDiscussion(discussionId, fully);
 	}
-	
+
+	public List<Forum> getSiteForums(String siteId, boolean fully)
+	{
+		if (logger.isDebugEnabled())
+			logger.debug("getSiteForums()");
+		return persistenceManager.getFora(siteId, fully);
+	}
+
 	public boolean addOrUpdateForum(Forum forum)
 	{
-		if(logger.isDebugEnabled()) logger.debug("addOrUpdateForum()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("addOrUpdateForum()");
+
 		// Every forum needs a title
-		if(forum.getTitle() == null || forum.getTitle().length() <= 0)
+		if (forum.getTitle() == null || forum.getTitle().length() <= 0)
 			return false;
-		
+
 		boolean creating = (forum.getId().length() == 0);
-		
+
 		boolean succeeded = persistenceManager.addOrUpdateForum(forum);
-		
-		if(succeeded && creating)
+
+		if (succeeded && creating)
 		{
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forum.getId();
-			sakaiProxy.postEvent(YAFT_FORUM_CREATED,reference,true);
+			sakaiProxy.postEvent(YAFT_FORUM_CREATED, reference, true);
 		}
-		
+
 		return succeeded;
 	}
-	
+
 	public SakaiProxy getSakaiProxy()
 	{
 		return sakaiProxy;
 	}
 
-	public boolean addOrUpdateMessage(String forumId,Message message,boolean sendMail)
+	public boolean addOrUpdateMessage(String siteId, String forumId, Message message, boolean sendMail)
 	{
-		if(logger.isDebugEnabled()) logger.debug("addOrUpdateMessage()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("addOrUpdateMessage()");
+
 		String discussionId = message.getDiscussionId();
-		
-		if(!persistenceManager.addOrUpdateMessage(forumId,message))
+
+		if (!persistenceManager.addOrUpdateMessage(siteId, forumId, message))
 			return false;
-		
-		//persistenceManager.markMessageRead(message.getId(), forumId, message.getDiscussionId());
-		
-		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/messages/" + message.getId();
-		
-		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED,reference,true);
-		
-		if(sendMail && "READY".equals(message.getStatus()))
-			sendEmail(message,false);
-		
+
+		// persistenceManager.markMessageRead(message.getId(), forumId, message.getDiscussionId());
+
+		String reference = YaftForumService.REFERENCE_ROOT + "/" + siteId + "/messages/" + message.getId();
+
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, reference, true);
+
+		if (sendMail && "READY".equals(message.getStatus()))
+			sendEmail(siteId, message, false);
+
 		return true;
 	}
-	
-	public Discussion addDiscussion(String forumId,Discussion discussion,boolean sendMail)
+
+	public Discussion addDiscussion(String siteId, String forumId, Discussion discussion, boolean sendMail)
 	{
-		if(logger.isDebugEnabled()) logger.debug("addDiscussion()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("addDiscussion()");
+
 		Message message = discussion.getFirstMessage();
-		
+
 		// Get this before calling addDiscussion as it will get set by it.
 		String id = discussion.getId();
-		
-		persistenceManager.addDiscussion(forumId,discussion);
-		
-		if(id.length() == 0)
+
+		persistenceManager.addDiscussion(siteId, forumId, discussion);
+
+		if (id.length() == 0)
 		{
 			// From the empty id we know this is a new discussion
-			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + message.getId();
-			sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED,reference,true);
+			String reference = YaftForumService.REFERENCE_ROOT + "/" + siteId + "/discussions/" + message.getId();
+			sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, reference, true);
 		}
-		
-		if(sendMail)
-			sendEmail(message,true);
-		
+
+		if (sendMail)
+			sendEmail(siteId, message, true);
+
 		return discussion;
 	}
-	
+
 	public List<Forum> getFora(boolean fully)
 	{
-		if(logger.isDebugEnabled()) logger.debug("getFora()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("getFora()");
+
 		List<Forum> fora = persistenceManager.getFora();
-		
-		for(Forum forum : fora)
+
+		for (Forum forum : fora)
 		{
 			forum.setDiscussions(getForumDiscussions(forum.getId(), fully));
-			//forum.setUrl(sakaiProxy.getDirectUrl("/forums/" + forum.getId()));
+			// forum.setUrl(sakaiProxy.getDirectUrl("/forums/" + forum.getId()));
 		}
-		
+
 		return fora;
 	}
 
-	public List<Discussion> getForumDiscussions(String forumId,boolean fully)
+	public List<Discussion> getForumDiscussions(String forumId, boolean fully)
 	{
-		if(logger.isDebugEnabled()) logger.debug("getForumDiscussions(" + forumId + ")");
-		
-		return persistenceManager.getForumDiscussions(forumId,fully);
+		if (logger.isDebugEnabled())
+			logger.debug("getForumDiscussions(" + forumId + ")");
+
+		return persistenceManager.getForumDiscussions(forumId, fully);
 	}
 
 	public List<Message> getMessages()
 	{
-		if(logger.isDebugEnabled()) logger.debug("getMessages()");
-		
+		if (logger.isDebugEnabled())
+			logger.debug("getMessages()");
+
 		return persistenceManager.getMessages();
 	}
 
@@ -194,82 +208,82 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		persistenceManager.deleteForum(forumId);
 		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forumId;
-		sakaiProxy.postEvent(YAFT_FORUM_DELETED,reference,true);
+		sakaiProxy.postEvent(YAFT_FORUM_DELETED, reference, true);
 	}
 
 	public boolean deleteDiscussion(String discussionId)
 	{
 		try
 		{
-			Discussion discussion = getDiscussion(discussionId,false);
-		
-			if(persistenceManager.deleteDiscussion(discussionId))
+			Discussion discussion = getDiscussion(discussionId, false);
+
+			if (persistenceManager.deleteDiscussion(discussionId))
 			{
 				sakaiProxy.removeCalendarEntry("Start of '" + discussion.getSubject() + "'", "Start of '" + discussion.getSubject() + "' Discussion (Click to launch)");
 				sakaiProxy.removeCalendarEntry("End of '" + discussion.getSubject() + "'", "End of '" + discussion.getSubject() + "' Discussion");
-			
+
 				String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
-				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED,reference,true);
-				
+				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED, reference, true);
+
 				return true;
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			logger.error("Failed to delete discussion.",e);
+			logger.error("Failed to delete discussion.", e);
 		}
-		
+
 		return false;
 	}
-	
-	public void deleteMessage(Message message,String forumId)
+
+	public void deleteMessage(Message message, String forumId)
 	{
-		persistenceManager.deleteMessage(message,forumId);
+		persistenceManager.deleteMessage(message, forumId);
 		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/messages/" + message.getId();
-		sakaiProxy.postEvent(YAFT_MESSAGE_DELETED,reference,true);
+		sakaiProxy.postEvent(YAFT_MESSAGE_DELETED, reference, true);
 	}
-	
-	public void undeleteMessage(Message message,String forumId)
+
+	public void undeleteMessage(Message message, String forumId)
 	{
-		persistenceManager.undeleteMessage(message,forumId);
+		persistenceManager.undeleteMessage(message, forumId);
 	}
 
 	public void unsubscribeFromDiscussion(String userId, String discussionId)
 	{
-		if(userId == null)
+		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
-		
-		persistenceManager.unsubscribeFromDiscussion(userId,discussionId);
+
+		persistenceManager.unsubscribeFromDiscussion(userId, discussionId);
 	}
-	
+
 	public List<String> getDiscussionUnsubscriptions(String userId)
 	{
-		if(userId == null)
+		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
-		
+
 		return persistenceManager.getDiscussionUnsubscriptions(userId);
 	}
 
 	public void subscribeToDiscussion(String userId, String discussionId)
 	{
-		if(userId == null)
+		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
-		
-		persistenceManager.subscribeToDiscussion(userId,discussionId);
+
+		persistenceManager.subscribeToDiscussion(userId, discussionId);
 	}
-	
+
 	public void subscribeToForum(String forumId)
 	{
 		String userId = sakaiProxy.getCurrentUser().getId();
-		
-		persistenceManager.subscribeToForum(userId,forumId);
+
+		persistenceManager.subscribeToForum(userId, forumId);
 	}
-	
+
 	public void unsubscribeFromForum(String forumId)
 	{
 		String userId = sakaiProxy.getCurrentUser().getId();
-		
-		persistenceManager.unsubscribeFromForum(userId,forumId);
+
+		persistenceManager.unsubscribeFromForum(userId, forumId);
 	}
 
 	public void showMessage(Message message)
@@ -279,7 +293,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public void deleteAttachment(String attachmentId, String messageId)
 	{
-		persistenceManager.deleteAttachment(attachmentId,messageId);
+		persistenceManager.deleteAttachment(attachmentId, messageId);
 	}
 
 	public Message getMessage(String messageId)
@@ -292,19 +306,19 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getForumContainingMessage(messageId);
 	}
 
-	public boolean markMessageRead(String messageId,String forumId,String discussionId)
+	public boolean markMessageRead(String messageId, String forumId, String discussionId)
 	{
-		return persistenceManager.markMessageRead(messageId,forumId,discussionId);
+		return persistenceManager.markMessageRead(messageId, forumId, discussionId);
 	}
 
-	public boolean markMessageUnRead(String messageId, String forumId,String discussionId)
+	public boolean markMessageUnRead(String messageId, String forumId, String discussionId)
 	{
-		return persistenceManager.markMessageUnRead(messageId,forumId,discussionId);
+		return persistenceManager.markMessageUnRead(messageId, forumId, discussionId);
 	}
-	
-	public boolean markDiscussionRead(String discussionId,String forumId)
+
+	public boolean markDiscussionRead(String discussionId, String forumId)
 	{
-		return persistenceManager.markDiscussionRead(discussionId,forumId);
+		return persistenceManager.markDiscussionRead(discussionId, forumId);
 	}
 
 	public List<String> getReadMessageIds(String discussionId)
@@ -312,70 +326,111 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getReadMessageIds(discussionId);
 	}
 
-	public void moveDiscussion(String discussionId, String currentForumId,String newForumId)
+	public void moveDiscussion(String discussionId, String currentForumId, String newForumId)
 	{
-		persistenceManager.moveDiscussion(discussionId,currentForumId,newForumId);
-	}
-	
-	private void sendEmail(Message message,boolean newDiscussion)
-	{
-			try
-			{
-				Site site = sakaiProxy.getCurrentSite();
-		
-				String siteTitle = "";
-		
-				if(site != null) siteTitle = site.getTitle();
-				
-				Set<String> users = sakaiProxy.getSiteUsers();
-		
-				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
-				
-				for(String excludedId : unsubscribers)
-					users.remove(excludedId);
-			
-				String url = sakaiProxy.getDirectUrl("/messages/" + message.getId());
-				
-				Map<String,String> replacementValues = new HashMap<String,String>();
-				
-				String templateKey = "yaft.newMessageNew";
-				if(newDiscussion)
-				{
-					templateKey = "yaft.newDiscussion";
-					replacementValues.put("siteTitle", siteTitle);
-					replacementValues.put("forumMessage", "Forum Message");
-					replacementValues.put("discussionSubject", message.getSubject());
-					replacementValues.put("creator", message.getCreatorDisplayName());
-					replacementValues.put("url", url);
-					replacementValues.put("messageContent", message.getContent());
-				}
-				else
-				{
-					templateKey = "yaft.newMessage";
-					replacementValues.put("siteTitle", siteTitle);
-					replacementValues.put("forumMessage", "Forum Message");
-					replacementValues.put("messageSubject", message.getSubject());
-					replacementValues.put("creator", message.getCreatorDisplayName());
-					replacementValues.put("url", url);
-					replacementValues.put("messageContent", message.getContent());
-				}
-				
-				sakaiProxy.sendEmail(new ArrayList<String>(users), templateKey, replacementValues);
-			}
-			catch(Exception e)
-			{
-				logger.error("Failed to send message email.",e);
-			}
-		
+		persistenceManager.moveDiscussion(discussionId, currentForumId, newForumId);
 	}
 
-	public void publishMessage(String forumId,Message message)
+	private void sendEmail(String siteId, Message message, boolean newDiscussion)
 	{
-		persistenceManager.publishMessage(forumId,message.getId());
-		
-		sendEmail(message,false);
+		try
+		{
+			Site site = null;
+
+			if (siteId == null)
+				site = sakaiProxy.getCurrentSite();
+			else
+				site = sakaiProxy.getSite(siteId);
+
+			String siteTitle = "";
+
+			if (site != null)
+				siteTitle = site.getTitle();
+
+			Set<String> users = site.getUsers();
+
+			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
+
+			for (String excludedId : unsubscribers)
+				users.remove(excludedId);
+
+			String url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId());
+
+			Map<String, String> replacementValues = new HashMap<String, String>();
+
+			String templateKey = "yaft.newMessageNew";
+			if (newDiscussion)
+			{
+				templateKey = "yaft.newDiscussion";
+				replacementValues.put("siteTitle", siteTitle);
+				replacementValues.put("forumMessage", "Forum Message");
+				replacementValues.put("discussionSubject", message.getSubject());
+				replacementValues.put("creator", message.getCreatorDisplayName());
+				replacementValues.put("url", url);
+				replacementValues.put("messageContent", message.getContent());
+			}
+			else
+			{
+				templateKey = "yaft.newMessage";
+				replacementValues.put("siteTitle", siteTitle);
+				replacementValues.put("forumMessage", "Forum Message");
+				replacementValues.put("messageSubject", message.getSubject());
+				replacementValues.put("creator", message.getCreatorDisplayName());
+				replacementValues.put("url", url);
+				replacementValues.put("messageContent", message.getContent());
+			}
+
+			RenderedTemplate template = null;
+
+			List<User> sakaiUsers = sakaiProxy.getUsers(users);
+
+			// get the rendered template for each user
+			for (User user : sakaiUsers)
+			{
+				YaftPreferences prefs = persistenceManager.getPreferencesForUser(user.getId(), siteId);
+
+				String emailPref = prefs.getEmail();
+
+				if (YaftPreferences.NEVER.equals(emailPref))
+					continue;
+
+				if (logger.isInfoEnabled())
+					logger.info("SakaiProxy.sendEmail() attempting to send email to: " + user.getId());
+
+				try
+				{
+					template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
+					if (template == null)
+					{
+						logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
+						return; // no template
+					}
+				}
+				catch (Exception e)
+				{
+					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + templateKey + " : " + e.getClass() + " : " + e.getMessage());
+					continue; // try next user
+				}
+
+				if (emailPref.equals(YaftPreferences.EACH))
+					sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
+				else if (emailPref.equals(YaftPreferences.DIGEST))
+					sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to send message email.", e);
+		}
 	}
-	
+
+	public void publishMessage(String forumId, Message message)
+	{
+		persistenceManager.publishMessage(forumId, message.getId());
+
+		sendEmail(null, message, false);
+	}
+
 	/** START EntityProducer IMPLEMENTATION */
 
 	public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments)
@@ -400,7 +455,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			Element forums = doc.createElement("forums");
 			element.appendChild(forums);
 			stack.push(forums);
-			List<Forum> fora = getSiteForums(siteId,true);
+			List<Forum> fora = getSiteForums(siteId, true);
 			if (fora != null && fora.size() > 0)
 			{
 				for (Forum forum : fora)
@@ -430,19 +485,19 @@ public class YaftForumServiceImpl implements YaftForumService
 		// TODO Auto-generated method stub
 		String referenceString = reference.getReference();
 		String[] parts = referenceString.split(Entity.SEPARATOR);
-		
-		if(!parts[0].equals(REFERENCE_ROOT))
+
+		if (!parts[0].equals(REFERENCE_ROOT))
 			return null;
-		
+
 		String type = parts[1];
-		
+
 		String id = parts[2];
-		
-		if("messages".equals(type))
+
+		if ("messages".equals(type))
 		{
 			return getMessage(id);
 		}
-		
+
 		return null;
 	}
 
@@ -484,7 +539,7 @@ public class YaftForumServiceImpl implements YaftForumService
 	public String merge(String siteId, Element root, String archivePath, String fromSiteId, Map attachmentNames, Map userIdTrans, Set userListAllowImport)
 	{
 		logger.debug("merge(siteId:" + siteId + ",root tagName:" + root.getTagName() + ",archivePath:" + archivePath + ",fromSiteId:" + fromSiteId);
-		
+
 		StringBuilder results = new StringBuilder();
 
 		try
@@ -510,25 +565,25 @@ public class YaftForumServiceImpl implements YaftForumService
 				forum.setSiteId(siteId);
 
 				addOrUpdateForum(forum);
-				
+
 				NodeList discussionNodes = forumElement.getElementsByTagName(XmlDefs.DISCUSSION);
-				
-				for(int j = 0;j < discussionNodes.getLength();j++)
+
+				for (int j = 0; j < discussionNodes.getLength(); j++)
 				{
 					Node discussionNode = discussionNodes.item(j);
-					NodeList discussionChildNodes  = discussionNode.getChildNodes();
-					for(int k = 0;k<discussionChildNodes.getLength();k++)
+					NodeList discussionChildNodes = discussionNode.getChildNodes();
+					for (int k = 0; k < discussionChildNodes.getLength(); k++)
 					{
 						Node discussionChildNode = discussionChildNodes.item(k);
-						if(discussionChildNode.getNodeType() == Node.ELEMENT_NODE && XmlDefs.MESSAGES.equals(((Element)discussionChildNode).getTagName()))
+						if (discussionChildNode.getNodeType() == Node.ELEMENT_NODE && XmlDefs.MESSAGES.equals(((Element) discussionChildNode).getTagName()))
 						{
 							NodeList messageNodes = discussionChildNode.getChildNodes();
-							mergeDescendantMessages(siteId,forum.getId(),null,null,messageNodes,results);
+							mergeDescendantMessages(siteId, forum.getId(), null, null, messageNodes, results);
 							break;
 						}
 					}
 				}
-				
+
 				forumCount++;
 			}
 
@@ -541,39 +596,39 @@ public class YaftForumServiceImpl implements YaftForumService
 
 		return results.toString();
 	}
-	
-	private void mergeDescendantMessages(String siteId,String forumId,String discussionId,String parentId,NodeList messageNodes,StringBuilder results)
+
+	private void mergeDescendantMessages(String siteId, String forumId, String discussionId, String parentId, NodeList messageNodes, StringBuilder results)
 	{
-		for(int i = 0;i<messageNodes.getLength();i++)
+		for (int i = 0; i < messageNodes.getLength(); i++)
 		{
 			Node node = messageNodes.item(i);
-			
-			if(node.getNodeType() != Node.ELEMENT_NODE)
+
+			if (node.getNodeType() != Node.ELEMENT_NODE)
 				continue;
-			
+
 			Element messageElement = (Element) node;
-			
-			if(!"message".equals(messageElement.getTagName()))
+
+			if (!"message".equals(messageElement.getTagName()))
 				continue;
-			
+
 			Message message = new Message();
 			message.fromXml(messageElement);
 			message.setParent(parentId);
 			message.setSiteId(siteId);
-			
-			if(parentId == null)
+
+			if (parentId == null)
 				discussionId = message.getId();
-			
+
 			message.setDiscussionId(discussionId);
-			
-			addOrUpdateMessage(forumId, message, false);
-			
+
+			addOrUpdateMessage(siteId, forumId, message, false);
+
 			NodeList repliesNodes = messageElement.getElementsByTagName(XmlDefs.REPLIES);
-			if(repliesNodes.getLength() >= 1)
+			if (repliesNodes.getLength() >= 1)
 			{
 				Node repliesNode = repliesNodes.item(0);
 				NodeList replyMessageNodes = repliesNode.getChildNodes();
-				mergeDescendantMessages(siteId,forumId, discussionId,message.getId(), replyMessageNodes,results);
+				mergeDescendantMessages(siteId, forumId, discussionId, message.getId(), replyMessageNodes, results);
 			}
 		}
 	}
@@ -581,20 +636,20 @@ public class YaftForumServiceImpl implements YaftForumService
 	public boolean parseEntityReference(String referenceString, Reference reference)
 	{
 		String[] parts = referenceString.split(Entity.SEPARATOR);
-		
-		if(!parts[0].equals(REFERENCE_ROOT))
+
+		if (!parts[0].equals(REFERENCE_ROOT))
 			return false;
-		
+
 		String type = parts[1];
-		
+
 		String id = parts[2];
-		
-		if("messages".equals(type))
+
+		if ("messages".equals(type))
 		{
-			//Message message = getMessage(id);
+			// Message message = getMessage(id);
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -602,29 +657,29 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		return true;
 	}
-	
+
 	/** END EntityProducer IMPLEMENTATION */
 
-	public Map<String,Integer> getReadMessageCountForAllFora()
+	public Map<String, Integer> getReadMessageCountForAllFora()
 	{
 		return persistenceManager.getReadMessageCountForAllFora(sakaiProxy.getCurrentUser().getId());
 	}
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId)
 	{
-		return persistenceManager.getReadMessageCountForForum(sakaiProxy.getCurrentUser().getId(),forumId);
+		return persistenceManager.getReadMessageCountForForum(sakaiProxy.getCurrentUser().getId(), forumId);
 	}
 
-	public Forum getForumForTitle(String title,String state,String siteId)
+	public Forum getForumForTitle(String title, String state, String siteId)
 	{
-		return persistenceManager.getForumForTitle(title,state,siteId);
+		return persistenceManager.getForumForTitle(title, state, siteId);
 	}
 
 	public List<String> getForumUnsubscriptions(String userId)
 	{
-		if(userId == null)
+		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
-		
+
 		return persistenceManager.getForumUnsubscriptions(userId);
 	}
 
@@ -632,10 +687,10 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		return persistenceManager.savePreferences(preferences);
 	}
-	
-	public YaftPreferences getPreferencesForUser(String user,String siteId)
+
+	public YaftPreferences getPreferencesForUser(String user, String siteId)
 	{
-		return persistenceManager.getPreferencesForUser(user,siteId);
+		return persistenceManager.getPreferencesForUser(user, siteId);
 	}
 
 	public YaftPreferences getPreferencesForCurrentUserAndSite()

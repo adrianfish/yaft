@@ -4,6 +4,104 @@ var YaftUtils;
 	if(YaftUtils == null)
 		YaftUtils = new Object();
 		
+	YaftUtils.saveForum = function() {
+	
+		var title = $('#yaft_title_field').val();
+		
+		if(title === '') {
+			var message = $('#yaft_message');
+			message.html(yaft_missing_title_message);
+			message.show();
+			return;
+		}
+
+		var startDate = (+$('#yaft_start_date_millis').val());
+		var startHours = (+$('#yaft_start_hours').val());
+		var startMinutes = (+$('#yaft_start_minutes').val());
+		startDate += (startHours * 3600000) + (startMinutes * 60000);
+
+		var endDate = (+$('#yaft_end_date_millis').val());
+		var endHours = (+$('#yaft_end_hours').val());
+		var endMinutes = (+$('#yaft_end_minutes').val());
+		endDate += (endHours * 3600000) + (endMinutes * 60000);
+
+	   	var forum = {
+	   		'siteId':yaftSiteId,
+			'id':$('#yaft_id_field').val(),
+			'startDate':startDate,
+			'endDate':endDate,
+			'title':$('#yaft_title_field').val(),
+			'description':$('#yaft_description_field').val(),
+			'discussions': []
+		};
+	   		
+		jQuery.ajax( {
+	   		url : "/direct/yaft-forum/new.json",
+	   		dataType : "text",
+	   		type: 'POST',
+	   		'data': forum,
+	       	async : false,
+			cache: false,
+		   	success : function(id) {
+				if('' === forum.id) {
+					// New forum. Enter it.
+					yaftCurrentForum = forum;
+					switchState('forum');
+				}
+				else {
+					switchState('forums');
+				}
+			},
+			error : function(xmlHttpRequest,status,error) {
+				alert("Failed to save forum. Status: " + status + ". Error: " + error);
+			}
+	   	});
+	}
+	
+	YaftUtils.saveDiscussion = function() {
+	
+		var subject = $('#yaft_subject_field').val();
+
+		var startDate = (+$('#yaft_start_date_millis').val());
+		var startHours = (+$('#yaft_start_hours').val());
+		var startMinutes = (+$('#yaft_start_minutes').val());
+		startDate += (startHours * 3600000) + (startMinutes * 60000);
+
+		var endDate = (+$('#yaft_end_date_millis').val());
+		var endHours = (+$('#yaft_end_hours').val());
+		var endMinutes = (+$('#yaft_end_minutes').val());
+		endDate += (endHours * 3600000) + (endMinutes * 60000);
+
+	   	var discussion = {
+	   		'siteId':yaftSiteId,
+			'id':$('#yaft_id_field').val(),
+			'forumId':$('#yaft_forum_id_field').val(),
+			'startDate':startDate,
+			'endDate':endDate,
+			'subject':subject,
+			'content':FCKeditorAPI.GetInstance('yaft_discussion_editor').GetXHTML(true)
+		};
+	   		
+		jQuery.ajax( {
+	   		url : "/direct/yaft-forum/new.json",
+	   		dataType : "text",
+	   		type: 'POST',
+	   		'data': forum,
+	       	async : false,
+			cache: false,
+		   	success : function(id) {
+				if('' === forum.id) {
+					// New forum. Enter it.
+					yaftCurrentForum = forum;
+					switchState('forum');
+				}
+			},
+			error : function(xmlHttpRequest,status,error) {
+				alert("Failed to save forum. Status: " + status + ". Error: " + error);
+			}
+	   	});
+	}
+	
 	YaftUtils.showDeleted = function() {
 		$(".yaft_deleted_message").show();
 	  	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
@@ -365,6 +463,7 @@ var YaftUtils;
 					$('#' + message.id + '_link').hide();
 					$('#' + message.id).hide();
 				}
+
 				$(document).ready(function() {
 					YaftUtils.attachProfilePopup();
 			    });
@@ -698,10 +797,12 @@ var YaftUtils;
 			cache: false,
         	success : function(results) {
         		var hits = results["search_collection"];
+				/*
 				for(var i=0,j=hits.length;i<j;i++) {
 					var messageId = hits[i].id;
 					hits[i].url = "javascript: switchState('minimal',{messageId:'" + messageId + "'});";
 				}
+				*/
 				SakaiUtils.renderTrimpathTemplate('yaft_search_results_content_template',{'results':hits},'yaft_content');
 	 			$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
         	},
