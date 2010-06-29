@@ -545,7 +545,9 @@ function renderChildMessages(parent,skipDeleted) {
 function yaftShowMessage(messageId) {
 	var message = YaftUtils.findMessage(messageId);
 	$('.yaft_full_message').hide();
+	$('.yaft_message_minimised').show();
 	$('#' + message.id).show();
+	$('#' + message.id + '_link').hide();
    	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
 }
 
