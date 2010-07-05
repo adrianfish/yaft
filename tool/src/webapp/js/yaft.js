@@ -260,6 +260,7 @@ function switchState(state,arg) {
 
 		SakaiUtils.renderTrimpathTemplate('yaft_message_view_content_template',yaftCurrentDiscussion,'yaft_content');
 		SakaiUtils.renderTrimpathTemplate('yaft_message_template',yaftCurrentDiscussion.firstMessage,yaftCurrentDiscussion.firstMessage.id);
+		$('#' + yaftCurrentDiscussion.firstMessage.id + '_link').hide();
 		renderChildMessages(yaftCurrentDiscussion.firstMessage,true);
 		YaftUtils.attachProfilePopup();
 

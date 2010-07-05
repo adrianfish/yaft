@@ -113,7 +113,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 		if (succeeded && creating)
 		{
-			String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forum.getId();
+			String reference = YaftForumService.REFERENCE_ROOT + "/" + forum.getSiteId() + "/forums/" + forum.getId();
 			sakaiProxy.postEvent(YAFT_FORUM_CREATED, reference, true);
 		}
 
