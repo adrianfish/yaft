@@ -365,7 +365,7 @@ public class YaftForumEntityProvider extends AbstractEntityProvider implements R
 	public Map<String, String> getEventNames(Locale locale)
 	{
 		Map<String, String> localeEventNames = new HashMap<String, String>();
-		ResourceLoader msgs = new ResourceLoader("Events");
+		ResourceLoader msgs = new ResourceLoader("YaftEvents");
 		msgs.setContextLocale(locale);
 		for (int i = 0; i < EVENT_KEYS.length; i++)
 		{
