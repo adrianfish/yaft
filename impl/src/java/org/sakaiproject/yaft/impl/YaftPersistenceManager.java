@@ -687,7 +687,6 @@ public class YaftPersistenceManager
 		message.setCreatorId(creatorId);
 		message.setStatus(rs.getString(ColumnNames.STATUS));
 		message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(creatorId));
-		message.setCreatorBio(sakaiProxy.getUserBio(creatorId));
 		
 		String sql = sqlGenerator.getMessageAttachmentsSelectStatement(message.getId());
 		

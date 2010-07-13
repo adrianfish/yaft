@@ -36,7 +36,6 @@ public class Message implements Entity
 	private String url = "";
 	private String placementId = "";
 	private String siteId = "";
-	private String creatorBio = "";
 	
 	public Message()
 	{
@@ -165,16 +164,6 @@ public class Message implements Entity
 	public String getPlacementId()
 	{
 		return placementId;
-	}
-
-	public void setCreatorBio(String creatorBio)
-	{
-		this.creatorBio = creatorBio;
-	}
-
-	public String getCreatorBio()
-	{
-		return creatorBio;
 	}
 
 	public void setSiteId(String siteId)
