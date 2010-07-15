@@ -258,6 +258,10 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 			throw new IllegalArgumentException("Invalid path provided: expect to receive the discussion id");
 		
 		List<String> ids = yaftForumService.getReadMessageIds(discussionId);
+		
+		if(ids.size() == 0)
+			throw new EntityException("No read messages",ref.getReference(),HttpServletResponse.SC_NOT_FOUND);
+		
 		return ids;
 	}
 	

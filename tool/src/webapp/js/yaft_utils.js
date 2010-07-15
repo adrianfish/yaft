@@ -906,8 +906,11 @@ var YaftUtils;
 					readMessages.push(ids[i].data);
 				}
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
-				alert("Failed to get read messages. Reason: " + errorThrown);
+			error : function(xhr,textStatus,errorThrown) {
+				// 404 can be thrown when there are no read messages
+				if(404 != xhr.status) {
+					alert("Failed to get read messages. Reason: " + errorThrown);
+				}
 			}
 		});
 			
