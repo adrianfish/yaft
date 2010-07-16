@@ -2,10 +2,6 @@
 	padding-left: 25px;
 }
 
-.yaftEvenRow{
-	background-color: #FFFFC0;
-}
-
 #yaft_toolbar_items{
 	float: left;
 }
@@ -135,4 +131,9 @@ th.yaftSortableTableHeaderSortDown {
 	text-align: right;
 	margin: 0 5px 5px;
 	color: #900;
+}
+
+#yaft_content table td { padding: 3px; }
+#yaft_content table tr.odd td {
+	background-color: #FFFFC0;
 }

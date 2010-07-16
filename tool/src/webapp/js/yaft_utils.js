@@ -164,7 +164,6 @@ var YaftUtils;
 		SakaiUtils.renderTrimpathTemplate('yaft_forum_content_template',yaftCurrentForum,'yaft_content');
 			
 		$(document).ready(function() {
-			YaftUtils.applyBanding();
 			YaftUtils.attachProfilePopup();
 									
 			$("#yaft_discussion_table").tablesorter({
@@ -175,7 +174,8 @@ var YaftUtils;
 	 								{
 	 									4:{sorter: "isoDate"},
 	 									5:{sorter: false}
-	 								}
+	 								},
+	 							widgets: ['zebra']
 	 						});
 
 			setMainFrameHeight(window.frameElement.id);
@@ -194,30 +194,8 @@ var YaftUtils;
 			closePosition: 'top',
 			showTitle: false,
 			hoverIntent: true,
-			ajaxCache: false
+			ajaxSettings: {type: 'GET'}
 		});
-	}
-
-	YaftUtils.applyBanding = function() {
-		$("tr:even").attr('class', function(indexArray)
-									{
-										var clz = this.getAttribute('class');
-
-										if(clz == null)
-										{
-											var clzNode = this.attributes['class'];
-											if(clzNode)
-												clz = clzNode.nodeValue;
-										}
-
-										if(clz == null)
-											return 'yaftEvenRow';
-
-										if(clz.indexOf('yaftInvisible') != -1)
-											return clz;
-										else
-											return clz + ' yaftEvenRow';
-									} );
 	}
 	
 	YaftUtils.renderCurrentForums = function() {
@@ -233,10 +211,9 @@ var YaftUtils;
 	 				{
 	 					4: {sorter: "isoDate"},
 	 					5: {sorter: false}
-	 				}
+	 				},
+	 			widgets: ['zebra']
 	 		});
-
-			YaftUtils.applyBanding();
 	 	});
 	}
 	
