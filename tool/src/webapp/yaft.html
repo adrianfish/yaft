@@ -457,7 +457,7 @@ ${yaft_forums_label}
 						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
 						{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-						{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.doc$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
@@ -660,7 +660,7 @@ ${yaft_forums_label}
 					<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
 					{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-					{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.doc$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
+					{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
