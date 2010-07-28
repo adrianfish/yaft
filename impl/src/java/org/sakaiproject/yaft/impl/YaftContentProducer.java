@@ -387,7 +387,14 @@ public class YaftContentProducer implements EntityContentProducer
 		if("forums".equals(type))
 		{
 			Forum forum = forumService.getForum(id,ForumPopulatedStates.EMPTY);
-			return forum.getUrl();
+			
+			if(forum == null)
+			{
+				logger.error("No forum for id: " + id + ". Returning an empty url ...");
+				return "";
+			}
+			else
+				return forum.getUrl();
 		}
 		
 		return null;
