@@ -129,6 +129,12 @@ public class YaftMessageEntityProvider extends AbstractEntityProvider implements
 			LOG.debug("Message Being Replied To: " + messageBeingRepliedTo);
 		}
 		
+		if(subject == null || subject.length() <= 0)
+			throw new IllegalArgumentException("You must supply a subject.");
+		
+		if(content == null || content.length() <= 0)
+			throw new IllegalArgumentException("You must supply some content.");
+		
 		if(viewMode == null || viewMode.length() <= 0)
 			viewMode = "full";
 		
