@@ -533,7 +533,10 @@ function renderChildMessages(parent,skipDeleted) {
 		var message = children[i];
 
 		if(message.status !== 'DELETED' || !skipDeleted) {
-			SakaiUtils.renderTrimpathTemplate('yaft_message_template',message,message.id);
+			var element = document.getElementById(message.id);
+        	if(element) {
+            	SakaiUtils.renderTrimpathTemplate('yaft_message_template',message,message.id);
+            }
 		}
 
 		renderChildMessages(message,skipDeleted);
