@@ -419,6 +419,16 @@ function switchState(state,arg) {
 					endDate += (endHours * 3600000) + (endMinutes * 60000);
 					$('#yaft_end_date_millis').val(endDate);
 				},
+			beforeSubmit: function(arr, $form, options) {
+                    for(var i=0,j=arr.length;i<j;i++) {
+                    	if('subject' === arr[i].name) {
+                        	if(!arr[i].value || arr[i].value.length < 4) {
+                            	alert("You must supply a subject of at least 4 characters");
+                                return false;
+                            }
+                     	}
+                  	}
+            	},
    			success: function(responseText,statusText,xhr) {
 					var discussion = YaftUtils.getDiscussion(responseText);
 					yaftCurrentForum.discussions.push(discussion);
