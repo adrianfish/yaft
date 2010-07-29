@@ -140,6 +140,12 @@ public class YaftDiscussionEntityProvider extends AbstractEntityProvider impleme
 		String lockWritingString = (String) params.get("lockWriting");
 		String lockReadingString = (String) params.get("lockReading");
 		
+		if(subject == null || subject.length() <= 0)
+			throw new IllegalArgumentException("You must supply a subject.");
+		
+		if(content == null || content.length() <= 0)
+			throw new IllegalArgumentException("You must supply some content.");
+		
 		boolean lockWriting = true;
 		boolean lockReading = true;
 		
