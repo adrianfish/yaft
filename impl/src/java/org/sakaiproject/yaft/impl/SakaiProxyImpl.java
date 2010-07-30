@@ -407,7 +407,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				StringBuilder sb = new StringBuilder();
 				sb.append("From: ");
 				sb.append(serverConfigurationService.getString("ui.service", "Sakai"));
-				sb.append(" <sakai-forum@");
+				sb.append(" <no-reply@");
 				sb.append(serverConfigurationService.getServerName());
 				sb.append(">");
 				
