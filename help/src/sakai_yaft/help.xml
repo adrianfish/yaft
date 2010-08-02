@@ -2,32 +2,29 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-   <bean id="yaftOverview" class="org.sakaiproject.component.app.help.model.ResourceBean">
-      <property name="docId"><value>overview</value></property>
+   <bean id="yaft_overview" class="org.sakaiproject.component.app.help.model.ResourceBean">
+      <property name="docId"><value>yaft_overview</value></property>
       <property name="name"><value>YAFT Overview</value></property>
       <property name="location"><value>/sakai_yaft/overview.html</value></property>
       <property name="defaultForTool"><value>sakai.yaft</value></property>
    </bean>
 
-   <bean id="yaftPermissions" class="org.sakaiproject.component.app.help.model.ResourceBean">
-      <property name="docId"><value>permissions</value></property>
+   <bean id="yaft_permissions" class="org.sakaiproject.component.app.help.model.ResourceBean">
+      <property name="docId"><value>yaft_permissions</value></property>
       <property name="name"><value>YAFT Permissions</value></property>
       <property name="location"><value>/sakai_yaft/permissions.html</value></property>
-      <property name="defaultForTool"><value>sakai.yaft</value></property>
    </bean>
 
-   <bean id="yaftPebbleTrail" class="org.sakaiproject.component.app.help.model.ResourceBean">
-      <property name="docId"><value>pebble</value></property>
+   <bean id="yaft_pebble" class="org.sakaiproject.component.app.help.model.ResourceBean">
+      <property name="docId"><value>yaft_pebble</value></property>
       <property name="name"><value>YAFT Pebble Trail</value></property>
       <property name="location"><value>/sakai_yaft/pebble_trail.html</value></property>
-      <property name="defaultForTool"><value>sakai.yaft</value></property>
    </bean>
 
-   <bean id="yaftForum" class="org.sakaiproject.component.app.help.model.ResourceBean">
-      <property name="docId"><value>forum</value></property>
+   <bean id="yaft_forum" class="org.sakaiproject.component.app.help.model.ResourceBean">
+      <property name="docId"><value>yaft_forum</value></property>
       <property name="name"><value>YAFT Forum</value></property>
       <property name="location"><value>/sakai_yaft/forum.html</value></property>
-      <property name="defaultForTool"><value>sakai.yaft</value></property>
    </bean>
 
     <bean id="org.sakaiproject.api.app.help.TableOfContents" 
@@ -39,10 +36,10 @@
                <property name="name"><value>YAFT</value></property>
                <property name="resources">
                   <list>
-                     <ref bean="yaftOverview"/>
-                     <ref bean="yaftPermissions"/>
-                     <ref bean="yaftPebbleTrail"/>
-                     <ref bean="yaftForum"/>
+                     <ref bean="yaft_overview"/>
+                     <ref bean="yaft_permissions"/>
+                     <ref bean="yaft_pebble"/>
+                     <ref bean="yaft_forum"/>
                   </list>
                </property>
             </bean>
