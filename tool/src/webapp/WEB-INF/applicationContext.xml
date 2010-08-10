@@ -3,6 +3,6 @@
 
 <beans>
 	<bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" 
-		class="org.sakaiproject.yaft.tool.entityprovider.YaftForumEntityProvider">
+		class="org.sakaiproject.yaft.tool.entityprovider.StatisticableEntityProvider">
 	</bean>
 </beans>
