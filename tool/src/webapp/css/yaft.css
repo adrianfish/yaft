@@ -60,6 +60,11 @@ fieldset {
 	background-color: white;
 }
 
+#yaft_feedback_message {
+	color: red;
+	font-weight:bold;
+}
+
 .yaft_deleted_message{
 	display: none;
 	filter:alpha(opacity=50);

@@ -89,7 +89,7 @@ var yaftShowingDeleted = false;
 
 function switchState(state,arg) {
 
-	$('#yaft_message').hide();
+	$('#yaft_feedback_message').hide();
 
 	// If a forum id has been specified we need to refresh the current forum
 	// state. We need to do it here as the breadcrumb in various states uses
@@ -116,13 +116,12 @@ function switchState(state,arg) {
 		$("#yaft_full_link").hide();
 
 		jQuery.ajax( {
-	   		//url : "/portal/tool/" + yaftPlacementId + "/data/forums",
-	   		url : "/direct/yaft-forum.json?siteId=" + yaftSiteId,
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
 	   		dataType : "json",
 	   		async : false,
 			cache: false,
 	  		success : function(forums,status) {
-				yaftCurrentForums = forums['yaft-forum_collection'];
+				yaftCurrentForums = forums;
 
 				YaftUtils.markReadMessagesInFora();
 
@@ -402,7 +401,7 @@ function switchState(state,arg) {
 		SakaiUtils.renderTrimpathTemplate('yaft_start_discussion_content_template',discussion,'yaft_content');
 		
 		var saveDiscussionOptions = { 
-			dataType: 'text',
+			dataType: 'html',
 			//async: false,
 			iframe: true,
 			timeout: 30000,
@@ -430,11 +429,17 @@ function switchState(state,arg) {
                   	}
             	},
    			success: function(responseText,statusText,xhr) {
-					var discussion = YaftUtils.getDiscussion(responseText);
-					yaftCurrentForum.discussions.push(discussion);
-					switchState('forum');
+   					if(responseText.match(/^ERROR.*/)) {
+   						alert("Failed to create/edit discussion");
+   					}
+   					else {
+						var discussion = YaftUtils.getDiscussion(responseText);
+						yaftCurrentForum.discussions.push(discussion);
+						switchState('forum');
+					}
    				},
    			error : function(xmlHttpRequest,textStatus,errorThrown) {
+   				alert("Failed to create/edit discussion");
 				}
    			}; 
  
@@ -484,12 +489,12 @@ function switchState(state,arg) {
 		SakaiUtils.renderTrimpathTemplate('yaft_move_discussion_breadcrumb_template',arg,'yaft_breadcrumb');
 		
 		jQuery.ajax( {
-	   		url : "/direct/yaft-forum.json?siteId=" + yaftSiteId,
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums?siteId=" + yaftSiteId,
 			dataType : "json",
 			async : false,
 			cache: false,
 			success : function(data) {
-				var forums = data['yaft-forum_collection'];
+				var forums = data;
 				var discussion = null;
 				jQuery.ajax( {
 					url : "/direct/yaft-discussion/" + arg.discussionId + '.json',
@@ -503,9 +508,24 @@ function switchState(state,arg) {
 						alert("Failed to get discussion. Reason: " + errorThrown);
 					}
 				});
+				
 				SakaiUtils.renderTrimpathTemplate('yaft_move_discussion_content_template',{'forums':forums,'discussion':discussion},'yaft_content');
 		
-				$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+				$(document).ready(function() {
+					var moveDiscussionOptions = { 
+						dataType: 'text',
+						timeout: 30000,
+						async: false,
+   						success: function(responseText,statusText,xhr) {
+							switchState('forums');
+   						},
+   						error : function(xmlHttpRequest,textStatus,errorThrown) {
+						}
+   					}; 
+ 
+   					$('#yaft_move_discussion_form').ajaxForm(moveDiscussionOptions);
+					setMainFrameHeight(window.frameElement.id);
+				});
 			},
 			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				alert("Failed to get forums. Reason: " + errorThrown);
@@ -530,7 +550,23 @@ function switchState(state,arg) {
 		SakaiUtils.renderTrimpathTemplate('yaft_preferences_template',{},'yaft_content');
 		$('#yaft_email_' + yaftCurrentUserPreferences.email + '_option').attr('checked',true);
 		$('#yaft_view_' + yaftCurrentUserPreferences.view + '_option').attr('checked',true);
-	 	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+	 	$(document).ready(function() {
+	 		var savePreferencesOptions = { 
+				dataType: 'json',
+				timeout: 30000,
+				async: false,
+   				success: function(preferences,statusText,xhr) {
+   					yaftCurrentUserPreferences = preferences;
+					switchState('forums');
+   				},
+   				error : function(xmlHttpRequest,textStatus,errorThrown) {
+				}
+   			}; 
+ 
+   			$('#yaft_preferences_form').ajaxForm(savePreferencesOptions);
+   			
+	 		setMainFrameHeight(window.frameElement.id);
+	 	});
 	}
 
 	return false;

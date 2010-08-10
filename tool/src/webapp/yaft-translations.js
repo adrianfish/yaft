@@ -89,6 +89,7 @@ yaft_unread_label = 'Unread';
 yaft_mark_discussion_read_message = 'Are you sure you want to mark the current discussion as read?';
 yaft_missing_subject_message = 'You must specify a subject.';
 yaft_missing_title_message = 'You must specify a title.';
+yaft_description_too_long_message = "The discussion can't be longer than 64 characters";
 yaft_email_alerts_label = 'Email Alerts';
 yaft_email_never_label = 'Never';
 yaft_email_each_label = 'Every time something happens';

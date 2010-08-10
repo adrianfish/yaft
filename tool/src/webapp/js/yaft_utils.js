@@ -9,9 +9,14 @@ var YaftUtils;
 		var title = $('#yaft_title_field').val();
 		
 		if(title === '') {
-			var message = $('#yaft_message');
-			message.html(yaft_missing_title_message);
-			message.show();
+			alert(yaft_missing_title_message);
+			return;
+		}
+		
+		var description = $('#yaft_description_field').val();
+		
+		if(description.length > 64) {
+			alert(yaft_description_too_long_message);
 			return;
 		}
 
@@ -30,13 +35,13 @@ var YaftUtils;
 			'id':$('#yaft_id_field').val(),
 			'startDate':startDate,
 			'endDate':endDate,
-			'title':$('#yaft_title_field').val(),
-			'description':$('#yaft_description_field').val(),
+			'title':title,
+			'description':description,
 			'discussions': []
 		};
 	   		
 		jQuery.ajax( {
-	   		url : "/direct/yaft-forum/new.json",
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
 	   		dataType : "text",
 	   		type: 'POST',
 	   		'data': forum,
@@ -52,8 +57,10 @@ var YaftUtils;
 					switchState('forums');
 				}
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to save forum. Status: " + status + ". Error: " + error);
+			error : function(xhr,status,error) {
+				var message = $('#yaft_feedback_message');
+				message.html('Failed to save forum');
+				message.show();
 			}
 	   	});
 	}
@@ -195,10 +202,8 @@ var YaftUtils;
 	}
 	
 	YaftUtils.getForum = function(forumId,state) {
-		//var forumDataUrl = "/portal/tool/" + yaftPlacementId + "/data/forums/" + forumId;
-		var forumDataUrl = "/direct/yaft-forum/" + forumId;
-		if(state != null) forumDataUrl += "-" + state;
-		forumDataUrl += ".json";
+		var forumDataUrl = "/portal/tool/" + yaftPlacementId + "/forums/" + forumId;
+		if(state != null) forumDataUrl += "?state=" + state;
 	
 		var currentForum = null;
 		
@@ -221,13 +226,12 @@ var YaftUtils;
 	{
 		var data = null;
 		jQuery.ajax( {
-	   		//url : "/portal/tool/" + yaftPlacementId + "/data/users/" + yaftCurrentUser.id + "/unsubscriptions",
-	   		url : "/direct/yaft-discussion/unsubscriptions.json",
+	   		url : "/portal/tool/" + yaftPlacementId + "/unsubscriptions",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
 	   		success : function(unsubscriptions,status) {
-				data = unsubscriptions.data;
+				data = unsubscriptions;
 			},
 			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				alert("Failed to get unsubscription data. Reason: " + errorThrown);
@@ -240,13 +244,12 @@ var YaftUtils;
 	YaftUtils.getForumUnsubscriptions = function() {
 		var data = null;
 		jQuery.ajax( {
-	   		//url : "/portal/tool/" + yaftPlacementId + "/data/users/" + yaftCurrentUser.id + "/forumUnsubscriptions",
-	   		url : "/direct/yaft-forum/unsubscriptions.json",
+	   		url : "/portal/tool/" + yaftPlacementId + "/unsubscriptions",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
 	   		success : function(unsubscriptions,status) {
-				data = unsubscriptions.data;
+				data = unsubscriptions;
 			},
 			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				alert("Failed to get forum unsubscription data. Reason: " + errorThrown);
@@ -288,7 +291,7 @@ var YaftUtils;
 		var discussion = null;
 		
 		jQuery.ajax( {
-	   		url : "/direct/yaft-discussion/" + discussionId + ".json",
+	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId,
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -307,7 +310,7 @@ var YaftUtils;
 		var discussion = null;
 		
 		jQuery.ajax( {
-	   		url : "/direct/yaft-discussion/discussionContainingMessage.json?messageId=" + messageId,
+	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/discussionContainingMessage?messageId=" + messageId,
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -326,7 +329,7 @@ var YaftUtils;
 		var forum = null;
 		
 		jQuery.ajax( {
-	   		url : "/direct/yaft-forum/forumContainingMessage.json?messageId=" + messageId,
+	   		url : "/portal/tool/" + yaftPlacementId + "/forumContainingMessage?messageId=" + messageId,
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -766,13 +769,12 @@ var YaftUtils;
 		var readMessages = null;
 			
 		jQuery.ajax( {
-	 		//url : "/portal/tool/" + yaftPlacementId + "/data/forums/readMessages",
-	 		url : "/direct/yaft-forum/allReadMessages.json",
+	 		url : "/portal/tool/" + yaftPlacementId + "/forums/allReadMessages",
 			async : false,
    			dataType: "json",
 			cache: false,
 			success : function(read,status) {
-				readMessages = read.data;
+				readMessages = read;
 			},
 			error : function(xmlHttpRequest,textStatus,error) {
 				alert("Failed to get read messages. Reason: " + error);
@@ -797,13 +799,12 @@ var YaftUtils;
 		var readMessages = null;
 			
 		jQuery.ajax( {
-	 		//url : "/portal/tool/" + yaftPlacementId + "/data/forums/" + yaftCurrentForum.id + "/readMessages.json",
-	 		url : "/direct/yaft-forum/" + yaftCurrentForum.id + "/readMessages.json",
+	 		url : "/portal/tool/" + yaftPlacementId + "/forums/" + yaftCurrentForum.id + "/readMessages",
 			async : false,
    			dataType: "json",
 			cache: false,
 			success : function(read,status) {
-				readMessages = read.data;
+				readMessages = read;
 			},
 			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				alert("Failed to get read messages. Reason: " + errorThrown);
@@ -828,15 +829,15 @@ var YaftUtils;
 		var readMessages = [];
 			
 		jQuery.ajax( {
-	 		//url : "/portal/tool/" + yaftPlacementId + "/data/discussions/" + yaftCurrentDiscussion.id + "/readMessages",
-	 		url : "/direct/yaft-discussion/" + yaftCurrentDiscussion.id + "/readMessages.json",
+	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/readMessages",
 			async : false,
    			dataType: "json",
 			cache: false,
 			success : function(read,status) {
-				var ids = read['yaft-discussion_collection'];
+				var ids = read;
 				for(var i=0,j=ids.length;i<j;i++) {
-					readMessages.push(ids[i].data);
+					//readMessages.push(ids[i].data);
+					readMessages.push(ids[i]);
 				}
 			},
 			error : function(xhr,textStatus,errorThrown) {
@@ -909,10 +910,10 @@ var YaftUtils;
         return null;
 	}
 
-	YaftUtils.getUserPreferences = function(placementId) {
+	YaftUtils.getUserPreferences = function() {
 		var preferences = null;
 		jQuery.ajax( {
-	 		url : "/direct/yaft-forum/" + yaftSiteId + "/userPreferences.json",
+	 		url : "/portal/tool/" + yaftPlacementId + "/userPreferences",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
