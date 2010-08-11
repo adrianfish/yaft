@@ -175,7 +175,7 @@ public class Message implements Entity
 			Site site = SiteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			placementId = tc.getId();
-			url = "/portal/tool/" + tc.getId() + "/messages/" + id;
+			url = "/portal/tool/" + tc.getId() + "/messages/" + id + ".html";
 		}
 		catch(Exception e)
 		{

@@ -67,7 +67,10 @@ var YaftUtils;
 	
 	YaftUtils.showDeleted = function() {
 		$(".yaft_deleted_message").show();
-	  	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+	  	$(document).ready(function() {
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
+		});
 	  	yaftShowingDeleted = true;
 		$('#yaft_show_deleted_link').hide();
 		$('#yaft_hide_deleted_link').show();
@@ -102,7 +105,8 @@ var YaftUtils;
 		$('#yaft_show_advanced_options_link').hide();
 		$('#yaft_hide_advanced_options_link').show();
 	 	$(document).ready(function() {
-	 		setMainFrameHeight(window.frameElement.id);
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
 		});
 	}
 
@@ -111,13 +115,17 @@ var YaftUtils;
 		$('#yaft_show_advanced_options_link').show();
 		$('#yaft_hide_advanced_options_link').hide();
 	 	$(document).ready(function() {
-	 		setMainFrameHeight(window.frameElement.id);
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
 		});
 	}
 
 	YaftUtils.hideDeleted = function() {
 		$(".yaft_deleted_message").hide();
-	   	$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+	   	$(document).ready(function() {
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
+		});
 	  	yaftShowingDeleted = false;
 		$('#yaft_show_deleted_link').show();
 		$('#yaft_hide_deleted_link').hide();
@@ -141,7 +149,8 @@ var YaftUtils;
 	 							widgets: ['zebra']
 	 						});
 
-			setMainFrameHeight(window.frameElement.id);
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
 		});
 	}
 	
@@ -164,7 +173,8 @@ var YaftUtils;
 	YaftUtils.renderCurrentForums = function() {
 		SakaiUtils.renderTrimpathTemplate('yaft_forums_content_template',{'items':yaftCurrentForums},'yaft_content');
 	 	$(document).ready(function() {
-	 		setMainFrameHeight(window.frameElement.id);
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
 	 			
 	 		$("#yaft_forum_table").tablesorter({
 	 			cssHeader:'yaftSortableTableHeader',
@@ -740,7 +750,10 @@ var YaftUtils;
 				}
 				*/
 				SakaiUtils.renderTrimpathTemplate('yaft_search_results_content_template',{'results':hits},'yaft_content');
-	 			$(document).ready(function() {setMainFrameHeight(window.frameElement.id);});
+	 			$(document).ready(function() {
+					if(window.frameElement)
+						setMainFrameHeight(window.frameElement.id);
+				});
         	},
         	error : function(xmlHttpRequest,status,error) {
 				alert("Failed to search. Status: " + status + ". Error: " + error);
