@@ -165,7 +165,7 @@ public class YaftTool extends HttpServlet
 				
 				else if ("messages".equals(part1))
 				{
-					doMessagesGet(request,response,parts);
+					doMessagesGet(request,response,parts,siteId,placementId,languageCode);
 				}
 			}
 		}
@@ -394,16 +394,31 @@ public class YaftTool extends HttpServlet
 		}
     }
 	
-	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response,String[] parts) throws ServletException, IOException
+	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response,String[] parts, String siteId,String placementId,String languageCode) throws ServletException, IOException
     {
         if (parts.length >= 2)
 		{
         	String messageId = parts[1];
+        	
+        	boolean isHtmlRequest = false;
+        	
+			if(messageId.endsWith(".html"))
+			{
+				isHtmlRequest = true;
+				messageId = messageId.substring(0, messageId.length() - 5);
+			}
+			
 			Message message = yaftForumService.getMessage(messageId);
 			Forum forum = yaftForumService.getForumContainingMessage(messageId);
 			
 			if(parts.length == 2)
 			{
+				if(isHtmlRequest)
+				{
+					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + message.getDiscussionId() + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId()  + "&language=" + languageCode + "#message-" + messageId);
+					return;
+				}
+				
 				JsonConfig config = new JsonConfig();
 				config.setExcludes(new String[] {"properties","reference"});
 

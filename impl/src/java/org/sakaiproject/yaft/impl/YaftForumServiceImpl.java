@@ -1,6 +1,5 @@
 package org.sakaiproject.yaft.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -14,16 +13,13 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
-import org.sakaiproject.user.api.Preferences;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
-import org.sakaiproject.yaft.api.SearchResult;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
@@ -354,7 +350,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			for (String excludedId : unsubscribers)
 				users.remove(excludedId);
 
-			String url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId());
+			String url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId() + ".html");
 
 			Map<String, String> replacementValues = new HashMap<String, String>();
 
