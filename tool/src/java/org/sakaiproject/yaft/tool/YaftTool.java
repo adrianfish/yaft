@@ -98,7 +98,7 @@ public class YaftTool extends HttpServlet
 
 				if ("forums".equals(part1))
 				{
-					doForumsGet(request,response,parts);
+					doForumsGet(request,response,parts,siteId,placementId,languageCode);
 				}
 				
 				else if ("userPreferences".equals(part1))
@@ -171,9 +171,8 @@ public class YaftTool extends HttpServlet
 		}
 	}
 	
-	private void doForumsGet(HttpServletRequest request, HttpServletResponse response,String[] parts) throws ServletException, IOException
+	private void doForumsGet(HttpServletRequest request, HttpServletResponse response,String[] parts,String siteId,String placementId,String languageCode) throws ServletException, IOException
     {
-        String siteId = sakaiProxy.getCurrentSiteId();
         String state = request.getParameter("state");
 
         if(state == null) state  = "";
@@ -216,6 +215,20 @@ public class YaftTool extends HttpServlet
             {
                 try
                 {
+                	boolean isHtmlRequest = false;
+                	
+                	if(forumId.endsWith(".html"))
+                	{
+                		isHtmlRequest = true;
+                		forumId = forumId.substring(0, forumId.length() - 5);
+                	}
+                	
+    				if(isHtmlRequest)
+    				{
+						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode);
+    					return;
+    				}
+    				
                     Forum forum = yaftForumService.getForum(forumId, state);
                     JsonConfig config = new JsonConfig();
                     config.setExcludes(new String[] {"properties","reference"});

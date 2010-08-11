@@ -76,7 +76,7 @@ public class Forum
 		{
 			Site site = SiteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
-			url = "/portal/tool/" + tc.getId() + "/forums/" + id;
+			url = "/portal/tool/" + tc.getId() + "/forums/" + id + ".html";
 		}
 		catch(Exception e)
 		{
