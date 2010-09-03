@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<emailTemplate>
+	<subject>[ ${siteTitle} - ${forumMessage} ] ${discussionSubject}</subject>
+	<message>
+
+--------------------
+${creator} added/updated the message titled '${discussionSubject}'
+--------------------
+
+To view this message, follow the link below:
+${url}
+
+---
+	</message>
+	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; started a new discussion titled '${discussionSubject}'
+&lt;br /&gt;
+&lt;br /&gt;
+Click &lt;a href="${url}"&gt;here&lt;/a&gt; to enter the forum
+&lt;br /&gt;
+&lt;br /&gt;
+&lt;strong&gt;Message:&lt;/strong&gt;
+&lt;br /&gt;
+&lt;br /&gt;
+${messageContent}
+	</htmlMessage>
+	<locale>en</locale>
+	<version>5</version>
+	<owner>admin</owner>
+	<key>yaft.newDiscussionEach</key>
+</emailTemplate>
