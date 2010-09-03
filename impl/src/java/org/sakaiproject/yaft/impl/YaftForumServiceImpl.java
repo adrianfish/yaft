@@ -353,11 +353,12 @@ public class YaftForumServiceImpl implements YaftForumService
 			String url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId() + ".html");
 
 			Map<String, String> replacementValues = new HashMap<String, String>();
+			
+			String baseTemplateKey = "";
 
-			String templateKey = "yaft.newMessageNew";
 			if (newDiscussion)
 			{
-				templateKey = "yaft.newDiscussion";
+				baseTemplateKey = "yaft.newDiscussion";
 				replacementValues.put("siteTitle", siteTitle);
 				replacementValues.put("forumMessage", "Forum Message");
 				replacementValues.put("discussionSubject", message.getSubject());
@@ -367,7 +368,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 			else
 			{
-				templateKey = "yaft.newMessage";
+				baseTemplateKey = "yaft.newMessage";
 				replacementValues.put("siteTitle", siteTitle);
 				replacementValues.put("forumMessage", "Forum Message");
 				replacementValues.put("messageSubject", message.getSubject());
@@ -375,8 +376,6 @@ public class YaftForumServiceImpl implements YaftForumService
 				replacementValues.put("url", url);
 				replacementValues.put("messageContent", message.getContent());
 			}
-
-			RenderedTemplate template = null;
 
 			List<User> sakaiUsers = sakaiProxy.getUsers(users);
 
@@ -395,23 +394,36 @@ public class YaftForumServiceImpl implements YaftForumService
 
 				try
 				{
-					template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
-					if (template == null)
+					if (emailPref.equals(YaftPreferences.EACH))
 					{
-						logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
-						return; // no template
+						String templateKey = baseTemplateKey += "Each";
+						RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
+						if (template == null)
+						{
+							logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
+							return; // no template
+						}
+						
+						sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
+					}
+					else if (emailPref.equals(YaftPreferences.DIGEST))
+					{
+						String templateKey = baseTemplateKey += "Digest";
+						RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
+						if (template == null)
+						{
+							logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
+							return; // no template
+						}
+						
+						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
 					}
 				}
 				catch (Exception e)
 				{
-					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + templateKey + " : " + e.getClass() + " : " + e.getMessage());
+					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + baseTemplateKey + " : " + e.getClass() + " : " + e.getMessage());
 					continue; // try next user
 				}
-
-				if (emailPref.equals(YaftPreferences.EACH))
-					sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
-				else if (emailPref.equals(YaftPreferences.DIGEST))
-					sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
 			}
 		}
 		catch (Exception e)
