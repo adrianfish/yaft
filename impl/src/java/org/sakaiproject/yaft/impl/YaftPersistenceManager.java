@@ -293,19 +293,28 @@ public class YaftPersistenceManager
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addOrUpdateMessage(java.lang.String, java.lang.String, org.sakaiproject.yaft.api.Message)
 	 */
-	public boolean addOrUpdateMessage(String siteId, String forumId,Message message)
+	public boolean addOrUpdateMessage(String siteId, String forumId,Message message,Connection connection)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateMessage()");
 		
-		Connection connection = null;
+		boolean isLocalConnection = false;
+		
+		if(connection == null)
+			isLocalConnection = true;
+			
 		List<PreparedStatement> messageStatements = null;
 		List<PreparedStatement> newStatements = null;
 
 		try
 		{
-			connection = sakaiProxy.borrowConnection();
-			boolean oldAutoCommitFlag = connection.getAutoCommit();
-			connection.setAutoCommit(false);
+			boolean oldAutoCommitFlag = false;
+			
+			if(isLocalConnection)
+			{
+				connection = sakaiProxy.borrowConnection();
+				oldAutoCommitFlag = connection.getAutoCommit();
+				connection.setAutoCommit(false);
+			}
 
 			try
 			{
@@ -336,19 +345,25 @@ public class YaftPersistenceManager
 					//}
 				}
 				
-				connection.commit();
+				if(isLocalConnection)
+					connection.commit();
 				
 				return true;
 			}
 			catch(Exception e)
 			{
-				logger.error("Caught exception whilst adding or updating a message. Rolling back ...",e);
-				connection.rollback();
+				if(isLocalConnection)
+				{
+					logger.error("Caught exception whilst adding or updating a message. Rolling back ...",e);
+					connection.rollback();
+				}
+				
 				return false;
 			}
 			finally
 			{
-				connection.setAutoCommit(oldAutoCommitFlag);
+				if(isLocalConnection)
+					connection.setAutoCommit(oldAutoCommitFlag);
 			}
 		}
 		catch (Exception e)
@@ -382,7 +397,8 @@ public class YaftPersistenceManager
 				}
 			}
 				
-			sakaiProxy.returnConnection(connection);
+			if(isLocalConnection)
+				sakaiProxy.returnConnection(connection);
 		}
 	}
 
@@ -2055,18 +2071,37 @@ public class YaftPersistenceManager
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addDiscussion(java.lang.String, java.lang.String, org.sakaiproject.yaft.api.Discussion)
 	 */
-	public void addDiscussion(String siteId, String forumId, Discussion discussion)
+	public boolean addDiscussion(String siteId, String forumId, Discussion discussion)
 	{
-		addOrUpdateMessage(siteId, forumId, discussion.getFirstMessage());
-		
 		PreparedStatement statement = null;
 		Connection connection = null;
 		
 		try
 		{
 			connection = sakaiProxy.borrowConnection();
-			statement = sqlGenerator.getSetDiscussionDatesStatement(discussion,connection);
-			statement.executeUpdate();
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+			
+			try
+			{
+				if(!addOrUpdateMessage(siteId, forumId, discussion.getFirstMessage(),connection))
+					throw new Exception("addOrUpdateMessage returned false");
+				
+				statement = sqlGenerator.getSetDiscussionDatesStatement(discussion,connection);
+				statement.executeUpdate();
+				connection.commit();
+			}
+			catch(Exception e)
+			{
+				logger.error("Caught exception whilst adding discussion. Rolling back ...",e);
+				connection.rollback();
+				
+				return false;
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
 			
 			long start = discussion.getStart();
 			long end = discussion.getEnd();
@@ -2077,10 +2112,13 @@ public class YaftPersistenceManager
 				sakaiProxy.addCalendarEntry("Start of '" + discussion.getSubject() + "'","<a onclick=\"window.open('" + url + "','discussion','location=0,width=500,height=400,scrollbars=1,resizable=1,toolbar=0,menubar=0'); return false;\" href=\"" + url + "\">Start of '" + discussion.getSubject() + "' Discussion (Click to launch)</a>","Activity",start + 32400000,start + 32460000);
 				sakaiProxy.addCalendarEntry("End of '" + discussion.getSubject() + "'","End of '" + discussion.getSubject() + "' Discussion","Activity",end + 32400000,end + 32460000);
 			}
+			
+			return true;
 		}
 		catch (Exception e)
 		{
-			logger.error("Caught exception whilst getting forum unsubscribers.", e);
+			logger.error("Caught exception whilst adding discussion.", e);
+			return false;
 		}
 		finally
 		{

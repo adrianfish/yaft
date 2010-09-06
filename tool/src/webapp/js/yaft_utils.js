@@ -51,6 +51,7 @@ var YaftUtils;
 				if('' === forum.id) {
 					// New forum. Enter it.
 					yaftCurrentForum = forum;
+					yaftCurrentForum.id = id;
 					switchState('forum');
 				}
 				else {

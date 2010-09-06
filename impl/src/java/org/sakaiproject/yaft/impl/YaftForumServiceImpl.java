@@ -128,7 +128,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 		String discussionId = message.getDiscussionId();
 
-		if (!persistenceManager.addOrUpdateMessage(siteId, forumId, message))
+		if (!persistenceManager.addOrUpdateMessage(siteId, forumId, message,null))
 			return false;
 
 		// persistenceManager.markMessageRead(message.getId(), forumId, message.getDiscussionId());
@@ -153,17 +153,18 @@ public class YaftForumServiceImpl implements YaftForumService
 		// Get this before calling addDiscussion as it will get set by it.
 		String id = discussion.getId();
 
-		persistenceManager.addDiscussion(siteId, forumId, discussion);
-
-		if (id.length() == 0)
+		if(persistenceManager.addDiscussion(siteId, forumId, discussion))
 		{
-			// From the empty id we know this is a new discussion
-			String reference = YaftForumService.REFERENCE_ROOT + "/" + siteId + "/discussions/" + message.getId();
-			sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, reference, true);
-		}
+			if (id.length() == 0)
+			{
+				// From the empty id we know this is a new discussion
+				String reference = YaftForumService.REFERENCE_ROOT + "/" + siteId + "/discussions/" + message.getId();
+				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, reference, true);
+			}
 
-		if (sendMail)
-			sendEmail(siteId, message, true);
+			if (sendMail)
+				sendEmail(siteId, message, true);
+		}
 
 		return discussion;
 	}

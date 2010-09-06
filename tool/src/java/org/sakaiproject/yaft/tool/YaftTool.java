@@ -723,7 +723,7 @@ public class YaftTool extends HttpServlet
         		{
         			response.setStatus(HttpServletResponse.SC_OK);
         			response.setContentType("text/plain");
-        			response.getWriter().write("success");
+        			response.getWriter().write(forum.getId());
         			response.getWriter().close();
         			return;
         		}
@@ -758,11 +758,12 @@ public class YaftTool extends HttpServlet
         	String lockReadingString = (String) request.getParameter("lockReading");
         	
         	if(subject == null || subject.length() <= 0
-        		|| content == null || content.length() <= 0)
+        		|| content == null || content.length() <= 0
+        		|| forumId == null || forumId.length() <= 0)
         	{
         		response.setStatus(HttpServletResponse.SC_OK);
         		response.setContentType("text/html");
-        		response.getWriter().write("ERROR:A subject and content must be supplied.");
+        		response.getWriter().write("ERROR:A forum id,subject and content must be supplied.");
         		response.getWriter().close();
         		return;
         	}
