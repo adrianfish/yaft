@@ -464,21 +464,6 @@ function switchState(state,arg) {
 			}
 		});
 
-/*
-		$('#yaft_start_discussion_form').submit(function()
-									{
-										if($('#yaft_subject_field').val() == '')
-										{
-											var message = $('#yaft_message');
-											message.html(yaft_missing_subject_message);
-											message.show();
-											return false;
-										}
-										else
-											return true;
-									});
-									*/
-
 		setupAvailability(discussion);
 
    		$(document).ready(function() {
