@@ -74,6 +74,10 @@ var yaftShowingDeleted = false;
 		$("#yaft_permissions_link").show();
 	else
 		$("#yaft_permissions_link").hide();
+		
+	if(arg.viewMode) {
+		yaftViewMode = arg.viewMode;
+	}
 
 	yaftCurrentUserPreferences = YaftUtils.getUserPreferences(arg.placementId);
 	yaftUnsubscriptions = YaftUtils.getUnsubscriptions();

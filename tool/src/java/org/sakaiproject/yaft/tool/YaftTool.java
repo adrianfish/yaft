@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,12 +83,32 @@ public class YaftTool extends HttpServlet
 		String languageCode = locale.getLanguage();
 
 		String pathInfo = request.getPathInfo();
+		
+		String uri = request.getRequestURI();
 
 		if (pathInfo == null || pathInfo.length() < 1)
 		{
 			// There's no path info, so this is the initial state
-			response.sendRedirect("/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode);
-			return;
+			
+			if(uri.contains("/portal/pda/"))
+			{
+				// The PDA portal is frameless for redirects don't work. It also
+				// means that we can't pass url parameters to the page.We can
+				// use a cookie and the JS will pull the initial state from that
+				// instead.
+				Cookie params = new Cookie("sakai-tool-params","state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&viewMode=minimal");
+				response.addCookie(params);
+				
+				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");
+				dispatcher.include(request, response);
+				return;
+			}
+			else
+			{
+				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode;
+				response.sendRedirect(url);
+				return;
+			}
 		}
 		else
 		{
