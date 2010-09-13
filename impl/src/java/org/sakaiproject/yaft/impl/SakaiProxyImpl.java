@@ -219,7 +219,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		List functions = functionManager.getRegisteredFunctions("yaft.");
 
 		if (!functions.contains(function))
-			functionManager.registerFunction(function);
+			functionManager.registerFunction(function,true);
 	}
 
 	public String getSakaiHomePath()
