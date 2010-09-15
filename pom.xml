@@ -13,19 +13,23 @@
 
 	<parent>
         <groupId>org.sakaiproject.purepoms</groupId>
-        <artifactId>sakai-commons-tool</artifactId>
-        <version>2.8-SNAPSHOT</version>
+        <artifactId>sakai-standard-tool</artifactId>
+        <!--version>2.8-SNAPSHOT</version--> <!-- 2.7.x build -->
+        <version>2.6.3</version> <!-- 2.6.x build -->
     </parent>
 
 	<properties>
-        <entitybroker.version>[1.3.13,1.4.0-SNAPSHOT]</entitybroker.version>
-        <search.version>[1.2.5,1.3.0-SNAPSHOT]</search.version>
+		<!--  1.3.5 is the first version of EB to have Statisticable -->
+        <entitybroker.version>[1.3.5,]</entitybroker.version>
+        <search.version>[1.2.1-sakai26-SNAPSHOT,]</search.version>
         <log4j.version>1.2.8</log4j.version>
         <servlet-api.version>2.4</servlet-api.version>
         <commons-lang.version>2.4</commons-lang.version>
-        <calendar.version>[2.7,2.8-SNAPSHOT]</calendar.version>
-	  	<profile-api.version>[2.7.2,2.8-SNAPSHOT]</profile-api.version>
-		<emailtemplateservice.version>[0.4.3,0.5-SNAPSHOT]</emailtemplateservice.version>
+        <!--calendar.version>2.6-SNAPSHOT</calendar.version--> <!-- 2.6.x build -->
+        <calendar.version>2.7-SNAPSHOT</calendar.version> <!-- 2.7.x build -->
+	  	<!--profile-api.version>2.6-SNAPSHOT</profile-api.version--> <!-- 2.6.x build -->
+	  	<profile-api.version>2.7-SNAPSHOT</profile-api.version>
+		<emailtemplateservice.version>[0.3.6-SNAPSHOT,]</emailtemplateservice.version>
     	<stax.api.version>1.0.1</stax.api.version>
     	<stax.version>1.2.0</stax.version>
     </properties>
@@ -135,12 +139,21 @@
                 <version>${entitybroker.version}</version>
             </dependency>
 
+			<!-- 2.7.x build -->
             <dependency>
       			<groupId>org.sakaiproject.profile</groupId>
       			<artifactId>profile-api</artifactId>
 	  			<version>${profile-api.version}</version>
 	  			<scope>provided</scope>
     		</dependency>
+
+			<!-- 2.6.x build -->
+            <!--dependency>
+      			<groupId>org.sakaiproject</groupId>
+      			<artifactId>sakai-profile-api</artifactId>
+	  			<version>${profile-api.version}</version>
+	  			<scope>provided</scope>
+    		</dependency-->
 
             <dependency>
                 <groupId>org.sakaiproject.search</groupId>

@@ -68,7 +68,7 @@ var yaftShowingDeleted = false;
 	yaftSiteId = arg.siteId;
 	yaftCurrentUser = SakaiUtils.getCurrentUser();
 
-	yaftCurrentUserPermissions = new YaftPermissions(SakaiUtils.getCurrentUserPermissions(yaftSiteId,'yaft'));
+	yaftCurrentUserPermissions = new YaftPermissions(YaftUtils.getCurrentUserPermissions());
 
 	if(yaftCurrentUserPermissions.modifyPermissions)
 		$("#yaft_permissions_link").show();
@@ -531,12 +531,12 @@ function switchState(state,arg) {
 		});
 	}
 	else if('permissions' === state) {
-		var perms = SakaiUtils.getSitePermissionMatrix(yaftSiteId,'yaft');
+		var perms = YaftUtils.getSitePermissionMatrix();
 		SakaiUtils.renderTrimpathTemplate('yaft_permissions_content_template',{'perms':perms},'yaft_content');
 
 	 	$(document).ready(function() {
 			$('#yaft_permissions_save_button').bind('click',function(e) {
-				return SakaiUtils.savePermissions(yaftSiteId,'yaft_permission_checkbox',function() { switchState('forums'); });
+				return YaftUtils.savePermissions();
 			});
 
 			if(window.frameElement)

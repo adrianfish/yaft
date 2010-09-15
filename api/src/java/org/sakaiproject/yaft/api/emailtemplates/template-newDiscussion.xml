@@ -26,5 +26,5 @@ ${messageContent}
 	<locale>en</locale>
 	<version>5</version>
 	<owner>admin</owner>
-	<key>yaft.newDiscussionEach</key>
+	<key>yaft.newDiscussion</key>
 </emailTemplate>

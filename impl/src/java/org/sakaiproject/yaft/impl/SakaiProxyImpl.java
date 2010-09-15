@@ -2,15 +2,18 @@ package org.sakaiproject.yaft.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -20,8 +23,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.log4j.Logger;
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.api.app.profile.ProfileManager;
+import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
+import org.sakaiproject.authz.api.AuthzPermissionException;
 import org.sakaiproject.authz.api.FunctionManager;
+import org.sakaiproject.authz.api.GroupNotDefinedException;
+import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.calendar.api.Calendar;
@@ -47,6 +54,9 @@ import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
+import org.sakaiproject.search.api.SearchList;
+import org.sakaiproject.search.api.SearchResult;
+import org.sakaiproject.search.api.SearchService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -63,6 +73,7 @@ import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
+import org.sakaiproject.yaft.api.YaftFunctions;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -113,6 +124,8 @@ public class SakaiProxyImpl implements SakaiProxy
 	
 	private EmailTemplateService emailTemplateService;
 	
+	private SearchService searchService;
+	
 	public SakaiProxyImpl()
 	{
 		if (logger.isDebugEnabled())
@@ -138,6 +151,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
+		searchService = (SearchService) componentManager.get(SearchService.class);
 		
 		List<String> emailTemplates = (List<String>) componentManager.get("org.sakaiproject.yaft.api.emailtemplates.List");
 		//emailTemplateService.processEmailTemplates(emailTemplates);
@@ -721,6 +735,25 @@ public class SakaiProxyImpl implements SakaiProxy
 		XMLInputFactory factory = (XMLInputFactory)XMLInputFactory.newInstance();
 		XMLStreamReader staxXmlReader = null;
 		EmailTemplate template = new EmailTemplate();
+		
+		boolean canSetHtml = false;
+		boolean canSetVersion = false;
+		
+		Class templateClass = EmailTemplate.class;
+		
+		try
+		{
+			templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
+			canSetHtml = true;
+		}
+		catch(NoSuchMethodException nsme) {}
+		
+		try
+		{
+			templateClass.getDeclaredMethod("setVersion", new Class[] {int.class});
+			canSetVersion = true;
+		}
+		catch(NoSuchMethodException nsme) {}
 
 		try
 		{
@@ -743,7 +776,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				    	template.setMessage(staxXmlReader.getElementText());
 				    }
 				    //html
-				    if(StringUtils.equals(element, ELEM_HTML_MESSAGE)) {
+				    if(canSetHtml && StringUtils.equals(element, ELEM_HTML_MESSAGE)) {
 				    	template.setHtmlMessage(staxXmlReader.getElementText());
 				    }
 				    //locale
@@ -751,7 +784,7 @@ public class SakaiProxyImpl implements SakaiProxy
 				    	template.setLocale(staxXmlReader.getElementText());
 				    }
 				    //version - SAK-17637
-				    if(StringUtils.equals(element, ELEM_VERSION)) {
+				    if(canSetVersion && StringUtils.equals(element, ELEM_VERSION)) {
 				    	//set as integer version of value, or default to 0
 				    	template.setVersion(Integer.valueOf(NumberUtils.toInt(staxXmlReader.getElementText(), 0)));
 				    }
@@ -806,23 +839,26 @@ public class SakaiProxyImpl implements SakaiProxy
 			return;
 		} 
 		
-		//check version, if local one newer than persisted, update it - SAK-17679
-		int existingTemplateVersion = existingTemplate.getVersion() != null ? existingTemplate.getVersion().intValue() : 0;
-		if(template.getVersion() > existingTemplateVersion)
+		if(canSetVersion)
 		{
-			existingTemplate.setSubject(template.getSubject());
-			existingTemplate.setMessage(template.getMessage());
-			existingTemplate.setHtmlMessage(template.getHtmlMessage());
-			existingTemplate.setVersion(template.getVersion());
-			existingTemplate.setOwner(template.getOwner());
+			//check version, if local one newer than persisted, update it - SAK-17679
+			int existingTemplateVersion = existingTemplate.getVersion() != null ? existingTemplate.getVersion().intValue() : 0;
+			if(template.getVersion() > existingTemplateVersion)
+			{
+				existingTemplate.setSubject(template.getSubject());
+				existingTemplate.setMessage(template.getMessage());
+				existingTemplate.setHtmlMessage(template.getHtmlMessage());
+				existingTemplate.setVersion(template.getVersion());
+				existingTemplate.setOwner(template.getOwner());
 
-			Session sakaiSession = sessionManager.getCurrentSession();
-			sakaiSession.setUserId(ADMIN);
-			sakaiSession.setUserEid(ADMIN);
-			emailTemplateService.updateTemplate(existingTemplate);
-			sakaiSession.setUserId(null);
-			sakaiSession.setUserId(null);
-			logger.info("Updated email template: " + template.getKey() + " with locale: " + template.getLocale());
+				Session sakaiSession = sessionManager.getCurrentSession();
+				sakaiSession.setUserId(ADMIN);
+				sakaiSession.setUserEid(ADMIN);
+				emailTemplateService.updateTemplate(existingTemplate);
+				sakaiSession.setUserId(null);
+				sakaiSession.setUserId(null);
+				logger.info("Updated email template: " + template.getKey() + " with locale: " + template.getLocale());
+			}
 		}
 	}
 
@@ -847,5 +883,196 @@ public class SakaiProxyImpl implements SakaiProxy
 	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String reference, Map<String, String> replacementValues)
 	{
 		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, reference, replacementValues);
+	}
+	
+	public Set<String> getPermissionsForCurrentUserAndSite()
+	{
+        String userId = getCurrentUser().getId();
+
+        if (userId == null)
+        {
+            throw new SecurityException(
+                    "This action (userPerms) is not accessible to anon and there is no current user.");
+        }
+
+        Set<String> filteredFunctions = new TreeSet<String>();
+
+        if (securityService.isSuperUser(userId))
+        {
+            // Special case for the super admin
+            filteredFunctions.addAll(functionManager.getRegisteredFunctions("yaft"));
+        }
+        else
+        {
+            Site site = null;
+            AuthzGroup siteHelperRealm = null;
+
+            try
+            {
+            	site = siteService.getSite(getCurrentSiteId());
+                siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
+            }
+            catch(Exception e) {
+                // This should probably be logged but not rethrown.
+            }
+
+            Role currentUserRole = site.getUserRole(userId);
+
+            Role siteHelperRole = siteHelperRealm.getRole(currentUserRole.getId());
+
+            Set<String> functions = currentUserRole.getAllowedFunctions();
+
+            if(siteHelperRole != null)
+            {
+                // Merge in all the functions from the same role in !site.helper
+                functions.addAll(siteHelperRole.getAllowedFunctions());
+            }
+
+            for(String function : functions)
+            {
+            	if(function.startsWith("yaft"))
+            		filteredFunctions.add(function);
+            }
+        }
+
+        return filteredFunctions;
+	}
+	
+	public Map<String,Set<String>> getPermsForCurrentSite()
+	{
+        Map<String, Set<String>> perms = new HashMap<String, Set<String>>();
+        
+        String userId = getCurrentUser().getId();
+        
+        if (userId == null) {
+            throw new SecurityException(
+                    "This action (perms) is not accessible to anon and there is no current user.");
+        }
+
+        String siteId = getCurrentSiteId();
+        Site site = null;
+        
+        try
+        {
+        	site = siteService.getSite(siteId);
+        
+        	Set<Role> roles = site.getRoles();
+        	for (Role role : roles)
+        	{
+        		Set<String> functions = role.getAllowedFunctions();
+        		Set<String> filteredFunctions = new TreeSet<String>();
+        		for (String function : functions)
+        		{
+        			if (function.startsWith("yaft"))
+        				filteredFunctions.add(function);
+        		}
+        		
+        		perms.put(role.getId(), filteredFunctions);
+        	}
+        }
+        catch(Exception e)
+        {
+        	logger.error("Failed to get current site permissions.",e);
+        }
+        
+        return perms;
+	}
+
+	public boolean setPermsForCurrentSite(Map<String, String[]> params)
+	{
+        String userId = getCurrentUser().getId();
+
+        if(userId == null)
+            throw new SecurityException("This action (setPerms) is not accessible to anon and there is no current user.");
+
+        String siteId = getCurrentSiteId();
+
+        Site site = null;
+        
+        try
+        {
+       		site = siteService.getSite(siteId);
+        }
+        catch(IdUnusedException ide)
+        {
+        	logger.warn(userId + " attempted to update YAFT permissions for unknown site " + siteId);
+        	return false;
+        }
+
+        	List<String> functions = functionManager.getRegisteredFunctions();
+
+        	boolean admin = securityService.isSuperUser(userId);
+
+        	try
+        	{
+        		AuthzGroup authzGroup = authzGroupService.getAuthzGroup(site.getReference());
+        		
+        		if(!authzGroup.getUserRole(userId).isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS))
+        		{
+        			logger.warn(userId + " attempted to update YAFT permissions for site " + site.getTitle());
+        			return false;
+        		}
+
+        		boolean changed = false;
+
+        		for (String name : params.keySet())
+        		{
+        			if (!name.contains(":"))
+        				continue;
+
+        			String value = params.get(name)[0];
+
+        			String roleId = name.substring(0, name.indexOf(":"));
+
+        			Role role = authzGroup.getRole(roleId);
+        			if(role == null)
+        			{
+        				throw new IllegalArgumentException(
+        						"Invalid role id '" + roleId + "' provided in POST parameters.");
+        			}
+        			String function = name.substring(name.indexOf(":") + 1);
+
+                    if("true".equals(value))
+                        role.allowFunction(function);
+                    else
+                        role.disallowFunction(function);
+
+                    changed = true;
+        		}
+
+        		if(changed)
+        		{
+        			try
+        			{
+        				authzGroupService.save(authzGroup);
+        			}
+        			catch(AuthzPermissionException ape) {
+                        throw new SecurityException("The permissions for this site (" + siteId
+                            + ") cannot be updated by the current user.");
+                    }
+                }
+        		
+        		return true;
+            }
+            catch(GroupNotDefinedException gnde) {
+                logger.error("No realm defined for site (" + siteId + ").");
+            }
+
+		return false;
+	}
+
+	public SearchList searchInCurrentSite(String searchTerms)
+	{
+		List<String> contexts = new ArrayList<String>(1);
+		contexts.add(getCurrentSiteId());
+		
+        try
+        {
+            return searchService.search(searchTerms,contexts,0,50,"normal","normal");
+        }
+        catch (Exception e)
+        {
+        	return null;
+        }
 	}
 }

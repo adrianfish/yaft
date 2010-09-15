@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.sakaiproject.emailtemplateservice.model.EmailTemplate;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.HttpAccess;
@@ -355,11 +356,11 @@ public class YaftForumServiceImpl implements YaftForumService
 
 			Map<String, String> replacementValues = new HashMap<String, String>();
 			
-			String baseTemplateKey = "";
+			String templateKey = "";
 
 			if (newDiscussion)
 			{
-				baseTemplateKey = "yaft.newDiscussion";
+				templateKey = "yaft.newDiscussion";
 				replacementValues.put("siteTitle", siteTitle);
 				replacementValues.put("forumMessage", "Forum Message");
 				replacementValues.put("discussionSubject", message.getSubject());
@@ -369,7 +370,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 			else
 			{
-				baseTemplateKey = "yaft.newMessage";
+				templateKey = "yaft.newMessage";
 				replacementValues.put("siteTitle", siteTitle);
 				replacementValues.put("forumMessage", "Forum Message");
 				replacementValues.put("messageSubject", message.getSubject());
@@ -379,6 +380,27 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 
 			List<User> sakaiUsers = sakaiProxy.getUsers(users);
+			
+			boolean canSetHtml = false;
+			boolean canSetVersion = false;
+		
+			// The 2.6.x version of EmailTemplateService doesn't have html
+			// methods. We need to test for it or else we'll get a runtime error
+			Class templateClass = EmailTemplate.class;
+		
+			try
+			{
+				templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
+				canSetHtml = true;
+			}
+			catch(NoSuchMethodException nsme) {}
+		
+			try
+			{
+				templateClass.getDeclaredMethod("setVersion", new Class[] {int.class});
+				canSetVersion = true;
+			}
+			catch(NoSuchMethodException nsme) {}
 
 			// get the rendered template for each user
 			for (User user : sakaiUsers)
@@ -392,37 +414,30 @@ public class YaftForumServiceImpl implements YaftForumService
 
 				if (logger.isInfoEnabled())
 					logger.info("SakaiProxy.sendEmail() attempting to send email to: " + user.getId());
+				
+				RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
+			
+				if (template == null)
+				{
+					logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
+					return; // no template
+				}
 
 				try
 				{
 					if (emailPref.equals(YaftPreferences.EACH))
 					{
-						String templateKey = baseTemplateKey += "Each";
-						RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
-						if (template == null)
-						{
-							logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
-							return; // no template
-						}
-						
-						sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
+						if(canSetHtml)
+							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
+						else
+							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());
 					}
 					else if (emailPref.equals(YaftPreferences.DIGEST))
-					{
-						String templateKey = baseTemplateKey += "Digest";
-						RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
-						if (template == null)
-						{
-							logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
-							return; // no template
-						}
-						
-						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
-					}
+						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());
 				}
 				catch (Exception e)
 				{
-					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + baseTemplateKey + " : " + e.getClass() + " : " + e.getMessage());
+					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + templateKey + " : " + e.getClass() + " : " + e.getMessage());
 					continue; // try next user
 				}
 			}

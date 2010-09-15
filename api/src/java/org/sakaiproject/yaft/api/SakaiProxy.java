@@ -5,10 +5,12 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.EntityProducer;
+import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.user.api.User;
@@ -90,4 +92,12 @@ public interface SakaiProxy
 	public List<User> getUsers(Collection<String> userIds);
 
 	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String reference, Map<String, String> replacementValues);
+	
+	public Set<String> getPermissionsForCurrentUserAndSite();
+
+	public Map<String,Set<String>> getPermsForCurrentSite();
+
+	public boolean setPermsForCurrentSite(Map<String,String[]> parameterMap);
+
+	public SearchList searchInCurrentSite(String searchTerms);
 }

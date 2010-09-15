@@ -124,7 +124,7 @@ public class Discussion
 
 	public String getUrl()
 	{
-		return "/portal/tool/" + getPlacementId() + "/discussions/" + getId();//firstMessage.getUrl();
+		return "/portal/tool/" + getPlacementId() + "/discussions/" + getId() + ".html";
 	}
 
 	public String getPlacementId()

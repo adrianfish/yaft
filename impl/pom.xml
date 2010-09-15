@@ -57,10 +57,16 @@
             <groupId>org.sakaiproject.search</groupId>
             <artifactId>search-util</artifactId>
         </dependency>
+		<!-- 2.7.x build -->
     	<dependency>
       		<groupId>org.sakaiproject.profile</groupId>
       		<artifactId>profile-api</artifactId>
 		</dependency>
+		<!-- 2.6.x build -->
+    	<!--dependency>
+      		<groupId>org.sakaiproject</groupId>
+      		<artifactId>sakai-profile-api</artifactId>
+		</dependency-->
 		<dependency>
   			<groupId>org.sakaiproject.emailtemplateservice</groupId>
    			<artifactId>emailtemplateservice-api</artifactId>

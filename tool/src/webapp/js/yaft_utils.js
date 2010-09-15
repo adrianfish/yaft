@@ -738,18 +738,21 @@ var YaftUtils;
 
 	YaftUtils.showSearchResults = function(searchTerms) {
     	jQuery.ajax( {
-			url : "/direct/search.json?tool=discussions&contexts=" + yaftSiteId + "&searchTerms=" + searchTerms,
+			url : "/portal/tool/" + yaftPlacementId + "/search",
+			type : 'POST',
         	dataType : "json",
         	async : false,
 			cache: false,
+        	data : {'searchTerms':searchTerms},
         	success : function(results) {
-        		var hits = results["search_collection"];
+        		var hits = results;
 				/*
 				for(var i=0,j=hits.length;i<j;i++) {
 					var messageId = hits[i].id;
 					hits[i].url = "javascript: switchState('minimal',{messageId:'" + messageId + "'});";
 				}
 				*/
+				$('#yaft_breadcrumb').html('');
 				SakaiUtils.renderTrimpathTemplate('yaft_search_results_content_template',{'results':hits},'yaft_content');
 	 			$(document).ready(function() {
 					if(window.frameElement)
@@ -760,8 +763,6 @@ var YaftUtils;
 				alert("Failed to search. Status: " + status + ". Error: " + error);
 			}
 		});
-
-
 
 		$("#yaft_add_discussion_link").hide();
 		$("#yaft_add_forum_link").hide();
@@ -954,4 +955,79 @@ var YaftUtils;
 		
 		return urlBase;
 	}
+	
+	YaftUtils.getCurrentUserPermissions = function() {
+		var permissions = null;
+		jQuery.ajax( {
+	 		url : "/portal/tool/" + yaftPlacementId + "/userPerms",
+	   		dataType : "json",
+	   		async : false,
+	   		cache : false,
+		   	success : function(perms,status) {
+				permissions = perms;
+			},
+			error : function(xmlHttpRequest,stat,error) {
+				alert("Failed to get the current user permissions. Status: " + stat + ". Error: " + error);
+			}
+	  	});
+	  	
+	  	return permissions;
+	}
+	
+	YaftUtils.getSitePermissionMatrix = function() {
+        var perms = [];
+
+        jQuery.ajax( {
+            url : "/portal/tool/" + yaftPlacementId + "/perms",
+            dataType : "json",
+            async : false,
+            cache: false,
+            success : function(p) {
+                for(role in p) {
+                    var permSet = {'role':role};
+
+                    for(var i=0,j=p[role].length;i<j;i++) {
+                        var perm = p[role][i].replace(/\./g,"_");
+                        eval("permSet." + perm + " = true");
+                    }
+
+                    perms.push(permSet);
+                }
+            },
+            error : function(xmlHttpRequest,stat,error) {
+                alert("Failed to get permissions. Status: " + stat + ". Error: " + error);
+            }
+        });
+
+        return perms;
+    }
+    
+    YaftUtils.savePermissions = function() {
+        var boxes = $('.yaft_permission_checkbox');
+        var myData = {};
+        for(var i=0,j=boxes.length;i<j;i++) {
+            var box = boxes[i];
+            if(box.checked)
+                myData[box.id] = 'true';
+            else
+                myData[box.id] = 'false';
+        }
+
+        jQuery.ajax( {
+            url : "/portal/tool/" + yaftPlacementId + "/setPerms",
+            type : 'POST',
+            data : myData,
+            timeout: 30000,
+            async : false,
+            dataType: 'text',
+            success : function(result) {
+                switchState('forums');
+            },
+            error : function(xmlHttpRequest,status,error) {
+                alert("Failed to save permissions. Status: " + status + '. Error: ' + error);
+            }
+        });
+
+        return false;
+    }
 }) ();

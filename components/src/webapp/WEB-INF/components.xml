@@ -22,10 +22,8 @@
 	<bean id="org.sakaiproject.yaft.api.emailtemplates.List" class="java.util.ArrayList">
 		<constructor-arg>
       		<list>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newMessageEach.xml</value>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newMessageDigest.xml</value>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newDiscussionEach.xml</value>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newDiscussionDigest.xml</value>
+        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newMessage.xml</value>
+        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newDiscussion.xml</value>
       		</list>      
     	</constructor-arg>
   	</bean>

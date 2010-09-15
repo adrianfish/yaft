@@ -63,10 +63,17 @@
 			<artifactId>sakai-kernel-util</artifactId>
 		</dependency>
 
-   		<dependency>
-			<groupId>org.sakaiproject.profile</groupId>
-			<artifactId>profile-api</artifactId>
-   		</dependency>
+		<!-- 2.7.x build -->
+    	<dependency>
+      		<groupId>org.sakaiproject.profile</groupId>
+      		<artifactId>profile-api</artifactId>
+		</dependency>
+
+		<!-- 2.6.x build -->
+    	<!--dependency>
+      		<groupId>org.sakaiproject</groupId>
+      		<artifactId>sakai-profile-api</artifactId>
+		</dependency-->
 
    		<dependency>
 			<groupId>org.sakaiproject.entitybroker</groupId>
@@ -82,6 +89,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
         </dependency>
+        
+		<dependency>
+			<groupId>org.sakaiproject.search</groupId>
+			<artifactId>search-api</artifactId>
+		</dependency>
         
         <dependency>
             <groupId>net.sf.json-lib</groupId>

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -27,6 +28,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.entitybroker.exception.EntityException;
+import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
@@ -131,6 +133,16 @@ public class YaftTool extends HttpServlet
 					response.setContentType("application/json");
 					response.getWriter().write(data.toString());
 					return;
+				}
+				
+				else if ("perms".equals(part1))
+				{
+					doPermsGet(response);
+				}
+				
+				else if ("userPerms".equals(part1))
+				{
+					doUserPermsGet(response);
 				}
 				
 				else if ("activeDiscussions".equals(part1))
@@ -583,6 +595,28 @@ public class YaftTool extends HttpServlet
 			}
 		}
     }
+	
+	private void doUserPermsGet(HttpServletResponse response) throws ServletException, IOException
+	{
+        Set<String> perms = sakaiProxy.getPermissionsForCurrentUserAndSite();
+        JSONArray data = JSONArray.fromObject(perms);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.getWriter().write(data.toString());
+        response.getWriter().close();
+        return;
+	}
+	
+	private void doPermsGet(HttpServletResponse response) throws ServletException, IOException
+	{
+        Map<String,Set<String>> perms = sakaiProxy.getPermsForCurrentSite();
+        JSONObject data = JSONObject.fromObject(perms);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.getWriter().write(data.toString());
+        response.getWriter().close();
+        return;
+	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
@@ -605,6 +639,10 @@ public class YaftTool extends HttpServlet
 				doDiscussionsPost(request,response,parts);
 			else if ("messages".equals(part1))
 				doMessagesPost(request,response,parts);
+			else if ("setPerms".equals(part1))
+				doPermsPost(request,response);
+			else if ("search".equals(part1))
+				doSearchPost(request,response);
 			else if ("preferences".equals(part1))
 			{
 				String emailPreference = request.getParameter("emailPreference");
@@ -962,6 +1000,40 @@ public class YaftTool extends HttpServlet
     			return;
     		}
         }
+	}
+	
+	private void doPermsPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		if(sakaiProxy.setPermsForCurrentSite(request.getParameterMap()))
+		{
+       		response.setStatus(HttpServletResponse.SC_OK);
+       		response.setContentType("text/plain");
+       		response.getWriter().write("success");
+       		response.getWriter().close();
+       		return;
+		}
+    	else
+    	{
+    		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    		return;
+    	}
+	}
+	
+	private void doSearchPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		String searchTerms = request.getParameter("searchTerms");
+		
+		if(searchTerms == null || searchTerms.length() == 0)
+			throw new ServletException("No search terms supplied.");
+		
+		SearchList results = sakaiProxy.searchInCurrentSite(searchTerms);
+		
+        JSONArray data = JSONArray.fromObject(results);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.getWriter().write(data.toString());
+        response.getWriter().close();
+        return;
 	}
 	
 	private List<Attachment> getAttachments(HttpServletRequest request)
