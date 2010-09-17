@@ -1,15 +1,18 @@
-/* Copyright (c) 2007 Paul Bakaus (paul.bakaus@googlemail.com) and Brandon Aaron (brandon.aaron@gmail.com || http://brandonaaron.net)
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+/*
+ * Copyright 2009 The Sakai Foundation
  *
- * $LastChangedDate: 2007-08-17 14:14:11 -0400 (Fri, 17 Aug 2007) $
- * $Rev: 2759 $
+ * Licensed under the Educational Community License, Version 1.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Version: 1.1.2
+ * http://www.opensource.org/licenses/ecl1.php
  *
- * Requires: jQuery 1.1.3+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 (function($){
 
 // store a copy of the core height and width methods
