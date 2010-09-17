@@ -23,12 +23,15 @@
       lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
+<!--
 <script type="text/javascript" src="/yaft-tool/lib/jquery.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery-ui.js"></script>
+-->
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/js/headscripts.js"></script>
+<!--
 <script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script>
-<script type="text/javascript" src="/yaft-tool/js/sakai_utils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/querystring.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.cluetip.min.js"></script> 
 <script type="text/javascript" src="/yaft-tool/lib/jquery.bgiframe.min.js"></script> 
@@ -39,6 +42,8 @@
 <script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.0-min.js"></script>
 <script type="text/javascript" language="JavaScript" src="/yaft-tool/lib/jquery.form.js"></script>
+-->
+<script type="text/javascript" src="/yaft-tool/js/sakai_utils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/yaft_utils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/yaft_permissions.js"></script>
 <script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
@@ -99,7 +104,14 @@ ${yaft_forums_label}
 <div id="yaft_forums_content_template" style="display:none"><!--
 <table id="yaft_forum_table" class="listHier">
 	<thead>
-	<tr><th align="left">${yaft_forum_label}</th><th align="left">${yaft_discussions_label}</th><th>${yaft_messages_label}</th><th>${yaft_unread_label}</th><th>${yaft_last_message_label}</th><th>${yaft_options_label}</th></tr>
+	<tr>
+		<th align="left"><div>${yaft_forum_label}</div></th>
+		<th align="left"><div>${yaft_discussions_label}</div></th>
+		<th><div>${yaft_messages_label}</div></th>
+		<th><div>${yaft_unread_label}</div></th>
+		<th><div>${yaft_last_message_label}</div></th>
+		<th><div>${yaft_options_label}</div></th>
+	</tr>
 	</thead>
 	<tbody>
 	{for forum in items}
@@ -143,12 +155,12 @@ ${yaft_forums_label}
 <table id="yaft_discussion_table" class="listHier">
 	<thead>
 	<tr>
-		<th align="left">${yaft_discussion_label}</th>
-		<th align="left">${yaft_started_by_label}</th>
-		<th align="left">${yaft_messages_label}</th>
-		<th align="left">${yaft_unread_label}</th>
-		<th align="left">${yaft_last_message_label}</th>
-		<th align="left">${yaft_options_label}</th>
+		<th align="left"><div>${yaft_discussion_label}</div></th>
+		<th align="left"><div>${yaft_started_by_label}</div></th>
+		<th align="left"><div>${yaft_messages_label}</div></th>
+		<th align="left"><div>${yaft_unread_label}</div></th>
+		<th align="left"><div>${yaft_last_message_label}</div></th>
+		<th align="left"><div>${yaft_options_label}</div></th>
 	</tr>
 	</thead>
 	<tbody>
