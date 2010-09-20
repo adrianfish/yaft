@@ -19,6 +19,25 @@ var YaftUtils;
 	if(YaftUtils == null)
 		YaftUtils = new Object();
 		
+	YaftUtils.setCurrentForums = function() {
+		jQuery.ajax( {
+	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
+	   		dataType : "json",
+	   		async : false,
+			cache: false,
+	  		success : function(forums,status) {
+				yaftCurrentForums = forums;
+
+				YaftUtils.markReadMessagesInFora();
+
+				YaftUtils.setupForumUnsubscriptions();
+			},
+			error : function(xmlHttpRequest,textStatus,errorThrown) {
+				alert("Failed to set current forums. Reason: " + errorThrown);
+			}
+		});
+	}
+		
 	YaftUtils.saveForum = function() {
 	
 		var title = $('#yaft_title_field').val();
