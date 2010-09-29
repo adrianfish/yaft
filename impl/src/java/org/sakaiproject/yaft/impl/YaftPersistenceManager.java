@@ -34,6 +34,7 @@ import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
+import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftPreferences;
@@ -178,7 +179,7 @@ public class YaftPersistenceManager
 			st = connection.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			if(rs.next())
-				forum = getForumFromResults(rs);
+				forum = getForumFromResults(rs,connection);
 			
 			rs.close();
 			
@@ -219,7 +220,7 @@ public class YaftPersistenceManager
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next())
 			{
-				Forum forum = getForumFromResults(rs);
+				Forum forum = getForumFromResults(rs,connection);
 				
 				// We do not want to return deleted fora
 				if("DELETED".equals(forum.getStatus())) continue;
@@ -273,17 +274,37 @@ public class YaftPersistenceManager
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateForum()");
 		
 		Connection connection = null;
-		PreparedStatement statement = null;
+		List<PreparedStatement> statements = null;
 
 		try
 		{
-			connection = sakaiProxy.borrowConnection();
-
-			statement = sqlGenerator.getAddOrUpdateForumStatement(forum,connection);
-			int rowCount = statement.executeUpdate();
-			connection.commit();
+			boolean oldAutoCommitFlag = false;
 			
-			return rowCount == 1;
+			connection = sakaiProxy.borrowConnection();
+			oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			statements = sqlGenerator.getAddOrUpdateForumStatements(forum,connection);
+			
+			try
+			{
+				for(PreparedStatement statement : statements)
+					statement.executeUpdate();
+				
+				connection.commit();
+			
+				return true;
+			}
+			catch(Exception e)
+			{
+				logger.error("Caught exception whilst adding or updating a forum. Rolling back ...",e);
+				connection.rollback();
+				return false;
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
 		}
 		catch (Exception e)
 		{
@@ -292,13 +313,16 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
-			if(statement != null)
+			if(statements != null)
 			{
-				try
+				for(PreparedStatement st : statements)
 				{
-					statement.close();
+					try
+					{
+						st.close();
+					}
+					catch (Exception e) {}
 				}
-				catch (Exception e) {}
 			}
 			
 			sakaiProxy.returnConnection(connection);
@@ -438,7 +462,7 @@ public class YaftPersistenceManager
 			
 			while(rs.next())
 			{
-				Forum forum = getForumFromResults(rs);
+				Forum forum = getForumFromResults(rs,connection);
 				
 				// Only add this forum to the list if is has not been deleted
 				if(!"DELETED".equals(forum.getStatus())) fora.add(forum);
@@ -762,7 +786,7 @@ public class YaftPersistenceManager
 		return message;
 	}
 	
-	private Forum getForumFromResults(ResultSet rs) throws Exception
+	private Forum getForumFromResults(ResultSet rs, Connection conn) throws Exception
 	{
 		Forum forum = new Forum();
 		forum.setId(rs.getString(ColumnNames.FORUM_ID));
@@ -790,6 +814,39 @@ public class YaftPersistenceManager
 		forum.setDiscussionCount(rs.getInt(ColumnNames.DISCUSSION_COUNT));
 		forum.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 		forum.setStatus(rs.getString("STATUS"));
+		
+		Statement st = null;
+		
+		try
+		{
+			st = conn.createStatement();
+			String sql = sqlGenerator.getForumGroupsSelectStatement(forum.getId());
+			ResultSet groupRS = st.executeQuery(sql);
+			
+			List<Group> groups = new ArrayList<Group>();
+		
+			while(groupRS.next())
+				groups.add(new Group(groupRS.getString("GROUP_ID"),groupRS.getString("TITLE")));
+			
+			forum.setGroups(groups);
+		
+			groupRS.close();
+		}
+		catch(Exception e)
+		{
+			logger.error("Caught exception whilst getting forum groups.",e);
+		}
+		finally
+		{
+			if(st != null)
+			{
+				try
+				{
+					st.close();
+				}
+				catch(Exception e) {}
+			}
+		}
 
 		return forum;
 	}

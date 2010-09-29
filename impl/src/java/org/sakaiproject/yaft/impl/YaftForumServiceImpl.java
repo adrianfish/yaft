@@ -55,12 +55,16 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	private boolean useSynopticFunctionality = true;
 
+	private YaftSecurityManager securityManager;
+
 	public void init()
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("init()");
 
 		sakaiProxy = new SakaiProxyImpl();
+		
+		securityManager = new YaftSecurityManager(sakaiProxy);
 
 		logger.info("Registering Yaft functions ...");
 
@@ -92,7 +96,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		if (logger.isDebugEnabled())
 			logger.debug("getForum()");
 
-		return persistenceManager.getForum(forumId, state);
+		return securityManager.filterForum(persistenceManager.getForum(forumId, state));
 	}
 
 	public Discussion getDiscussion(String discussionId, boolean fully)
@@ -107,7 +111,8 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("getSiteForums()");
-		return persistenceManager.getFora(siteId, fully);
+		
+		return securityManager.filterFora(persistenceManager.getFora(siteId, fully));
 	}
 
 	public boolean addOrUpdateForum(Forum forum)
@@ -190,7 +195,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		if (logger.isDebugEnabled())
 			logger.debug("getFora()");
 
-		List<Forum> fora = persistenceManager.getFora();
+		List<Forum> fora = securityManager.filterFora(persistenceManager.getFora());
 
 		for (Forum forum : fora)
 		{
@@ -316,7 +321,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public Forum getForumContainingMessage(String messageId)
 	{
-		return persistenceManager.getForumContainingMessage(messageId);
+		return securityManager.filterForum(persistenceManager.getForumContainingMessage(messageId));
 	}
 
 	public boolean markMessageRead(String messageId, String forumId, String discussionId)
@@ -711,7 +716,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public Forum getForumForTitle(String title, String state, String siteId)
 	{
-		return persistenceManager.getForumForTitle(title, state, siteId);
+		return securityManager.filterForum(persistenceManager.getForumForTitle(title, state, siteId));
 	}
 
 	public List<String> getForumUnsubscriptions(String userId)

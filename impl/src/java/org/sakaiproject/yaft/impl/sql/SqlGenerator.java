@@ -33,7 +33,7 @@ public interface SqlGenerator
 
 	String getForumSelectStatement(String forumId);
 
-	PreparedStatement getAddOrUpdateForumStatement(Forum forum,Connection connection) throws SQLException;
+	List<PreparedStatement> getAddOrUpdateForumStatements(Forum forum,Connection connection) throws SQLException;
 
 	String getForaSelectStatement(String siteId);
 
@@ -118,4 +118,6 @@ public interface SqlGenerator
 	String getDeleteFromActiveDiscussionStatement(String discussionId);
 
 	String getSelectIdOfSiteContainingMessage(String messageId);
+
+	String getForumGroupsSelectStatement(String forumId);
 }

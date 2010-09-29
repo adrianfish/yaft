@@ -282,19 +282,27 @@ function switchState(state,arg) {
 		});
 	}
 	else if('editForum' === state) {
-		var forum = {'id':'','title':'','description':'',start: -1,end: -1};
+		var forum = {'id':'','title':'','description':'',start: -1,end: -1,'groups': []};
 
 		if(arg && arg.forumId)
 			forum = YaftUtils.findForum(arg.forumId);
+			
+		var groups = YaftUtils.getGroupsForCurrentSite();
 
 		SakaiUtils.renderTrimpathTemplate('yaft_edit_forum_breadcrumb_template',arg,'yaft_breadcrumb');
-		SakaiUtils.renderTrimpathTemplate('yaft_edit_forum_content_template',forum,'yaft_content');
+		SakaiUtils.renderTrimpathTemplate('yaft_edit_forum_content_template',{'forum':forum,'groups':groups},'yaft_content');
 
 		setupAvailability(forum);
 	
 	 	$(document).ready(function() {
+				for(var i=0,j=forum.groups.length;i<j;i++) {
+					$('#' + forum.groups[i].id).attr('checked','true');
+				}
+
 	 			$('#yaft_title_field').focus();
 	 			$('#yaft_forum_save_button').click(YaftUtils.saveForum);
+	 			$('#yaft_show_advanced_options_link').click(YaftUtils.showAdvancedOptions);
+                $('#yaft_hide_advanced_options_link').click(YaftUtils.hideAdvancedOptions);
 	 			$('#yaft_title_field').keypress(function(e) {
 						if(e.keyCode == '13') { // Enter key
 							YaftUtils.saveForum();

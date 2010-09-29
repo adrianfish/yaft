@@ -166,3 +166,6 @@ th.yaftSortableTableHeaderSortDown {
 	margin-right: 15px;
 }
 
+.yaft_group_title {
+	font-weight: bold;
+}

@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.YaftPreferences;
 
@@ -55,9 +56,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		List<String> statements = new ArrayList<String>();
 		
-		statements.add("CREATE TABLE YAFT_FORUM (FORUM_ID CHAR(36) NOT NULL," + "SITE_ID " + VARCHAR + "(99) NOT NULL," + "CREATOR_ID " + VARCHAR + "(99) NOT NULL," + "TITLE " + VARCHAR + "(255) NOT NULL," + "DESCRIPTION " + VARCHAR + "(255)," + "DISCUSSION_COUNT INT NOT NULL," + "MESSAGE_COUNT INT NOT NULL," + "LAST_MESSAGE_DATE " + TIMESTAMP + "," + "START_DATE " + TIMESTAMP + "," + "END_DATE " + TIMESTAMP + "," + "LOCKED_FOR_WRITING " + BOOL + " NOT NULL," + "LOCKED_FOR_READING " + BOOL + " NOT NULL," + "STATUS " + VARCHAR + "(36) NOT NULL," + "CONSTRAINT yaft_forum_pk PRIMARY KEY (FORUM_ID))");
+		statements.add("CREATE TABLE YAFT_FORUM (FORUM_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,CREATOR_ID " + VARCHAR + "(99) NOT NULL,TITLE " + VARCHAR + "(255) NOT NULL,DESCRIPTION " + VARCHAR + "(255),DISCUSSION_COUNT INT NOT NULL,MESSAGE_COUNT INT NOT NULL,LAST_MESSAGE_DATE " + TIMESTAMP + ",START_DATE " + TIMESTAMP + ",END_DATE " + TIMESTAMP + ",LOCKED_FOR_WRITING " + BOOL + " NOT NULL,LOCKED_FOR_READING " + BOOL + " NOT NULL,STATUS " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_forum_pk PRIMARY KEY (FORUM_ID))");
+		
+		statements.add("CREATE TABLE YAFT_FORUM_GROUP (FORUM_ID CHAR(36) NOT NULL,GROUP_ID " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_forum_group_pk PRIMARY KEY (FORUM_ID,GROUP_ID))");
 
-		statements.add("CREATE TABLE YAFT_FORUM_DISCUSSION (FORUM_ID CHAR(36) NOT NULL," + "DISCUSSION_ID CHAR(36) NOT NULL," + "CONSTRAINT yaft_forum_discussion_pk PRIMARY KEY (FORUM_ID,DISCUSSION_ID))");
+		statements.add("CREATE TABLE YAFT_FORUM_DISCUSSION (FORUM_ID CHAR(36) NOT NULL,DISCUSSION_ID CHAR(36) NOT NULL,CONSTRAINT yaft_forum_discussion_pk PRIMARY KEY (FORUM_ID,DISCUSSION_ID))");
 
 		statements.add("CREATE TABLE YAFT_DISCUSSION (DISCUSSION_ID CHAR(36) NOT NULL," + "LAST_MESSAGE_DATE " + TIMESTAMP + " NOT NULL," + "MESSAGE_COUNT INT NOT NULL," + "STATUS " + VARCHAR + "(36) NOT NULL," + "START_DATE " + TIMESTAMP + "," + "END_DATE " + TIMESTAMP + "," + "LOCKED_FOR_WRITING " + BOOL + " NOT NULL," + "LOCKED_FOR_READING " + BOOL + " NOT NULL," + "CONSTRAINT yaft_discussion_pk PRIMARY KEY (DISCUSSION_ID))");
 
@@ -102,8 +105,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "SELECT * FROM YAFT_FORUM WHERE FORUM_ID = '" + forumId + "'";
 	}
 
-	public PreparedStatement getAddOrUpdateForumStatement(Forum forum, Connection connection) throws SQLException
+	public List<PreparedStatement> getAddOrUpdateForumStatements(Forum forum, Connection connection) throws SQLException
 	{
+		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
+		
 		if (forum.getId().length() > 0)
 		{
 			String updateSql = "UPDATE YAFT_FORUM SET TITLE = ?, DESCRIPTION = ?,START_DATE = ?,END_DATE = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ? WHERE FORUM_ID = ?";
@@ -130,8 +135,22 @@ public class DefaultSqlGenerator implements SqlGenerator
 			ps.setBoolean(6, forum.isLockedForReading());
 
 			ps.setString(7, forum.getId());
-
-			return ps;
+			
+			statements.add(ps);
+			
+			PreparedStatement deleteGroupsStatement = connection.prepareStatement("DELETE FROM YAFT_FORUM_GROUP WHERE FORUM_ID = ?");
+			deleteGroupsStatement.setString(1, forum.getId());
+			
+			statements.add(deleteGroupsStatement);
+			
+			for(Group group : forum.getGroups())
+			{
+				PreparedStatement addGroupsStatement = connection.prepareStatement("INSERT INTO YAFT_FORUM_GROUP VALUES(?,?)");
+				addGroupsStatement.setString(1,forum.getId());
+				addGroupsStatement.setString(2,group.getId());
+				
+				statements.add(addGroupsStatement);
+			}
 		}
 		else
 		{
@@ -164,9 +183,20 @@ public class DefaultSqlGenerator implements SqlGenerator
 			ps.setBoolean(9, forum.isLockedForReading());
 
 			ps.setString(10, forum.getStatus());
-
-			return ps;
+			
+			statements.add(ps);
+			
+			for(Group group : forum.getGroups())
+			{
+				PreparedStatement addGroupsStatement = connection.prepareStatement("INSERT INTO YAFT_FORUM_GROUP VALUES(?,?)");
+				addGroupsStatement.setString(1,forum.getId());
+				addGroupsStatement.setString(2,group.getId());
+				
+				statements.add(addGroupsStatement);
+			}
 		}
+		
+		return statements;
 	}
 
 	public String getMessageSelectStatement(String messageId)
@@ -812,5 +842,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public String getSelectIdOfSiteContainingMessage(String messageId)
 	{
 		return "SELECT SITE_ID FROM YAFT_MESSAGE WHERE MESSAGE_ID = '" + messageId + "'";
+	}
+
+	public String getForumGroupsSelectStatement(String forumId)
+	{
+		return "SELECT YAFT_FORUM_GROUP.GROUP_ID,TITLE FROM YAFT_FORUM_GROUP,sakai_site_group WHERE FORUM_ID = '" + forumId + "' and YAFT_FORUM_GROUP.GROUP_ID = sakai_site_group.GROUP_ID";
 	}
 }

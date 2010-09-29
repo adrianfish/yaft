@@ -16,11 +16,7 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +38,6 @@ import net.sf.json.JsonConfig;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
-import org.sakaiproject.entitybroker.exception.EntityException;
 import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
@@ -51,6 +46,7 @@ import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
@@ -719,24 +715,12 @@ public class YaftTool extends HttpServlet
             {
         		String id = (String) request.getParameter("id");
         		String title = (String) request.getParameter("title");
+        		String groupsString = (String) request.getParameter("groups");
         		String description = (String) request.getParameter("description");
         		String startDate= (String) request.getParameter("startDate");
         		String endDate= (String) request.getParameter("endDate");
         		String lockWritingString = (String) request.getParameter("lockWriting");
         		String lockReadingString = (String) request.getParameter("lockReading");
-        		
-        		boolean lockWriting = true;
-        		boolean lockReading = true;
-        		
-        		if(lockWritingString != null)
-        			lockWriting = lockWritingString.equals("true");
-        		else
-        			lockWriting = false;
-        		
-        		if(lockReadingString != null)
-        			lockReading = lockReadingString.equals("true");
-        		else
-        			lockReading = false;
         		
         		if (logger.isDebugEnabled())
         		{
@@ -756,10 +740,33 @@ public class YaftTool extends HttpServlet
         			return;
         		}
         		
+        		boolean lockWriting = true;
+        		boolean lockReading = true;
+        		
+        		if(lockWritingString != null)
+        			lockWriting = lockWritingString.equals("true");
+        		else
+        			lockWriting = false;
+        		
+        		if(lockReadingString != null)
+        			lockReading = lockReadingString.equals("true");
+        		else
+        			lockReading = false;
+        		
         		Forum forum = new Forum();
         		
         		if(id != null)
         			forum.setId(id);
+        		
+        		if(groupsString != null)
+        		{
+        			String[] groups = groupsString.split(",");
+        			List<Group> list = new ArrayList<Group>();
+        			for(String groupId : groups)
+        				list.add(new Group(groupId, ""));
+        			
+        			forum.setGroups(list);
+        		}
         		
         		forum.setTitle(title);
         		forum.setDescription(description);

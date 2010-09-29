@@ -115,4 +115,6 @@ public interface SakaiProxy
 	public boolean setPermsForCurrentSite(Map<String,String[]> parameterMap);
 
 	public SearchList searchInCurrentSite(String searchTerms);
+
+	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups);
 }

@@ -110,3 +110,5 @@ yaft_email_never_label = 'Never';
 yaft_email_each_label = 'Every time something happens';
 yaft_email_digest_label = 'As a digest once a day';
 yaft_search_results = 'Search Results';
+yaft_limit_to_groups_label = 'Display this forum and its contents to the selected groups only';
+yaft_forum_group_message = 'Only visible to these groups: ';

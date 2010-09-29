@@ -17,7 +17,9 @@ package org.sakaiproject.yaft.api;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class Forum
 	private String creatorId = "";
 	private List<Discussion> discussions= new ArrayList<Discussion>();
 	private String url = "";
+	private List<Group> groups = new ArrayList<Group>();
 	
 	public Forum()
 	{
@@ -276,5 +279,15 @@ public class Forum
 	public boolean isLockedForReadingAndUnavailable()
 	{
 		return lockedForReading && !isCurrent();
+	}
+	
+	public void setGroups(List<Group> groups)
+	{
+		this.groups = groups;
+	}
+
+	public List<Group> getGroups()
+	{
+		return groups;
 	}
 }

@@ -118,8 +118,20 @@ ${yaft_forums_label}
 	{if !forum.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id}
    	<tr class="yaftForumRow {if (yaftCurrentUserPermissions.viewInvisible || forum.creatorId == yaftCurrentUser.id) && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable)} yaftInvisible{/if}">
 		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
+		{if forum.description.length > 0}
 		<br/>
-		<span class="yaftForumDescription">${forum.description}</span></td>
+		<span class="yaftForumDescription">${forum.description}</span>
+		{/if}
+		{if forum.groups.length > 0}
+		<br />
+		<span class="yaftForumDescription">${yaft_forum_group_message}
+			{for group in forum.groups}
+				<span class="yaft_group_title">${group.title}<span>
+				{if group_index < (forum.groups.length - 1)},{/if}
+			{/for}
+		</span>
+		{/if}
+		</td>
 		<td align="center">${forum.discussionCount}</td>
 		<td align="center">${forum.messageCount}</td>
 		<td align="center">${forum.unread}</td>
@@ -564,15 +576,26 @@ ${yaft_forums_label}
 
 <div id="yaft_edit_forum_content_template" style="display:none;"><!--
 <form>
-<input id="yaft_id_field" type="hidden" name="id" value="${id}"/>
+<input id="yaft_id_field" type="hidden" name="id" value="${forum.id}"/>
 <table>
-<tr><td>${yaft_forum_title_label}: *</td><td><input id="yaft_title_field" type="text" name="title" value="${title}"/></td></tr>
-<tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="64" value="${description}"/></td></tr>
+<tr><td>${yaft_forum_title_label}: *</td><td><input id="yaft_title_field" type="text" name="title" value="${forum.title}"/></td></tr>
+<tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="64" value="${forum.description}"/></td></tr>
 </table>
 <br />
-<a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
-<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YaftUtils.hideAdvancedOptions();">Hide advanced options</a>
-<fieldset id="yaft_availability_fieldset" style="display: none;">
+<a id="yaft_show_advanced_options_link" href="javascript:;">Show advanced options</a>
+<a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
+<div id="yaft_advanced_options" style="display:none;">
+<fieldset id="yaft_groups_fieldset">
+<legend>Groups</legend>
+<span class="instruction">${yaft_limit_to_groups_label}</span>
+<br />
+<br />
+{for group in groups}
+    <input type="checkbox" class="yaft_group_checkbox" id="${group.id}" value="${group.title}"/>${group.title}
+    <br />
+{/for}
+</fieldset>
+<fieldset id="yaft_availability_fieldset">
 <legend>Availability</legend>
 <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
 <br />
@@ -657,6 +680,7 @@ ${yaft_forums_label}
 <br />
 <a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
 </fieldset>
+</div>
 <br />
 <br />
 <input type="button" id="yaft_forum_save_button" value="${yaft_save_label}"/>

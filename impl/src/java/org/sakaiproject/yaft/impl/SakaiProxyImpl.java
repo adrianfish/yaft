@@ -86,6 +86,7 @@ import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.util.BaseResourceProperties;
 import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
+import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
@@ -1089,5 +1090,25 @@ public class SakaiProxyImpl implements SakaiProxy
         {
         	return null;
         }
+	}
+
+	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups)
+	{
+		String userId = getCurrentUser().getId();
+		
+		for(Group group : groups)
+		{
+			try
+			{
+				AuthzGroup ag = authzGroupService.getAuthzGroup("/site/" + getCurrentSiteId() + "/group/" + group.getId());
+				
+				if(ag.getMember(userId) != null) return true;
+            }
+            catch(GroupNotDefinedException gnde)
+            {
+            }
+		}
+		
+		return false;
 	}
 }

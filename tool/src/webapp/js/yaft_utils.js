@@ -64,6 +64,16 @@ var YaftUtils;
 		var endMinutes = (+$('#yaft_end_minutes').val());
 		endDate += (endHours * 3600000) + (endMinutes * 60000);
 
+		// Get any selected groups
+		var groupBoxes = $('.yaft_group_checkbox:checked');
+
+		var groups = '';
+
+		for(var i=0,j=groupBoxes.length;i<j;i++) {
+			groups += groupBoxes[i].id;
+			if(i<j) groups += ',';
+		}
+
 	   	var forum = {
 	   		'siteId':yaftSiteId,
 			'id':$('#yaft_id_field').val(),
@@ -71,7 +81,8 @@ var YaftUtils;
 			'endDate':endDate,
 			'title':title,
 			'description':description,
-			'discussions': []
+			'discussions': [],
+			'groups': groups
 		};
 	   		
 		jQuery.ajax( {
@@ -120,6 +131,24 @@ var YaftUtils;
 		$('#yaft_end_minute_selector').get(0).selectedIndex = 0;
 	}
 	
+	YaftUtils.getGroupsForCurrentSite = function() {
+        var groups = null;
+
+        $.ajax( {
+            url : "/direct/site/" + yaftSiteId + ".json?includeGroups=true",
+            dataType : "json",
+            cache: false,
+            async : false,
+            success : function(site) {
+                groups = site.siteGroups;
+            },
+            error : function(xmlHttpRequest,status) {
+            }
+        });
+
+        return groups;
+    }
+	
 	YaftUtils.clearActiveDiscussionsForCurrentUser = function() {
 		$.ajax( {
 	   		url : "/portal/tool/" + yaftPlacementId + "/activeDiscussions/clear",
@@ -136,7 +165,7 @@ var YaftUtils;
 	}
 
 	YaftUtils.showAdvancedOptions = function() {
-		$('#yaft_availability_fieldset').show();
+		$('#yaft_advanced_options').show();
 		$('#yaft_show_advanced_options_link').hide();
 		$('#yaft_hide_advanced_options_link').show();
 	 	$(document).ready(function() {
@@ -146,7 +175,7 @@ var YaftUtils;
 	}
 
 	YaftUtils.hideAdvancedOptions = function() {
-		$('#yaft_availability_fieldset').hide();
+		$('#yaft_advanced_options').hide();
 		$('#yaft_show_advanced_options_link').show();
 		$('#yaft_hide_advanced_options_link').hide();
 	 	$(document).ready(function() {
