@@ -417,6 +417,7 @@ ${yaft_forums_label}
 			<th style="text-align:center;">create</th>
 			<th style="text-align:center;">delete.own</th>
 			<th style="text-align:center;">delete.any</th>
+			<th style="text-align:center;">viewGroups</th>
 			<th style="background: white;"></th>
 			<th style="text-align:center;">create</th>
 			<th style="text-align:center;">delete.own</th>
@@ -438,6 +439,7 @@ ${yaft_forums_label}
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_create}checked="checked"{/if}" id="${p.role}:yaft.forum.create"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.forum.deleteOwn"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_deleteAny}checked="checked"{/if}" id="${p.role}:yaft.forum.deleteAny"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_forum_viewGroups}checked="checked"{/if}" id="${p.role}:yaft.forum.viewGroups"/></td>
 	<td></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_create}checked="checked"{/if}" id="${p.role}:yaft.discussion.create"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.discussion.deleteOwn"/></td>
@@ -586,7 +588,7 @@ ${yaft_forums_label}
 <a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
 <div id="yaft_advanced_options" style="display:none;">
 <fieldset id="yaft_groups_fieldset">
-<legend>Groups</legend>
+<legend>${yaft_groups_box_label}</legend>
 <span class="instruction">${yaft_limit_to_groups_label}</span>
 <br />
 <br />

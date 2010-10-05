@@ -34,6 +34,8 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.ForumPopulatedStates;
+import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.XmlDefs;
@@ -72,6 +74,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_FORUM_CREATE);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_FORUM_DELETE_OWN);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_FORUM_DELETE_ANY);
+		sakaiProxy.registerFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_CREATE);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY);
@@ -96,7 +99,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		if (logger.isDebugEnabled())
 			logger.debug("getForum()");
 
-		return securityManager.filterForum(persistenceManager.getForum(forumId, state));
+		return securityManager.filterForum(persistenceManager.getForum(forumId, state),null);
 	}
 
 	public Discussion getDiscussion(String discussionId, boolean fully)
@@ -159,7 +162,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, reference, true);
 
 		if (sendMail && "READY".equals(message.getStatus()))
-			sendEmail(siteId, message, false);
+			sendEmail(siteId, forumId, message, false);
 
 		return true;
 	}
@@ -184,7 +187,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 
 			if (sendMail)
-				sendEmail(siteId, message, true);
+				sendEmail(siteId, forumId, message, true);
 		}
 
 		return discussion;
@@ -321,7 +324,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public Forum getForumContainingMessage(String messageId)
 	{
-		return securityManager.filterForum(persistenceManager.getForumContainingMessage(messageId));
+		return securityManager.filterForum(persistenceManager.getForumContainingMessage(messageId), null);
 	}
 
 	public boolean markMessageRead(String messageId, String forumId, String discussionId)
@@ -349,7 +352,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		persistenceManager.moveDiscussion(discussionId, currentForumId, newForumId);
 	}
 
-	private void sendEmail(String siteId, Message message, boolean newDiscussion)
+	private void sendEmail(String siteId, String forumId, Message message, boolean newDiscussion)
 	{
 		try
 		{
@@ -364,8 +367,24 @@ public class YaftForumServiceImpl implements YaftForumService
 
 			if (site != null)
 				siteTitle = site.getTitle();
-
-			Set<String> users = site.getUsers();
+			
+			Set<String> users = null;
+			
+			Forum forum = persistenceManager.getForum(forumId, ForumPopulatedStates.EMPTY);
+			
+			List<Group> groups = forum.getGroups();
+			
+			if(groups.size() > 0)
+			{
+				users = sakaiProxy.getGroupMemberIds(groups);
+			}
+			else
+			{
+				users = site.getUsers();
+			}
+			
+			// Make sure the current user is included
+			users.add(sakaiProxy.getCurrentUser().getId());
 
 			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
 
@@ -472,7 +491,7 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		persistenceManager.publishMessage(forumId, message.getId());
 
-		sendEmail(null, message, false);
+		sendEmail(null, forumId, message, false);
 	}
 
 	/** START EntityProducer IMPLEMENTATION */
@@ -716,7 +735,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public Forum getForumForTitle(String title, String state, String siteId)
 	{
-		return securityManager.filterForum(persistenceManager.getForumForTitle(title, state, siteId));
+		return securityManager.filterForum(persistenceManager.getForumForTitle(title, state, siteId),siteId);
 	}
 
 	public List<String> getForumUnsubscriptions(String userId)

@@ -6,6 +6,7 @@ import java.util.List;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.YaftFunctions;
 
 public class YaftSecurityManager
 {
@@ -24,12 +25,7 @@ public class YaftSecurityManager
 		
 		for(Forum forum : fora)
 		{
-			if(!forum.getSiteId().equals(siteId))
-				continue;
-			
-			List<Group> groups = forum.getGroups();
-			
-			if(groups.size() > 0 && !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups))
+			if(filterForum(forum, siteId) == null)
 				continue;
 			
 			filtered.add(forum);
@@ -38,13 +34,22 @@ public class YaftSecurityManager
 		return filtered;
 	}
 
-	public Forum filterForum(Forum forum)
+	public Forum filterForum(Forum forum,String siteId)
 	{
-		String siteId = sakaiProxy.getCurrentSiteId();
+		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
 		
-		if(forum.getSiteId().equals(siteId))
-			return forum;
+		if(!forum.getSiteId().equals(siteId))
+			return null;
 		
-		return null;
+		List<Group> groups = forum.getGroups();
+			
+		if(groups.size() > 0
+				&& !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups)
+				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
+		{
+			return null;
+		}
+		
+		return forum;
 	}
 }

@@ -21,6 +21,7 @@ public class YaftFunctions
 	public static  final String YAFT_FORUM_CREATE = "yaft.forum.create";
 	public static  final String YAFT_FORUM_DELETE_OWN = "yaft.forum.deleteOwn";
 	public static  final String YAFT_FORUM_DELETE_ANY = "yaft.forum.deleteAny";
+	public static  final String YAFT_FORUM_VIEW_GROUPS = "yaft.forum.viewGroups";
 	public static  final String YAFT_DISCUSSION_CREATE = "yaft.discussion.create";
 	public static  final String YAFT_DISCUSSION_DELETE_OWN = "yaft.discussion.deleteOwn";
 	public static  final String YAFT_DISCUSSION_DELETE_ANY = "yaft.discussion.deleteAny";

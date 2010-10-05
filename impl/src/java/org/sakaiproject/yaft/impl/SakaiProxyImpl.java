@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.sakaiproject.authz.api.AuthzPermissionException;
 import org.sakaiproject.authz.api.FunctionManager;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Role;
+import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.calendar.api.Calendar;
@@ -1110,5 +1112,46 @@ public class SakaiProxyImpl implements SakaiProxy
 		}
 		
 		return false;
+	}
+
+	public Set<String> getGroupMemberIds(List<Group> groups)
+	{
+		Set<String> members = new HashSet<String>();
+		
+		for(Group group : groups)
+		{
+			String groupId = "/site/" + getCurrentSiteId() + "/group/" + group.getId();
+			try
+			{
+				AuthzGroup ag = authzGroupService.getAuthzGroup(groupId);
+				Set<Member> groupMembers = ag.getMembers();
+				for(Member 
+						member : groupMembers)
+					members.add(member.getUserId());
+			}
+			catch(GroupNotDefinedException e)
+			{
+				logger.error("Forum group '" + groupId + "' not found.");
+			}
+		}
+		
+		return members;
+	}
+
+	public List<Group> getCurrentSiteGroups()
+	{
+		List<Group> groups = new ArrayList<Group>();
+		
+		Collection<org.sakaiproject.site.api.Group> sakaiGroups = getCurrentSite().getGroups();
+		
+		for(org.sakaiproject.site.api.Group sakaiGroup : sakaiGroups)
+			groups.add(new Group(sakaiGroup.getId(),sakaiGroup.getTitle()));
+		
+		return groups;
+	}
+
+	public boolean currentUserHasFunction(String function)
+	{
+		return getCurrentSite().isAllowed(getCurrentUser().getId(),function);
 	}
 }

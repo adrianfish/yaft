@@ -117,4 +117,10 @@ public interface SakaiProxy
 	public SearchList searchInCurrentSite(String searchTerms);
 
 	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups);
+
+	public Set<String> getGroupMemberIds(List<Group> groups);
+
+	public List<Group> getCurrentSiteGroups();
+
+	public boolean currentUserHasFunction(String function);
 }

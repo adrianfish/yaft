@@ -135,12 +135,12 @@ var YaftUtils;
         var groups = null;
 
         $.ajax( {
-            url : "/direct/site/" + yaftSiteId + ".json?includeGroups=true",
+            url : "/portal/tool/" + yaftPlacementId + "/siteGroups",
             dataType : "json",
             cache: false,
             async : false,
-            success : function(site) {
-                groups = site.siteGroups;
+            success : function(data) {
+                groups = data;
             },
             error : function(xmlHttpRequest,status) {
             }

@@ -136,6 +136,16 @@ public class YaftTool extends HttpServlet
 					doForumsGet(request,response,parts,siteId,placementId,languageCode);
 				}
 				
+				else if ("siteGroups".equals(part1))
+				{
+					List<Group> groups = sakaiProxy.getCurrentSiteGroups();
+					JSONArray data = JSONArray.fromObject(groups);
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json");
+					response.getWriter().write(data.toString());
+					return;
+				}
+				
 				else if ("userPreferences".equals(part1))
 				{
 					YaftPreferences prefs = yaftForumService.getPreferencesForUser(sakaiProxy.getCurrentUser().getId(),siteId);

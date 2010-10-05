@@ -28,6 +28,8 @@ function YaftPermissions(data) {
 			this.forumDeleteAny = true;
 		else if('yaft.forum.deleteOwn' === data[i])
 			this.forumDeleteOwn = true;
+		else if('yaft.forum.viewGroups' === data[i])
+			this.forumViewGroups = true;
 		else if('yaft.message.create' === data[i])
 			this.messageCreate = true;
 		else if('yaft.message.deleteAny' === data[i])
