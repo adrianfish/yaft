@@ -137,13 +137,13 @@ public class SakaiProxyImpl implements SakaiProxy
 	private TimeService timeService;
 
 	private UsageSessionService usageSessionService;
-	
+
 	private SessionManager sessionManager;
-	
+
 	private EmailTemplateService emailTemplateService;
-	
+
 	private SearchService searchService;
-	
+
 	public SakaiProxyImpl()
 	{
 		if (logger.isDebugEnabled())
@@ -170,10 +170,10 @@ public class SakaiProxyImpl implements SakaiProxy
 		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
-		
+
 		List<String> emailTemplates = (List<String>) componentManager.get("org.sakaiproject.yaft.api.emailtemplates.List");
-		//emailTemplateService.processEmailTemplates(emailTemplates);
-		for(String templatePath : emailTemplates)
+		// emailTemplateService.processEmailTemplates(emailTemplates);
+		for (String templatePath : emailTemplates)
 			processEmailTemplate(templatePath);
 	}
 
@@ -251,7 +251,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		List functions = functionManager.getRegisteredFunctions("yaft.");
 
 		if (!functions.contains(function))
-			functionManager.registerFunction(function,true);
+			functionManager.registerFunction(function, true);
 	}
 
 	public String getSakaiHomePath()
@@ -329,22 +329,31 @@ public class SakaiProxyImpl implements SakaiProxy
 			return ""; // this can happen if the user does not longer exist in the system
 		}
 	}
-	
+
 	public void sendEmail(final String userId, final String subject, String message)
 	{
 		class EmailSender implements Runnable
 		{
 			private Thread runner;
+
 			private String userId;
+
 			private String subject;
+
 			private String message;
-			
+
 			public final String MULTIPART_BOUNDARY = "======sakai-multi-part-boundary======";
-			public final String BOUNDARY_LINE = "\n\n--"+MULTIPART_BOUNDARY+"\n";
-			public final String TERMINATION_LINE = "\n\n--"+MULTIPART_BOUNDARY+"--\n\n";
+
+			public final String BOUNDARY_LINE = "\n\n--" + MULTIPART_BOUNDARY + "\n";
+
+			public final String TERMINATION_LINE = "\n\n--" + MULTIPART_BOUNDARY + "--\n\n";
+
 			public final String MIME_ADVISORY = "This message is for MIME-compliant mail readers.";
-			public final String PLAIN_TEXT_HEADERS= "Content-Type: text/plain\n\n";
+
+			public final String PLAIN_TEXT_HEADERS = "Content-Type: text/plain\n\n";
+
 			public final String HTML_HEADERS = "Content-Type: text/html; charset=ISO-8859-1\n\n";
+
 			public final String HTML_END = "\n  </body>\n</html>\n";
 
 			public EmailSender(String userId, String subject, String message)
@@ -352,33 +361,33 @@ public class SakaiProxyImpl implements SakaiProxy
 				this.userId = userId;
 				this.subject = subject;
 				this.message = message;
-				runner = new Thread(this,"YAFT EmailSender thread");
+				runner = new Thread(this, "YAFT EmailSender thread");
 				runner.start();
 			}
 
-			//do it!
+			// do it!
 			public synchronized void run()
 			{
 				try
 				{
 
-					//get User to send to
+					// get User to send to
 					User user = userDirectoryService.getUser(userId);
-					
+
 					String email = user.getEmail();
-					
+
 					if (email == null || email.length() == 0)
 					{
 						logger.error("SakaiProxy.sendEmail() failed. No email for userId: " + userId);
 						return;
 					}
-					
+
 					List<User> receivers = new ArrayList<User>();
 					receivers.add(user);
-					
-					//do it
+
+					// do it
 					emailService.sendToUsers(receivers, getHeaders(user.getEmail(), subject), formatMessage(subject, message));
-					
+
 					logger.info("Email sent to: " + userId);
 				}
 				catch (Exception e)
@@ -386,7 +395,7 @@ public class SakaiProxyImpl implements SakaiProxy
 					logger.error("SakaiProxy.sendEmail() failed for userId: " + userId + " : " + e.getClass() + " : " + e.getMessage());
 				}
 			}
-			
+
 			/** helper methods for formatting the message */
 			private String formatMessage(String subject, String message)
 			{
@@ -401,10 +410,10 @@ public class SakaiProxyImpl implements SakaiProxy
 				sb.append(message);
 				sb.append(HTML_END);
 				sb.append(TERMINATION_LINE);
-				
+
 				return sb.toString();
 			}
-			
+
 			private String htmlPreamble(String subject)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -415,25 +424,25 @@ public class SakaiProxyImpl implements SakaiProxy
 				sb.append(subject);
 				sb.append("</title></head>\n");
 				sb.append("<body>\n");
-				
+
 				return sb.toString();
 			}
-			
+
 			private List<String> getHeaders(String emailTo, String subject)
 			{
 				List<String> headers = new ArrayList<String>();
 				headers.add("MIME-Version: 1.0");
-				headers.add("Content-Type: multipart/alternative; boundary=\""+MULTIPART_BOUNDARY+"\"");
+				headers.add("Content-Type: multipart/alternative; boundary=\"" + MULTIPART_BOUNDARY + "\"");
 				headers.add(formatSubject(subject));
 				headers.add(getFrom());
 				if (emailTo != null && emailTo.length() > 0)
 				{
 					headers.add("To: " + emailTo);
 				}
-				
+
 				return headers;
 			}
-			
+
 			private String getFrom()
 			{
 				StringBuilder sb = new StringBuilder();
@@ -442,22 +451,22 @@ public class SakaiProxyImpl implements SakaiProxy
 				sb.append(" <no-reply@");
 				sb.append(serverConfigurationService.getServerName());
 				sb.append(">");
-				
+
 				return sb.toString();
 			}
-			
-			private String formatSubject(String subject) {
+
+			private String formatSubject(String subject)
+			{
 				StringBuilder sb = new StringBuilder();
 				sb.append("Subject: ");
 				sb.append(subject);
-				
+
 				return sb.toString();
 			}
-			
-			
+
 		}
-		
-		//instantiate class to format, then send the mail
+
+		// instantiate class to format, then send the mail
 		new EmailSender(userId, subject, message);
 	}
 
@@ -514,7 +523,7 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return toolManager.getCurrentPlacement().getId();
 	}
-	
+
 	public String getYaftPageId(String siteId)
 	{
 		try
@@ -528,7 +537,7 @@ public class SakaiProxyImpl implements SakaiProxy
 			return "";
 		}
 	}
-	
+
 	public String getYaftToolId(String siteId)
 	{
 		try
@@ -546,11 +555,11 @@ public class SakaiProxyImpl implements SakaiProxy
 	public String getDirectUrl(String siteId, String string)
 	{
 		String portalUrl = getPortalUrl();
-		
+
 		String pageId = null;
 		String toolId = null;
-		
-		if(siteId == null) 
+
+		if (siteId == null)
 		{
 			siteId = getCurrentSiteId();
 			pageId = getCurrentPageId();
@@ -603,8 +612,8 @@ public class SakaiProxyImpl implements SakaiProxy
 			mimeType = "application/excel";
 
 		// String uuid = UUID.randomUUID().toString();
-		
-		if(siteId == null)
+
+		if (siteId == null)
 			siteId = getCurrentSiteId();
 
 		String id = "/group/" + siteId + "/yaft-files/" + name;
@@ -637,9 +646,9 @@ public class SakaiProxyImpl implements SakaiProxy
 
 	public void getAttachment(String siteId, Attachment attachment)
 	{
-		if(siteId == null)
+		if (siteId == null)
 			siteId = getCurrentSiteId();
-		
+
 		try
 		{
 			enableSecurityAdvisor();
@@ -675,7 +684,7 @@ public class SakaiProxyImpl implements SakaiProxy
 			if (profile != null)
 				return profile.getOtherInformation();
 		}
-		catch(SecurityException se)
+		catch (SecurityException se)
 		{
 		}
 
@@ -730,15 +739,16 @@ public class SakaiProxyImpl implements SakaiProxy
 
 		return null;
 	}
-	
+
 	/**
 	 * Process the supplied template XML into an EmailTemplate object and save it
+	 * 
 	 * @param templatePath
 	 * @return
 	 * @throws IOException
 	 * @throws XMLStreamException
 	 */
-	private void processEmailTemplate(String templatePath) 
+	private void processEmailTemplate(String templatePath)
 	{
 		final String ELEM_SUBJECT = "subject";
 		final String ELEM_MESSAGE = "message";
@@ -748,73 +758,82 @@ public class SakaiProxyImpl implements SakaiProxy
 		final String ELEM_OWNER = "owner";
 		final String ELEM_KEY = "key";
 		final String ADMIN = "admin";
-		
+
 		InputStream in = SakaiProxy.class.getClassLoader().getResourceAsStream(templatePath);
-		XMLInputFactory factory = (XMLInputFactory)XMLInputFactory.newInstance();
+		XMLInputFactory factory = (XMLInputFactory) XMLInputFactory.newInstance();
 		XMLStreamReader staxXmlReader = null;
 		EmailTemplate template = new EmailTemplate();
-		
+
 		boolean canSetHtml = false;
 		boolean canSetVersion = false;
-		
+
 		Class templateClass = EmailTemplate.class;
-		
+
 		try
 		{
-			templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
+			templateClass.getDeclaredMethod("setHtmlMessage", new Class[] { String.class });
 			canSetHtml = true;
 		}
-		catch(NoSuchMethodException nsme) {}
-		
+		catch (NoSuchMethodException nsme)
+		{
+		}
+
 		try
 		{
-			templateClass.getDeclaredMethod("setVersion", new Class[] {int.class});
+			templateClass.getDeclaredMethod("setVersion", new Class[] { int.class });
 			canSetVersion = true;
 		}
-		catch(NoSuchMethodException nsme) {}
+		catch (NoSuchMethodException nsme)
+		{
+		}
 
 		try
 		{
 			staxXmlReader = (XMLStreamReader) factory.createXMLStreamReader(in);
-		
+
 			for (int event = staxXmlReader.next(); event != XMLStreamConstants.END_DOCUMENT; event = staxXmlReader.next())
 			{
 				if (event == XMLStreamConstants.START_ELEMENT)
 				{
 					String element = staxXmlReader.getLocalName();
-			    
-				    //subject
-				    if(StringUtils.equals(element, ELEM_SUBJECT))
-				    {
-				    	template.setSubject(staxXmlReader.getElementText());
-				    }
-				    //message
-				    if(StringUtils.equals(element, ELEM_MESSAGE))
-				    {
-				    	template.setMessage(staxXmlReader.getElementText());
-				    }
-				    //html
-				    if(canSetHtml && StringUtils.equals(element, ELEM_HTML_MESSAGE)) {
-				    	template.setHtmlMessage(staxXmlReader.getElementText());
-				    }
-				    //locale
-				    if(StringUtils.equals(element, ELEM_LOCALE)) {
-				    	template.setLocale(staxXmlReader.getElementText());
-				    }
-				    //version - SAK-17637
-				    if(canSetVersion && StringUtils.equals(element, ELEM_VERSION)) {
-				    	//set as integer version of value, or default to 0
-				    	template.setVersion(Integer.valueOf(NumberUtils.toInt(staxXmlReader.getElementText(), 0)));
-				    }
-				    
-				    //owner
-				    if(StringUtils.equals(element, ELEM_OWNER)) {
-				    	template.setOwner(staxXmlReader.getElementText());
-				    }
-				    //key
-				    if(StringUtils.equals(element, ELEM_KEY)) {
-				    	template.setKey(staxXmlReader.getElementText());
-				    }
+
+					// subject
+					if (StringUtils.equals(element, ELEM_SUBJECT))
+					{
+						template.setSubject(staxXmlReader.getElementText());
+					}
+					// message
+					if (StringUtils.equals(element, ELEM_MESSAGE))
+					{
+						template.setMessage(staxXmlReader.getElementText());
+					}
+					// html
+					if (canSetHtml && StringUtils.equals(element, ELEM_HTML_MESSAGE))
+					{
+						template.setHtmlMessage(staxXmlReader.getElementText());
+					}
+					// locale
+					if (StringUtils.equals(element, ELEM_LOCALE))
+					{
+						template.setLocale(staxXmlReader.getElementText());
+					}
+					// version - SAK-17637
+					if (canSetVersion && StringUtils.equals(element, ELEM_VERSION))
+					{
+						// set as integer version of value, or default to 0
+						template.setVersion(Integer.valueOf(NumberUtils.toInt(staxXmlReader.getElementText(), 0)));
+					}
+
+					// owner
+					if (StringUtils.equals(element, ELEM_OWNER))
+					{
+						template.setOwner(staxXmlReader.getElementText());
+					}
+					// key
+					if (StringUtils.equals(element, ELEM_KEY))
+					{
+						template.setKey(staxXmlReader.getElementText());
+					}
 				}
 			}
 		}
@@ -841,12 +860,12 @@ public class SakaiProxyImpl implements SakaiProxy
 				e.printStackTrace();
 			}
 		}
-		
-		//check if we have an existing template of this key and locale
+
+		// check if we have an existing template of this key and locale
 		EmailTemplate existingTemplate = emailTemplateService.getEmailTemplate(template.getKey(), new Locale(template.getLocale()));
-		if(existingTemplate == null)
+		if (existingTemplate == null)
 		{
-			//no existing, save this one
+			// no existing, save this one
 			Session sakaiSession = sessionManager.getCurrentSession();
 			sakaiSession.setUserId(ADMIN);
 			sakaiSession.setUserEid(ADMIN);
@@ -855,13 +874,13 @@ public class SakaiProxyImpl implements SakaiProxy
 			sakaiSession.setUserId(null);
 			logger.info("Saved email template: " + template.getKey() + " with locale: " + template.getLocale());
 			return;
-		} 
-		
-		if(canSetVersion)
+		}
+
+		if (canSetVersion)
 		{
-			//check version, if local one newer than persisted, update it - SAK-17679
+			// check version, if local one newer than persisted, update it - SAK-17679
 			int existingTemplateVersion = existingTemplate.getVersion() != null ? existingTemplate.getVersion().intValue() : 0;
-			if(template.getVersion() > existingTemplateVersion)
+			if (template.getVersion() > existingTemplateVersion)
 			{
 				existingTemplate.setSubject(template.getSubject());
 				existingTemplate.setMessage(template.getMessage());
@@ -886,7 +905,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		{
 			return siteService.getSite(siteId);
 		}
-		catch(IdUnusedException e)
+		catch (IdUnusedException e)
 		{
 			logger.error("No site with id of '" + siteId + "'. Returning null ...");
 			return null;
@@ -902,179 +921,184 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, reference, replacementValues);
 	}
-	
+
 	public Set<String> getPermissionsForCurrentUserAndSite()
 	{
-        String userId = getCurrentUser().getId();
+		String userId = getCurrentUser().getId();
 
-        if (userId == null)
-        {
-            throw new SecurityException(
-                    "This action (userPerms) is not accessible to anon and there is no current user.");
-        }
+		if (userId == null)
+		{
+			throw new SecurityException("This action (userPerms) is not accessible to anon and there is no current user.");
+		}
 
-        Set<String> filteredFunctions = new TreeSet<String>();
+		Set<String> filteredFunctions = new TreeSet<String>();
 
-        if (securityService.isSuperUser(userId))
-        {
-            // Special case for the super admin
-            filteredFunctions.addAll(functionManager.getRegisteredFunctions("yaft"));
-        }
-        else
-        {
-            Site site = null;
-            AuthzGroup siteHelperRealm = null;
+		if (securityService.isSuperUser(userId))
+		{
+			// Special case for the super admin
+			filteredFunctions.addAll(functionManager.getRegisteredFunctions("yaft"));
+		}
+		else
+		{
+			Site site = null;
+			AuthzGroup siteHelperRealm = null;
 
-            try
-            {
-            	site = siteService.getSite(getCurrentSiteId());
-                siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
-            }
-            catch(Exception e) {
-                // This should probably be logged but not rethrown.
-            }
+			try
+			{
+				site = siteService.getSite(getCurrentSiteId());
+				siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
+			}
+			catch (Exception e)
+			{
+				// This should probably be logged but not rethrown.
+			}
 
-            Role currentUserRole = site.getUserRole(userId);
+			Role currentUserRole = site.getUserRole(userId);
 
-            Role siteHelperRole = siteHelperRealm.getRole(currentUserRole.getId());
+			Role siteHelperRole = siteHelperRealm.getRole(currentUserRole.getId());
 
-            Set<String> functions = currentUserRole.getAllowedFunctions();
+			Set<String> functions = currentUserRole.getAllowedFunctions();
 
-            if(siteHelperRole != null)
-            {
-                // Merge in all the functions from the same role in !site.helper
-                functions.addAll(siteHelperRole.getAllowedFunctions());
-            }
+			if (siteHelperRole != null)
+			{
+				// Merge in all the functions from the same role in !site.helper
+				functions.addAll(siteHelperRole.getAllowedFunctions());
+			}
 
-            for(String function : functions)
-            {
-            	if(function.startsWith("yaft"))
-            		filteredFunctions.add(function);
-            }
-        }
+			for (String function : functions)
+			{
+				if (function.startsWith("yaft"))
+					filteredFunctions.add(function);
+			}
+		}
 
-        return filteredFunctions;
+		return filteredFunctions;
 	}
-	
-	public Map<String,Set<String>> getPermsForCurrentSite()
-	{
-        Map<String, Set<String>> perms = new HashMap<String, Set<String>>();
-        
-        String userId = getCurrentUser().getId();
-        
-        if (userId == null) {
-            throw new SecurityException(
-                    "This action (perms) is not accessible to anon and there is no current user.");
-        }
 
-        String siteId = getCurrentSiteId();
-        Site site = null;
-        
-        try
-        {
-        	site = siteService.getSite(siteId);
-        
-        	Set<Role> roles = site.getRoles();
-        	for (Role role : roles)
-        	{
-        		Set<String> functions = role.getAllowedFunctions();
-        		Set<String> filteredFunctions = new TreeSet<String>();
-        		for (String function : functions)
-        		{
-        			if (function.startsWith("yaft"))
-        				filteredFunctions.add(function);
-        		}
-        		
-        		perms.put(role.getId(), filteredFunctions);
-        	}
-        }
-        catch(Exception e)
-        {
-        	logger.error("Failed to get current site permissions.",e);
-        }
-        
-        return perms;
+	public Map<String, Set<String>> getPermsForCurrentSite()
+	{
+		Map<String, Set<String>> perms = new HashMap<String, Set<String>>();
+
+		String userId = getCurrentUser().getId();
+
+		if (userId == null)
+		{
+			throw new SecurityException("This action (perms) is not accessible to anon and there is no current user.");
+		}
+
+		String siteId = getCurrentSiteId();
+		Site site = null;
+
+		try
+		{
+			site = siteService.getSite(siteId);
+
+			Set<Role> roles = site.getRoles();
+			for (Role role : roles)
+			{
+				Set<String> functions = role.getAllowedFunctions();
+				Set<String> filteredFunctions = new TreeSet<String>();
+				for (String function : functions)
+				{
+					if (function.startsWith("yaft"))
+						filteredFunctions.add(function);
+				}
+
+				perms.put(role.getId(), filteredFunctions);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to get current site permissions.", e);
+		}
+
+		return perms;
 	}
 
 	public boolean setPermsForCurrentSite(Map<String, String[]> params)
 	{
-        String userId = getCurrentUser().getId();
+		String userId = getCurrentUser().getId();
 
-        if(userId == null)
-            throw new SecurityException("This action (setPerms) is not accessible to anon and there is no current user.");
+		if (userId == null)
+			throw new SecurityException("This action (setPerms) is not accessible to anon and there is no current user.");
 
-        String siteId = getCurrentSiteId();
+		String siteId = getCurrentSiteId();
 
-        Site site = null;
-        
-        try
-        {
-       		site = siteService.getSite(siteId);
-        }
-        catch(IdUnusedException ide)
-        {
-        	logger.warn(userId + " attempted to update YAFT permissions for unknown site " + siteId);
-        	return false;
-        }
+		Site site = null;
 
-        	List<String> functions = functionManager.getRegisteredFunctions();
+		try
+		{
+			site = siteService.getSite(siteId);
+		}
+		catch (IdUnusedException ide)
+		{
+			logger.warn(userId + " attempted to update YAFT permissions for unknown site " + siteId);
+			return false;
+		}
 
-        	boolean admin = securityService.isSuperUser(userId);
+		List<String> functions = functionManager.getRegisteredFunctions();
 
-        	try
-        	{
-        		AuthzGroup authzGroup = authzGroupService.getAuthzGroup(site.getReference());
-        		
-        		if(!authzGroup.getUserRole(userId).isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS))
-        		{
-        			logger.warn(userId + " attempted to update YAFT permissions for site " + site.getTitle());
-        			return false;
-        		}
+		boolean admin = securityService.isSuperUser(userId);
 
-        		boolean changed = false;
+		try
+		{
+			AuthzGroup authzGroup = authzGroupService.getAuthzGroup(site.getReference());
+			Role siteRole = authzGroup.getUserRole(userId);
+			AuthzGroup siteHelperAuthzGroup = authzGroupService.getAuthzGroup("!site.helper");
+			Role siteHelperRole = siteHelperAuthzGroup.getRole(siteRole.getId());
 
-        		for (String name : params.keySet())
-        		{
-        			if (!name.contains(":"))
-        				continue;
+			if (!securityService.isSuperUser()
+					&& !siteRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS)
+					&& !siteHelperRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS))
+			{
+				logger.warn(userId + " attempted to update YAFT permissions for site " + site.getTitle());
+				return false;
+			}
 
-        			String value = params.get(name)[0];
+			boolean changed = false;
 
-        			String roleId = name.substring(0, name.indexOf(":"));
+			for (String name : params.keySet())
+			{
+				if (!name.contains(":"))
+					continue;
 
-        			Role role = authzGroup.getRole(roleId);
-        			if(role == null)
-        			{
-        				throw new IllegalArgumentException(
-        						"Invalid role id '" + roleId + "' provided in POST parameters.");
-        			}
-        			String function = name.substring(name.indexOf(":") + 1);
+				String value = params.get(name)[0];
 
-                    if("true".equals(value))
-                        role.allowFunction(function);
-                    else
-                        role.disallowFunction(function);
+				String roleId = name.substring(0, name.indexOf(":"));
 
-                    changed = true;
-        		}
+				Role role = authzGroup.getRole(roleId);
+				if (role == null)
+				{
+					throw new IllegalArgumentException("Invalid role id '" + roleId + "' provided in POST parameters.");
+				}
+				String function = name.substring(name.indexOf(":") + 1);
 
-        		if(changed)
-        		{
-        			try
-        			{
-        				authzGroupService.save(authzGroup);
-        			}
-        			catch(AuthzPermissionException ape) {
-                        throw new SecurityException("The permissions for this site (" + siteId
-                            + ") cannot be updated by the current user.");
-                    }
-                }
-        		
-        		return true;
-            }
-            catch(GroupNotDefinedException gnde) {
-                logger.error("No realm defined for site (" + siteId + ").");
-            }
+				if ("true".equals(value))
+					role.allowFunction(function);
+				else
+					role.disallowFunction(function);
+
+				changed = true;
+			}
+
+			if (changed)
+			{
+				try
+				{
+					authzGroupService.save(authzGroup);
+				}
+				catch (AuthzPermissionException ape)
+				{
+					throw new SecurityException("The permissions for this site (" + siteId + ") cannot be updated by the current user.");
+				}
+			}
+
+			return true;
+		}
+		catch (GroupNotDefinedException gnde)
+		{
+			logger.error("No realm defined for site (" + siteId + ").");
+		}
 
 		return false;
 	}
@@ -1083,75 +1107,75 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		List<String> contexts = new ArrayList<String>(1);
 		contexts.add(getCurrentSiteId());
-		
-        try
-        {
-            return searchService.search(searchTerms,contexts,0,50,"normal","normal");
-        }
-        catch (Exception e)
-        {
-        	return null;
-        }
+
+		try
+		{
+			return searchService.search(searchTerms, contexts, 0, 50, "normal", "normal");
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
 	}
 
 	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups)
 	{
 		String userId = getCurrentUser().getId();
-		
-		for(Group group : groups)
+
+		for (Group group : groups)
 		{
 			try
 			{
 				AuthzGroup ag = authzGroupService.getAuthzGroup("/site/" + getCurrentSiteId() + "/group/" + group.getId());
-				
-				if(ag.getMember(userId) != null) return true;
-            }
-            catch(GroupNotDefinedException gnde)
-            {
-            }
+
+				if (ag.getMember(userId) != null)
+					return true;
+			}
+			catch (GroupNotDefinedException gnde)
+			{
+			}
 		}
-		
+
 		return false;
 	}
 
 	public Set<String> getGroupMemberIds(List<Group> groups)
 	{
 		Set<String> members = new HashSet<String>();
-		
-		for(Group group : groups)
+
+		for (Group group : groups)
 		{
 			String groupId = "/site/" + getCurrentSiteId() + "/group/" + group.getId();
 			try
 			{
 				AuthzGroup ag = authzGroupService.getAuthzGroup(groupId);
 				Set<Member> groupMembers = ag.getMembers();
-				for(Member 
-						member : groupMembers)
+				for (Member member : groupMembers)
 					members.add(member.getUserId());
 			}
-			catch(GroupNotDefinedException e)
+			catch (GroupNotDefinedException e)
 			{
 				logger.error("Forum group '" + groupId + "' not found.");
 			}
 		}
-		
+
 		return members;
 	}
 
 	public List<Group> getCurrentSiteGroups()
 	{
 		List<Group> groups = new ArrayList<Group>();
-		
+
 		Collection<org.sakaiproject.site.api.Group> sakaiGroups = getCurrentSite().getGroups();
-		
-		for(org.sakaiproject.site.api.Group sakaiGroup : sakaiGroups)
-			groups.add(new Group(sakaiGroup.getId(),sakaiGroup.getTitle()));
-		
+
+		for (org.sakaiproject.site.api.Group sakaiGroup : sakaiGroups)
+			groups.add(new Group(sakaiGroup.getId(), sakaiGroup.getTitle()));
+
 		return groups;
 	}
 
 	public boolean currentUserHasFunction(String function)
 	{
-		return getCurrentSite().isAllowed(getCurrentUser().getId(),function);
+		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
 	}
 }
