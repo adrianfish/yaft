@@ -540,6 +540,8 @@ function switchState(state,arg) {
 				return YaftUtils.savePermissions();
 			});
 
+			$('#yaft_permissions_table tbody tr:odd').addClass('yaft_odd_row');
+
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
 		});

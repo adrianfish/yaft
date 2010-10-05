@@ -169,3 +169,7 @@ th.yaftSortableTableHeaderSortDown {
 .yaft_group_title {
 	font-weight: bold;
 }
+
+.yaft_odd_row {
+	background-color: #FFFFC0;
+}
