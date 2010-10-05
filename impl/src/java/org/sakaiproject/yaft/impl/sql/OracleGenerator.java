@@ -20,9 +20,10 @@ public class OracleGenerator extends DefaultSqlGenerator
 	public OracleGenerator()
 	{
 		VARCHAR    = "VARCHAR2";
-		TIMESTAMP  = "TIMESTAMP";
+		DATETIME  = "DATE";
 		TEXT       = "CLOB";
 		BOOL = "char(1)";
 		MEDIUMTEXT = "CLOB";
+		INT = "NUMBER(10, 0)";
 	}
 }

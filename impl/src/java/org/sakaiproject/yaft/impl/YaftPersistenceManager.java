@@ -41,7 +41,6 @@ import org.sakaiproject.yaft.api.YaftPreferences;
 import org.sakaiproject.yaft.impl.sql.ColumnNames;
 import org.sakaiproject.yaft.impl.sql.DefaultSqlGenerator;
 import org.sakaiproject.yaft.impl.sql.HypersonicGenerator;
-import org.sakaiproject.yaft.impl.sql.MySQLGenerator;
 import org.sakaiproject.yaft.impl.sql.OracleGenerator;
 import org.sakaiproject.yaft.impl.sql.SqlGenerator;
 
@@ -69,7 +68,7 @@ public class YaftPersistenceManager
 		
 		String dbVendor = sakaiProxy.getDbVendor();
 		if(dbVendor.equals("mysql"))
-			sqlGenerator = new MySQLGenerator();
+			sqlGenerator = new DefaultSqlGenerator();
 		else if(dbVendor.equals("oracle"))
 			sqlGenerator = new OracleGenerator();
 		else if(dbVendor.equals("hsqldb"))
