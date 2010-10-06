@@ -457,7 +457,17 @@ function switchState(state,arg) {
    					}
    					else {
 						var discussion = YaftUtils.getDiscussion(responseText);
-						yaftCurrentForum.discussions.push(discussion);
+						if(!arg || !arg.discussionId) {
+							yaftCurrentForum.discussions.push(discussion);
+						}
+						else {
+							for(var i = 0,j = yaftCurrentForum.discussions.length;i<j;i++) {
+								if(responseText === yaftCurrentForum.discussions[i].id) {
+									yaftCurrentForum.discussions.splice(i,1,discussion);
+									break;
+								}
+							}
+						}
 						switchState('forum');
 					}
    				},
