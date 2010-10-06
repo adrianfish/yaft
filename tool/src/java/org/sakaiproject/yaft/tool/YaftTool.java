@@ -725,6 +725,7 @@ public class YaftTool extends HttpServlet
             {
         		String id = (String) request.getParameter("id");
         		String title = (String) request.getParameter("title");
+        		String sendEmailString = (String) request.getParameter("sendEmail");
         		String groupsString = (String) request.getParameter("groups");
         		String description = (String) request.getParameter("description");
         		String startDate= (String) request.getParameter("startDate");
@@ -749,6 +750,13 @@ public class YaftTool extends HttpServlet
         			response.sendError(HttpServletResponse.SC_BAD_REQUEST,"The description cannot exceed 64 characters in length.");
         			return;
         		}
+        		
+        		boolean sendEmail = true;
+        		
+        		if(sendEmailString != null)
+        			sendEmail = sendEmailString.equals("true");
+        		else
+        			sendEmail = false;
         		
         		boolean lockWriting = true;
         		boolean lockReading = true;
@@ -811,7 +819,7 @@ public class YaftTool extends HttpServlet
         			}
         		}
 
-        		if(yaftForumService.addOrUpdateForum(forum))
+        		if(yaftForumService.addOrUpdateForum(forum, sendEmail))
         		{
         			response.setStatus(HttpServletResponse.SC_OK);
         			response.setContentType("text/plain");
@@ -844,6 +852,7 @@ public class YaftTool extends HttpServlet
         	String subject = (String) request.getParameter("subject");
         	String content = (String) request.getParameter("content");
         	String forumId = (String) request.getParameter("forumId");
+        	String sendEmailString = (String) request.getParameter("sendEmail");
         	String startDate= (String) request.getParameter("startDate");
         	String endDate= (String) request.getParameter("endDate");
         	String lockWritingString = (String) request.getParameter("lockWriting");
@@ -859,6 +868,13 @@ public class YaftTool extends HttpServlet
         		response.getWriter().close();
         		return;
         	}
+        	
+        	boolean sendEmail = true;
+        		
+        	if(sendEmailString != null)
+        		sendEmail = sendEmailString.equals("true");
+        	else
+        		sendEmail = false;
 		
         	boolean lockWriting = true;
         	boolean lockReading = true;
@@ -939,7 +955,7 @@ public class YaftTool extends HttpServlet
         		}
         	}
 
-        	if(yaftForumService.addDiscussion(siteId, forumId, discussion, true) != null)
+        	if(yaftForumService.addDiscussion(siteId, forumId, discussion, sendEmail) != null)
         	{
         		response.setStatus(HttpServletResponse.SC_OK);
         		response.setContentType("text/html");
@@ -972,6 +988,7 @@ public class YaftTool extends HttpServlet
     		String messageId = (String) request.getParameter("messageId");
     		String messageBeingRepliedTo = (String) request.getParameter("messageBeingRepliedTo");
     		String discussionId = (String) request.getParameter("discussionId");
+        	String sendEmailString = (String) request.getParameter("sendEmail");
 
     		if (logger.isDebugEnabled())
     		{
@@ -992,6 +1009,13 @@ public class YaftTool extends HttpServlet
     		
     		if(viewMode == null || viewMode.length() <= 0)
     			viewMode = "full";
+    		
+       		boolean sendEmail = true;
+        		
+       		if(sendEmailString != null)
+       			sendEmail = sendEmailString.equals("true");
+       		else
+       			sendEmail = false;
     		
     		String currentUserId = sakaiProxy.getCurrentUser().getId();
     		
@@ -1018,7 +1042,7 @@ public class YaftTool extends HttpServlet
     			message.setId(messageId);
     		}
     		
-    		if(yaftForumService.addOrUpdateMessage(siteId, forumId, message, true))
+    		if(yaftForumService.addOrUpdateMessage(siteId, forumId, message, sendEmail))
     		{
         		response.setStatus(HttpServletResponse.SC_OK);
         		response.setContentType("text/plain");

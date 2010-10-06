@@ -117,8 +117,13 @@ public class YaftForumServiceImpl implements YaftForumService
 		
 		return securityManager.filterFora(persistenceManager.getFora(siteId, fully));
 	}
-
+	
 	public boolean addOrUpdateForum(Forum forum)
+	{
+		return addOrUpdateForum(forum, true);
+	}
+
+	public boolean addOrUpdateForum(Forum forum, boolean sendEmail)
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("addOrUpdateForum()");
@@ -135,8 +140,10 @@ public class YaftForumServiceImpl implements YaftForumService
 		{
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + forum.getSiteId() + "/forums/" + forum.getId();
 			sakaiProxy.postEvent(YAFT_FORUM_CREATED, reference, true);
-			sendEmail(forum.getSiteId(), forum.getId(), null, false);
 		}
+		
+		if(sendEmail)
+			sendEmail(forum.getSiteId(), forum.getId(), null, false);
 
 		return succeeded;
 	}

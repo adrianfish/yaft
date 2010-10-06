@@ -21,7 +21,7 @@
 	<message>
 
 --------------------
-${creator} added/updated the message titled '${discussionSubject}'
+${creator} created/updated the discussion titled '${discussionSubject}'
 --------------------
 
 To view this message, follow the link below:
@@ -29,7 +29,7 @@ ${url}
 
 ---
 	</message>
-	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; started a new discussion titled '${discussionSubject}'
+	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created/updated the discussion titled '${discussionSubject}'
 &lt;br /&gt;
 &lt;br /&gt;
 Click &lt;a href="${url}"&gt;here&lt;/a&gt; to enter the forum
@@ -41,7 +41,7 @@ Click &lt;a href="${url}"&gt;here&lt;/a&gt; to enter the forum
 ${messageContent}
 	</htmlMessage>
 	<locale>en</locale>
-	<version>5</version>
+	<version>1</version>
 	<owner>admin</owner>
 	<key>yaft.newDiscussion</key>
 </emailTemplate>

@@ -21,7 +21,7 @@
 	<message>
 
 --------------------
-${creator} created a forum titled '${forumTitle}'
+${creator} created/updated the forum titled '${forumTitle}'
 --------------------
 
 To view this forum, follow the link below:
@@ -29,7 +29,7 @@ ${url}
 
 ---
 	</message>
-	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created a forum titled '${forumTitle}'
+	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created/updated the forum titled '${forumTitle}'
 &lt;br /&gt;
 &lt;br /&gt;
 Click &lt;a href="${url}"&gt;here&lt;/a&gt; to enter the forum

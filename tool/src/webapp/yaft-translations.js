@@ -113,3 +113,4 @@ yaft_search_results = 'Search Results';
 yaft_groups_box_label = 'Groups/Sections';
 yaft_limit_to_groups_label = 'Display this forum and its contents to the selected groups/sections only';
 yaft_forum_group_message = 'Only visible to these groups: ';
+yaft_send_email_alert_label = 'Send email alert';

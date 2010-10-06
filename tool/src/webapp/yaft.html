@@ -289,9 +289,10 @@ ${yaft_forums_label}
 		<br />
 		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${firstMessage.content}</textarea>
 		<br />
-<br />
 		<br />
-	
+		<input type="checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
+		<br />
+		<br />
 		<span>Add Attachments:</span>
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
@@ -585,6 +586,9 @@ ${yaft_forums_label}
 <tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="64" value="${forum.description}"/></td></tr>
 </table>
 <br />
+<input type="checkbox" id="yaft_send_email_checkbox" value="true" checked/>${yaft_send_email_alert_label}
+<br />
+<br />
 <a id="yaft_show_advanced_options_link" href="javascript:;">Show advanced options</a>
 <a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
 <div id="yaft_advanced_options" style="display:none;">
@@ -782,7 +786,9 @@ ${yaft_forums_label}
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
 	<br />
 	<br />
-	
+	<input type="checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
+	<br />
+	<br />
 	<span>${yaft_add_attachments_label}</span>
 	<br />
 	<input id="yaft_attachment" name="attachment" type="file" class="multi"/>
@@ -818,8 +824,11 @@ ${yaft_forums_label}
     <span>Message</span>
     <br />
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
-    <br />
-    <br />
+	<br />
+	<br />
+	<input type="checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
+	<br />
+	<br />
     <span id="current_attachments_label">${yaft_current_attachments_label}</span>
     <br />
     <br />

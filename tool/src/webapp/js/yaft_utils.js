@@ -81,6 +81,7 @@ var YaftUtils;
 			'endDate':endDate,
 			'title':title,
 			'description':description,
+			'sendEmail':$('#yaft_send_email_checkbox').attr('checked'),
 			'discussions': [],
 			'groups': groups
 		};

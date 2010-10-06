@@ -56,6 +56,7 @@ public interface YaftForumService extends EntityProducer
 	public SakaiProxy getSakaiProxy();
 
 	public boolean addOrUpdateForum(Forum forum);
+	public boolean addOrUpdateForum(Forum forum,boolean sendEmail);
 	
 	public Discussion addDiscussion(String siteId, String forumId,Discussion discussion,boolean sendMail);
 
