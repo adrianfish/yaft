@@ -135,6 +135,7 @@ public class YaftForumServiceImpl implements YaftForumService
 		{
 			String reference = YaftForumService.REFERENCE_ROOT + "/" + forum.getSiteId() + "/forums/" + forum.getId();
 			sakaiProxy.postEvent(YAFT_FORUM_CREATED, reference, true);
+			sendEmail(forum.getSiteId(), forum.getId(), null, false);
 		}
 
 		return succeeded;
@@ -370,6 +371,10 @@ public class YaftForumServiceImpl implements YaftForumService
 			
 			Set<String> users = null;
 			
+			boolean newForum = false;
+			
+			if(message == null) newForum = true;
+			
 			Forum forum = persistenceManager.getForum(forumId, ForumPopulatedStates.EMPTY);
 			
 			List<Group> groups = forum.getGroups();
@@ -385,13 +390,20 @@ public class YaftForumServiceImpl implements YaftForumService
 			
 			// Make sure the current user is included
 			users.add(sakaiProxy.getCurrentUser().getId());
+			
+			String url = "";
 
-			List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
+			if(!newForum)
+			{
+				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
 
-			for (String excludedId : unsubscribers)
-				users.remove(excludedId);
+				for (String excludedId : unsubscribers)
+					users.remove(excludedId);
 
-			String url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId() + ".html");
+				url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId() + ".html");
+			}
+			else
+				url = sakaiProxy.getDirectUrl(siteId, "/forums/" + forumId + ".html");
 
 			Map<String, String> replacementValues = new HashMap<String, String>();
 			
@@ -406,6 +418,17 @@ public class YaftForumServiceImpl implements YaftForumService
 				replacementValues.put("creator", message.getCreatorDisplayName());
 				replacementValues.put("url", url);
 				replacementValues.put("messageContent", message.getContent());
+			}
+			else if (newForum)
+			{
+				templateKey = "yaft.newForum";
+				replacementValues.put("siteTitle", siteTitle);
+				replacementValues.put("forumMessage", "Forum Message");
+				replacementValues.put("forumTitle", forum.getTitle());
+				replacementValues.put("forumDescription", forum.getDescription());
+				replacementValues.put("creator", sakaiProxy.getDisplayNameForUser(forum.getCreatorId()));
+				replacementValues.put("url", url);
+				
 			}
 			else
 			{

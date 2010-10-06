@@ -41,6 +41,7 @@
       		<list>
         		<value>org/sakaiproject/yaft/api/emailtemplates/template-newMessage.xml</value>
         		<value>org/sakaiproject/yaft/api/emailtemplates/template-newDiscussion.xml</value>
+        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newForum.xml</value>
       		</list>      
     	</constructor-arg>
   	</bean>
