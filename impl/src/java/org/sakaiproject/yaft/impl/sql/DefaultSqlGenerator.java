@@ -848,6 +848,6 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 	public String getForumGroupsSelectStatement(String forumId)
 	{
-		return "SELECT YAFT_FORUM_GROUP.GROUP_ID,TITLE FROM YAFT_FORUM_GROUP,sakai_site_group WHERE FORUM_ID = '" + forumId + "' and YAFT_FORUM_GROUP.GROUP_ID = sakai_site_group.GROUP_ID";
+		return "SELECT YAFT_FORUM_GROUP.GROUP_ID,TITLE FROM YAFT_FORUM_GROUP,SAKAI_SITE_GROUP WHERE FORUM_ID = '" + forumId + "' and YAFT_FORUM_GROUP.GROUP_ID = SAKAI_SITE_GROUP.GROUP_ID";
 	}
 }

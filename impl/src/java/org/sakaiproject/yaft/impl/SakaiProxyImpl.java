@@ -1102,20 +1102,30 @@ public class SakaiProxyImpl implements SakaiProxy
 
 		return false;
 	}
-
-	public SearchList searchInCurrentSite(String searchTerms)
+	
+	public List<SearchResult> searchInCurrentSite(String searchTerms)
 	{
+		List<SearchResult> results = new ArrayList<SearchResult>();
+		
 		List<String> contexts = new ArrayList<String>(1);
 		contexts.add(getCurrentSiteId());
 
 		try
 		{
-			return searchService.search(searchTerms, contexts, 0, 50, "normal", "normal");
+			SearchList sl = searchService.search(searchTerms, contexts, 0, 50, "normal", "normal");
+			for(SearchResult sr : sl)
+			{
+				if("Discussions".equals(sr.getTool()))
+					results.add(sr);
+			}
+			
 		}
 		catch (Exception e)
 		{
-			return null;
+			logger.error("Caught exception whilst searching",e);
 		}
+		
+		return results;
 	}
 
 	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups)

@@ -38,7 +38,7 @@ import net.sf.json.JsonConfig;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
-import org.sakaiproject.search.api.SearchList;
+import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
@@ -1082,7 +1082,7 @@ public class YaftTool extends HttpServlet
 		if(searchTerms == null || searchTerms.length() == 0)
 			throw new ServletException("No search terms supplied.");
 		
-		SearchList results = sakaiProxy.searchInCurrentSite(searchTerms);
+		List<SearchResult> results = sakaiProxy.searchInCurrentSite(searchTerms);
 		
         JSONArray data = JSONArray.fromObject(results);
         response.setStatus(HttpServletResponse.SC_OK);
