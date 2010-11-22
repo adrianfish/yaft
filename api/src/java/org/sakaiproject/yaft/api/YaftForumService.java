@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityProducer;
-import org.sakaiproject.exception.IdUnusedException;
 
 public interface YaftForumService extends EntityProducer
 {

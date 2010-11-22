@@ -55,8 +55,6 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	private YaftPersistenceManager persistenceManager = null;
 
-	private boolean useSynopticFunctionality = true;
-
 	private YaftSecurityManager securityManager;
 
 	public void init()
@@ -89,7 +87,6 @@ public class YaftForumServiceImpl implements YaftForumService
 		persistenceManager.setSakaiProxy(sakaiProxy);
 		persistenceManager.init();
 		persistenceManager.setupTables();
-		persistenceManager.setUseSynopticFunctionality(useSynopticFunctionality);
 
 		sakaiProxy.registerEntityProducer(this);
 	}
@@ -157,8 +154,6 @@ public class YaftForumServiceImpl implements YaftForumService
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("addOrUpdateMessage()");
-
-		String discussionId = message.getDiscussionId();
 
 		if (!persistenceManager.addOrUpdateMessage(siteId, forumId, message,null))
 			return false;
@@ -614,7 +609,6 @@ public class YaftForumServiceImpl implements YaftForumService
 
 	public String getEntityUrl(Reference reference)
 	{
-		String referenceString = reference.getReference();
 		return null;
 	}
 
@@ -735,11 +729,8 @@ public class YaftForumServiceImpl implements YaftForumService
 
 		String type = parts[1];
 
-		String id = parts[2];
-
 		if ("messages".equals(type))
 		{
-			// Message message = getMessage(id);
 			return true;
 		}
 
@@ -799,15 +790,5 @@ public class YaftForumServiceImpl implements YaftForumService
 	public String getIdOfSiteContainingMessage(String messageId)
 	{
 		return persistenceManager.getIdOfSiteContainingMessage(messageId);
-	}
-
-	public void setUseSynopticFunctionality(boolean useSynopticFunctionality)
-	{
-		this.useSynopticFunctionality = useSynopticFunctionality;
-	}
-
-	public boolean isUseSynopticFunctionality()
-	{
-		return useSynopticFunctionality;
 	}
 }

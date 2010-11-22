@@ -68,7 +68,6 @@ import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.NotificationService;
-import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.search.api.SearchList;
@@ -136,8 +135,6 @@ public class SakaiProxyImpl implements SakaiProxy
 
 	private TimeService timeService;
 
-	private UsageSessionService usageSessionService;
-
 	private SessionManager sessionManager;
 
 	private EmailTemplateService emailTemplateService;
@@ -166,7 +163,6 @@ public class SakaiProxyImpl implements SakaiProxy
 		timeService = (TimeService) componentManager.get(TimeService.class);
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
-		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
@@ -1035,10 +1031,6 @@ public class SakaiProxyImpl implements SakaiProxy
 			logger.warn(userId + " attempted to update YAFT permissions for unknown site " + siteId);
 			return false;
 		}
-
-		List<String> functions = functionManager.getRegisteredFunctions();
-
-		boolean admin = securityService.isSuperUser(userId);
 
 		try
 		{

@@ -25,7 +25,6 @@ import java.util.Set;
 import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.EntityProducer;
-import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;

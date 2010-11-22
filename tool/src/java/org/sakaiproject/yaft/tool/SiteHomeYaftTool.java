@@ -16,7 +16,6 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletConfig;
@@ -25,13 +24,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.ResourceLoader;
-import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 

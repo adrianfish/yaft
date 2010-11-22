@@ -15,8 +15,6 @@
  */
 package org.sakaiproject.yaft.api;
 
-import java.util.UUID;
-
 public class Attachment
 {
 	private String url = "";

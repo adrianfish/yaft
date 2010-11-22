@@ -51,7 +51,6 @@ public class YaftPersistenceManager
 	private SakaiProxy sakaiProxy = null;
 	private SqlGenerator sqlGenerator = null;
 
-	private boolean useSynopticFunctionality = true;
 	private int activeDiscussionLimit = 5;
 
 	public YaftPersistenceManager()
@@ -374,13 +373,10 @@ public class YaftPersistenceManager
 				{
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
-					//if(useSynopticFunctionality)
-					//{
-						newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
+					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
 			
-						for(PreparedStatement statement : newStatements)
-							statement.executeUpdate();
-					//}
+					for(PreparedStatement statement : newStatements)
+						statement.executeUpdate();
 				}
 				
 				if(isLocalConnection)
@@ -2442,13 +2438,5 @@ public class YaftPersistenceManager
 		}
 		
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#setUseSynopticFunctionality(boolean)
-	 */
-	public void setUseSynopticFunctionality(boolean useSynopticFunctionality)
-	{
-		this.useSynopticFunctionality = useSynopticFunctionality;
 	}
 }

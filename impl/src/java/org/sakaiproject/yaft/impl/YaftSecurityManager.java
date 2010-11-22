@@ -36,6 +36,8 @@ public class YaftSecurityManager
 
 	public Forum filterForum(Forum forum,String siteId)
 	{
+		if(forum == null) return null;
+		
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
 		
 		if(!forum.getSiteId().equals(siteId))

@@ -15,9 +15,7 @@
  */
 package org.sakaiproject.yaft.api;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Stack;
 
 import org.w3c.dom.Document;
@@ -37,11 +35,7 @@ public class Discussion
 	
 	private String forumId;
 	
-	private String url;
-	
 	private String status = "READY";
-	
-	private List<Attachment> attachments = new ArrayList<Attachment>();
 	
 	// We need this to build direct urls in the rendered pages. Bogus, but necessary.
 	private String pageId;
