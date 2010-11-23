@@ -21,6 +21,7 @@ var yaftCurrentUserPermissions = null;
 var yaftCurrentUserPreferences = null;
 var yaftUnsubscriptions = null;
 var yaftForumUnsubscriptions = null;
+var likeServiceAvailable = false;
 var yaftCurrentForums = null;
 
 /* State specific stuff */
@@ -92,6 +93,10 @@ var yaftShowingDeleted = false;
 		
 	if(arg.viewMode) {
 		yaftViewMode = arg.viewMode;
+	}
+	
+	if(arg.likeServiceAvailable && "true" === arg.likeServiceAvailable) {
+		likeServiceAvailable = true;
 	}
 
 	yaftCurrentUserPreferences = YaftUtils.getUserPreferences(arg.placementId);

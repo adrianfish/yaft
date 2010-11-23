@@ -418,6 +418,19 @@ var YaftUtils;
 		
 		return forum;
 	}
+
+	YaftUtils.likeAuthor = function(authorId) {
+		jQuery.ajax( {
+	   		url : "/direct/likeservice/" + authorId + "/addLike",
+			dataType : "text",
+			cache: false,
+	  		success : function(response) {
+	  		},
+			error : function(xmlHttpRequest,textStatus,errorThrown) {
+				alert("Failed to like author. Reason: " + xmlHttpRequest.statusText);
+	 		}
+		});
+	}
 	
 	/* START MESSAGE OPERATIONS */
 	

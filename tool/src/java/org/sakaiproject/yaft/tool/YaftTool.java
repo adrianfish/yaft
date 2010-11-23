@@ -65,6 +65,8 @@ public class YaftTool extends HttpServlet
 	private YaftForumService yaftForumService = null;
 
 	private SakaiProxy sakaiProxy;
+	
+	private boolean likeServiceAvailable =  false;
 
 	public void destroy()
 	{
@@ -109,7 +111,7 @@ public class YaftTool extends HttpServlet
 				// means that we can't pass url parameters to the page.We can
 				// use a cookie and the JS will pull the initial state from that
 				// instead.
-				Cookie params = new Cookie("sakai-tool-params","state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&viewMode=minimal");
+				Cookie params = new Cookie("sakai-tool-params","state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&viewMode=minimal&likeServiceAvailable=" + likeServiceAvailable);
 				response.addCookie(params);
 				
 				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");
@@ -118,7 +120,7 @@ public class YaftTool extends HttpServlet
 			}
 			else
 			{
-				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode;
+				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&likeServiceAvailable=" + likeServiceAvailable;
 				response.sendRedirect(url);
 				return;
 			}
@@ -1161,6 +1163,10 @@ public class YaftTool extends HttpServlet
 			ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
 			yaftForumService = (YaftForumService) componentManager.get(YaftForumService.class);
 			sakaiProxy = yaftForumService.getSakaiProxy();
+			
+			// If the LikeService is in Spring, we can use it.
+			Object likeService = componentManager.get("org.sakaiproject.likeservice.impl.entity.LikeServiceEntityProvider");
+			if(likeService != null) likeServiceAvailable = true;
 		}
 		catch (Throwable t)
 		{
