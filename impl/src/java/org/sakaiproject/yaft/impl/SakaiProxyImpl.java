@@ -68,6 +68,8 @@ import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.NotificationService;
+import org.sakaiproject.event.api.UsageSession;
+import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.search.api.SearchList;
@@ -136,6 +138,8 @@ public class SakaiProxyImpl implements SakaiProxy
 	private TimeService timeService;
 
 	private SessionManager sessionManager;
+	
+	private UsageSessionService usageSessionService;
 
 	private EmailTemplateService emailTemplateService;
 
@@ -164,6 +168,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
 		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
+		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
 
@@ -676,7 +681,8 @@ public class SakaiProxyImpl implements SakaiProxy
 
 	public void postEvent(String event, String reference, boolean modify)
 	{
-		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify));
+		UsageSession usageSession = usageSessionService.getSession();
+		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify),usageSession);
 	}
 
 	public byte[] getResourceBytes(String resourceId)
