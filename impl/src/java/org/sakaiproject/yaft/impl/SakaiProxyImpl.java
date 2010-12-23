@@ -380,9 +380,13 @@ public class SakaiProxyImpl implements SakaiProxy
 
 					List<User> receivers = new ArrayList<User>();
 					receivers.add(user);
+					
+					final List<String> additionalHeaders = new ArrayList<String>();
+					additionalHeaders.add("Content-Type: text/html; charset=ISO-8859-1");
 
 					// do it
-					emailService.sendToUsers(receivers, getHeaders(user.getEmail(), subject), formatMessage(subject, message));
+					final String emailFromAddress = "\""+serverConfigurationService.getString("ui.service") + "\" <no-reply@" + serverConfigurationService.getServerName()+">";
+					emailService.send(emailFromAddress, email, subject, formatMessage(subject, message), email, null, additionalHeaders);
 
 					logger.info("Email sent to: " + userId);
 				}
@@ -396,17 +400,9 @@ public class SakaiProxyImpl implements SakaiProxy
 			private String formatMessage(String subject, String message)
 			{
 				StringBuilder sb = new StringBuilder();
-				sb.append(MIME_ADVISORY);
-				sb.append(BOUNDARY_LINE);
-				sb.append(PLAIN_TEXT_HEADERS);
-				sb.append(Validator.escapeHtmlFormattedText(message));
-				sb.append(BOUNDARY_LINE);
-				sb.append(HTML_HEADERS);
 				sb.append(htmlPreamble(subject));
 				sb.append(message);
 				sb.append(HTML_END);
-				sb.append(TERMINATION_LINE);
-
 				return sb.toString();
 			}
 
@@ -423,43 +419,6 @@ public class SakaiProxyImpl implements SakaiProxy
 
 				return sb.toString();
 			}
-
-			private List<String> getHeaders(String emailTo, String subject)
-			{
-				List<String> headers = new ArrayList<String>();
-				headers.add("MIME-Version: 1.0");
-				headers.add("Content-Type: multipart/alternative; boundary=\"" + MULTIPART_BOUNDARY + "\"");
-				headers.add(formatSubject(subject));
-				headers.add(getFrom());
-				if (emailTo != null && emailTo.length() > 0)
-				{
-					headers.add("To: " + emailTo);
-				}
-
-				return headers;
-			}
-
-			private String getFrom()
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("From: ");
-				sb.append(serverConfigurationService.getString("ui.service", "Sakai"));
-				sb.append(" <no-reply@");
-				sb.append(serverConfigurationService.getServerName());
-				sb.append(">");
-
-				return sb.toString();
-			}
-
-			private String formatSubject(String subject)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("Subject: ");
-				sb.append(subject);
-
-				return sb.toString();
-			}
-
 		}
 
 		// instantiate class to format, then send the mail
