@@ -1,4 +1,5 @@
 require(["jquery"
+			,"trimpath-template-latest"
 			,"jquery.ui.core"
 			,"jquery.ui.widget"
 			,"jquery.ui.mouse"
