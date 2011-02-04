@@ -115,7 +115,7 @@
             	<!-- DISABLED: see http://jira.sakaiproject.org/browse/BBB-34
             	<yuicompressor.phase>process-resources</yuicompressor.phase>
             	-->
-            	<yuicompressor.phase>process-resources</yuicompressor.phase>
+            	<!--yuicompressor.phase>process-resources</yuicompressor.phase-->
             </properties>
         </profile>
 		<profile>

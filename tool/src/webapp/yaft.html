@@ -23,45 +23,16 @@
       lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
-<!--
-<script type="text/javascript" src="/yaft-tool/lib/jquery.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery-ui.js"></script>
--->
+<script type="text/javascript" src="lib/require-jquery.js" data-main="main" ></script>
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/js/headscripts.js"></script>
-<!--
-<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/querystring.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.cluetip.min.js"></script> 
-<script type="text/javascript" src="/yaft-tool/lib/jquery.bgiframe.min.js"></script> 
-<script type="text/javascript" src="/yaft-tool/lib/jquery.hoverIntent.minified.js"></script> 
-<script type="text/javascript" src="/yaft-tool/lib/jquery.dimensions.js"></script> 
-<script type="text/javascript" src="/yaft-tool/lib/jquery.MultiFile.pack.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.localisation.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.0-min.js"></script>
-<script type="text/javascript" language="JavaScript" src="/yaft-tool/lib/jquery.form.js"></script>
--->
-<script type="text/javascript" src="/yaft-tool/js/sakai_utils.js"></script>
-<script type="text/javascript" src="/yaft-tool/js/yaft_utils.js"></script>
-<script type="text/javascript" src="/yaft-tool/js/yaft_permissions.js"></script>
 <script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
 <link rel="stylesheet" type="text/css" href="/library/skin/default/tool.css" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui.css" />
-<link href="/profile2-tool/css/profile2-profile-entity.css" type="text/css" rel="stylesheet" media="all" />
+<link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
-<script type="text/javascript">
-var arg = SakaiUtils.getParameters();
-if(arg['language'])
-{
-	$.localise('yaft-translations',{language:arg['language'],loadBase: true});
-}
-else
-	$.localise('yaft-translations');
-</script>
 </head>
 <body>
 <div id="yaft_toolbar"></div>
@@ -142,12 +113,12 @@ ${yaft_forums_label}
 			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
 		{/if}
 		{if forum.unsubscribed}
-		<a href="#" onClick="return YaftUtils.subscribeToForum('${forum.id}');" title="${yaft_subscribe_to_forum_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.subscribeToForum('${forum.id}');" title="${yaft_subscribe_to_forum_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
 		{else}
-		<a href="#" onClick="return YaftUtils.unsubscribeFromForum('${forum.id}');" title="${yaft_unsubscribe_from_forum_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.unsubscribeFromForum('${forum.id}');" title="${yaft_unsubscribe_from_forum_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
-			<a href="#" onclick="return YaftUtils.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
+			<a href="#" onclick="return YAFTUTILS.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
 		{/if}
 		</td>
 	</tr>
@@ -193,12 +164,12 @@ ${yaft_forums_label}
 		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>{/if}
 		{/if}
 		{if discussion.unsubscribed}
-		<a href="#" onClick="return YaftUtils.subscribeToDiscussion('${discussion.id}','${id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.subscribeToDiscussion('${discussion.id}','${id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
 		{else}
-		<a href="#" onClick="return YaftUtils.unsubscribeFromDiscussion('${discussion.id}','${id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.unsubscribeFromDiscussion('${discussion.id}','${id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
-			<a href="#" onClick="return YaftUtils.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+			<a href="#" onClick="return YAFTUTILS.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
 		{/if}
 		</td>
 	</tr>
@@ -297,8 +268,8 @@ ${yaft_forums_label}
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
 
-<a id="yaft_show_advanced_options_link" href="#" onclick="YaftUtils.showAdvancedOptions();">Show advanced options</a>
-<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YaftUtils.hideAdvancedOptions();">Hide advanced options</a>
+<a id="yaft_show_advanced_options_link" href="#" onclick="YAFTUTILS.showAdvancedOptions();">Show advanced options</a>
+<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YAFTUTILS.hideAdvancedOptions();">Hide advanced options</a>
 <br />
 <fieldset id="yaft_availability_fieldset" style="display: none;">
 <legend>Availability</legend>
@@ -381,7 +352,7 @@ ${yaft_forums_label}
 					</select>
 <br />
 <br />
-<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+<a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
 <br />
 	
@@ -523,18 +494,18 @@ ${yaft_forums_label}
 				{if yaftCurrentUserPermissions.messageCreate && status == 'READY'}
 					<span><a href="#" onClick="return switchState('reply',{'messageBeingRepliedTo':'${id}'});">${yaft_reply_label}</a></span>
 				{/if}
-				{if parent && 'DELETED' != status && ( (yaftCurrentUserPermissions.messageDeleteOwn && yaftCurrentUser.id == creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YaftUtils.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
-				{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YaftUtils.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
-				{if children.length > 0 && yaftViewMode != 'minimal'}<span><a href="#" onclick="YaftUtils.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
-				{if status == 'DRAFT' && yaftCurrentUser.id == creatorId}<span><a href="#" onClick="return YaftUtils.publishMessage('${id}');">${yaft_publish_label}</a></span>{/if}
+				{if parent && 'DELETED' != status && ( (yaftCurrentUserPermissions.messageDeleteOwn && yaftCurrentUser.id == creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
+				{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YAFTUTILS.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
+				{if children.length > 0 && yaftViewMode != 'minimal'}<span><a href="#" onclick="YAFTUTILS.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
+				{if status == 'DRAFT' && yaftCurrentUser.id == creatorId}<span><a href="#" onClick="return YAFTUTILS.publishMessage('${id}');">${yaft_publish_label}</a></span>{/if}
 				{if yaftCurrentUser.id != creatorId}
 				{if defined('read') && read == true}
-					<span><a href="javascript:;" onClick="return YaftUtils.markMessageRead(YaftUtils.findMessage('${id}'),false);">${yaft_mark_message_unread_label}</a></span>
+					<span><a href="javascript:;" onClick="return YAFTUTILS.markMessageRead(YAFTUTILS.findMessage('${id}'),false);">${yaft_mark_message_unread_label}</a></span>
 				{else}
-					<span><a href="#" onClick="return YaftUtils.markMessageRead(YaftUtils.findMessage('${id}'),true);">${yaft_mark_message_read_label}</a></span>
+					<span><a href="#" onClick="return YAFTUTILS.markMessageRead(YAFTUTILS.findMessage('${id}'),true);">${yaft_mark_message_read_label}</a></span>
 				{/if}
 				{/if}
-				{if likeServiceAvailable && yaftCurrentUser.id != creatorId}<span><a href="#" onClick="return YaftUtils.likeAuthor('${creatorId}');" title="Like the author of this message">${yaft_like_label}</a></span>{/if}
+				{if likeServiceAvailable && yaftCurrentUser.id != creatorId}<span><a href="#" onClick="return YAFTUTILS.likeAuthor('${creatorId}');" title="Like the author of this message">${yaft_like_label}</a></span>{/if}
 			</div>
 		</div>
 		</div>
@@ -551,7 +522,7 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
 	<br />
 	<br />
 
@@ -569,7 +540,7 @@ ${yaft_forums_label}
 	
 	<br />
 	
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
 	{/if}
 -->
 </div>
@@ -686,7 +657,7 @@ ${yaft_forums_label}
 					</select>
 <br />
 <br />
-<a href="#" onclick="YaftUtils.clearDates();">Clear dates</a>
+<a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
 </div>
 <br />
@@ -708,7 +679,7 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YaftUtils.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
     <br />
     <br />
 
@@ -774,7 +745,7 @@ ${yaft_forums_label}
 </div>
 <br />
 <div id="yaft_reply_container">
-	<form id="yaft_message_form" onSubmit="return YaftUtils.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}/messages" method="POST">
+	<form id="yaft_message_form" onSubmit="return YAFTUTILS.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}/messages" method="POST">
 	<h4>${yaft_type_your_message_label}</h4>
 	<br />
 	<span>${yaft_subject_label}:</span>
@@ -837,7 +808,7 @@ ${yaft_forums_label}
 	    {if attachment.name != 'array'}
 		    <div id="file_${attachment_index}">
 		        <span>${attachment.name}</span>
-		        <a href="#" onclick="YaftUtils.removeAttachment('${attachment.resourceId}','${id}','file_${attachment_index}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+		        <a href="#" onclick="YAFTUTILS.removeAttachment('${attachment.resourceId}','${id}','file_${attachment_index}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
 		        <br />
 		    </div>
 	    {/if}
@@ -894,7 +865,7 @@ ${yaft_forums_label}
 
 <!--  Templates End -->
 
-<script type="text/javascript" src="/yaft-tool/js/yaft.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 
 </body>
