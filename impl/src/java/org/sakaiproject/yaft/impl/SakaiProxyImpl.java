@@ -1145,4 +1145,11 @@ public class SakaiProxyImpl implements SakaiProxy
 	{
 		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
 	}
+	
+	public String getSakaiSkin()
+	{
+		String skin = serverConfigurationService.getString("skin.default");
+		String siteSkin = siteService.getSiteSkin(getCurrentSiteId());
+		return siteSkin != null ? siteSkin : (skin != null ? skin : "default");
+	}
 }

@@ -28,6 +28,20 @@
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
+<script type="text/javascript" language="JavaScript">
+$(document).ready(function(){
+    var arg = YAFTUTILS.getParameters();
+    // load Sakai skin
+    $.ajax({
+        url: '/library/skin/'+arg['skin']+'/tool.css',
+        success: function(data, textStatus) {
+            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
+        },
+        async: false,
+        dataType: 'text/css'
+    });
+});
+</script>
 </head>
 <body>
 <div id="yaft_toolbar"></div>

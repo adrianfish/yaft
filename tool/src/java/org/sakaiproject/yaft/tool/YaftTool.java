@@ -111,7 +111,7 @@ public class YaftTool extends HttpServlet
 				// means that we can't pass url parameters to the page.We can
 				// use a cookie and the JS will pull the initial state from that
 				// instead.
-				Cookie params = new Cookie("sakai-tool-params","state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&viewMode=minimal&likeServiceAvailable=" + likeServiceAvailable);
+				Cookie params = new Cookie("sakai-tool-params","state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal&likeServiceAvailable=" + likeServiceAvailable);
 				response.addCookie(params);
 				
 				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");
@@ -120,7 +120,7 @@ public class YaftTool extends HttpServlet
 			}
 			else
 			{
-				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&likeServiceAvailable=" + likeServiceAvailable;
+				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&likeServiceAvailable=" + likeServiceAvailable;
 				response.sendRedirect(url);
 				return;
 			}

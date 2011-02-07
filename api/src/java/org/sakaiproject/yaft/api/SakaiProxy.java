@@ -123,4 +123,6 @@ public interface SakaiProxy
 	public List<Group> getCurrentSiteGroups();
 
 	public boolean currentUserHasFunction(String function);
+
+	public String getSakaiSkin();
 }
