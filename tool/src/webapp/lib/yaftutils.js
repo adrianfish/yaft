@@ -170,6 +170,8 @@ var YAFTUTILS = (function($) {
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
 		});
+		
+		return false;
 	};
 
 	my.hideAdvancedOptions = function() {
@@ -180,6 +182,7 @@ var YAFTUTILS = (function($) {
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
 		});
+		return false;
 	};
 
 	my.hideDeleted = function() {

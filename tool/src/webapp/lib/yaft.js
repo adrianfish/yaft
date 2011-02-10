@@ -498,6 +498,8 @@ function switchState(state,arg) {
 		setupAvailability(discussion);
 
    		$(document).ready(function() {
+	 		$('#yaft_show_advanced_options_link').click(YAFTUTILS.showAdvancedOptions);
+            $('#yaft_hide_advanced_options_link').click(YAFTUTILS.hideAdvancedOptions);
 	    	$('#yaft_attachment').MultiFile(
 		            {
 		            	max: 5,

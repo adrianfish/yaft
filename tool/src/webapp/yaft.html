@@ -277,10 +277,11 @@ ${yaft_forums_label}
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
 
-<a id="yaft_show_advanced_options_link" href="#" onclick="YAFTUTILS.showAdvancedOptions();">Show advanced options</a>
-<a id="yaft_hide_advanced_options_link" href="#" style="display: none;" onclick="YAFTUTILS.hideAdvancedOptions();">Hide advanced options</a>
+<a id="yaft_show_advanced_options_link" href="javascript:;">Show advanced options</a>
+<a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
 <br />
-<fieldset id="yaft_availability_fieldset" style="display: none;">
+<div id="yaft_advanced_options" style="display:none;">
+<fieldset id="yaft_availability_fieldset">
 <legend>Availability</legend>
 <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
 <br />
@@ -363,6 +364,7 @@ ${yaft_forums_label}
 <br />
 <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
+</div>
 <br />
 	
 		<input type="submit" value="${yaft_save_label}"/>
