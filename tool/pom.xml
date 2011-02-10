@@ -102,12 +102,6 @@
             <classifier>jdk15</classifier>
             <type>jar</type>
         </dependency>
-        
-        <!-- dependency>
-  			<groupId>ro.isdc.wro4j</groupId>
-  			<artifactId>wro4j-core</artifactId>
-  			<version>1.3.3</version>
-		</dependency-->
 
 	</dependencies>
 	
@@ -139,25 +133,6 @@
             </resource>
         </resources>
 		<plugins>
-			<!--plugin>
-    			<groupId>ro.isdc.wro4j</groupId>
-    			<artifactId>wro4j-maven-plugin</artifactId>
-    			<version>1.3.3</version>
-    			<executions>
-      				<execution>
-        				<phase>compile</phase>
-        				<goals>
-          					<goal>run</goal>
-        				</goals>
-      				</execution>
-    			</executions>
-    			<configuration>
-    				<wroFile>${basedir}/src/webapp/WEB-INF/wro.xml</wroFile>
-      				<minimize>true</minimize>
-      				<destinationFolder>${basedir}/src/webapp/wro/</destinationFolder>
-      				<contextFolder>${basedir}/src/webapp/</contextFolder>
-    			</configuration>
-  			</plugin-->
             <!-- Compress CSS Stylesheets and Javascript -->
             <plugin>
                 <groupId>net.sf.alchim</groupId>

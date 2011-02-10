@@ -521,10 +521,10 @@ function switchState(state,arg) {
 			dataType : "json",
 			async : false,
 			cache: false,
-			success : function(d) {
+			success : function(d,textStatus) {
 				discussion = d;
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get discussion. Reason: " + errorThrown);
 			}
 		});

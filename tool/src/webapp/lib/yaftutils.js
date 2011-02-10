@@ -22,14 +22,14 @@ var YAFTUTILS = (function($) {
 	   		dataType : "json",
 	   		async : false,
 			cache: false,
-	  		success : function(forums,status) {
+	  		success : function(forums,textStatus) {
 				yaftCurrentForums = forums;
 
 				markReadMessagesInFora();
 
 				setupForumUnsubscriptions();
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to set current forums. Reason: " + errorThrown);
 			}
 		});
@@ -90,7 +90,7 @@ var YAFTUTILS = (function($) {
 	   		'data': forum,
 	       	async : false,
 			cache: false,
-		   	success : function(id) {
+		   	success : function(id,textStatus) {
 				if('' === forum.id) {
 					// New forum. Enter it.
 					yaftCurrentForum = forum;
@@ -101,7 +101,7 @@ var YAFTUTILS = (function($) {
 					switchState('forums');
 				}
 			},
-			error : function(xhr,status,error) {
+			error : function(xhr,textStatus,errorThrown) {
 				var message = $('#yaft_feedback_message');
 				message.html('Failed to save forum');
 				message.show();
@@ -137,10 +137,10 @@ var YAFTUTILS = (function($) {
             dataType : "json",
             cache: false,
             async : false,
-            success : function(data) {
+            success : function(data,textStatus) {
                 groups = data;
             },
-            error : function(xmlHttpRequest,status) {
+            error : function(xhr,textStatus,errorThrown) {
             }
         });
 
@@ -156,7 +156,7 @@ var YAFTUTILS = (function($) {
 	  		success : function(text,status) {
 				$('.yaft_active_discussion_row').hide();
 			},
-			error : function(xmlHttpRequest,status,error) {
+            error : function(xhr,textStatus,errorThrown) {
 				alert('failed');
 			}
 		});
@@ -290,7 +290,7 @@ var YAFTUTILS = (function($) {
 	  		success : function(forum) {
 	  			currentForum = forum;
 			},
-			error : function(xmlHttpRequest,status) {
+            error : function(xhr,textStatus,errorThrown) {
 			}
 		});
 		
@@ -308,7 +308,7 @@ var YAFTUTILS = (function($) {
 	   		success : function(unsubscriptions,status) {
 				data = unsubscriptions;
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+            error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get unsubscription data. Reason: " + errorThrown);
 			}
 	  	});
@@ -326,7 +326,7 @@ var YAFTUTILS = (function($) {
 	   		success : function(unsubscriptions,status) {
 				data = unsubscriptions;
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+            error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get forum unsubscription data. Reason: " + errorThrown);
 			}
 	  	});
@@ -373,8 +373,8 @@ var YAFTUTILS = (function($) {
 	  		success : function(d) {
 				discussion = d;
 	  		},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
-				alert("Failed to get discussion. Reason: " + xmlHttpRequest.statusText);
+            error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get discussion. Reason: " + xhr.statusText);
 	 		}
 		});
 		
@@ -392,8 +392,8 @@ var YAFTUTILS = (function($) {
 	  		success : function(d) {
 				discussion = d;
 	  		},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
-				alert("Failed to get discussion. Reason: " + xmlHttpRequest.statusText);
+            error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get discussion. Reason: " + xhr.statusText);
 	 		}
 		});
 		
@@ -411,8 +411,8 @@ var YAFTUTILS = (function($) {
 	  		success : function(d) {
 				forum = d;
 	  		},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
-				alert("Failed to get forum. Reason: " + xmlHttpRequest.statusText);
+            error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get forum. Reason: " + xhr.statusText);
 	 		}
 		});
 		
@@ -426,8 +426,8 @@ var YAFTUTILS = (function($) {
 			cache: false,
 	  		success : function(response) {
 	  		},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
-				alert("Failed to like author. Reason: " + xmlHttpRequest.statusText);
+            error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to like author. Reason: " + xhr.statusText);
 	 		}
 		});
 	};
@@ -440,7 +440,7 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				var message = YAFTUTILS.findMessage(messageId);
 				
 				message.status = 'READY';
@@ -458,7 +458,7 @@ var YAFTUTILS = (function($) {
 					attachProfilePopup();
 			    });
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to publish message. Reason: " + errorThrown);
 			}
 		});
@@ -475,7 +475,7 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				var message = YAFTUTILS.findMessage(messageId);
 				message.status = 'DELETED';
 				if(message.id == yaftCurrentDiscussion.firstMessage.id)
@@ -492,8 +492,8 @@ var YAFTUTILS = (function($) {
 					attachProfilePopup();
 			    });
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to delete message. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete message. Reason: " + textStatus);
 			}
 		});
 		
@@ -529,7 +529,7 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				var message = YAFTUTILS.findMessage(messageId);
 				message.status = 'READY';
 				if(message.id == yaftCurrentDiscussion.firstMessage.id)
@@ -541,8 +541,8 @@ var YAFTUTILS = (function($) {
 					attachProfilePopup();
 			    });
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to un-delete message. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to un-delete message. Reason: " + textStatus);
 			}
 		});
 		
@@ -585,7 +585,7 @@ var YAFTUTILS = (function($) {
 				
 				switchState('forum');
 			},
-			error : function(xmlHttpRequest,status,error) {
+			error : function(xhr,status,error) {
 			}
 	  	});
 
@@ -618,7 +618,7 @@ var YAFTUTILS = (function($) {
 				SAKAIUTILS.renderTrimpathTemplate('yaft_message_template',message,message.id);
 					
 			},
-			error : function(xmlHttpRequest,status,error) {
+			error : function(xhr,status,error) {
 				alert("Failed to mark message as read. Reason: " + status);
 			}
 	  	});
@@ -637,11 +637,11 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				switchState('forums');
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to delete forum. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete forum. Reason: " + textStatus);
 			}
 		});
 		
@@ -657,11 +657,11 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				switchState('forum',{'forumId':yaftCurrentForum.id});
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to delete discussion. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete discussion. Reason: " + textStatus);
 			}
 		});
 		
@@ -691,8 +691,8 @@ var YAFTUTILS = (function($) {
 
 				//switchState('forum');
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to subscribe to discussion. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to subscribe to discussion. Reason: " + textStatus);
 			}
 		});
 		
@@ -705,7 +705,7 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
 					if(yaftCurrentForum.discussions[i].id == discussionId) {
 						yaftCurrentForum.discussions[i].unsubscribed = true;
@@ -719,8 +719,8 @@ var YAFTUTILS = (function($) {
 
 				//switchState('forum');
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to unsubscribe from discussion. Reason: " + error);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to unsubscribe from discussion. Reason: " + errorThrown);
 			}
 		});
 		
@@ -733,7 +733,7 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
    			async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				for(var i=0,j=yaftCurrentForums.length;i<j;i++) {
 					var forum = yaftCurrentForums[i];
 					if(forum.id == forumId) {
@@ -749,8 +749,8 @@ var YAFTUTILS = (function($) {
 
 				renderCurrentForums();
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to subscribe to forum. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to subscribe to forum. Reason: " + textStatus);
 			}
 		});
 
@@ -779,8 +779,8 @@ var YAFTUTILS = (function($) {
 				
 				renderCurrentForums();
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to unsubscribe to forum. Reason: " + status);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to unsubscribe to forum. Reason: " + textStatus);
 			}
 		});
 
@@ -803,12 +803,12 @@ var YAFTUTILS = (function($) {
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
-		   	success : function(text,status) {
+		   	success : function(text,textStatus) {
 				//if("success".equals(text))
 					jQuery("#" + elementId).remove();
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to delete attachment. Reason: " + error);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete attachment. Reason: " + errorThrown);
 			}
 	  	});
 	};
@@ -821,7 +821,7 @@ var YAFTUTILS = (function($) {
         	async : false,
 			cache: false,
         	data : {'searchTerms':searchTerms},
-        	success : function(results) {
+        	success : function(results,textStatus) {
         		var hits = results;
 				/*
 				for(var i=0,j=hits.length;i<j;i++) {
@@ -836,8 +836,8 @@ var YAFTUTILS = (function($) {
 						setMainFrameHeight(window.frameElement.id);
 				});
         	},
-        	error : function(xmlHttpRequest,status,error) {
-				alert("Failed to search. Status: " + status + ". Error: " + error);
+        	error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to search. Status: " + textStatus + ". Error: " + errorThrown);
 			}
 		});
 
@@ -865,11 +865,11 @@ var YAFTUTILS = (function($) {
 			async : false,
    			dataType: "json",
 			cache: false,
-			success : function(read,status) {
+			success : function(read,textStatus) {
 				readMessages = read;
 			},
-			error : function(xmlHttpRequest,textStatus,error) {
-				alert("Failed to get read messages. Reason: " + error);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get read messages. Reason: " + errorThrown);
 			}
 		});
 			
@@ -895,10 +895,10 @@ var YAFTUTILS = (function($) {
 			async : false,
    			dataType: "json",
 			cache: false,
-			success : function(read,status) {
+			success : function(read,textStatus) {
 				readMessages = read;
 			},
-			error : function(xmlHttpRequest,textStatus,errorThrown) {
+			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get read messages. Reason: " + errorThrown);
 			}
 		});
@@ -925,7 +925,7 @@ var YAFTUTILS = (function($) {
 			async : false,
    			dataType: "json",
 			cache: false,
-			success : function(read,status) {
+			success : function(read,textStatus) {
 				var ids = read;
 				for(var i=0,j=ids.length;i<j;i++) {
 					//readMessages.push(ids[i].data);
@@ -1012,8 +1012,8 @@ var YAFTUTILS = (function($) {
 		   	success : function(prefs) {
 				preferences = prefs;
 			},
-			error : function(xmlHttpRequest,status,error) {
-				alert("Failed to get the user preferences. Reason: " + error);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get the user preferences. Reason: " + errorThrown);
 			}
 	  	});
 	  	
@@ -1027,11 +1027,11 @@ var YAFTUTILS = (function($) {
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
-		   	success : function(perms,status) {
+		   	success : function(perms,textStatus) {
 				permissions = perms;
 			},
-			error : function(xmlHttpRequest,stat,error) {
-				alert("Failed to get the current user permissions. Status: " + stat + ". Error: " + error);
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get the current user permissions. Status: " + textStatus + ". Error: " + errorThrown);
 			}
 	  	});
 	  	
@@ -1046,7 +1046,7 @@ var YAFTUTILS = (function($) {
             dataType : "json",
             async : false,
             cache: false,
-            success : function(p) {
+            success : function(p,textStatus) {
                 for(role in p) {
                     var permSet = {'role':role};
 
@@ -1058,8 +1058,8 @@ var YAFTUTILS = (function($) {
                     perms.push(permSet);
                 }
             },
-            error : function(xmlHttpRequest,stat,error) {
-                alert("Failed to get permissions. Status: " + stat + ". Error: " + error);
+            error : function(xhr,textStatus,errorThrown) {
+                alert("Failed to get permissions. Status: " + textStatus + ". Error: " + errorThrown);
             }
         });
 
@@ -1084,11 +1084,11 @@ var YAFTUTILS = (function($) {
             timeout: 30000,
             async : false,
             dataType: 'text',
-            success : function(result) {
+            success : function(result,textStatus) {
                 switchState('forums');
             },
-            error : function(xmlHttpRequest,status,error) {
-                alert("Failed to save permissions. Status: " + status + '. Error: ' + error);
+            error : function(xhr,textStatus,errorThrown) {
+                alert("Failed to save permissions. Status: " + textStatus + '. Error: ' + errorThrown);
             }
         });
 
