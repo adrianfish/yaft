@@ -84,6 +84,12 @@
     		<artifactId>simple-xml</artifactId>
     		<version>2.3.5</version>
 		</dependency>
+		<dependency>
+    		<groupId>org.sakaiproject.edu-services.gradebook</groupId>
+    		<artifactId>gradebook-service-api</artifactId>
+    		<version>1.0.5</version>
+    		<scope>provided</scope>
+		</dependency>
 		
 	</dependencies>
 </project>

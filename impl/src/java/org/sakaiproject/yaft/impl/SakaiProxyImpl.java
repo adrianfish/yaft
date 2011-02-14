@@ -75,6 +75,8 @@ import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.search.api.SearchService;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -144,6 +146,8 @@ public class SakaiProxyImpl implements SakaiProxy
 	private EmailTemplateService emailTemplateService;
 
 	private SearchService searchService;
+	
+	private GradebookService gradebookService;
 
 	public SakaiProxyImpl()
 	{
@@ -171,6 +175,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
+		gradebookService = (GradebookService) componentManager.get("org_sakaiproject_service_gradebook_GradebookService");
 
 		List<String> emailTemplates = (List<String>) componentManager.get("org.sakaiproject.yaft.api.emailtemplates.List");
 		// emailTemplateService.processEmailTemplates(emailTemplates);
@@ -1144,6 +1149,19 @@ public class SakaiProxyImpl implements SakaiProxy
 	public boolean currentUserHasFunction(String function)
 	{
 		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
+	}
+	
+	public boolean scorePost(String assignmentName, String studentId,String score) {
+		String siteId = this.getCurrentSiteId();
+		
+		try {
+			gradebookService.setAssignmentScoreString(siteId,assignmentName,studentId,score,"YAFT");
+			return true;
+		}
+		catch(Exception e) {
+			logger.error("Failed to score assignment '" + assignmentName + "'",e);
+			return false;
+		}
 	}
 	
 	public String getSakaiSkin()

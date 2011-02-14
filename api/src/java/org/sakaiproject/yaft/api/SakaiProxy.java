@@ -123,6 +123,8 @@ public interface SakaiProxy
 	public List<Group> getCurrentSiteGroups();
 
 	public boolean currentUserHasFunction(String function);
+	
+	public boolean scorePost(String assignmentName, String studentId,String score);
 
 	public String getSakaiSkin();
 }
