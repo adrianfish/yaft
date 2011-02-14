@@ -120,4 +120,9 @@ public interface SqlGenerator
 	String getSelectIdOfSiteContainingMessage(String messageId);
 
 	String getForumGroupsSelectStatement(String forumId);
+
+	PreparedStatement getSelectSiteAuthors(String siteId, Connection conn) throws Exception;
+
+	PreparedStatement getSelectMessagesForAuthorInSite(String authorId,
+			String currentSiteId, Connection connection) throws Exception;
 }

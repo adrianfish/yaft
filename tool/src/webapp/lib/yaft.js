@@ -65,6 +65,10 @@ var yaftShowingDeleted = false;
 		switchState('preferences');
 	});
 
+	$('#yaft_authors_view_link').click(function(e) {
+		switchState('authors');
+	});
+
 	$('#yaft_search_field').change(function(e) {
 		YAFTUTILS.showSearchResults(e.target.value);
 	});
@@ -145,6 +149,19 @@ function switchState(state,arg) {
 					
 		YAFTUTILS.renderCurrentForums();
 	}
+	else if('authors' === state) {
+        SAKAIUTILS.renderTrimpathTemplate('yaft_authors_breadcrumb_template',{},'yaft_breadcrumb');
+        YAFTUTILS.getAuthors();
+    }
+	else if('author' === state) {
+		if(!arg.id) {
+            return false;
+        }
+
+        SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_breadcrumb_template',{'displayName':arg.displayName},'yaft_breadcrumb');
+
+        YAFTUTILS.showAuthorPosts(arg.id);
+    }
 	else if('forum' === state) {
 		// If a forum id has been specified we need to refresh the current forum
 		// state

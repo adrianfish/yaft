@@ -37,6 +37,7 @@ import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
@@ -790,5 +791,14 @@ public class YaftForumServiceImpl implements YaftForumService
 	public String getIdOfSiteContainingMessage(String messageId)
 	{
 		return persistenceManager.getIdOfSiteContainingMessage(messageId);
+	}
+	
+	public List<Author> getAuthorsForCurrentSite() {
+		return persistenceManager.getAuthorsForCurrentSite();
+	}
+
+	@Override
+	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
+		return persistenceManager.getMessagesForAuthorInCurrentSite(authorId);
 	}
 }

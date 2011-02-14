@@ -36,6 +36,7 @@ import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftPreferences;
 import org.sakaiproject.yaft.impl.sql.ColumnNames;
@@ -847,7 +848,6 @@ public class YaftPersistenceManager
 	}
 
 	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getMessages()
 	 */
 	public List<Message> getMessages()
 	{
@@ -2429,6 +2429,95 @@ public class YaftPersistenceManager
 			{
 				try
 				{
+					statement.close();
+				}
+				catch (SQLException e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return null;
+	}
+
+	public List<Author> getAuthorsForCurrentSite() {
+		List<Author> posters = new ArrayList<Author>();
+		
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		
+		try {
+			connection = sakaiProxy.borrowConnection();
+			
+			statement = sqlGenerator.getSelectSiteAuthors(sakaiProxy.getCurrentSiteId(),connection);
+				
+			rs = statement.executeQuery();
+			
+			while(rs.next()) {
+				String id = rs.getString("CREATOR_ID");
+				posters.add(new Author( id,sakaiProxy.getDisplayNameForUser(id),rs.getInt("NUMBER_OF_POSTS") ));
+			}
+			
+			return posters;
+		}
+		catch (Exception e) {
+			logger.error("Caught exception whilst getting authors for site '" + sakaiProxy.getCurrentSiteId(), e);
+		}
+		finally {
+			
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			
+			if(statement != null) {
+				try {
+					statement.close();
+				}
+				catch (SQLException e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return null;
+	}
+
+	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
+		List<Message> messages = new ArrayList<Message>();
+		
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		
+		try {
+			connection = sakaiProxy.borrowConnection();
+			
+			statement = sqlGenerator.getSelectMessagesForAuthorInSite(authorId,sakaiProxy.getCurrentSiteId(),connection);
+				
+			rs = statement.executeQuery();
+			
+			while(rs.next()) {
+				messages.add(this.getMessageFromResults(rs, connection));
+			}
+			
+			return messages;
+		}
+		catch (Exception e) {
+			logger.error("Caught exception whilst getting messages for author '" + authorId + "' and site '" + sakaiProxy.getCurrentSiteId(), e);
+		}
+		finally {
+			
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			
+			if(statement != null) {
+				try {
 					statement.close();
 				}
 				catch (SQLException e) {}

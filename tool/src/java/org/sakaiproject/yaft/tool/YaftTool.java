@@ -48,6 +48,7 @@ import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftPreferences;
@@ -136,6 +137,31 @@ public class YaftTool extends HttpServlet
 				if ("forums".equals(part1))
 				{
 					doForumsGet(request,response,parts,siteId,placementId,languageCode);
+				}
+				
+				else if ("authors".equals(part1)) {
+					if(parts.length == 1) {
+						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
+						JSONArray data = JSONArray.fromObject(authors);
+						response.setStatus(HttpServletResponse.SC_OK);
+						response.setContentType("application/json");
+						response.getWriter().write(data.toString());
+						return;
+					} else if(parts.length == 3) {
+						String authorId = parts[1];
+						String authorOp = parts[2];
+						
+						if("messages".equals(authorOp)) {
+							List<Message> messages = yaftForumService.getMessagesForAuthorInCurrentSite(authorId);
+							JsonConfig config = new JsonConfig();
+							config.setExcludes(new String[] {"properties","reference"});
+							JSONArray data = JSONArray.fromObject(messages,config);
+							response.setStatus(HttpServletResponse.SC_OK);
+							response.setContentType("application/json");
+							response.getWriter().write(data.toString());
+							return;
+						}
+					}
 				}
 				
 				else if ("siteGroups".equals(part1))

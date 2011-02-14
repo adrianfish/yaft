@@ -115,3 +115,5 @@ yaft_groups_box_label = 'Groups/Sections';
 yaft_limit_to_groups_label = 'Display this forum and its contents to the selected groups/sections only';
 yaft_forum_group_message = 'Only visible to these groups: ';
 yaft_send_email_alert_label = 'Send email alert';
+yaft_authors_view_tooltip = 'Click to view a list of the people in this site who have posted messages';
+yaft_authors_label = 'Authors';

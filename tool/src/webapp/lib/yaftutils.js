@@ -1095,6 +1095,57 @@ var YAFTUTILS = (function($) {
         return false;
     };
 
+    my.getAuthors = function() {
+		jQuery.ajax( {
+	 		url : "/portal/tool/" + yaftPlacementId + "/authors",
+	   		dataType : "json",
+	   		cache : false,
+		   	success : function(data,textStatus) {
+                SAKAIUTILS.renderTrimpathTemplate('yaft_authors_template',{'authors': data},'yaft_content');
+	  	        $(document).ready(function() {
+			        YAFTUTILS.attachProfilePopup();
+			        $("#yaft_author_table").tablesorter({
+	 							cssHeader:'yaftSortableTableHeader',
+	 							cssAsc:'yaftSortableTableHeaderSortUp',
+	 							cssDesc:'yaftSortableTableHeaderSortDown',
+	 							widgets: ['zebra']
+	 						});
+			        if(window.frameElement)
+				        setMainFrameHeight(window.frameElement.id);
+		        });
+			},
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get the current set of authors. Status: " + textStatus + ". Error: " + errorThrown);
+			}
+	  	});
+    };
+
+    my.showAuthorPosts = function(authorId) {
+		jQuery.ajax( {
+	 		url : "/portal/tool/" + yaftPlacementId + "/authors/" + authorId + '/messages',
+	   		dataType : "json",
+	   		cache : false,
+		   	success : function(data,textStatus) {
+                SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_template',{'messages': data},'yaft_content');
+
+                for(var i=0,j=data.length;i<j;i++) {
+                    data[i].read = true;
+            	    SAKAIUTILS.renderTrimpathTemplate('yaft_message_template',data[i],data[i].id);
+                }
+
+	  	        $(document).ready(function() {
+			        YAFTUTILS.attachProfilePopup();
+			        if(window.frameElement) {
+				        setMainFrameHeight(window.frameElement.id);
+                    }
+		        });
+			},
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to get posts for author. Status: " + textStatus + ". Error: " + errorThrown);
+			}
+	  	});
+    };
+
     return my;
 
 }(jQuery));

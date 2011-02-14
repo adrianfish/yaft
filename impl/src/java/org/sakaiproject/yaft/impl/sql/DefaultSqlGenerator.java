@@ -850,4 +850,19 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		return "SELECT YAFT_FORUM_GROUP.GROUP_ID,TITLE FROM YAFT_FORUM_GROUP,SAKAI_SITE_GROUP WHERE FORUM_ID = '" + forumId + "' and YAFT_FORUM_GROUP.GROUP_ID = SAKAI_SITE_GROUP.GROUP_ID";
 	}
+
+	@Override
+	public PreparedStatement getSelectSiteAuthors(String siteId,Connection conn) throws Exception{
+		PreparedStatement st = conn.prepareStatement("SELECT CREATOR_ID,COUNT(*) NUMBER_OF_POSTS FROM YAFT_MESSAGE WHERE SITE_ID = ? GROUP BY CREATOR_ID");
+		st.setString(1,siteId);
+		return st;
+	}
+
+	@Override
+	public PreparedStatement getSelectMessagesForAuthorInSite(String authorId, String siteId, Connection connection) throws Exception {
+		PreparedStatement st = connection.prepareStatement("SELECT * FROM YAFT_MESSAGE WHERE SITE_ID = ? AND CREATOR_ID = ? ORDER BY CREATED_DATE");
+		st.setString(1,siteId);
+		st.setString(2,authorId);
+		return st;
+	}
 }
