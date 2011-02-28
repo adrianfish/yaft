@@ -161,7 +161,7 @@
               				<insertNewLine>true</insertNewLine>
               				<output>${project.build.directory}/${project.build.finalName}/lib/all.js</output>
               				<includes>
-                				<include>jquery.js</include>
+                				<include>jquery-1.4.4.js</include>
                 				<include>jquery.ui.core.js</include>
                 				<include>jquery.ui.widget.js</include>
                 				<include>jquery.ui.mouse.js</include>
