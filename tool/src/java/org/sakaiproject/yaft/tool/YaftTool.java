@@ -315,7 +315,12 @@ public class YaftTool extends HttpServlet
                     Forum forum = yaftForumService.getForum(forumId, state);
                     JsonConfig config = new JsonConfig();
                     config.setExcludes(new String[] {"properties","reference"});
-                    JSONObject data = JSONObject.fromObject(forum,config);
+                    JSONObject forumObject = JSONObject.fromObject(forum,config);
+            		Map<String,Integer> counts = yaftForumService.getReadMessageCountForForum(forumId);
+                    JSONObject countsObject = JSONObject.fromObject(counts);
+                    JSONObject data = new JSONObject();
+                    data.accumulate("forum", forumObject);
+                    data.accumulate("counts", countsObject);
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.setContentType("application/json");
                     response.getWriter().write(data.toString());
@@ -357,15 +362,6 @@ public class YaftTool extends HttpServlet
                     response.setContentType("text/plain");
                     response.getWriter().write("success");
                     response.getWriter().close();
-                    return;
-                }
-                else if ("readMessages".equals(forumOp))
-                {
-            		Map<String,Integer> counts = yaftForumService.getReadMessageCountForForum(forumId);
-                    JSONObject data = JSONObject.fromObject(counts);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.setContentType("application/json");
-                    response.getWriter().write(data.toString());
                     return;
                 }
             }

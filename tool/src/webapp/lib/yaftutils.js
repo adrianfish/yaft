@@ -16,11 +16,11 @@
 var YAFTUTILS = (function($) {
     var my = {};
 		
-	my.setCurrentForums = function() {
+	my.setCurrentForums = function (render) {
 		jQuery.ajax( {
 	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
 	   		dataType : "json",
-	   		async : false,
+	   		//async : false,
 			cache: false,
 	  		success : function(forums,textStatus) {
 				yaftCurrentForums = forums;
@@ -28,6 +28,10 @@ var YAFTUTILS = (function($) {
 				markReadMessagesInFora();
 
 				setupForumUnsubscriptions();
+
+                if(render) {
+                    YAFTUTILS.renderCurrentForums();
+                }
 			},
 			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to set current forums. Reason: " + errorThrown);
@@ -287,14 +291,42 @@ var YAFTUTILS = (function($) {
 			dataType : "json",
 			cache: false,
 			async : false,
-	  		success : function(forum) {
-	  			currentForum = forum;
-			},
+	  		success : function(data) {
+	  			currentForum = data.forum;
+
+			    for(var i=0,j=currentForum.discussions.length;i<j;i++) {
+			        var discussion = currentForum.discussions[i];
+				    var count = data.counts[discussion.id];
+				    if(count) {
+				        discussion['unread'] = discussion.messageCount - count;
+                    } else {
+					    discussion['unread'] = discussion.messageCount;
+                    }
+
+				    if(discussion['unread'] < 0) {
+                        discussion['unread'] = 0;
+                    }
+			    }
+	        },
             error : function(xhr,textStatus,errorThrown) {
 			}
 		});
 		
 		return currentForum;
+	};
+	
+	my.setupCurrentForumUnsubscriptions = function() {
+		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
+			var discussion = yaftCurrentForum.discussions[i];
+			discussion["unsubscribed"] = false;
+			for(var k=0,m=yaftUnsubscriptions.length;k<m;k++) {
+				var d = yaftUnsubscriptions[k];
+				if(d == discussion.id) {
+					discussion["unsubscribed"] = true;
+					break;
+				}
+			}
+		}
 	};
 	
 	my.getUnsubscriptions = function()
@@ -347,20 +379,6 @@ var YAFTUTILS = (function($) {
 			}
 		}
 	}
-	
-	my.setupCurrentForumUnsubscriptions = function() {
-		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-			var discussion = yaftCurrentForum.discussions[i];
-			discussion["unsubscribed"] = false;
-			for(var k=0,m=yaftUnsubscriptions.length;k<m;k++) {
-				var d = yaftUnsubscriptions[k];
-				if(d == discussion.id) {
-					discussion["unsubscribed"] = true;
-					break;
-				}
-			}
-		}
-	};
 	
 	my.getDiscussion = function(discussionId) {
 		var discussion = null;
@@ -887,36 +905,6 @@ var YAFTUTILS = (function($) {
 		}
 	}
 	
-	my.setUnreadMessageCountForCurrentForum = function() {
-		var readMessages = null;
-			
-		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/forums/" + yaftCurrentForum.id + "/readMessages",
-			async : false,
-   			dataType: "json",
-			cache: false,
-			success : function(read,textStatus) {
-				readMessages = read;
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get read messages. Reason: " + errorThrown);
-			}
-		});
-			
-		if(readMessages != null) {
-			for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-				var discussion = yaftCurrentForum.discussions[i];
-				var count = readMessages[discussion.id];
-				if(count)
-					discussion['unread'] = discussion.messageCount - count;
-				else
-					discussion['unread'] = discussion.messageCount;
-
-				if(discussion['unread'] < 0) discussion['unread'] = 0;
-			}
-		}
-	};
-	
 	my.markReadMessagesInCurrentDiscussion = function() {
 		var readMessages = [];
 			
@@ -1127,11 +1115,6 @@ var YAFTUTILS = (function($) {
 	   		cache : false,
 		   	success : function(data,textStatus) {
                 SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_template',{'messages': data},'yaft_content');
-
-                for(var i=0,j=data.length;i<j;i++) {
-                    data[i].read = true;
-            	    SAKAIUTILS.renderTrimpathTemplate('yaft_message_template',data[i],data[i].id);
-                }
 
 	  	        $(document).ready(function() {
 			        YAFTUTILS.attachProfilePopup();

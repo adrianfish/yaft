@@ -119,13 +119,14 @@ function switchState(state,arg) {
 
 	$('#yaft_feedback_message').hide();
 
+    $('#cluetip').hide();
+
 	// If a forum id has been specified we need to refresh the current forum
 	// state. We need to do it here as the breadcrumb in various states uses
 	// the information.
 	if(arg && arg.forumId) {
 
 		yaftCurrentForum = YAFTUTILS.getForum(arg.forumId,"part");
-		YAFTUTILS.setUnreadMessageCountForCurrentForum();
 		YAFTUTILS.setupCurrentForumUnsubscriptions();
 	}
 
@@ -142,15 +143,13 @@ function switchState(state,arg) {
 		$("#yaft_hide_deleted_link").hide();
 		$("#yaft_minimal_link").hide();
 		$("#yaft_full_link").hide();
-		
-		YAFTUTILS.setCurrentForums();
-				
+
 		$("#yaft_breadcrumb").html(yaft_forums_label);
-					
-		YAFTUTILS.renderCurrentForums();
+		
+		YAFTUTILS.setCurrentForums(true);
 	}
 	else if('authors' === state) {
-        SAKAIUTILS.renderTrimpathTemplate('yaft_authors_breadcrumb_template',{},'yaft_breadcrumb');
+		$("#yaft_breadcrumb").html(yaft_authors_label);
         YAFTUTILS.getAuthors();
     }
 	else if('author' === state) {
@@ -158,18 +157,11 @@ function switchState(state,arg) {
             return false;
         }
 
-        SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_breadcrumb_template',{'displayName':arg.displayName},'yaft_breadcrumb');
+        SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_breadcrumb_template',{'id':arg.id,'displayName':arg.displayName},'yaft_breadcrumb');
 
         YAFTUTILS.showAuthorPosts(arg.id);
     }
 	else if('forum' === state) {
-		// If a forum id has been specified we need to refresh the current forum
-		// state
-		if(arg && arg.forumId) {
-			yaftCurrentForum = YAFTUTILS.getForum(arg.forumId,"part");
-			YAFTUTILS.setUnreadMessageCountForCurrentForum();
-			YAFTUTILS.setupCurrentForumUnsubscriptions();
-		}
 		
 		if(!yaftCurrentForums) {
 			YAFTUTILS.setCurrentForums();
@@ -348,7 +340,6 @@ function switchState(state,arg) {
 		var saveMessageOptions = { 
 			dataType: 'text',
 			timeout: 30000,
-			//async: false,
 			iframe: true,
    			success: function(responseText,statusText,xhr) {
 					yaftCurrentDiscussion = YAFTUTILS.getDiscussion(yaftCurrentDiscussion.id);
@@ -398,7 +389,6 @@ function switchState(state,arg) {
 		var saveMessageOptions = { 
 			dataType: 'text',
 			timeout: 30000,
-			//async: false,
 			iframe: true,
    			success: function(responseText,statusText,xhr) {
 					yaftCurrentDiscussion = YAFTUTILS.getDiscussion(yaftCurrentDiscussion.id);
@@ -447,7 +437,6 @@ function switchState(state,arg) {
 		
 		var saveDiscussionOptions = { 
 			dataType: 'html',
-			//async: false,
 			iframe: true,
 			timeout: 30000,
 			beforeSerialize: function($form,options) {
@@ -534,7 +523,7 @@ function switchState(state,arg) {
 		YAFTUTILS.setCurrentForums();
 		var discussion = null;
 		jQuery.ajax( {
-			url : "/direct/yaft-discussion/" + arg.discussionId + '.json',
+			url : "/portal/tool/" + yaftPlacementId + "/discussions/" + arg.discussionId,
 			dataType : "json",
 			async : false,
 			cache: false,
