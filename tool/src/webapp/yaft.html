@@ -875,11 +875,6 @@ ${yaft_forums_label}
 -->
 </div>
 
-<div id="yaft_authors_breadcrumb_template" style="display:none;"><!--
-${yaft_authors_label}
--->
-</div>
-
 <div id="yaft_authors_template" style="display:none;"><!--
 <table id="yaft_author_table" class="listHier">
     <thead>
@@ -895,13 +890,45 @@ ${yaft_authors_label}
 </div>
 
 <div id="yaft_author_messages_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${yaftPlacementId}/authors" onClick="return switchState('authors');">${yaft_authors_label}</a>-&gt;${displayName}
+<a href="/portal/tool/${yaftPlacementId}/authors" onClick="return switchState('authors');">${yaft_authors_label}</a>-&gt;<a class="profile" rel="/direct/profile/${id}/formatted" href="javascript:;">${displayName}</a>
 -->
 </div>
 
 <div id="yaft_author_messages_template" style="display:none"><!--
     {for message in messages}
-		<div id="${message.id}" style="overflow: auto;"></div>
+		<div class="yaft_message">
+		
+		<div style="margin:5px;overflow:hidden;">
+			<div style="margin-left:2px;overflow: hidden;">
+				<div style="float:left;">
+					<a id="message-${message.id}" href="${message.url}"><span style="font-weight: bold">${message.subject}</span></a> - <span>${new Date(message.createdDate).toLocaleString()}</span>
+				</div>
+				<div style="float: right;">
+					{if message.attachments.length > 0}
+					<span>Attachments: </span>
+					{/if}
+					{for attachment in message.attachments}
+						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
+						{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'text/html'}<img src="/library/image/silk/html.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType.match(/^image/)}<img src="/library/image/silk/picture.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType.match(/^audio/)}<img src="/library/image/silk/sound.png" width="16" height="16" alt="${attachment.name}" />
+						{else}<img src="/library/image/silk/error.png" width="16" height="16" alt="${attachment.name}" />
+						{/if}
+						</a>
+					{/for}
+				</div>
+			</div>
+			<hr style="clear: left"/>
+			<div style="clear: left">${message.content}</div>
+			<br />
+		</div>
+		</div>
     {/for}
 -->
 </div>
@@ -909,8 +936,8 @@ ${yaft_authors_label}
 <!--  Templates End -->
 
 <script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
-<!--script type="text/javascript" src="/yaft-tool/lib/all.js"></script-->
-<script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
+<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
@@ -928,7 +955,7 @@ ${yaft_authors_label}
 <script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script-->
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/js/headscripts.js"></script>
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
