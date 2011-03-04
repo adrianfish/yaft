@@ -26,6 +26,8 @@ import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.search.api.SearchResult;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.user.api.User;
@@ -124,7 +126,16 @@ public interface SakaiProxy
 
 	public boolean currentUserHasFunction(String function);
 	
-	public boolean scorePost(String assignmentName, String studentId,String score);
+	public boolean scoreAssignment(int assignmentId, String studentId,String score);
 
 	public String getSakaiSkin();
+
+	//public void createGradebookAssignment(String subject);
+
+	/** Gets the list of assignments for the current worksite*/
+	public List<Assignment> getGradebookAssignments();
+
+	public Assignment getGradebookAssignment(int gradebookAssignmentId);
+
+	public GradeDefinition getAssignmentGrade(String userId, long assignmentId);
 }

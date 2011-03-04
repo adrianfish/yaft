@@ -125,4 +125,8 @@ public interface SqlGenerator
 
 	PreparedStatement getSelectMessagesForAuthorInSite(String authorId,
 			String currentSiteId, Connection connection) throws Exception;
+
+	PreparedStatement getSelectDiscussionAuthors(String discussionId, Connection conn) throws Exception;
+
+	PreparedStatement getSelectMessagesForAuthorInDiscussion(String authorId, String discussionId, Connection conn) throws Exception;
 }

@@ -990,40 +990,22 @@ var YAFTUTILS = (function($) {
         return null;
 	}
 
-	my.getUserPreferences = function() {
-		var preferences = null;
+	my.getCurrentUserData = function() {
+		var userData = null;
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/userPreferences",
+	 		url : "/portal/tool/" + yaftPlacementId + "/userData",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
-		   	success : function(prefs) {
-				preferences = prefs;
+		   	success : function(data,textStatus) {
+                userData = data;
 			},
 			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get the user preferences. Reason: " + errorThrown);
+				alert("Failed to get the current user data. Status: " + textStatus + ". Error: " + errorThrown);
 			}
 	  	});
 	  	
-	  	return preferences;
-	};
-	
-	my.getCurrentUserPermissions = function() {
-		var permissions = null;
-		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/userPerms",
-	   		dataType : "json",
-	   		async : false,
-	   		cache : false,
-		   	success : function(perms,textStatus) {
-				permissions = perms;
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get the current user permissions. Status: " + textStatus + ". Error: " + errorThrown);
-			}
-	  	});
-	  	
-	  	return permissions;
+	  	return userData;
 	};
 	
 	my.getSitePermissionMatrix = function() {
@@ -1084,23 +1066,30 @@ var YAFTUTILS = (function($) {
     };
 
     my.getAuthors = function() {
+        this.setCurrentAuthors();
+	    SAKAIUTILS.renderTrimpathTemplate('yaft_discussion_authors_breadcrumb_template',yaftCurrentDiscussion,'yaft_breadcrumb');
+        SAKAIUTILS.renderTrimpathTemplate('yaft_authors_template',{'authors': yaftCurrentAuthors},'yaft_content');
+	    $(document).ready(function() {
+	        YAFTUTILS.attachProfilePopup();
+		    $("#yaft_author_table").tablesorter({
+	 				cssHeader:'yaftSortableTableHeader',
+	 				cssAsc:'yaftSortableTableHeaderSortUp',
+	 				cssDesc:'yaftSortableTableHeaderSortDown',
+	 				widgets: ['zebra']
+	 		});
+	        if(window.frameElement)
+		        setMainFrameHeight(window.frameElement.id);
+        });
+    };
+
+    my.setCurrentAuthors = function() {
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/authors",
+	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors",
 	   		dataType : "json",
 	   		cache : false,
+            async: false,
 		   	success : function(data,textStatus) {
-                SAKAIUTILS.renderTrimpathTemplate('yaft_authors_template',{'authors': data},'yaft_content');
-	  	        $(document).ready(function() {
-			        YAFTUTILS.attachProfilePopup();
-			        $("#yaft_author_table").tablesorter({
-	 							cssHeader:'yaftSortableTableHeader',
-	 							cssAsc:'yaftSortableTableHeaderSortUp',
-	 							cssDesc:'yaftSortableTableHeaderSortDown',
-	 							widgets: ['zebra']
-	 						});
-			        if(window.frameElement)
-				        setMainFrameHeight(window.frameElement.id);
-		        });
+                yaftCurrentAuthors = data;
 			},
 			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get the current set of authors. Status: " + textStatus + ". Error: " + errorThrown);
@@ -1108,16 +1097,51 @@ var YAFTUTILS = (function($) {
 	  	});
     };
 
+
     my.showAuthorPosts = function(authorId) {
+        var author = null;
+
+        if(yaftCurrentAuthors == null) {
+            this.setCurrentAuthors();
+        }
+
+        for(var i=0,j=yaftCurrentAuthors.length;i<j;i++) {
+            if(yaftCurrentAuthors[i].id === authorId) {
+                author = yaftCurrentAuthors[i];
+            }
+        }
+
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/authors/" + authorId + '/messages',
+	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors/" + authorId + "/messages",
 	   		dataType : "json",
 	   		cache : false,
 		   	success : function(data,textStatus) {
-                SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_template',{'messages': data},'yaft_content');
+                var stuff = {'messages': data,'assignment':yaftCurrentDiscussion.assignment};
+                if(author.grade) stuff.grade = author.grade.grade;
+                SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_template',stuff,'yaft_content');
 
 	  	        $(document).ready(function() {
 			        YAFTUTILS.attachProfilePopup();
+                    $('#yaft_grade_button').click(function () {
+
+                        var gradePoints = $('#yaft_grade_field').val();
+
+                        jQuery.ajax( {
+	 		                url : "/portal/tool/" + yaftPlacementId + "/assignments/" + yaftCurrentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
+	   		                dataType : "text",
+	   		                cache : false,
+		   	                success : function(data,textStatus) {
+                                $('.yaft_grade_field').val(gradePoints);
+
+                                $('.yaft_grade_success_message').show();
+
+                                window.setTimeout(function () { $('.yaft_grade_success_message').fadeOut(); },2000);
+                            },
+			                error : function(xhr,textStatus,errorThrown) {
+			                }
+                        });
+                    });
+
 			        if(window.frameElement) {
 				        setMainFrameHeight(window.frameElement.id);
                     }

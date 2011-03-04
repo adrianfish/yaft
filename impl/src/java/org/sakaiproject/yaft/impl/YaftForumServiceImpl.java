@@ -801,4 +801,14 @@ public class YaftForumServiceImpl implements YaftForumService
 	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
 		return persistenceManager.getMessagesForAuthorInCurrentSite(authorId);
 	}
+
+	@Override
+	public List<Author> getAuthorsForDiscussion(String discussionId) {
+		return persistenceManager.getAuthorsForDiscussion(discussionId);
+	}
+
+	@Override
+	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
+		return persistenceManager.getMessagesForAuthorInDiscussion(authorId,discussionId);
+	}
 }

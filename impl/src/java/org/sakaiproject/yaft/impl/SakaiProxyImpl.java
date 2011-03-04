@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -75,7 +77,9 @@ import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.search.api.SearchList;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.search.api.SearchService;
+import org.sakaiproject.service.gradebook.shared.AssessmentNotFoundException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -903,6 +907,7 @@ public class SakaiProxyImpl implements SakaiProxy
 		{
 			// Special case for the super admin
 			filteredFunctions.addAll(functionManager.getRegisteredFunctions("yaft"));
+			filteredFunctions.add("gradebook.gradeAll");
 		}
 		else
 		{
@@ -931,10 +936,10 @@ public class SakaiProxyImpl implements SakaiProxy
 				functions.addAll(siteHelperRole.getAllowedFunctions());
 			}
 
-			for (String function : functions)
-			{
-				if (function.startsWith("yaft"))
+			for (String function : functions) {
+				if (function.startsWith("yaft") || "gradebook.gradeAll".equals(function)) {
 					filteredFunctions.add(function);
+				}
 			}
 		}
 
@@ -1151,15 +1156,17 @@ public class SakaiProxyImpl implements SakaiProxy
 		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
 	}
 	
-	public boolean scorePost(String assignmentName, String studentId,String score) {
+	public boolean scoreAssignment(int assignmentId, String studentId,String score) {
 		String siteId = this.getCurrentSiteId();
 		
+		Assignment assignment = gradebookService.getAssignment(siteId,(long) assignmentId);
+		
 		try {
-			gradebookService.setAssignmentScoreString(siteId,assignmentName,studentId,score,"YAFT");
+			gradebookService.setAssignmentScoreString(siteId,assignment.getName(),studentId,score,"YAFT");
 			return true;
 		}
 		catch(Exception e) {
-			logger.error("Failed to score assignment '" + assignmentName + "'",e);
+			logger.error("Failed to score assignment '" + assignment.getName() + "'",e);
 			return false;
 		}
 	}
@@ -1169,5 +1176,41 @@ public class SakaiProxyImpl implements SakaiProxy
 		String skin = serverConfigurationService.getString("skin.default");
 		String siteSkin = siteService.getSiteSkin(getCurrentSiteId());
 		return siteSkin != null ? siteSkin : (skin != null ? skin : "default");
+	}
+
+	public List<Assignment> getGradebookAssignments() {
+		try {
+			return gradebookService.getAssignments(getCurrentSiteId());
+		}
+		catch(AssessmentNotFoundException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public Assignment getGradebookAssignment(int gradebookAssignmentId) {
+		try {
+			return gradebookService.getAssignment(getCurrentSiteId(),(long) gradebookAssignmentId);
+		}
+		catch(AssessmentNotFoundException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public GradeDefinition getAssignmentGrade(String userId, long assignmentId) {
+		
+		if(!gradebookService.isUserAbleToViewItemForStudent(getCurrentSiteId(),(long) assignmentId,userId)) {
+			logger.warn("Current user allowed to view grades for user '" + userId + "'. Returning null ...");
+			return null;
+		}
+		
+		try	{
+			return gradebookService.getGradeDefinitionForStudentForItem(getCurrentSiteId(),(long) assignmentId,userId);
+		}
+		catch(Exception e) {
+			logger.error("Failed to get grade for user",e);
+			return null;
+		}
 	}
 }

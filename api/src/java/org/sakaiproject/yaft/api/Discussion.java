@@ -18,6 +18,7 @@ package org.sakaiproject.yaft.api;
 import java.util.Date;
 import java.util.Stack;
 
+import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,6 +46,16 @@ public class Discussion
 	
 	private boolean lockedForWriting = false;
 	private boolean lockedForReading = false;
+	
+	private Assignment assignment = null;
+	
+	public void setAssignment(Assignment assignment) {
+		this.assignment = assignment;
+	}
+
+	public Assignment getAssignment() {
+		return assignment;
+	}
 	
 	public void setFirstMessage(Message firstMessage)
 	{
@@ -247,5 +258,9 @@ public class Discussion
 	public boolean isLockedForReadingAndUnavailable()
 	{
 		return lockedForReading && !isCurrent();
+	}
+
+	public boolean isGraded() {
+		return assignment != null;
 	}
 }

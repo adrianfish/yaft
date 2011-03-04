@@ -39,6 +39,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.search.api.SearchResult;
+import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
@@ -134,12 +135,9 @@ public class YaftTool extends HttpServlet
 			{
 				String part1 = parts[0];
 
-				if ("forums".equals(part1))
-				{
+				if ("forums".equals(part1)) {
 					doForumsGet(request,response,parts,siteId,placementId,languageCode);
-				}
-				
-				else if ("authors".equals(part1)) {
+				} else if ("authors".equals(part1)) {
 					if(parts.length == 1) {
 						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
 						JSONArray data = JSONArray.fromObject(authors);
@@ -162,26 +160,15 @@ public class YaftTool extends HttpServlet
 							return;
 						}
 					}
-				}
-				
-				else if ("siteGroups".equals(part1))
-				{
+				} else if ("siteGroups".equals(part1)) {
 					List<Group> groups = sakaiProxy.getCurrentSiteGroups();
 					JSONArray data = JSONArray.fromObject(groups);
 					response.setStatus(HttpServletResponse.SC_OK);
 					response.setContentType("application/json");
 					response.getWriter().write(data.toString());
 					return;
-				}
-				
-				else if ("userPreferences".equals(part1))
-				{
-					YaftPreferences prefs = yaftForumService.getPreferencesForUser(sakaiProxy.getCurrentUser().getId(),siteId);
-					JSONObject data = JSONObject.fromObject(prefs);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
-					response.getWriter().write(data.toString());
-					return;
+				} else if ("assignments".equals(part1)) {
+					doAssignmentsGet(response, parts);
 				}
 				
 				else if ("perms".equals(part1))
@@ -189,9 +176,9 @@ public class YaftTool extends HttpServlet
 					doPermsGet(response);
 				}
 				
-				else if ("userPerms".equals(part1))
+				else if ("userData".equals(part1))
 				{
-					doUserPermsGet(response);
+					doUserDataGet(response,siteId);
 				}
 				
 				else if ("activeDiscussions".equals(part1))
@@ -497,6 +484,30 @@ public class YaftTool extends HttpServlet
             		response.getWriter().close();
             		return;
 				}
+				else if ("authors".equals(discussionOp)) {
+					if(parts.length == 3) {
+						List<Author> authors = yaftForumService.getAuthorsForDiscussion(discussionId);
+						JSONArray data = JSONArray.fromObject(authors);
+						response.setStatus(HttpServletResponse.SC_OK);
+						response.setContentType("application/json");
+						response.getWriter().write(data.toString());
+						return;
+					} else if(parts.length == 5) {
+						String authorId = parts[3];
+						String authorOp = parts[4];
+						
+						if("messages".equals(authorOp)) {
+							List<Message> messages = yaftForumService.getMessagesForAuthorInDiscussion(authorId,discussionId);
+							JsonConfig config = new JsonConfig();
+							config.setExcludes(new String[] {"properties","reference"});
+							JSONArray data = JSONArray.fromObject(messages,config);
+							response.setStatus(HttpServletResponse.SC_OK);
+							response.setContentType("application/json");
+							response.getWriter().write(data.toString());
+							return;
+						}
+					}
+				}
 			}
 		}
     }
@@ -641,10 +652,48 @@ public class YaftTool extends HttpServlet
 		}
     }
 	
-	private void doUserPermsGet(HttpServletResponse response) throws ServletException, IOException
-	{
+	private void doAssignmentsGet(HttpServletResponse response,String[] parts) throws ServletException, IOException {
+		
+		// Only a single case supported at the mo, that of a grading operation.
+		
+        if (parts.length != 6)	{
+        	return;
+        }
+        
+        String assignmentId = parts[1];
+       	String authorId = parts[3];
+       	String points = parts[5];
+       	
+       	if(sakaiProxy.scoreAssignment(Integer.parseInt(assignmentId), authorId, points)) {
+       		response.setStatus(HttpServletResponse.SC_OK);
+       		return;
+       	}
+       	else {
+       		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+       		return;
+       	}
+    }
+	
+	private void doUserDataGet(HttpServletResponse response, String siteId) throws ServletException, IOException {
         Set<String> perms = sakaiProxy.getPermissionsForCurrentUserAndSite();
-        JSONArray data = JSONArray.fromObject(perms);
+        YaftPreferences prefs = yaftForumService.getPreferencesForUser(sakaiProxy.getCurrentUser().getId(),siteId);
+        
+        
+		JSONObject prefsData = JSONObject.fromObject(prefs);
+        JSONArray permsData = JSONArray.fromObject(perms);
+        
+        JSONObject data = new JSONObject();
+        data.accumulate("permissions", permsData);
+        data.accumulate("preferences", prefsData);
+        
+        if(sakaiProxy.currentUserHasFunction("gradebook.editAssignments")) {
+        	List<Assignment> assignments = sakaiProxy.getGradebookAssignments();
+        	JsonConfig config = new JsonConfig();
+        	config.setExcludes(new String[] {"dueDate"});
+        	JSONArray assignmentsData = JSONArray.fromObject(assignments,config);
+        	data.accumulate("assignments", assignmentsData);
+        }
+        
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.getWriter().write(data.toString());
@@ -882,6 +931,8 @@ public class YaftTool extends HttpServlet
         	String lockWritingString = (String) request.getParameter("lockWriting");
         	String lockReadingString = (String) request.getParameter("lockReading");
         	
+        	String grade = (String) request.getParameter("grade");
+        	
         	if(subject == null || subject.length() <= 0
         		|| content == null || content.length() <= 0
         		|| forumId == null || forumId.length() <= 0)
@@ -944,6 +995,18 @@ public class YaftTool extends HttpServlet
         	discussion.setFirstMessage(message);
         	discussion.setLockedForWriting(lockWriting);
         	discussion.setLockedForReading(lockReading);
+        	
+        	if(grade != null && "true".equals(grade)) {
+        		String gradebookAssignmentIdString = (String) request.getParameter("assignmentId");
+        		try {
+        			int gradebookAssignmentId = Integer.parseInt(gradebookAssignmentIdString);
+        			discussion.setAssignment(sakaiProxy.getGradebookAssignment(gradebookAssignmentId));
+        		} catch(Exception e) {
+        			logger.error("Failed to set discussion assignment",e);
+        			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        			return;
+        		}
+        	}
 		
         	if(startDate != null && startDate.length() > 0
         			&& endDate != null && endDate.length() > 0)

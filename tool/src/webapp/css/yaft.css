@@ -173,3 +173,23 @@ th.yaftSortableTableHeaderSortDown {
 .yaft_odd_row {
 	background-color: #FFFFC0;
 }
+
+.yaft_graded_in_label {
+    margin-left: 5px;
+    color: green;
+    font-weight: bold;
+}
+
+.yaft_small_graded_in_label {
+    margin-left: 5px;
+    color: green;
+    font-weight: italic;
+    font-size: smaller;
+}
+
+.yaft_grade_success_message {
+    margin-left: 5px;
+    color: green;
+    font-weight: bold;
+    display: none;
+}

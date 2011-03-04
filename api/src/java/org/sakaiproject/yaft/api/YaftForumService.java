@@ -126,4 +126,9 @@ public interface YaftForumService extends EntityProducer
 	public List<Author> getAuthorsForCurrentSite();
 
 	public List<Message> getMessagesForAuthorInCurrentSite(String authorId);
+
+	public List<Author> getAuthorsForDiscussion(String discussionId);
+
+	public List<Message> getMessagesForAuthorInDiscussion(String authorId,
+			String discussionId);
 }

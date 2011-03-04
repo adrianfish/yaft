@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
@@ -622,6 +624,11 @@ public class YaftPersistenceManager
 		
 			discussion.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 			discussion.setLastMessageDate(rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE).getTime());
+			int gradebookAssignmentId = rs.getInt("GRADEBOOK_ASSIGNMENT_ID");
+			if(gradebookAssignmentId != 0) {
+				Assignment  assignment = sakaiProxy.getGradebookAssignment(gradebookAssignmentId);
+				discussion.setAssignment(assignment);
+			}
 		
 			return discussion;
 		}
@@ -2507,6 +2514,104 @@ public class YaftPersistenceManager
 		}
 		catch (Exception e) {
 			logger.error("Caught exception whilst getting messages for author '" + authorId + "' and site '" + sakaiProxy.getCurrentSiteId(), e);
+		}
+		finally {
+			
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			
+			if(statement != null) {
+				try {
+					statement.close();
+				}
+				catch (SQLException e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return null;
+	}
+
+	public List<Author> getAuthorsForDiscussion(String discussionId) {
+		List<Author> posters = new ArrayList<Author>();
+		
+		Discussion discussion = getDiscussion(discussionId,false);
+		
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		
+		try {
+			connection = sakaiProxy.borrowConnection();
+			
+			statement = sqlGenerator.getSelectDiscussionAuthors(discussionId,connection);
+				
+			rs = statement.executeQuery();
+			
+			while(rs.next()) {
+				String id = rs.getString("CREATOR_ID");
+				Author author = new Author( id,sakaiProxy.getDisplayNameForUser(id),rs.getInt("NUMBER_OF_POSTS") );
+				
+				if(discussion.isGraded()) {
+					GradeDefinition grade = sakaiProxy.getAssignmentGrade(id,discussion.getAssignment().getId());
+					author.setGrade(grade);
+				}
+				
+				posters.add(author);
+			}
+			
+			return posters;
+		}
+		catch (Exception e) {
+			logger.error("Caught exception whilst getting authors for discussion '" + discussionId + "'", e);
+		}
+		finally {
+			
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			
+			if(statement != null) {
+				try {
+					statement.close();
+				}
+				catch (SQLException e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		
+		return null;
+	}
+
+	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
+		List<Message> messages = new ArrayList<Message>();
+		
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		
+		try {
+			connection = sakaiProxy.borrowConnection();
+			
+			statement = sqlGenerator.getSelectMessagesForAuthorInDiscussion(authorId,discussionId,connection);
+				
+			rs = statement.executeQuery();
+			
+			while(rs.next()) {
+				messages.add(this.getMessageFromResults(rs, connection));
+			}
+			
+			return messages;
+		}
+		catch (Exception e) {
+			logger.error("Caught exception whilst getting messages for author '" + authorId + "' and discussion '" + discussionId + "'", e);
 		}
 		finally {
 			

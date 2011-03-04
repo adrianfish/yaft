@@ -42,5 +42,7 @@ function YaftPermissions(data) {
 			this.modifyPermissions = true;
 		else if('yaft.view.invisible' === data[i])
 			this.viewInvisible = true;
+		else if('gradebook.gradeAll' === data[i])
+			this.gradeAll = true;
 	}
 }

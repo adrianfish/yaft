@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
@@ -64,7 +65,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		statements.add("CREATE TABLE YAFT_FORUM_DISCUSSION (FORUM_ID CHAR(36) NOT NULL,DISCUSSION_ID CHAR(36) NOT NULL,CONSTRAINT yaft_forum_discussion_pk PRIMARY KEY (FORUM_ID,DISCUSSION_ID))");
 
-		statements.add("CREATE TABLE YAFT_DISCUSSION (DISCUSSION_ID CHAR(36) NOT NULL," + "LAST_MESSAGE_DATE " + DATETIME + " NOT NULL," + "MESSAGE_COUNT " + INT + " NOT NULL," + "STATUS " + VARCHAR + "(36) NOT NULL," + "START_DATE " + DATETIME + "," + "END_DATE " + DATETIME + "," + "LOCKED_FOR_WRITING " + BOOL + " NOT NULL," + "LOCKED_FOR_READING " + BOOL + " NOT NULL," + "CONSTRAINT yaft_discussion_pk PRIMARY KEY (DISCUSSION_ID))");
+		statements.add("CREATE TABLE YAFT_DISCUSSION (DISCUSSION_ID CHAR(36) NOT NULL," + "LAST_MESSAGE_DATE " + DATETIME + " NOT NULL," + "MESSAGE_COUNT " + INT + " NOT NULL," + "STATUS " + VARCHAR + "(36) NOT NULL," + "START_DATE " + DATETIME + "," + "END_DATE " + DATETIME + "," + "LOCKED_FOR_WRITING " + BOOL + " NOT NULL," + "LOCKED_FOR_READING " + BOOL + " NOT NULL,GRADEBOOK_ASSIGNMENT_ID BIGINT(20),"+ "CONSTRAINT yaft_discussion_pk PRIMARY KEY (DISCUSSION_ID))");
 
 		statements.add("CREATE TABLE YAFT_MESSAGE (MESSAGE_ID CHAR(36) NOT NULL," + "SITE_ID " + VARCHAR + "(99) NOT NULL," + "PARENT_MESSAGE_ID CHAR(36)," + "DISCUSSION_ID CHAR(36)," + "SUBJECT " + VARCHAR + "(255) NOT NULL," + "CONTENT " + MEDIUMTEXT + " NOT NULL," + "CREATOR_ID " + VARCHAR + "(99) NOT NULL," + "CREATED_DATE " + DATETIME + " NOT NULL," + "STATUS " + VARCHAR + "(36)," + "CONSTRAINT yaft_message_pk PRIMARY KEY (MESSAGE_ID))");
 
@@ -750,7 +751,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 	public PreparedStatement getSetDiscussionDatesStatement(Discussion discussion, Connection conn) throws Exception
 	{
-		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START_DATE = ?,END_DATE = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ? WHERE DISCUSSION_ID = ?");
+		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START_DATE = ?,END_DATE = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ?,GRADEBOOK_ASSIGNMENT_ID = ? WHERE DISCUSSION_ID = ?");
 
 		long start = discussion.getStart();
 		long end = discussion.getEnd();
@@ -768,8 +769,16 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		st.setBoolean(3, discussion.isLockedForWriting());
 		st.setBoolean(4, discussion.isLockedForReading());
+		
+		Assignment gradebookAssignment = discussion.getAssignment();
+		
+		if(gradebookAssignment != null) {
+			st.setLong(5, gradebookAssignment.getId());
+		} else {
+			st.setNull(5,Types.INTEGER);
+		}
 
-		st.setString(5, discussion.getId());
+		st.setString(6, discussion.getId());
 
 		return st;
 	}
@@ -862,6 +871,21 @@ public class DefaultSqlGenerator implements SqlGenerator
 	public PreparedStatement getSelectMessagesForAuthorInSite(String authorId, String siteId, Connection connection) throws Exception {
 		PreparedStatement st = connection.prepareStatement("SELECT * FROM YAFT_MESSAGE WHERE SITE_ID = ? AND CREATOR_ID = ? ORDER BY CREATED_DATE");
 		st.setString(1,siteId);
+		st.setString(2,authorId);
+		return st;
+	}
+
+	@Override
+	public PreparedStatement getSelectDiscussionAuthors(String discussionId, Connection conn) throws Exception {
+		PreparedStatement st = conn.prepareStatement("SELECT CREATOR_ID,COUNT(*) NUMBER_OF_POSTS FROM YAFT_MESSAGE WHERE DISCUSSION_ID = ? GROUP BY CREATOR_ID");
+		st.setString(1,discussionId);
+		return st;
+	}
+	
+	@Override
+	public PreparedStatement getSelectMessagesForAuthorInDiscussion(String authorId, String discussionId, Connection conn) throws Exception {
+		PreparedStatement st = conn.prepareStatement("SELECT * FROM YAFT_MESSAGE WHERE DISCUSSION_ID = ? AND CREATOR_ID = ? ORDER BY CREATED_DATE");
+		st.setString(1,discussionId);
 		st.setString(2,authorId);
 		return st;
 	}

@@ -28,20 +28,6 @@
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
-<script type="text/javascript" language="JavaScript">
-$(document).ready(function(){
-    var arg = YAFTUTILS.getParameters();
-    // load Sakai skin
-    $.ajax({
-        url: '/library/skin/'+arg['skin']+'/tool.css',
-        success: function(data, textStatus) {
-            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
-        },
-        async: false,
-        dataType: 'text/css'
-    });
-});
-</script>
 </head>
 <body>
 <div id="yaft_toolbar"></div>
@@ -68,7 +54,7 @@ $(document).ready(function(){
 		<a style="display: none;" id="yaft_show_deleted_link" title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a>
 		<a style="display: none;" id="yaft_hide_deleted_link" title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a>
 		<a id="yaft_preferences_link" title="${yaft_preferences_tooltip}" href="javascript:;">${yaft_preferences_label}</a>
-		<a id="yaft_authors_view_link" title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a>
+		<a style="display: none;" id="yaft_authors_view_link" title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a>
 	</div>
 	<div id="yaft_search_bar">
 	<input id="yaft_search_field" type="text"/><input type="button" value="${yaft_search_label}"/>
@@ -161,7 +147,7 @@ ${yaft_forums_label}
 	{for discussion in discussions}
 	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
    	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
-		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a></td>
+		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}</td>
 		<td><a href="javascript:;" class="profile" rel="/direct/profile/${discussion.creatorId}/formatted">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
 		<td>${discussion.unread}</td>
@@ -365,6 +351,16 @@ ${yaft_forums_label}
 <br />
 <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
+<fieldset id="yaft_grading_fieldset" style="display: none;">
+<legend>Grading</legend>
+<input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>Grade this discussion in Gradebook (pick from the list of current Gradebook assignments)
+<br />
+<select id="yaft_assignment_selector" class="indnt4" name="assignmentId" style="display: none;">
+{for gbAssignment in yaftGradebookAssignments}
+<option value="${gbAssignment.id}">${gbAssignment.name}</option>
+{/for}
+</select>
+</fieldset>
 </div>
 <br />
 	
@@ -447,7 +443,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_discussion_breadcrumb_template"><!--
-<a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;${subject}
+<a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;${subject} {if defined('assignment')}<span class="yaft_graded_in_label">(${yaft_graded_in_label}: ${assignment.name})</span>{/if}
 -->
 </div>
 
@@ -878,23 +874,29 @@ ${yaft_forums_label}
 <div id="yaft_authors_template" style="display:none;"><!--
 <table id="yaft_author_table" class="listHier">
     <thead>
-        <tr><th>Name</th><th>Number of Posts</th></tr>
+        <tr><th>Name</th><th>Number of Posts</th>{if yaftCurrentUserPermissions.gradeAll && yaftCurrentDiscussion.graded}<th>${yaft_grade_label}</th>{/if}</tr>
     </thead>
     <tbody>
         {for author in authors}
-            <tr><td><a class="profile" rel="/direct/profile/${author.id}/formatted" href="javascript:;" onClick="switchState('author',{'id':'${author.id}','displayName':'${author.displayName}'});">${author.displayName}</a></td><td>${author.numberOfPosts}</td></tr>
+            <tr><td><a class="profile" rel="/direct/profile/${author.id}/formatted" href="javascript:;" onClick="switchState('author',{'id':'${author.id}','displayName':'${author.displayName}'});">${author.displayName}</a></td><td>${author.numberOfPosts}</td>{if yaftCurrentDiscussion.graded}<td>{if author.graded}${author.grade.grade}{/if}</td>{/if}</tr>
         {/for}
     </tbody>
 </table>
 -->
 </div>
 
+<div id="yaft_discussion_authors_breadcrumb_template" style="display:none;"><!--
+<a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;<a href="${yaftCurrentDiscussion.url}" onClick="return switchState('full',{'discussionId':'${id}'});">${subject}</a>-&gt;${yaft_authors_label}
+-->
+</div>
+
 <div id="yaft_author_messages_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${yaftPlacementId}/authors" onClick="return switchState('authors');">${yaft_authors_label}</a>-&gt;<a class="profile" rel="/direct/profile/${id}/formatted" href="javascript:;">${displayName}</a>
+<a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;<a href="${yaftCurrentDiscussion.url}" onClick="return switchState('full',{'discussionId':'${yaftCurrentDiscussion.id}'});">${yaftCurrentDiscussion.subject}</a>-&gt;<a href="/portal/tool/${yaftPlacementId}/authors" onClick="return switchState('authors');">${yaft_authors_label}</a>-&gt;<a class="profile" rel="/direct/profile/${id}/formatted" href="javascript:;">${displayName}</a>
 -->
 </div>
 
 <div id="yaft_author_messages_template" style="display:none"><!--
+    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
     {for message in messages}
 		<div class="yaft_message">
 		
@@ -930,6 +932,7 @@ ${yaft_forums_label}
 		</div>
 		</div>
     {/for}
+    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
 -->
 </div>
 
@@ -959,6 +962,20 @@ ${yaft_forums_label}
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/js/headscripts.js"></script>
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
+<script type="text/javascript" language="JavaScript">
+$(document).ready(function(){
+    var arg = SAKAIUTILS.getParameters();
+    // load Sakai skin
+    $.ajax({
+        url: '/library/skin/'+arg['skin']+'/tool.css',
+        success: function(data, textStatus) {
+            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
+        },
+        async: false,
+        dataType: 'text/css'
+    });
+});
+</script>
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 
 </body>

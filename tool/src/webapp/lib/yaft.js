@@ -23,6 +23,9 @@ var yaftUnsubscriptions = null;
 var yaftForumUnsubscriptions = null;
 var likeServiceAvailable = false;
 var yaftCurrentForums = null;
+/* Needed for show author messages */
+var yaftCurrentAuthors = null;
+var yaftGradebookAssignments = null;
 
 /* State specific stuff */
 var yaftCurrentForum = null;
@@ -34,38 +37,38 @@ var yaftShowingDeleted = false;
 	// We need the toolbar in a template so we can swap in the translations
 	SAKAIUTILS.renderTrimpathTemplate('yaft_toolbar_template',{},'yaft_toolbar');
 
-	$('#yaft_home_link').bind('click',function(e) {
+	$('#yaft_home_link').click(function (e) {
 		switchState('forums');
 	});
 
-	$('#yaft_add_forum_link').bind('click',function(e) {
+	$('#yaft_add_forum_link').click(function (e) {
 		switchState('editForum');
 	});
 
-	$('#yaft_add_discussion_link').bind('click',function(e) {
+	$('#yaft_add_discussion_link').click(function (e) {
 		switchState('startDiscussion');
 	});
 
-	$('#yaft_permissions_link').bind('click',function(e) {
+	$('#yaft_permissions_link').click(function (e) {
 		switchState('permissions');
 	});
 
-	$('#yaft_minimal_link').bind('click',function(e) {
+	$('#yaft_minimal_link').click(function (e) {
 		switchState('minimal');
 	});
 
-	$('#yaft_full_link').bind('click',function(e) {
+	$('#yaft_full_link').click(function (e) {
 		switchState('full');
 	});
 
-	$('#yaft_show_deleted_link').bind('click',YAFTUTILS.showDeleted);
-	$('#yaft_hide_deleted_link').bind('click',YAFTUTILS.hideDeleted);
+	$('#yaft_show_deleted_link').click(YAFTUTILS.showDeleted);
+	$('#yaft_hide_deleted_link').click(YAFTUTILS.hideDeleted);
 
-	$('#yaft_preferences_link').bind('click',function(e) {
+	$('#yaft_preferences_link').click(function (e) {
 		switchState('preferences');
 	});
 
-	$('#yaft_authors_view_link').click(function(e) {
+	$('#yaft_authors_view_link').click(function (e) {
 		switchState('authors');
 	});
 
@@ -88,7 +91,11 @@ var yaftShowingDeleted = false;
 	yaftSiteId = arg.siteId;
 	yaftCurrentUser = SAKAIUTILS.getCurrentUser();
 
-	yaftCurrentUserPermissions = new YaftPermissions(YAFTUTILS.getCurrentUserPermissions());
+	var data = YAFTUTILS.getCurrentUserData();
+
+    yaftGradebookAssignments = data.assignments;
+
+	yaftCurrentUserPermissions = new YaftPermissions(data.permissions);
 
 	if(yaftCurrentUserPermissions.modifyPermissions)
 		$("#yaft_permissions_link").show();
@@ -103,7 +110,7 @@ var yaftShowingDeleted = false;
 		likeServiceAvailable = true;
 	}
 
-	yaftCurrentUserPreferences = YAFTUTILS.getUserPreferences(arg.placementId);
+	yaftCurrentUserPreferences = data.preferences;
 	yaftUnsubscriptions = YAFTUTILS.getUnsubscriptions();
 	yaftForumUnsubscriptions = YAFTUTILS.getForumUnsubscriptions();
 	
@@ -116,6 +123,13 @@ var yaftShowingDeleted = false;
 })();
 
 function switchState(state,arg) {
+
+	$("#yaft_minimal_link").hide();
+	$("#yaft_full_link").hide();
+	$("#yaft_show_deleted_link").hide();
+	$("#yaft_hide_deleted_link").hide();
+	$("#yaft_add_discussion_link").hide();
+	$("#yaft_authors_view_link").hide();
 
 	$('#yaft_feedback_message').hide();
 
@@ -136,13 +150,6 @@ function switchState(state,arg) {
 			$("#yaft_add_forum_link").show();
 		else
 			$("#yaft_add_forum_link").hide();
-
-
-		$("#yaft_add_discussion_link").hide();
-		$("#yaft_show_deleted_link").hide();
-		$("#yaft_hide_deleted_link").hide();
-		$("#yaft_minimal_link").hide();
-		$("#yaft_full_link").hide();
 
 		$("#yaft_breadcrumb").html(yaft_forums_label);
 		
@@ -212,6 +219,7 @@ function switchState(state,arg) {
 		$("#yaft_add_forum_link").hide();
 		$("#yaft_minimal_link").show();
 		$("#yaft_full_link").hide();
+		$("#yaft_authors_view_link").show();
 		
 		if(yaftCurrentDiscussion != null) {
 			SAKAIUTILS.renderTrimpathTemplate('yaft_discussion_breadcrumb_template',yaftCurrentDiscussion,'yaft_breadcrumb');
@@ -427,10 +435,11 @@ function switchState(state,arg) {
 	}
 	else if('startDiscussion' === state) {
 
-		var discussion = {'id':'','subject':'',lockedForWriting:yaftCurrentForum.lockedForWriting,lockedForReading:yaftCurrentForum.lockedForReading,start: yaftCurrentForum.start,end: yaftCurrentForum.end,'firstMessage':{'content':''}};
+		var discussion = {'id':'','subject':'',lockedForWriting:yaftCurrentForum.lockedForWriting,lockedForReading:yaftCurrentForum.lockedForReading,start: yaftCurrentForum.start,end: yaftCurrentForum.end,'firstMessage':{'content':''},'grade': false};
 
-		if(arg && arg.discussionId)
+		if(arg && arg.discussionId) {
 			discussion = YAFTUTILS.findDiscussion(arg.discussionId);
+        }
 
 		SAKAIUTILS.renderTrimpathTemplate('yaft_start_discussion_breadcrumb_template',arg,'yaft_breadcrumb');
 		SAKAIUTILS.renderTrimpathTemplate('yaft_start_discussion_content_template',discussion,'yaft_content');
@@ -513,6 +522,25 @@ function switchState(state,arg) {
 					});
 			SAKAIUTILS.setupFCKEditor('yaft_discussion_editor',800,500,'Default',yaftSiteId);
 			$('#yaft_subject_field').focus();
+
+            if(yaftGradebookAssignments && yaftGradebookAssignments.length > 0) {
+                $('#yaft_grading_fieldset').show();
+            }
+
+			$('#yaft_grade_checkbox').click(function () {
+                if(this.checked === true) {
+                    $('#yaft_assignment_selector').show();
+                } else {
+                    $('#yaft_assignment_selector').hide();
+                }
+            });
+
+	        if(discussion.assignment) {
+		        $('#yaft_grade_checkbox').attr('checked',true);
+                $('#yaft_assignment_selector').show();
+                $("#yaft_assignment_selector option[value='" + discussion.assignment.id + "']").attr('selected', 'selected');
+            }
+
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
    		});
@@ -559,7 +587,7 @@ function switchState(state,arg) {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_permissions_content_template',{'perms':perms},'yaft_content');
 
 	 	$(document).ready(function() {
-			$('#yaft_permissions_save_button').bind('click',function(e) {
+			$('#yaft_permissions_save_button').click(function (e) {
 				return YAFTUTILS.savePermissions();
 			});
 
