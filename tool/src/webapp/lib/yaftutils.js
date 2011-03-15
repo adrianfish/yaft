@@ -215,6 +215,7 @@ var YAFTUTILS = (function($) {
 	 									4:{sorter: "isoDate"},
 	 									5:{sorter: false}
 	 								},
+                                sortList: [[0,0]],
 	 							widgets: ['zebra']
 	 						});
 
