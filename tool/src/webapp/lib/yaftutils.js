@@ -20,7 +20,7 @@ var YAFTUTILS = (function($) {
 		jQuery.ajax( {
 	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
 	   		dataType : "json",
-	   		//async : false,
+	   		async : false,
 			cache: false,
 	  		success : function(forums,textStatus) {
 				yaftCurrentForums = forums;
