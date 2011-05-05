@@ -351,6 +351,7 @@ ${yaft_forums_label}
 <br />
 <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
+{if yaftGradebookAssignments.length > 0 }
 <fieldset id="yaft_grading_fieldset" style="display: none;">
 <legend>Grading</legend>
 <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>Grade this discussion in Gradebook (pick from the list of current Gradebook assignments)
@@ -361,6 +362,7 @@ ${yaft_forums_label}
 {/for}
 </select>
 </fieldset>
+{/if}
 </div>
 <br />
 	
@@ -939,8 +941,8 @@ ${yaft_forums_label}
 <!--  Templates End -->
 
 <script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
-<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
+<!--script type="text/javascript" src="/yaft-tool/lib/all.js"></script-->
+<script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
@@ -958,7 +960,7 @@ ${yaft_forums_label}
 <script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script-->
+<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/js/headscripts.js"></script>
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
