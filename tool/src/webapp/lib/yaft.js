@@ -80,6 +80,13 @@ var yaftShowingDeleted = false;
 	$('#yaft_home_link').show();
 	
 	var arg = SAKAIUTILS.getParameters();
+
+    if(arg['language']) {
+        $.localise('yaft-translations',{language:arg['language'],loadBase: true});
+    }
+    else {
+        $.localise('yaft-translations');
+    }
 	
 	if(!arg || !arg.placementId || !arg.siteId) {
 		alert('The placement id and site id MUST be supplied as page parameters');
