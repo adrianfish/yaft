@@ -1232,7 +1232,7 @@ public class YaftPersistenceManager
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#unsubscribeFromDiscussion(java.lang.String, java.lang.String)
 	 */
-	public void unsubscribeFromDiscussion(String userId, String discussionId)
+	public boolean unsubscribeFromDiscussion(String userId, String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1241,10 +1241,12 @@ public class YaftPersistenceManager
 			connection = sakaiProxy.borrowConnection();
 			statement = connection.createStatement();
 			statement.executeUpdate(sqlGenerator.getUnsubscribeFromDiscussionStatement(userId,discussionId));
+			return true;
 		}
 		catch (Exception e)
 		{
-			logger.error("Caught exception whilst getting discussion unsubscribers.", e);
+			logger.error("Caught exception whilst unsubscribing from discussion '" + discussionId + "'", e);
+			return false;
 		}
 		finally
 		{
@@ -1303,7 +1305,7 @@ public class YaftPersistenceManager
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#subscribeToDiscussion(java.lang.String, java.lang.String)
 	 */
-	public void subscribeToDiscussion(String userId, String discussionId)
+	public boolean subscribeToDiscussion(String userId, String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1312,10 +1314,12 @@ public class YaftPersistenceManager
 			connection = sakaiProxy.borrowConnection();
 			statement = connection.createStatement();
 			statement.executeUpdate(sqlGenerator.getSubscribeToDiscussionStatement(userId,discussionId));
+			return true;
 		}
 		catch (Exception e)
 		{
 			logger.error("Caught exception whilst getting discussion unsubscribers.", e);
+			return false;
 		}
 		finally
 		{

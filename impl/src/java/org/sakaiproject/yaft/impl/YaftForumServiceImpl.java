@@ -273,12 +273,12 @@ public class YaftForumServiceImpl implements YaftForumService
 		persistenceManager.undeleteMessage(message, forumId);
 	}
 
-	public void unsubscribeFromDiscussion(String userId, String discussionId)
+	public boolean unsubscribeFromDiscussion(String userId, String discussionId)
 	{
 		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
 
-		persistenceManager.unsubscribeFromDiscussion(userId, discussionId);
+		return persistenceManager.unsubscribeFromDiscussion(userId, discussionId);
 	}
 
 	public List<String> getDiscussionUnsubscriptions(String userId)
@@ -289,12 +289,12 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getDiscussionUnsubscriptions(userId);
 	}
 
-	public void subscribeToDiscussion(String userId, String discussionId)
+	public boolean subscribeToDiscussion(String userId, String discussionId)
 	{
 		if (userId == null)
 			userId = sakaiProxy.getCurrentUser().getId();
 
-		persistenceManager.subscribeToDiscussion(userId, discussionId);
+		return persistenceManager.subscribeToDiscussion(userId, discussionId);
 	}
 
 	public void subscribeToForum(String forumId)

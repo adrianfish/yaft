@@ -19,7 +19,7 @@ var yaftSiteId = null;
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
 var yaftCurrentUserPreferences = null;
-var yaftUnsubscriptions = null;
+var yaftDiscussionUnsubscriptions = null;
 var yaftForumUnsubscriptions = null;
 var likeServiceAvailable = false;
 var yaftCurrentForums = null;
@@ -118,7 +118,7 @@ var yaftShowingDeleted = false;
 	}
 
 	yaftCurrentUserPreferences = data.preferences;
-	yaftUnsubscriptions = YAFTUTILS.getUnsubscriptions();
+	yaftDiscussionUnsubscriptions = YAFTUTILS.getDiscussionUnsubscriptions();
 	yaftForumUnsubscriptions = YAFTUTILS.getForumUnsubscriptions();
 	
 	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null) {

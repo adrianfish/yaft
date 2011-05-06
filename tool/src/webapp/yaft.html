@@ -160,9 +160,9 @@ ${yaft_forums_label}
 		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>{/if}
 		{/if}
 		{if discussion.unsubscribed}
-		<a href="#" onClick="return YAFTUTILS.subscribeToDiscussion('${discussion.id}','${id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.subscribeToDiscussion('${discussion.id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
 		{else}
-		<a href="#" onClick="return YAFTUTILS.unsubscribeFromDiscussion('${discussion.id}','${id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
+		<a href="#" onClick="return YAFTUTILS.unsubscribeFromDiscussion('${discussion.id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
 			<a href="#" onClick="return YAFTUTILS.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>

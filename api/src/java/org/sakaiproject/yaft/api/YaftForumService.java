@@ -77,11 +77,11 @@ public interface YaftForumService extends EntityProducer
 	
 	public void undeleteMessage(Message messageId,String forumId);
 
-	public void unsubscribeFromDiscussion(String userId, String discussionId);
+	public boolean unsubscribeFromDiscussion(String userId, String discussionId);
 
 	public List<String> getDiscussionUnsubscriptions(String userId);
 
-	public void subscribeToDiscussion(String userId, String discussionId);
+	public boolean subscribeToDiscussion(String userId, String discussionId);
 
 	public void showMessage(Message messageId);
 

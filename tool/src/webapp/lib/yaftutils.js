@@ -321,8 +321,8 @@ var YAFTUTILS = (function($) {
 		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
 			var discussion = yaftCurrentForum.discussions[i];
 			discussion["unsubscribed"] = false;
-			for(var k=0,m=yaftUnsubscriptions.length;k<m;k++) {
-				var d = yaftUnsubscriptions[k];
+			for(var k=0,m=yaftDiscussionUnsubscriptions.length;k<m;k++) {
+				var d = yaftDiscussionUnsubscriptions[k];
 				if(d == discussion.id) {
 					discussion["unsubscribed"] = true;
 					break;
@@ -331,11 +331,11 @@ var YAFTUTILS = (function($) {
 		}
 	};
 	
-	my.getUnsubscriptions = function()
+	my.getDiscussionUnsubscriptions = function()
 	{
 		var data = null;
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/unsubscriptions",
+	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/unsubscriptions",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
@@ -688,11 +688,10 @@ var YAFTUTILS = (function($) {
 		return false;
 	};
 	
-	my.subscribeToDiscussion = function(discussionId,forumId){
+	my.subscribeToDiscussion = function(discussionId){
 		jQuery.ajax( {
 	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/subscribe",
 	   		dataType : "text",
-	   		async : false,
 			cache: false,
 		   	success : function(text,status) {
 				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
@@ -700,16 +699,16 @@ var YAFTUTILS = (function($) {
 						yaftCurrentForum.discussions[i].unsubscribed = false;
 						
 						// Remove this discussion id from the unsubscriptions list
-						for(var k=0,m=yaftUnsubscriptions.length;k<m;k++) {
-							if(yaftUnsubscriptions[k] == discussionId)
-								yaftUnsubscriptions.splice(k,1);
+						for(var k=0,m=yaftDiscussionUnsubscriptions.length;k<m;k++) {
+							if(yaftDiscussionUnsubscriptions[k] == discussionId)
+								yaftDiscussionUnsubscriptions.splice(k,1);
 						}
 					}
 				}
 
-				renderCurrentForumContent();
+				//renderCurrentForumContent();
 
-				//switchState('forum');
+				switchState('forum');
 			},
 			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to subscribe to discussion. Reason: " + textStatus);
@@ -719,25 +718,24 @@ var YAFTUTILS = (function($) {
 		return false;
 	};
 	
-	my.unsubscribeFromDiscussion = function(discussionId,forumId) {
+	my.unsubscribeFromDiscussion = function(discussionId) {
 		jQuery.ajax( {
 	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/unsubscribe",
 	   		dataType : "text",
-	   		async : false,
-			cache: false,
 		   	success : function(text,textStatus) {
 				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-					if(yaftCurrentForum.discussions[i].id == discussionId) {
+					if(yaftCurrentForum.discussions[i].id === text) {
 						yaftCurrentForum.discussions[i].unsubscribed = true;
 						
 						// Add this discussion id to the unsubscriptions list
-						yaftUnsubscriptions.push(discussionId);
+						yaftDiscussionUnsubscriptions.push(text);
 					}
 				}
 
-				renderCurrentForumContent();
+                //setupCurrentForumUnsubscriptions();
+				//renderCurrentForumContent();
 
-				//switchState('forum');
+				switchState('forum');
 			},
 			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to unsubscribe from discussion. Reason: " + errorThrown);
@@ -765,7 +763,7 @@ var YAFTUTILS = (function($) {
 				}
 
 				yaftForumUnsubscriptions = getForumUnsubscriptions();
-				yaftUnsubscriptions = getUnsubscriptions();
+				yaftDiscussionUnsubscriptions = getDiscussionUnsubscriptions();
 
 				renderCurrentForums();
 			},
@@ -795,7 +793,7 @@ var YAFTUTILS = (function($) {
 				}
 
 				yaftForumUnsubscriptions = getForumUnsubscriptions();
-				yaftUnsubscriptions = getUnsubscriptions();
+				yaftDiscussionUnsubscriptions = getDiscussionUnsubscriptions();
 				
 				renderCurrentForums();
 			},

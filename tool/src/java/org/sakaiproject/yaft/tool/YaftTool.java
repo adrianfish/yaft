@@ -388,19 +388,29 @@ public class YaftTool extends HttpServlet {
 		    response.getWriter().close();
 		    return;
 		} else if ("subscribe".equals(discussionOp)) {
-		    yaftForumService.subscribeToDiscussion(null, discussionId);
-		    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		    response.setContentType("text/plain");
-		    response.getWriter().write("success");
-		    response.getWriter().close();
+		    if(yaftForumService.subscribeToDiscussion(null, discussionId)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("text/plain");
+			response.getWriter().write(discussionId);
+			response.getWriter().close();
+		    }
+		    else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		    }
+		    
 		    return;
 		} else if ("unsubscribe".equals(discussionOp)) {
-		    yaftForumService.unsubscribeFromDiscussion(null, discussionId);
-		    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		    response.setContentType("text/plain");
-		    response.getWriter().write("success");
-		    response.getWriter().close();
-		    return;
+		    if(yaftForumService.unsubscribeFromDiscussion(null, discussionId)) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("text/plain");
+			response.getWriter().write(discussionId);
+			response.getWriter().close();
+			return;
+		    }
+		    else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		    }
 		} else if ("markRead".equals(discussionOp)) {
 		    Forum forum = yaftForumService.getForumContainingMessage(discussionId);
 		    String forumId = forum.getId();
