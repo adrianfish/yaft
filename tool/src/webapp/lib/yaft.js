@@ -286,6 +286,7 @@ function switchState(state,arg) {
 
 		$("#yaft_add_discussion_link").hide();
 		$("#yaft_show_deleted_link").hide();
+		$("#yaft_authors_view_link").show();
 		
 		var message = null;
 		if(arg != null && arg.messageId != null)

@@ -81,7 +81,7 @@ public class YaftAdminTool extends HttpServlet
 			}
 		}
 		else
-			response.sendRedirect("/sakai-yaft-tool/admin.html?placementId=" + sakaiProxy.getCurrentToolId());
+			response.sendRedirect("/yaft-tool/admin.html?placementId=" + sakaiProxy.getCurrentToolId());
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -171,7 +171,7 @@ public class YaftAdminTool extends HttpServlet
 				
 		}
 		
-		response.sendRedirect("/sakai-yaft-tool/admin.html?placementId=" + sakaiProxy.getCurrentToolId());
+		response.sendRedirect("/yaft-tool/admin.html?placementId=" + sakaiProxy.getCurrentToolId());
 		return;
 	}
 
