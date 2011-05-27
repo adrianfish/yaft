@@ -21,26 +21,26 @@
 <beans>
    <bean id="yaft_overview" class="org.sakaiproject.component.app.help.model.ResourceBean">
       <property name="docId"><value>yaft_overview</value></property>
-      <property name="name"><value>YAFT Overview</value></property>
+      <property name="name"><value>Discussions Overview</value></property>
       <property name="location"><value>/sakai_yaft/overview.html</value></property>
       <property name="defaultForTool"><value>sakai.yaft</value></property>
    </bean>
 
    <bean id="yaft_permissions" class="org.sakaiproject.component.app.help.model.ResourceBean">
       <property name="docId"><value>yaft_permissions</value></property>
-      <property name="name"><value>YAFT Permissions</value></property>
+      <property name="name"><value>Discussions Permissions</value></property>
       <property name="location"><value>/sakai_yaft/permissions.html</value></property>
    </bean>
 
    <bean id="yaft_pebble" class="org.sakaiproject.component.app.help.model.ResourceBean">
       <property name="docId"><value>yaft_pebble</value></property>
-      <property name="name"><value>YAFT Pebble Trail</value></property>
+      <property name="name"><value>Discussions Pebble Trail</value></property>
       <property name="location"><value>/sakai_yaft/pebble_trail.html</value></property>
    </bean>
 
    <bean id="yaft_forum" class="org.sakaiproject.component.app.help.model.ResourceBean">
       <property name="docId"><value>yaft_forum</value></property>
-      <property name="name"><value>YAFT Forum</value></property>
+      <property name="name"><value>Discussions Forum</value></property>
       <property name="location"><value>/sakai_yaft/forum.html</value></property>
    </bean>
 
@@ -50,7 +50,7 @@
       <property name="categories">
          <list>
             <bean id="yaftCategory" class="org.sakaiproject.component.app.help.model.CategoryBean">
-               <property name="name"><value>YAFT</value></property>
+               <property name="name"><value>Discussions</value></property>
                <property name="resources">
                   <list>
                      <ref bean="yaft_overview"/>
