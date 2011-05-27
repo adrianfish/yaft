@@ -42,6 +42,12 @@
    			<scope>compile</scope>
    			<type>war</type>
    		</dependency>
+		<dependency>
+   			<groupId>org.sakaiproject.yaft</groupId>
+   			<artifactId>yaft-help</artifactId>
+   			<version>${project.version}</version>
+   			<scope>compile</scope>
+   		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
