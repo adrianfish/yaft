@@ -50,6 +50,13 @@
             </includes>
             <unpack>false</unpack>
         </dependencySet>
+		<dependencySet>
+			<outputDirectory>shared/lib</outputDirectory>
+			<useTransitiveDependencies>false</useTransitiveDependencies>
+			<includes>
+				<include>org.sakaiproject.yaft:yaft-help:jar:*</include>
+			</includes>
+		</dependencySet>
 	</dependencySets>
 	<!-- additional files -->
 	<fileSets>
