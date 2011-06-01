@@ -384,7 +384,12 @@ public class YaftForumServiceImpl implements YaftForumService
 			
 			if(groups.size() > 0)
 			{
-				users = sakaiProxy.getGroupMemberIds(groups);
+			    // This forum is limited to groups. Make sure the alert only goes
+			    // to the group members
+			    users = sakaiProxy.getGroupMemberIds(groups);
+			    
+			    // Maintainers need to get emails also.
+			    users.addAll(sakaiProxy.getCurrentSiteMaintainers());
 			}
 			else
 			{

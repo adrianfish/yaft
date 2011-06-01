@@ -1034,4 +1034,10 @@ public class SakaiProxyImpl implements SakaiProxy {
 	    return null;
 	}
     }
+
+    @Override
+    public Set<String> getCurrentSiteMaintainers() {
+	Site currentSite = getCurrentSite();
+	return currentSite.getUsersHasRole(currentSite.getMaintainRole());
+    }
 }

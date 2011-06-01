@@ -138,4 +138,6 @@ public interface SakaiProxy
 	public Assignment getGradebookAssignment(int gradebookAssignmentId);
 
 	public GradeDefinition getAssignmentGrade(String userId, long assignmentId);
+
+	public Set<String> getCurrentSiteMaintainers();
 }
