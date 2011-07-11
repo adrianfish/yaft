@@ -19,7 +19,7 @@
 <emailTemplate>
 	<subject>[ ${siteTitle} - ${forumMessage} ] ${messageSubject}</subject>
 	<message>
-${creator} created/updated the message titled '${messageSubject}'.
+${creator} created/updated the message titled '${messageSubject}'
 
 To view this message, follow the link below:
 ${url}
@@ -27,9 +27,26 @@ ${url}
 If you don't want to receive any further emails from this Sakai worksite follow the link below:
 ${unsubscribeUrl}
 	</message>
+	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created/updated the message titled '${messageSubject}'
+&lt;br /&gt;
+&lt;br /&gt;
+&lt;strong&gt;Message:&lt;/strong&gt;
+&lt;br /&gt;
+&lt;br /&gt;
+${messageContent}
+&lt;br /&gt;
+&lt;br /&gt;
+To view this message, follow the link below:
+&lt;br /&gt;
+${url}
+&lt;br /&gt;
+&lt;br /&gt;
+If you don't want to receive any further emails from this Sakai worksite follow the link below:
+&lt;br /&gt;
+${unsubscribeUrl}
+	</htmlMessage>
 	<locale>en</locale>
-	<version>2</version>
+	<version>1</version>
 	<owner>admin</owner>
-	<key>yaft.newMessage</key>
-	<defaultType>text</defaultType>
+	<key>yaft.newMessageWithBody</key>
 </emailTemplate>

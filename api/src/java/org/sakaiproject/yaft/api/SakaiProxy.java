@@ -64,7 +64,7 @@ public interface SakaiProxy
 	
 	public boolean removeCalendarEntry(String title,String description);
 	
-	public void sendEmail(final String userId, final String subject, String message);
+	public void sendEmail(final String userId, final String subject, String message,boolean html);
 
 	public User getCurrentUser();
 
@@ -140,4 +140,8 @@ public interface SakaiProxy
 	public GradeDefinition getAssignmentGrade(String userId, long assignmentId);
 
 	public Set<String> getCurrentSiteMaintainers();
+
+	public boolean getIncludeMessageBodyInEmailSetting();
+
+	public String getWysiwygEditor();
 }

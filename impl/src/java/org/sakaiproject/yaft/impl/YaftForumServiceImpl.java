@@ -57,6 +57,8 @@ public class YaftForumServiceImpl implements YaftForumService
 	private YaftPersistenceManager persistenceManager = null;
 
 	private YaftSecurityManager securityManager;
+	
+	private boolean includeMessageBodyInEmail = false;
 
 	public void init()
 	{
@@ -90,6 +92,8 @@ public class YaftForumServiceImpl implements YaftForumService
 		persistenceManager.setupTables();
 
 		sakaiProxy.registerEntityProducer(this);
+		
+		includeMessageBodyInEmail = sakaiProxy.getIncludeMessageBodyInEmailSetting();
 	}
 
 	public Forum getForum(String forumId, String state)
@@ -399,6 +403,59 @@ public class YaftForumServiceImpl implements YaftForumService
 			// Make sure the current user is included
 			users.add(sakaiProxy.getCurrentUser().getId());
 			
+			
+			boolean canSetHtml = false;
+		
+			// The 2.6.x version of EmailTemplateService doesn't have html
+			// methods. We need to test for it or else we'll get a runtime error
+			Class templateClass = EmailTemplate.class;
+		
+			try
+			{
+				templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
+				canSetHtml = true;
+			}
+			catch(NoSuchMethodException nsme) {}
+		
+			Map<String, String> replacementValues = new HashMap<String, String>();
+			
+			String templateKey = "";
+
+			if (newDiscussion)
+			{
+			    if(includeMessageBodyInEmail && canSetHtml) {
+			    	templateKey = "yaft.newDiscussionWithBody";
+			    	replacementValues.put("messageContent", message.getContent());
+			    } else {
+			    	templateKey = "yaft.newDiscussion";
+			    }
+			    
+				replacementValues.put("discussionSubject", message.getSubject());
+			}
+			else if (newForum)
+			{
+				templateKey = "yaft.newForum";
+				
+				replacementValues.put("forumTitle", forum.getTitle());
+				replacementValues.put("forumDescription", forum.getDescription());
+				
+			}
+			else
+			{
+			    if(includeMessageBodyInEmail && canSetHtml) {
+			    	templateKey = "yaft.newMessageWithBody";
+			    	replacementValues.put("messageContent", message.getContent());
+			    } else {
+			    	templateKey = "yaft.newMessage";
+			    }
+			    
+				replacementValues.put("messageSubject", message.getSubject());
+			}
+			
+			replacementValues.put("forumMessage", "Forum Message");
+			replacementValues.put("siteTitle", siteTitle);
+			replacementValues.put("creator", sakaiProxy.getCurrentUser().getDisplayName());
+			
 			String url = "";
 
 			if(!newForum)
@@ -412,65 +469,13 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 			else
 				url = sakaiProxy.getDirectUrl(siteId, "/forums/" + forumId + ".html");
-
-			Map<String, String> replacementValues = new HashMap<String, String>();
 			
-			String templateKey = "";
-
-			if (newDiscussion)
-			{
-				templateKey = "yaft.newDiscussion";
-				replacementValues.put("siteTitle", siteTitle);
-				replacementValues.put("forumMessage", "Forum Message");
-				replacementValues.put("discussionSubject", message.getSubject());
-				replacementValues.put("creator", message.getCreatorDisplayName());
-				replacementValues.put("url", url);
-				replacementValues.put("messageContent", message.getContent());
-			}
-			else if (newForum)
-			{
-				templateKey = "yaft.newForum";
-				replacementValues.put("siteTitle", siteTitle);
-				replacementValues.put("forumMessage", "Forum Message");
-				replacementValues.put("forumTitle", forum.getTitle());
-				replacementValues.put("forumDescription", forum.getDescription());
-				replacementValues.put("creator", sakaiProxy.getDisplayNameForUser(forum.getCreatorId()));
-				replacementValues.put("url", url);
-				
-			}
-			else
-			{
-				templateKey = "yaft.newMessage";
-				replacementValues.put("siteTitle", siteTitle);
-				replacementValues.put("forumMessage", "Forum Message");
-				replacementValues.put("messageSubject", message.getSubject());
-				replacementValues.put("creator", message.getCreatorDisplayName());
-				replacementValues.put("url", url);
-				replacementValues.put("messageContent", message.getContent());
-			}
+			replacementValues.put("url", url);
+			
+			String unsubscribeUrl = sakaiProxy.getDirectUrl(siteId, "/unsubscribe");
+			replacementValues.put("unsubscribeUrl", unsubscribeUrl);
 
 			List<User> sakaiUsers = sakaiProxy.getUsers(users);
-			
-			boolean canSetHtml = false;
-			boolean canSetVersion = false;
-		
-			// The 2.6.x version of EmailTemplateService doesn't have html
-			// methods. We need to test for it or else we'll get a runtime error
-			Class templateClass = EmailTemplate.class;
-		
-			try
-			{
-				templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
-				canSetHtml = true;
-			}
-			catch(NoSuchMethodException nsme) {}
-		
-			try
-			{
-				templateClass.getDeclaredMethod("setVersion", new Class[] {int.class});
-				canSetVersion = true;
-			}
-			catch(NoSuchMethodException nsme) {}
 
 			// get the rendered template for each user
 			for (User user : sakaiUsers)
@@ -497,10 +502,12 @@ public class YaftForumServiceImpl implements YaftForumService
 				{
 					if (emailPref.equals(YaftPreferences.EACH))
 					{
-						if(canSetHtml)
-							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage());
-						else
-							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());
+						if(includeMessageBodyInEmail && canSetHtml) {
+							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage(),true);
+						}
+						else {
+							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage(),false);
+						}
 					}
 					else if (emailPref.equals(YaftPreferences.DIGEST))
 						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());
@@ -802,17 +809,14 @@ public class YaftForumServiceImpl implements YaftForumService
 		return persistenceManager.getAuthorsForCurrentSite();
 	}
 
-	@Override
 	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
 		return persistenceManager.getMessagesForAuthorInCurrentSite(authorId);
 	}
 
-	@Override
 	public List<Author> getAuthorsForDiscussion(String discussionId) {
 		return persistenceManager.getAuthorsForDiscussion(discussionId);
 	}
 
-	@Override
 	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
 		return persistenceManager.getMessagesForAuthorInDiscussion(authorId,discussionId);
 	}

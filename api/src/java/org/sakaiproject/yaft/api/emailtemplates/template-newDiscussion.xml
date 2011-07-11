@@ -19,29 +19,16 @@
 <emailTemplate>
 	<subject>[ ${siteTitle} - ${forumMessage} ] ${discussionSubject}</subject>
 	<message>
-
---------------------
 ${creator} created/updated the discussion titled '${discussionSubject}'
---------------------
 
-To view this message, follow the link below:
+To view this discussion, follow the link below:
 ${url}
 
----
+If you don't want to receive any further emails from this Sakai worksite follow the link below:
+${unsubscribeUrl}
 	</message>
-	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created/updated the discussion titled '${discussionSubject}'
-&lt;br /&gt;
-&lt;br /&gt;
-Click &lt;a href="${url}"&gt;here&lt;/a&gt; to enter the forum
-&lt;br /&gt;
-&lt;br /&gt;
-&lt;strong&gt;Message:&lt;/strong&gt;
-&lt;br /&gt;
-&lt;br /&gt;
-${messageContent}
-	</htmlMessage>
 	<locale>en</locale>
-	<version>1</version>
+	<version>2</version>
 	<owner>admin</owner>
 	<key>yaft.newDiscussion</key>
 </emailTemplate>

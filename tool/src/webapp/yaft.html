@@ -24,7 +24,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
-<link rel="stylesheet" type="text/css" href="/library/skin/default/tool.css" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
@@ -63,6 +62,19 @@
 </div>
 -->
 </div>
+
+<!--ul class="navIntraTool actionToolBar" role="menu">
+        <li id="yaft_home_link" class="firstToolBarItem" role="menuItem"><span><a title="${yaft_home_tooltip}" href="javascript:;">${yaft_home_label}</a></span></li> 
+        <li id="yaft_add_forum_link" style="display: none;" role="menuItem"><span><a title="${yaft_add_forum_tooltip}" href="javascript:;">${yaft_new_forum_label}</a></span></li>
+        <li id="yaft_add_discussion_link" style="display: none;" role="menuItem"><span><a title="${yaft_add_discussion_tooltip}" href="javascript:;">${yaft_new_discussion_label}</a></span></li>
+        <li id="yaft_permissions_link" style="display: none;" role="menuItem"><span><a title="${yaft_permissions_tooltip}" href="javascript:;">${yaft_permissions_label}</a></span></li>
+        <li id="yaft_minimal_link" style="display: none;" role="menuItem"><span><a title="${yaft_minimal_tooltip}" href="javascript:;">${yaft_minimal_label}</a></span></li>
+        <li id="yaft_full_link" style="display: none;" role="menuItem"><span><a title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a></span></li>
+        <li id="yaft_show_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a></span></li>
+        <li id="yaft_hide_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a></span></li>
+        <li id="yaft_preferences_link" role="menuItem"><span><a title="${yaft_preferences_tooltip}" href="javascript:;">${yaft_preferences_label}</a></span></li>
+        <li id="yaft_authors_view_link" role="menuItem"><span><a title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a></span></li>
+</ul-->
 
 <div id="yaft_forums_breadcrumb_template" style="display:none;"><!--
 ${yaft_forums_label}
@@ -351,7 +363,7 @@ ${yaft_forums_label}
 <br />
 <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
 </fieldset>
-{if yaftGradebookAssignments.length > 0 }
+{if defined('yaftGradebookAssignments') && yaftGradebookAssignments.length > 0 }
 <fieldset id="yaft_grading_fieldset" style="display: none;">
 <legend>Grading</legend>
 <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>Grade this discussion in Gradebook (pick from the list of current Gradebook assignments)
@@ -938,11 +950,16 @@ ${yaft_forums_label}
 -->
 </div>
 
+<div id="yaft_unsubscribed_template" style="display:none;"><!--
+<h3>${yaft_unsubscribed_message}</h3>
+-->
+</div>
+
 <!--  Templates End -->
 
 <script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
-<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
+<!--script type="text/javascript" src="/yaft-tool/lib/all.js"></script-->
+<script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
@@ -957,27 +974,14 @@ ${yaft_forums_label}
 <script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.2.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.form.js"></script>
+<script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
+<script type="text/javascript" src="/library/editor/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/library/js/headscripts.js"></script>
+<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script-->
-<script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
-<script type="text/javascript" src="/library/js/headscripts.js"></script>
-<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
-<script type="text/javascript" language="JavaScript">
-$(document).ready(function(){
-    var arg = SAKAIUTILS.getParameters();
-    // load Sakai skin
-    $.ajax({
-        url: '/library/skin/'+arg['skin']+'/tool.css',
-        success: function(data, textStatus) {
-            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
-        },
-        async: false,
-        dataType: 'text/css'
-    });
-});
-</script>
+<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 
 </body>

@@ -158,12 +158,24 @@ th.yaftSortableTableHeaderSortDown {
 	background-color: #FFFFC0;
 }
 
+#yaft_forum_table {
+    width: 100%;
+}
+
 #yaft_forum_table th div{
 	margin-right: 15px;
 }
 
+#yaft_discussion_table {
+    width: 100%;
+}
+
 #yaft_discussion_table th div{
 	margin-right: 15px;
+}
+
+#yaft_author_table {
+    width: 100%;
 }
 
 .yaft_group_title {
