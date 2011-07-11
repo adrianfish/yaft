@@ -174,7 +174,6 @@
                 				<include>jquery.ui.mouse.js</include>
                 				<include>jquery.ui.position.js</include>
                 				<include>jquery.ui.datepicker.js</include>
-                				<include>trimpath-template-latest.js</include>
                 				<include>jquery.cluetip.js</include>
                 				<include>jquery.hoverIntent.js</include>
                 				<include>jquery.dimensions.js</include>
@@ -183,6 +182,7 @@
                 				<include>jquery.tablesorter.js</include>
                 				<include>jquery.scrollTo-1.4.2.js</include>
                 				<include>jquery.form.js</include>
+                				<include>trimpath-template-latest.js</include>
                 				<include>yaftutils.js</include>
                 				<include>sakaiutils.js</include>
                 				<include>yaftpermissions.js</include>

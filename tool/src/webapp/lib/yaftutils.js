@@ -203,10 +203,11 @@ var YAFTUTILS = (function($) {
 	my.renderCurrentForumContent = function() {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_forum_content_template',yaftCurrentForum,'yaft_content');
 			
-		$(document).ready(function() {
-			YAFTUTILS.attachProfilePopup();
+        $(document).ready(function() {
 									
-			$("#yaft_discussion_table").tablesorter({
+            // We need to check this as tablesorter complains at empty tbody
+            if(yaftCurrentForum.discussions.length > 0) {
+			    $("#yaft_discussion_table").tablesorter({
 	 							cssHeader:'yaftSortableTableHeader',
 	 							cssAsc:'yaftSortableTableHeaderSortUp',
 	 							cssDesc:'yaftSortableTableHeaderSortDown',
@@ -219,9 +220,12 @@ var YAFTUTILS = (function($) {
 	 							widgets: ['zebra']
 	 						});
 
+	            YAFTUTILS.attachProfilePopup();
+            }
+
 			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
-		});
+		        setMainFrameHeight(window.frameElement.id);
+	    });
 	};
 	
 	my.attachProfilePopup = function() {
@@ -246,18 +250,20 @@ var YAFTUTILS = (function($) {
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
 	 			
-	 		$("#yaft_forum_table").tablesorter({
-	 			cssHeader:'yaftSortableTableHeader',
-	 			cssAsc:'yaftSortableTableHeaderSortUp',
-	 			cssDesc:'yaftSortableTableHeaderSortDown',
-	 			headers:
-	 				{
-	 					4: {sorter: "isoDate"},
-	 					5: {sorter: false}
-	 				},
-                sortList: [[0,0]],
-	 			widgets: ['zebra']
-	 		});
+            if(yaftCurrentForums.length > 0) {
+	 		    $("#yaft_forum_table").tablesorter({
+	 			    cssHeader:'yaftSortableTableHeader',
+	 			    cssAsc:'yaftSortableTableHeaderSortUp',
+	 			    cssDesc:'yaftSortableTableHeaderSortDown',
+	 			    headers:
+	 				    {
+	 					    4: {sorter: "isoDate"},
+	 					    5: {sorter: false}
+	 				    },
+                    sortList: [[0,0]],
+	 			    widgets: ['zebra']
+	 		    });
+            }
 	 	});
 	};
 	
