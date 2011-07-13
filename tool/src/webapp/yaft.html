@@ -24,7 +24,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
-<link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
 </head>
@@ -495,6 +495,7 @@ ${yaft_forums_label}
 						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
 						{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
@@ -714,6 +715,7 @@ ${yaft_forums_label}
 					<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
 					{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
+					{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 					{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
@@ -927,6 +929,7 @@ ${yaft_forums_label}
 						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
 						{if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
+						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
 						{elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
