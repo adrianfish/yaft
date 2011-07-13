@@ -25,5 +25,6 @@ public class OracleGenerator extends DefaultSqlGenerator
 		BOOL = "char(1)";
 		MEDIUMTEXT = "CLOB";
 		INT = "NUMBER(10, 0)";
+		ACTIVE_DISCUSSIONS_TTL = "(SYSTIMESTAMP - INTERVAL '1' DAY)";
 	}
 }

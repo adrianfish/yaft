@@ -51,6 +51,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 	protected String BOOL = "BOOL";
 	
 	protected String INT = "INT";
+	
+	protected String ACTIVE_DISCUSSIONS_TTL = "(NOW() - 86400)"; // 1 Day
 
 	public List<String> getSetupStatements()
 	{
@@ -832,7 +834,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 			statement.setString(5, message.getSubject());
 			statements.add(statement);
 			
-			sql = "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE LAST_MESSAGE_DATE < (NOW() - 86400)"; // 1 day
+			sql = "DELETE FROM YAFT_ACTIVE_DISCUSSIONS WHERE LAST_MESSAGE_DATE < " + ACTIVE_DISCUSSIONS_TTL;
 			PreparedStatement st2 = connection.prepareStatement(sql);
 			statements.add(st2);
 		}
