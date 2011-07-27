@@ -82,19 +82,6 @@ var yaftEditor = 'FCKeditor'; //default
 	
 	var arg = SAKAIUTILS.getParameters();
 
-    //$(document).ready(function(){
-        //var arg = SAKAIUTILS.getParameters();
-        // load Sakai skin
-        $.ajax({
-            url: '/library/skin/'+arg['skin']+'/tool.css',
-            success: function(data, textStatus) {
-                $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
-            },
-            async: false,
-            dataType: 'text/css'
-        });
-    //});
-
     if(arg['language']) {
         $.localise('yaft-translations',{language:arg['language'],loadBase: true});
     }

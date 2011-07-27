@@ -27,8 +27,44 @@
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
+<script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
+<script type="text/javascript" src="/library/editor/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/library/js/headscripts.js"></script>
+<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
+<script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
+
+<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.position.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.datepicker.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.cluetip.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.dimensions.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.MultiFile.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.localisation.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.2.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery.form.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script-->
+
 </head>
 <body>
+<script>
+    var arg = SAKAIUTILS.getParameters();
+    $.ajax({
+        url: '/library/skin/'+arg['skin']+'/tool.css',
+        dataType: 'text/css',
+        success: function(data, textStatus) {
+            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
+        }
+    });
+</script>
 <div id="yaft_toolbar"></div>
 <br />
 <div id="yaft_container">
@@ -960,32 +996,8 @@ ${yaft_forums_label}
 
 <!--  Templates End -->
 
-<script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
-<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.datepicker.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.cluetip.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.hoverIntent.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.dimensions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.MultiFile.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.localisation.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.2.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.form.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script-->
-<script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
-<script type="text/javascript" src="/library/editor/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/library/js/headscripts.js"></script>
-<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
+<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
 
 </body>
 </html>
