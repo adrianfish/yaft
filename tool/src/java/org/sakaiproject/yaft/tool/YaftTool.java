@@ -272,7 +272,7 @@ public class YaftTool extends HttpServlet {
 					}
 
 					if (isHtmlRequest) {
-						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&editor=" + sakaiProxy.getWysiwygEditor());
+						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 						return;
 					}
 
@@ -370,7 +370,7 @@ public class YaftTool extends HttpServlet {
 
 				if (isHtmlRequest) {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
-					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + discussionId + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&editor=" + sakaiProxy.getWysiwygEditor());
+					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + discussionId + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 					return;
 				}
 
@@ -481,7 +481,7 @@ public class YaftTool extends HttpServlet {
 
 			if (parts.length == 2) {
 				if (isHtmlRequest) {
-					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + message.getDiscussionId() + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&editor=" + sakaiProxy.getWysiwygEditor() + "#message-" + messageId);
+					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + message.getDiscussionId() + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor() + "#message-" + messageId);
 					return;
 				}
 
