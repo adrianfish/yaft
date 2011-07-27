@@ -183,10 +183,6 @@
                 				<include>jquery.scrollTo-1.4.2.js</include>
                 				<include>jquery.form.js</include>
                 				<include>trimpath-template-latest.js</include>
-                				<include>yaftutils.js</include>
-                				<include>sakaiutils.js</include>
-                				<include>yaftpermissions.js</include>
-                				<include>yaft.js</include>
               				</includes>
             			</aggregation>
           			</aggregations>
