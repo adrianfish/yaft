@@ -18,7 +18,7 @@ var YAFTUTILS = (function($) {
 		
 	my.setCurrentForums = function (render) {
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
+	   		url : yaftBaseDataUrl + "forums.json",
 	   		dataType : "json",
 	   		async : false,
 			cache: false,
@@ -289,7 +289,7 @@ var YAFTUTILS = (function($) {
 	};
 	
 	my.getForum = function(forumId,state) {
-		var forumDataUrl = "/portal/tool/" + yaftPlacementId + "/forums/" + forumId;
+		var forumDataUrl = yaftBaseDataUrl + "forums/" + forumId + ".json";
 		if(state != null) forumDataUrl += "?state=" + state;
 	
 		var currentForum = null;
@@ -341,7 +341,7 @@ var YAFTUTILS = (function($) {
 	{
 		var data = null;
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/unsubscriptions",
+	   		url : yaftBaseDataUrl + "discussions/unsubscriptions.json",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
@@ -359,7 +359,7 @@ var YAFTUTILS = (function($) {
 	my.getForumUnsubscriptions = function() {
 		var data = null;
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/unsubscriptions",
+	   		url : yaftBaseDataUrl + "unsubscriptions.json",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
@@ -392,7 +392,7 @@ var YAFTUTILS = (function($) {
 		var discussion = null;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId,
+	   		url : yaftBaseDataUrl + "discussions/" + discussionId + ".json",
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -885,7 +885,7 @@ var YAFTUTILS = (function($) {
 		var readMessages = null;
 			
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/forums/allReadMessages",
+	 		url : yaftBaseDataUrl + "forums/allReadMessages.json",
 			async : false,
    			dataType: "json",
 			cache: false,
@@ -915,7 +915,7 @@ var YAFTUTILS = (function($) {
 		var readMessages = [];
 			
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/readMessages",
+	 		url : yaftBaseDataUrl + "discussions/" + yaftCurrentDiscussion.id + "/readMessages.json",
 			async : false,
    			dataType: "json",
 			cache: false,
@@ -999,7 +999,7 @@ var YAFTUTILS = (function($) {
 	my.getCurrentUserData = function() {
 		var userData = null;
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/userData",
+	 		url : yaftBaseDataUrl + "userData.json",
 	   		dataType : "json",
 	   		async : false,
 	   		cache : false,
@@ -1018,7 +1018,7 @@ var YAFTUTILS = (function($) {
         var perms = [];
 
         jQuery.ajax( {
-            url : "/portal/tool/" + yaftPlacementId + "/perms",
+            url : yaftBaseDataUrl + "perms.json",
             dataType : "json",
             async : false,
             cache: false,
@@ -1054,7 +1054,7 @@ var YAFTUTILS = (function($) {
         }
 
         jQuery.ajax( {
-            url : "/portal/tool/" + yaftPlacementId + "/setPerms",
+            url : yaftBaseDataUrl + "setPerms.json",
             type : 'POST',
             data : myData,
             timeout: 30000,
@@ -1158,6 +1158,29 @@ var YAFTUTILS = (function($) {
 			}
 	  	});
     };
+    
+    my.addFormattedDatesToCurrentDiscussion = function () {
+    	var d = new Date(yaftCurrentDiscussion.firstMessage.createdDate);
+        var minutes = d.getMinutes();
+        if(minutes < 10) minutes = '0' + minutes;
+        var formattedCreatedDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + d.getHours() + ":" + minutes;
+    	yaftCurrentDiscussion.firstMessage.formattedDate = formattedCreatedDate;
+    	
+    	this.recursivelyAddFormattedDatesToChildMessages(yaftCurrentDiscussion.firstMessage);
+    };
+    
+   	my.recursivelyAddFormattedDatesToChildMessages = function(parent) {
+   		for(var i=0,j=parent.children.length;i<j;i++) {
+   			var child = parent.children[i];
+    		var d = new Date(child.createdDate);
+        	var minutes = d.getMinutes();
+        	if(minutes < 10) minutes = '0' + minutes;
+        	var formattedCreatedDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + d.getHours() + ":" + minutes;
+    		child.formattedDate = formattedCreatedDate;
+    		
+   			this.recursivelyAddFormattedDatesToChildMessages(child);
+   		}
+   	};
 
     return my;
 

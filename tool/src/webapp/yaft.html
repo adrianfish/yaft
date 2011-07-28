@@ -65,6 +65,9 @@
         }
     });
 </script>
+
+<div class="portletBody">
+
 <div id="yaft_toolbar"></div>
 <br />
 <div id="yaft_container">
@@ -521,7 +524,7 @@ ${yaft_forums_label}
 					<a id="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>
 					{if status == 'DRAFT'} - <span style="font-weight: bold;">${yaft_draft_message}</span>{/if}
 					<br/>
-					<span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${new Date(createdDate).toLocaleString()}</span>
+					<span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${formattedDate}</span>
 				</div>
 				<div style="float: right;">
 					{if attachments.length > 0}
@@ -745,7 +748,7 @@ ${yaft_forums_label}
 	{macro displayMinimum(message)}
 		{if message.status == 'READY' || (message.status == 'DRAFT' && yaftCurrentUser.id == message.creatorId)}
 			<div id="${message.id}_link" class="yaft_message_minimised">
-				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${new Date(message.createdDate).toLocaleString()}</span>
+				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
 				<img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
 				{for attachment in message.attachments}
 					<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
@@ -796,7 +799,7 @@ ${yaft_forums_label}
 			<div style="float:left;">
 				<span style="font-weight: bold">${subject}</span>
 				<br/>
-				<span>by ${creatorDisplayName}</span> - <span>${new Date(createdDate).toLocaleString()}</span>
+				<span>by ${creatorDisplayName}</span> - <span>${formattedDate}</span>
 			</div>
 		</div>
 		<hr style="clear: left"/>
@@ -899,7 +902,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_preferences_template" style="display:none"><!--
-<form id="yaft_preferences_form" action="/portal/tool/${yaftPlacementId}/preferences" method="POST">
+<form id="yaft_preferences_form" action="${yaftBaseDataUrl}preferences.json" method="POST">
 <fieldset id="yaft_email_preferences_fieldset">
 <legend>${yaft_email_alerts_label}</legend>
 <input id="yaft_email_never_option" type="radio" name="emailPreference" value="never"/>${yaft_email_never_label}
@@ -955,7 +958,7 @@ ${yaft_forums_label}
 		<div style="margin:5px;overflow:hidden;">
 			<div style="margin-left:2px;overflow: hidden;">
 				<div style="float:left;">
-					<a id="message-${message.id}" href="${message.url}"><span style="font-weight: bold">${message.subject}</span></a> - <span>${new Date(message.createdDate).toLocaleString()}</span>
+					<a id="message-${message.id}" href="${message.url}"><span style="font-weight: bold">${message.subject}</span></a> - <span>${message.formattedDate}</span>
 				</div>
 				<div style="float: right;">
 					{if message.attachments.length > 0}
@@ -995,6 +998,8 @@ ${yaft_forums_label}
 </div>
 
 <!--  Templates End -->
+
+</div> <!-- /portletBody-->
 
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 <script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>

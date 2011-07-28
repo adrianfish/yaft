@@ -125,7 +125,8 @@ public class YaftTool extends HttpServlet {
 			if (parts.length >= 1) {
 				String part1 = parts[0];
 
-				if ("forums".equals(part1)) {
+				//if ("forums.json".equals(part1)) {
+				if (part1.startsWith("forums")) {
 					doForumsGet(request, response, parts, siteId, placementId, languageCode);
 				} else if ("authors".equals(part1)) {
 					if (parts.length == 1) {
@@ -161,11 +162,11 @@ public class YaftTool extends HttpServlet {
 					doAssignmentsGet(response, parts);
 				}
 
-				else if ("perms".equals(part1)) {
+				else if ("perms.json".equals(part1)) {
 					doPermsGet(response);
 				}
 
-				else if ("userData".equals(part1)) {
+				else if ("userData.json".equals(part1)) {
 					doUserDataGet(response, siteId);
 				}
 
@@ -202,7 +203,7 @@ public class YaftTool extends HttpServlet {
 					return;
 				}
 
-				else if ("unsubscriptions".equals(part1)) {
+				else if ("unsubscriptions.json".equals(part1)) {
 					List<String> unsubs = yaftForumService.getForumUnsubscriptions(user.getId());
 					JSONArray data = JSONArray.fromObject(unsubs);
 					response.setStatus(HttpServletResponse.SC_OK);
@@ -253,7 +254,7 @@ public class YaftTool extends HttpServlet {
 		} else if (parts.length >= 2) {
 			String forumId = parts[1];
 
-			if ("allReadMessages".equals(forumId)) {
+			if ("allReadMessages.json".equals(forumId)) {
 				Map<String, Integer> read = yaftForumService.getReadMessageCountForAllFora();
 				JSONObject data = JSONObject.fromObject(read);
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -275,6 +276,8 @@ public class YaftTool extends HttpServlet {
 						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 						return;
 					}
+					
+					forumId = forumId.substring(0,forumId.indexOf(".json"));
 
 					Forum forum = yaftForumService.getForum(forumId, state);
 					JsonConfig config = new JsonConfig();
@@ -329,7 +332,7 @@ public class YaftTool extends HttpServlet {
 			String discussionId = parts[1];
 
 			if (parts.length == 2) {
-				if ("unsubscriptions".equals(discussionId)) {
+				if ("unsubscriptions.json".equals(discussionId)) {
 					List<String> unsubs = yaftForumService.getDiscussionUnsubscriptions(sakaiProxy.getCurrentUser().getId());
 					JSONArray data = JSONArray.fromObject(unsubs);
 					response.setStatus(HttpServletResponse.SC_OK);
@@ -373,6 +376,8 @@ public class YaftTool extends HttpServlet {
 					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + discussionId + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 					return;
 				}
+				
+				discussionId = discussionId.substring(0,discussionId.indexOf(".json"));
 
 				Discussion discussion = yaftForumService.getDiscussion(discussionId, true);
 
@@ -429,7 +434,7 @@ public class YaftTool extends HttpServlet {
 					}
 
 					return;
-				} else if ("readMessages".equals(discussionOp)) {
+				} else if ("readMessages.json".equals(discussionOp)) {
 					List<String> ids = yaftForumService.getReadMessageIds(discussionId);
 					JSONArray data = JSONArray.fromObject(ids);
 					response.setStatus(HttpServletResponse.SC_OK);
@@ -657,11 +662,11 @@ public class YaftTool extends HttpServlet {
 				doDiscussionsPost(request, response, parts);
 			else if ("messages".equals(part1))
 				doMessagesPost(request, response, parts);
-			else if ("setPerms".equals(part1))
+			else if ("setPerms.json".equals(part1))
 				doPermsPost(request, response);
 			else if ("search".equals(part1))
 				doSearchPost(request, response);
-			else if ("preferences".equals(part1)) {
+			else if ("preferences.json".equals(part1)) {
 				String emailPreference = request.getParameter("emailPreference");
 				String viewPreference = request.getParameter("viewPreference");
 				if (logger.isDebugEnabled()) {

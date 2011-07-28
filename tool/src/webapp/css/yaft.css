@@ -25,6 +25,9 @@ fieldset {
     border: solid 1px black;
 	padding: 5px;
 	}
+#yaft_toolbar{
+    padding: 0px;
+}
 
 /* This governs the horizontal distance of a child from its parent */
 .yaft_messages{margin-left: 20px;}
@@ -44,7 +47,7 @@ fieldset {
 }
 
 #yaft_container{
-	margin: 5px;
+	/*margin: 5px;*/
 }
 
 .yaft_profile_popup{

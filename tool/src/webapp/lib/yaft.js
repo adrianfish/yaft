@@ -34,7 +34,45 @@ var yaftViewMode = "full";
 var yaftShowingDeleted = false;
 var yaftEditor = 'FCKeditor'; //default
 
+var yaftBaseDataUrl = "";
+
 (function() {
+
+	var arg = SAKAIUTILS.getParameters();
+	
+    if (arg.editor) {
+        yaftEditor = arg.editor;
+    }
+	
+	if(!arg || !arg.placementId || !arg.siteId) {
+		alert('The placement id and site id MUST be supplied as page parameters');
+		return;
+	}
+	
+	// Stuff that we always expect to be setup
+	yaftPlacementId = arg.placementId;
+	yaftSiteId = arg.siteId;
+
+	var href = document.location.href;
+
+    if(href.indexOf("portal/pda") != -1) {
+        yaftBaseDataUrl = "/portal/pda/" + yaftSiteId + "/tool/" + yaftPlacementId + "/";
+        wysiwygEditor = 'none';
+    } else {
+        yaftBaseDataUrl = "/portal/tool/" + yaftPlacementId + "/";
+    }
+    
+    $(document).ready(function () {
+        if(arg['language']) {
+            $.localise('yaft-translations',{language:arg['language'],loadBase: true});
+        }
+        else {
+            $.localise('yaft-translations');
+        }
+    });
+    
+	// We need the toolbar in a template so we can swap in the translations
+    
 	// We need the toolbar in a template so we can swap in the translations
 	SAKAIUTILS.renderTrimpathTemplate('yaft_toolbar_template',{},'yaft_toolbar');
 
@@ -72,35 +110,14 @@ var yaftEditor = 'FCKeditor'; //default
 	$('#yaft_authors_view_link').click(function (e) {
 		switchState('authors');
 	});
+	
+	// This is always showing in every state, so show it here.
+	$('#yaft_home_link').show();
 
 	$('#yaft_search_field').change(function(e) {
 		YAFTUTILS.showSearchResults(e.target.value);
 	});
 	
-	// This is always showing in every state, so show it here.
-	$('#yaft_home_link').show();
-	
-	var arg = SAKAIUTILS.getParameters();
-
-    if(arg['language']) {
-        $.localise('yaft-translations',{language:arg['language'],loadBase: true});
-    }
-    else {
-        $.localise('yaft-translations');
-    }
-
-    if (arg.editor) {
-        yaftEditor = arg.editor;
-    }
-	
-	if(!arg || !arg.placementId || !arg.siteId) {
-		alert('The placement id and site id MUST be supplied as page parameters');
-		return;
-	}
-	
-	// Stuff that we always expect to be setup
-	yaftPlacementId = arg.placementId;
-	yaftSiteId = arg.siteId;
 	yaftCurrentUser = SAKAIUTILS.getCurrentUser();
 
 	var data = YAFTUTILS.getCurrentUserData();
@@ -109,10 +126,11 @@ var yaftEditor = 'FCKeditor'; //default
 
 	yaftCurrentUserPermissions = new YaftPermissions(data.permissions);
 
-	if(yaftCurrentUserPermissions.modifyPermissions)
+	if(yaftCurrentUserPermissions.modifyPermissions) {
 		$("#yaft_permissions_link").show();
-	else
+	} else {
 		$("#yaft_permissions_link").hide();
+	}
 		
 	if(arg.viewMode) {
 		yaftViewMode = arg.viewMode;
@@ -186,17 +204,20 @@ function switchState(state,arg) {
 			YAFTUTILS.setCurrentForums();
 		}
 		
-		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentUser.id == yaftCurrentForum.creatorId))
+		
+		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentUser.id == yaftCurrentForum.creatorId)) {
 			$("#yaft_add_discussion_link").show();
-		else
+		}
+		else {
 			$("#yaft_add_discussion_link").hide();
+		}
 
 		$("#yaft_add_forum_link").hide();
 		$("#yaft_show_deleted_link").hide();
 		$("#yaft_hide_deleted_link").hide();
 		$("#yaft_minimal_link").hide();
 		$("#yaft_full_link").hide();
-	  		
+	 		
 		SAKAIUTILS.renderTrimpathTemplate('yaft_forum_breadcrumb_template',yaftCurrentForum,'yaft_breadcrumb');
 
 		YAFTUTILS.renderCurrentForumContent();
@@ -205,6 +226,7 @@ function switchState(state,arg) {
 		if(arg && arg.discussionId) {
 			yaftCurrentDiscussion = YAFTUTILS.getDiscussion(arg.discussionId);
 			YAFTUTILS.markReadMessagesInCurrentDiscussion();
+			YAFTUTILS.addFormattedDatesToCurrentDiscussion();
 		}
 		
 		// At this point yaftCurrentForum and yaftCurrentDiscussion must be set
@@ -268,6 +290,7 @@ function switchState(state,arg) {
 		if(arg && arg.discussionId) {
 			yaftCurrentDiscussion = YAFTUTILS.getDiscussion(arg.discussionId);
 			YAFTUTILS.markReadMessagesInCurrentDiscussion();
+			YAFTUTILS.addFormattedDatesToCurrentDiscussion();
 		}
 
 		if(!yaftCurrentDiscussion) {

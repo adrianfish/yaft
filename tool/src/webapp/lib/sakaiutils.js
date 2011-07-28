@@ -199,7 +199,9 @@ var SAKAIUTILS = (function ($) {
 			return this.getWysiwygEditor(editorId,textarea_id).EditorDocument.body.text;
 		} else if ('ckeditor' === editorId) {
 			return this.getWysiwygEditor(editorId,textarea_id).getData();
-		}
+		} else {
+            return $('#' + textarea_id).val();
+        }
 	}
 
 	my.updateEditorElement = function(editorId,textarea_id) {
