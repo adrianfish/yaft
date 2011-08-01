@@ -26,14 +26,17 @@
 		<!-- shared -->
 		<dependencySet>
 			<outputDirectory>shared/lib</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveDependencies>false</useTransitiveDependencies>
 			<includes>
 				<include>org.sakaiproject.yaft:yaft-api:jar:*</include>
+				<include>org.sakaiproject.yaft:yaft-help:jar:*</include>
 			</includes>
 		</dependencySet>
 		<!-- components -->
 		<dependencySet>
 			<outputDirectory>components/yaft-pack</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveDependencies>false</useTransitiveDependencies>
 			<includes>
 				<include>org.sakaiproject.yaft:yaft-pack:war:*</include>
@@ -43,6 +46,7 @@
 		<!-- webapps -->
 		<dependencySet>
             <outputDirectory>webapps/</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputFileNameMapping>${artifact.artifactId}.war</outputFileNameMapping>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
@@ -50,13 +54,6 @@
             </includes>
             <unpack>false</unpack>
         </dependencySet>
-		<dependencySet>
-			<outputDirectory>shared/lib</outputDirectory>
-			<useTransitiveDependencies>false</useTransitiveDependencies>
-			<includes>
-				<include>org.sakaiproject.yaft:yaft-help:jar:*</include>
-			</includes>
-		</dependencySet>
 	</dependencySets>
 	<!-- additional files -->
 	<fileSets>
