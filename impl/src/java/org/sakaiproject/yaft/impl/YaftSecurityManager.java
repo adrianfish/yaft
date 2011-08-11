@@ -61,6 +61,11 @@ public class YaftSecurityManager
 		if(!forum.getSiteId().equals(siteId))
 			return null;
 		
+		// Is the current user a member of the site?
+		if(!sakaiProxy.isCurrentUserMemberOfSite(siteId)) {
+			return null;
+		}
+		
 		List<Group> groups = forum.getGroups();
 			
 		if(groups.size() > 0
@@ -78,6 +83,11 @@ public class YaftSecurityManager
 		if(discussion == null) return null;
 		
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
+		
+		// Is the current user a member of the site?
+		if(!sakaiProxy.isCurrentUserMemberOfSite(siteId)) {
+			return null;
+		}
 		
 		List<Group> groups = discussion.getGroups();
 			

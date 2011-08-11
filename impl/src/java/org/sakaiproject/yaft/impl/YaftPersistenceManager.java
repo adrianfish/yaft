@@ -195,7 +195,7 @@ public class YaftPersistenceManager
 			catch(Exception e) {}
 		}
 		
-		return forum;
+		return securityManager.filterForum(forum,null);
 	}
 
 	List<Forum> getFora(String siteId,boolean fully)
@@ -248,7 +248,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return fora;
+		return securityManager.filterFora(fora);
 	}
 
 	boolean addOrUpdateForum(Forum forum)
@@ -465,7 +465,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return fora;
+		return securityManager.filterFora(fora);
 	}
 
 	private void getMessageChildren(Message message,Connection connection) throws Exception
@@ -523,7 +523,6 @@ public class YaftPersistenceManager
 			rs.close();
 		
 			return securityManager.filterDiscussions(discussions);
-			//return discussions;
 		}
 		finally
 		{
@@ -663,7 +662,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return discussion;
+		return securityManager.filterDiscussion(discussion,null);
 	}
 	
 	private boolean deleteFromActiveDiscussions(String discussionId)
@@ -1406,7 +1405,7 @@ public class YaftPersistenceManager
 			if(rs.next())
 			{
 				String forumId = rs.getString(ColumnNames.FORUM_ID);
-				return getForum(forumId, ForumPopulatedStates.EMPTY);
+				return securityManager.filterForum(getForum(forumId, ForumPopulatedStates.EMPTY),null);
 			}
 		}
 		catch (Exception e)
@@ -1877,7 +1876,7 @@ public class YaftPersistenceManager
 			else
 				return null;
 			
-			return getForum(forumId,state);
+			return securityManager.filterForum(getForum(forumId,state),null);
 		}
 		catch (Exception e)
 		{

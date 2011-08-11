@@ -144,4 +144,6 @@ public interface SakaiProxy
 	public boolean getIncludeMessageBodyInEmailSetting();
 
 	public String getWysiwygEditor();
+
+	public boolean isCurrentUserMemberOfSite(String siteId);
 }

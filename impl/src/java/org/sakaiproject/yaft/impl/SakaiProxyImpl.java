@@ -1027,7 +1027,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return assignments;
 	}
 
-	@Override
 	public Assignment getGradebookAssignment(int gradebookAssignmentId) {
 		try {
 			return gradebookService.getAssignment(getCurrentSiteId(), (long) gradebookAssignmentId);
@@ -1036,7 +1035,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		}
 	}
 
-	@Override
 	public GradeDefinition getAssignmentGrade(String userId, long assignmentId) {
 
 		if (!gradebookService.isUserAbleToViewItemForStudent(getCurrentSiteId(), (long) assignmentId, userId)) {
@@ -1052,18 +1050,22 @@ public class SakaiProxyImpl implements SakaiProxy {
 		}
 	}
 
-	@Override
 	public Set<String> getCurrentSiteMaintainers() {
 		Site currentSite = getCurrentSite();
 		return currentSite.getUsersHasRole(currentSite.getMaintainRole());
 	}
 
-	@Override
 	public boolean getIncludeMessageBodyInEmailSetting() {
 		return serverConfigurationService.getBoolean("yaft.includeMessageBodyInEmail", false);
 	}
 	
 	public String getWysiwygEditor() {
 		return serverConfigurationService.getString("wysiwyg.editor");
+	}
+
+	public boolean isCurrentUserMemberOfSite(String siteId) {
+		Site currentSite = getCurrentSite();
+		if(currentSite == null) return false;
+		return (currentSite.getMember(userDirectoryService.getCurrentUser().getId()) != null);
 	}
 }
