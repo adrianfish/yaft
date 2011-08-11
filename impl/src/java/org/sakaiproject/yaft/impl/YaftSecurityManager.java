@@ -20,6 +20,10 @@ public class YaftSecurityManager
 	
 	public List<Forum> filterFora(List<Forum> fora)
 	{
+		if("IndexManager".equals(Thread.currentThread().getName())) {
+			return fora;
+		}
+		
 		String siteId = sakaiProxy.getCurrentSiteId();
 		
 		List<Forum> filtered = new ArrayList<Forum>();
@@ -37,6 +41,10 @@ public class YaftSecurityManager
 	
 	public List<Discussion> filterDiscussions(List<Discussion> discussions)
 	{
+		if("IndexManager".equals(Thread.currentThread().getName())) {
+			return discussions;
+		}
+		
 		String siteId = sakaiProxy.getCurrentSiteId();
 		
 		List<Discussion> filtered = new ArrayList<Discussion>();
@@ -54,6 +62,10 @@ public class YaftSecurityManager
 
 	public Forum filterForum(Forum forum,String siteId)
 	{
+		if("IndexManager".equals(Thread.currentThread().getName())) {
+			return forum;
+		}
+		
 		if(forum == null) return null;
 		
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
@@ -80,6 +92,10 @@ public class YaftSecurityManager
 	
 	public Discussion filterDiscussion(Discussion discussion,String siteId)
 	{
+		if("IndexManager".equals(Thread.currentThread().getName())) {
+			return discussion;
+		}
+		
 		if(discussion == null) return null;
 		
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
