@@ -68,7 +68,7 @@ public class YaftPersistenceManager
 	public YaftPersistenceManager() {
 	}
 	
-	public void init()
+	void init()
 	{
 		if(logger.isDebugEnabled()) logger.debug("init()");
 		
@@ -86,11 +86,7 @@ public class YaftPersistenceManager
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#setupTables()
-	 */
-	public void setupTables()
-	{
+	void setupTables() {
 		if(logger.isDebugEnabled()) logger.debug("setupTables()");
 		
 		if(!sakaiProxy.isAutoDDL())
@@ -147,10 +143,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getForum(java.lang.String, java.lang.String)
-	 */
-	public Forum getForum(String forumId,String state)
+	Forum getForum(String forumId,String state)
 	{
 		Connection connection = null;
 
@@ -205,10 +198,7 @@ public class YaftPersistenceManager
 		return forum;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getFora(java.lang.String, boolean)
-	 */
-	public List<Forum> getFora(String siteId,boolean fully)
+	List<Forum> getFora(String siteId,boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getFora()");
 		
@@ -261,11 +251,7 @@ public class YaftPersistenceManager
 		return fora;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addOrUpdateForum(org.sakaiproject.yaft.api.Forum)
-	 */
-	public boolean addOrUpdateForum(Forum forum)
+	boolean addOrUpdateForum(Forum forum)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateForum()");
 		
@@ -325,10 +311,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addOrUpdateMessage(java.lang.String, java.lang.String, org.sakaiproject.yaft.api.Message)
-	 */
-	public boolean addOrUpdateMessage(String siteId, String forumId,Message message,Connection connection)
+	boolean addOrUpdateMessage(String siteId, String forumId,Message message,Connection connection)
 	{
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateMessage()");
 		
@@ -434,9 +417,6 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getFora()
-	 */
 	List<Forum> getFora(boolean fully)
 	{
 		if(logger.isDebugEnabled()) logger.debug("getFora()");
@@ -640,10 +620,7 @@ public class YaftPersistenceManager
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getDiscussion(java.lang.String, boolean)
-	 */
-	public Discussion getDiscussion(String discussionId,boolean fully)
+	Discussion getDiscussion(String discussionId,boolean fully)
 	{
 		Connection connection = null;
 		Statement st = null;
@@ -689,10 +666,7 @@ public class YaftPersistenceManager
 		return discussion;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#deleteFromActiveDiscussions(java.lang.String)
-	 */
-	public boolean deleteFromActiveDiscussions(String discussionId)
+	private boolean deleteFromActiveDiscussions(String discussionId)
 	{
 		Connection connection = null;
 		Statement st = null;
@@ -849,18 +823,7 @@ public class YaftPersistenceManager
 		return forum;
 	}
 
-	/* (non-Javadoc)
-	 */
-	public List<Message> getMessages()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#reallyDeleteForum(java.lang.String)
-	 */
-	public boolean reallyDeleteForum(String forumId)
+	private boolean reallyDeleteForum(String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -915,10 +878,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#deleteForum(java.lang.String)
-	 */
-	public boolean deleteForum(String forumId)
+	boolean deleteForum(String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -996,10 +956,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#deleteDiscussion(java.lang.String)
-	 */
-	public boolean deleteDiscussion(String discussionId)
+	boolean deleteDiscussion(String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1066,10 +1023,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#deleteMessage(org.sakaiproject.yaft.api.Message, java.lang.String)
-	 */
-	public boolean deleteMessage(Message message,String forumId)
+	boolean deleteMessage(Message message,String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1124,10 +1078,7 @@ public class YaftPersistenceManager
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#undeleteMessage(org.sakaiproject.yaft.api.Message, java.lang.String)
-	 */
-	public boolean undeleteMessage(Message message,String forumId)
+	boolean undeleteMessage(Message message,String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1182,10 +1133,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getDiscussionUnsubscribers(java.lang.String)
-	 */
-	public List<String> getDiscussionUnsubscribers(String discussionId)
+	List<String> getDiscussionUnsubscribers(String discussionId)
 	{
 		List<String> unsubscribers = new ArrayList<String>();
 		
@@ -1224,10 +1172,7 @@ public class YaftPersistenceManager
 		return unsubscribers;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#unsubscribeFromDiscussion(java.lang.String, java.lang.String)
-	 */
-	public boolean unsubscribeFromDiscussion(String userId, String discussionId)
+	boolean unsubscribeFromDiscussion(String userId, String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1255,10 +1200,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getDiscussionUnsubscriptions(java.lang.String)
-	 */
-	public List<String> getDiscussionUnsubscriptions(String userId)
+	List<String> getDiscussionUnsubscriptions(String userId)
 	{
 		List<String> discussions = new ArrayList<String>();
 		
@@ -1297,10 +1239,7 @@ public class YaftPersistenceManager
 		return discussions;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#subscribeToDiscussion(java.lang.String, java.lang.String)
-	 */
-	public boolean subscribeToDiscussion(String userId, String discussionId)
+	boolean subscribeToDiscussion(String userId, String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1328,10 +1267,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#showMessage(org.sakaiproject.yaft.api.Message)
-	 */
-	public boolean showMessage(Message message)
+	boolean showMessage(Message message)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1368,10 +1304,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#deleteAttachment(java.lang.String, java.lang.String)
-	 */
-	public void deleteAttachment(String attachmentId, String messageId)
+	void deleteAttachment(String attachmentId, String messageId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1423,10 +1356,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getMessage(java.lang.String)
-	 */
-	public Message getMessage(String messageId)
+	Message getMessage(String messageId)
 	{
 		String sql = sqlGenerator.getMessageSelectStatement(messageId);
 		
@@ -1461,10 +1391,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getForumContainingMessage(java.lang.String)
-	 */
-	public Forum getForumContainingMessage(String messageId)
+	Forum getForumContainingMessage(String messageId)
 	{
 		String sql = sqlGenerator.getSelectForumContainingMessageStatement(messageId);
 		
@@ -1501,10 +1428,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#markMessageRead(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public boolean markMessageRead(String messageId,String forumId,String discussionId)
+	boolean markMessageRead(String messageId,String forumId,String discussionId)
 	{
 		Connection connection = null;
 		
@@ -1572,10 +1496,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#markMessageUnRead(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public boolean markMessageUnRead(String messageId,String forumId,String discussionId)
+	boolean markMessageUnRead(String messageId,String forumId,String discussionId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1626,10 +1547,7 @@ public class YaftPersistenceManager
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#markDiscussionRead(java.lang.String, java.lang.String)
-	 */
-	public boolean markDiscussionRead(String discussionId,String forumId)
+	boolean markDiscussionRead(String discussionId,String forumId)
 	{
 		if(logger.isInfoEnabled())
 			logger.info("markDiscussionRead(" + discussionId + "," + forumId + ")");
@@ -1683,10 +1601,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getReadMessageIds(java.lang.String)
-	 */
-	public List<String> getReadMessageIds(String discussionId)
+	List<String> getReadMessageIds(String discussionId)
 	{
 		String sql = sqlGenerator.getSelectReadMessageIds(sakaiProxy.getCurrentUser().getId(),discussionId);
 		
@@ -1722,10 +1637,7 @@ public class YaftPersistenceManager
 		return results;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#moveDiscussion(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public void moveDiscussion(String discussionId, String currentForumId,String newForumId)
+	void moveDiscussion(String discussionId, String currentForumId,String newForumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -1773,10 +1685,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#publishMessage(java.lang.String, java.lang.String)
-	 */
-	public boolean publishMessage(String forumId,String messageId)
+	boolean publishMessage(String forumId,String messageId)
 	{
 		Connection connection = null;
 		List<PreparedStatement> statements = null;
@@ -1856,10 +1765,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getReadMessageCountForAllFora(java.lang.String)
-	 */
-	public Map<String,Integer> getReadMessageCountForAllFora(String userId)
+	Map<String,Integer> getReadMessageCountForAllFora(String userId)
 	{
 		String sql = sqlGenerator.getSelectReadMessageCountForAllForaStatement(userId);
 		
@@ -1899,10 +1805,7 @@ public class YaftPersistenceManager
 		return counts;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getReadMessageCountForForum(java.lang.String, java.lang.String)
-	 */
-	public Map<String, Integer> getReadMessageCountForForum(String userId, String forumId)
+	Map<String, Integer> getReadMessageCountForForum(String userId, String forumId)
 	{
 		String discussionIdsQuery = sqlGenerator.getSelectDiscussionIdsForForumStatement(forumId);
 		
@@ -1955,10 +1858,7 @@ public class YaftPersistenceManager
 		return counts;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getForumForTitle(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public Forum getForumForTitle(String title,String state,String siteId)
+	Forum getForumForTitle(String title,String state,String siteId)
 	{
 		String sql = sqlGenerator.getSelectForumIdForTitleStatement(title,siteId);
 		
@@ -1997,10 +1897,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#subscribeToForum(java.lang.String, java.lang.String)
-	 */
-	public void subscribeToForum(String userId, String forumId)
+	void subscribeToForum(String userId, String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -2048,10 +1945,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#unsubscribeFromForum(java.lang.String, java.lang.String)
-	 */
-	public void unsubscribeFromForum(String userId, String forumId)
+	void unsubscribeFromForum(String userId, String forumId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -2099,10 +1993,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getForumUnsubscriptions(java.lang.String)
-	 */
-	public List<String> getForumUnsubscriptions(String userId)
+	List<String> getForumUnsubscriptions(String userId)
 	{
 		List<String> forums = new ArrayList<String>();
 		
@@ -2141,10 +2032,7 @@ public class YaftPersistenceManager
 		return forums;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addDiscussion(java.lang.String, java.lang.String, org.sakaiproject.yaft.api.Discussion)
-	 */
-	public boolean addDiscussion(String siteId, String forumId, Discussion discussion)
+	boolean addDiscussion(String siteId, String forumId, Discussion discussion)
 	{
 		PreparedStatement statement = null;
 		Connection connection = null;
@@ -2225,10 +2113,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#savePreferences(org.sakaiproject.yaft.api.YaftPreferences)
-	 */
-	public boolean savePreferences(YaftPreferences preferences)
+	boolean savePreferences(YaftPreferences preferences)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -2265,10 +2150,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getPreferencesForCurrentUserAndSite()
-	 */
-	public YaftPreferences getPreferencesForCurrentUserAndSite()
+	YaftPreferences getPreferencesForCurrentUserAndSite()
 	{
 		YaftPreferences yaftPreferences = new YaftPreferences();
 		
@@ -2313,10 +2195,7 @@ public class YaftPersistenceManager
 		return yaftPreferences;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getPreferencesForUser(java.lang.String, java.lang.String)
-	 */
-	public YaftPreferences getPreferencesForUser(String user,String siteId)
+	YaftPreferences getPreferencesForUser(String user,String siteId)
 	{
 		YaftPreferences yaftPreferences = new YaftPreferences();
 		
@@ -2363,10 +2242,7 @@ public class YaftPersistenceManager
 		return yaftPreferences;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getActiveDiscussions(java.lang.String)
-	 */
-	public List<ActiveDiscussion> getActiveDiscussions(String siteId)
+	List<ActiveDiscussion> getActiveDiscussions(String siteId)
 	{
 		List<ActiveDiscussion> discussions = new ArrayList<ActiveDiscussion>();
 		
@@ -2423,10 +2299,7 @@ public class YaftPersistenceManager
 		return discussions;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getIdOfSiteContainingMessage(java.lang.String)
-	 */
-	public String getIdOfSiteContainingMessage(String messageId)
+	String getIdOfSiteContainingMessage(String messageId)
 	{
 		Connection connection = null;
 		Statement statement = null;
@@ -2466,7 +2339,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 
-	public List<Author> getAuthorsForCurrentSite() {
+	List<Author> getAuthorsForCurrentSite() {
 		List<Author> posters = new ArrayList<Author>();
 		
 		Connection connection = null;
@@ -2511,7 +2384,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 
-	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
+	List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
 		List<Message> messages = new ArrayList<Message>();
 		
 		Connection connection = null;
@@ -2555,7 +2428,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 
-	public List<Author> getAuthorsForDiscussion(String discussionId) {
+	List<Author> getAuthorsForDiscussion(String discussionId) {
 		List<Author> posters = new ArrayList<Author>();
 		
 		Discussion discussion = getDiscussion(discussionId,false);
@@ -2609,7 +2482,7 @@ public class YaftPersistenceManager
 		return null;
 	}
 
-	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
+	List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
 		List<Message> messages = new ArrayList<Message>();
 		
 		Connection connection = null;

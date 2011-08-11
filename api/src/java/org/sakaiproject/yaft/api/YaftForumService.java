@@ -67,8 +67,6 @@ public interface YaftForumService extends EntityProducer
 
 	public List<Discussion> getForumDiscussions(String id,boolean fully);
 
-	public List<Message> getMessages();
-
 	public void deleteForum(String forumId);
 
 	public boolean deleteDiscussion(String discussionId);

@@ -222,14 +222,6 @@ public class YaftForumServiceImpl implements YaftForumService
 		return securityManager.filterDiscussions(forum.getDiscussions());
 	}
 
-	public List<Message> getMessages()
-	{
-		if (logger.isDebugEnabled())
-			logger.debug("getMessages()");
-
-		return persistenceManager.getMessages();
-	}
-
 	public void deleteForum(String forumId)
 	{
 		persistenceManager.deleteForum(forumId);
