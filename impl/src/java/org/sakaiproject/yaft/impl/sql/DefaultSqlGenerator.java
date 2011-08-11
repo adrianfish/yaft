@@ -89,6 +89,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 		
 		statements.add("CREATE TABLE YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,SUBJECT " + VARCHAR + "(255) NOT NULL,LAST_MESSAGE_DATE " + DATETIME + " NOT NULL,LATEST_MESSAGE_SUBJECT " + VARCHAR + "(255) NOT NULL)");
 		
+		statements.add("CREATE TABLE YAFT_DISCUSSION_GROUP (DISCUSSION_ID CHAR(36) NOT NULL,GROUP_ID " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_discussion_group_pk PRIMARY KEY (DISCUSSION_ID,GROUP_ID))");
+		
 		return statements;
 	}
 
@@ -861,6 +863,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		return "SELECT YAFT_FORUM_GROUP.GROUP_ID,TITLE FROM YAFT_FORUM_GROUP,SAKAI_SITE_GROUP WHERE FORUM_ID = '" + forumId + "' and YAFT_FORUM_GROUP.GROUP_ID = SAKAI_SITE_GROUP.GROUP_ID";
 	}
+	
+	public String getDiscussionGroupsSelectStatement(String discussionId)
+	{
+		return "SELECT YAFT_DISCUSSION_GROUP.GROUP_ID,TITLE FROM YAFT_DISCUSSION_GROUP,SAKAI_SITE_GROUP WHERE DISCUSSION_ID = '" + discussionId + "' and YAFT_DISCUSSION_GROUP.GROUP_ID = SAKAI_SITE_GROUP.GROUP_ID";
+	}
 
 	@Override
 	public PreparedStatement getSelectSiteAuthors(String siteId,Connection conn) throws Exception{
@@ -891,4 +898,23 @@ public class DefaultSqlGenerator implements SqlGenerator
 		st.setString(2,authorId);
 		return st;
 	}
-}
+
+	@Override
+	public List<PreparedStatement> getSetDiscussionGroupsStatements(Discussion discussion, Connection connection) throws Exception {
+		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
+		
+		PreparedStatement deleteGroupsStatement = connection.prepareStatement("DELETE FROM YAFT_DISCUSSION_GROUP WHERE DISCUSSION_ID = ?");
+		deleteGroupsStatement.setString(1, discussion.getId());
+		statements.add(deleteGroupsStatement);
+			
+		for(Group group : discussion.getGroups()) {
+			PreparedStatement addGroupsStatement = connection.prepareStatement("INSERT INTO YAFT_DISCUSSION_GROUP VALUES(?,?)");
+			addGroupsStatement.setString(1,discussion.getId());
+			addGroupsStatement.setString(2,group.getId());
+				
+			statements.add(addGroupsStatement);
+		}
+		
+		return statements;
+	}
+} 

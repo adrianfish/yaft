@@ -15,7 +15,9 @@
  */
 package org.sakaiproject.yaft.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Stack;
 
 import org.sakaiproject.service.gradebook.shared.Assignment;
@@ -47,7 +49,18 @@ public class Discussion
 	private boolean lockedForWriting = false;
 	private boolean lockedForReading = false;
 	
+	private boolean groupsInherited = false;
+	
+	private List<Group> groups = new ArrayList<Group>();
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
+	}
+	public List<Group> getGroups() {
+		return groups;
+	}
+	
 	private Assignment assignment = null;
+
 	
 	public void setAssignment(Assignment assignment) {
 		this.assignment = assignment;
@@ -262,5 +275,13 @@ public class Discussion
 
 	public boolean isGraded() {
 		return assignment != null;
+	}
+	
+	public void setGroupsInherited(boolean b) {
+		this.groupsInherited = b;
+	}
+	
+	public boolean isGroupsInherited() {
+		return this.groupsInherited;
 	}
 }

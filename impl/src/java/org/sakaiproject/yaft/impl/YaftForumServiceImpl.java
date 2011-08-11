@@ -88,6 +88,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
+		persistenceManager.setSecurityManager(securityManager);
 		persistenceManager.init();
 		persistenceManager.setupTables();
 
@@ -206,23 +207,19 @@ public class YaftForumServiceImpl implements YaftForumService
 		if (logger.isDebugEnabled())
 			logger.debug("getFora()");
 
-		List<Forum> fora = securityManager.filterFora(persistenceManager.getFora());
-
-		for (Forum forum : fora)
-		{
-			forum.setDiscussions(getForumDiscussions(forum.getId(), fully));
-			// forum.setUrl(sakaiProxy.getDirectUrl("/forums/" + forum.getId()));
-		}
-
-		return fora;
+		return securityManager.filterFora(persistenceManager.getFora(fully));
 	}
 
+	/**
+	 * Used by LessonBuilder
+	 */
 	public List<Discussion> getForumDiscussions(String forumId, boolean fully)
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("getForumDiscussions(" + forumId + ")");
 
-		return persistenceManager.getForumDiscussions(forumId, fully);
+		Forum forum = persistenceManager.getForum(forumId, ForumPopulatedStates.PART);
+		return securityManager.filterDiscussions(forum.getDiscussions());
 	}
 
 	public List<Message> getMessages()

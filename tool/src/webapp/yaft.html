@@ -25,7 +25,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
-<link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
+<link rel="stylesheet" type="text/css" href="/prufile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/editor/ckeditor/ckeditor.js"></script>
@@ -143,7 +143,7 @@ ${yaft_forums_label}
 		{/if}
 		{if forum.groups.length > 0}
 		<br />
-		<span class="yaftForumDescription">${yaft_forum_group_message}
+		<span class="yaftForumDescription">${yaft_group_message}
 			{for group in forum.groups}
 				<span class="yaft_group_title">${group.title}<span>
 				{if group_index < (forum.groups.length - 1)},{/if}
@@ -198,7 +198,17 @@ ${yaft_forums_label}
 	{for discussion in discussions}
 	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id}
    	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == yaftCurrentUser.id) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
-		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}</td>
+		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${yaftViewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}
+		{if discussion.groups.length > 0}
+		<br />
+		<span class="yaftForumDescription">${yaft_group_message}
+			{for group in discussion.groups}
+				<span class="yaft_group_title">${group.title}<span>
+				{if group_index < (discussion.groups.length - 1)},{/if}
+			{/for}
+		</span>
+		{/if}
+		</td>
 		<td><a href="javascript:;" class="profile" rel="/direct/profile/${discussion.creatorId}/formatted">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
 		<td>${discussion.unread}</td>
@@ -293,19 +303,19 @@ ${yaft_forums_label}
 <div id="yaft_start_discussion_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
 	<form id="yaft_discussion_form" method="POST" action="/portal/tool/${yaftPlacementId}/discussions">
-		<input type="hidden" name="id" value="${id}"/>
+		<input type="hidden" name="id" value="${discussion.id}"/>
 		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
 		<input type="hidden" name="siteId" value="${yaftSiteId}"/>
 		<h4>Type your message</h4>
 		<br />
 		<span>Subject: *</span>
 		<br />
-		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${subject}"/>
+		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${discussion.subject}"/>
 		<br />
 		<br />
 		<span>Message</span>
 		<br />
-		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${firstMessage.content}</textarea>
+		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${discussion.firstMessage.content}</textarea>
 		<br />
 		<br />
 		<input type="checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
@@ -319,6 +329,18 @@ ${yaft_forums_label}
 <a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
 <br />
 <div id="yaft_advanced_options" style="display:none;">
+{if !discussion.groupsInherited && groups.length > 0}
+<fieldset id="yaft_groups_fieldset">
+<legend>${yaft_groups_box_label}</legend>
+<span class="instruction">${yaft_limit_discussion_to_groups_label}</span>
+<br />
+<br />
+{for group in groups}
+    <input type="checkbox" id="${group.id}" class="yaft_group_checkbox" name="groups" value="${group.id}"/>${group.title}
+    <br />
+{/for}
+</fieldset>
+{/if}
 <fieldset id="yaft_availability_fieldset">
 <legend>Availability</legend>
 <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
@@ -628,7 +650,7 @@ ${yaft_forums_label}
 <div id="yaft_advanced_options" style="display:none;">
 <fieldset id="yaft_groups_fieldset">
 <legend>${yaft_groups_box_label}</legend>
-<span class="instruction">${yaft_limit_to_groups_label}</span>
+<span class="instruction">${yaft_limit_forum_to_groups_label}</span>
 <br />
 <br />
 {for group in groups}

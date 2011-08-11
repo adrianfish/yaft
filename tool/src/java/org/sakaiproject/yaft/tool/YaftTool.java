@@ -17,6 +17,8 @@ package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -125,7 +127,6 @@ public class YaftTool extends HttpServlet {
 			if (parts.length >= 1) {
 				String part1 = parts[0];
 
-				//if ("forums.json".equals(part1)) {
 				if (part1.startsWith("forums")) {
 					doForumsGet(request, response, parts, siteId, placementId, languageCode);
 				} else if ("authors".equals(part1)) {
@@ -834,6 +835,8 @@ public class YaftTool extends HttpServlet {
 			String lockReadingString = (String) request.getParameter("lockReading");
 
 			String grade = (String) request.getParameter("grade");
+			
+			String[] groups = request.getParameterValues("groups");
 
 			if (subject == null || subject.length() <= 0 || content == null || content.length() <= 0 || forumId == null || forumId.length() <= 0) {
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -893,6 +896,15 @@ public class YaftTool extends HttpServlet {
 			discussion.setFirstMessage(message);
 			discussion.setLockedForWriting(lockWriting);
 			discussion.setLockedForReading(lockReading);
+			
+			List<Group> groupsList = new ArrayList<Group>();
+			
+			if(groups != null && groups.length > 0) {
+				for (String groupId : groups)
+					groupsList.add(new Group(groupId, ""));
+			}
+			
+			discussion.setGroups(groupsList);
 
 			if (grade != null && "true".equals(grade)) {
 				String gradebookAssignmentIdString = (String) request.getParameter("assignmentId");

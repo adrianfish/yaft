@@ -52,18 +52,22 @@ public class YaftPersistenceManager
 	private Logger logger = Logger.getLogger(YaftPersistenceManager.class);
 	
 	private SakaiProxy sakaiProxy = null;
+	public void setSakaiProxy(SakaiProxy sakaiProxy) {
+		this.sakaiProxy = sakaiProxy;
+	}
+	
 	private SqlGenerator sqlGenerator = null;
+	
+	private YaftSecurityManager securityManager = null;
+	public void setSecurityManager(YaftSecurityManager sm) {
+		this.securityManager = sm;
+	}
 
 	private int activeDiscussionLimit = 5;
 
-	public YaftPersistenceManager()
-	{
-		if(logger.isDebugEnabled()) logger.debug("YaftPersistenceManager()");
+	public YaftPersistenceManager() {
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#init()
-	 */
 	public void init()
 	{
 		if(logger.isDebugEnabled()) logger.debug("init()");
@@ -157,7 +161,7 @@ public class YaftPersistenceManager
 		}
 		catch (Exception e)
 		{
-			logger.error("Caught exception whilst deleting comment.", e);
+			logger.error("Caught exception whilst getting forum.", e);
 			return null;
 		}
 		finally
@@ -229,7 +233,7 @@ public class YaftPersistenceManager
 				if(fully)
 				{
 					// Add the discussions
-					forum.setDiscussions(getForumDiscussions(forum.getId(), true));
+					forum.setDiscussions(getForumDiscussions(forum.getId(), true,connection));
 				}
 				fora.add(forum);
 			}
@@ -257,15 +261,6 @@ public class YaftPersistenceManager
 		return fora;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#setSakaiProxy(org.sakaiproject.yaft.api.SakaiProxy)
-	 */
-	public void setSakaiProxy(SakaiProxy sakaiProxy)
-	{
-		if(logger.isDebugEnabled()) logger.debug("setSakaiProxy()");
-		
-		this.sakaiProxy = sakaiProxy;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#addOrUpdateForum(org.sakaiproject.yaft.api.Forum)
@@ -442,9 +437,9 @@ public class YaftPersistenceManager
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getFora()
 	 */
-	public List<Forum> getFora()
+	List<Forum> getFora(boolean fully)
 	{
-		if(logger.isDebugEnabled()) logger.debug("getForums()");
+		if(logger.isDebugEnabled()) logger.debug("getFora()");
 		
 		List<Forum> fora = new ArrayList<Forum>();
 		
@@ -461,6 +456,10 @@ public class YaftPersistenceManager
 			while(rs.next())
 			{
 				Forum forum = getForumFromResults(rs,connection);
+				
+				if(fully) {
+					forum.setDiscussions(getForumDiscussions(forum.getId(), fully,connection));
+				}
 				
 				// Only add this forum to the list if is has not been deleted
 				if(!"DELETED".equals(forum.getStatus())) fora.add(forum);
@@ -520,28 +519,6 @@ public class YaftPersistenceManager
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.sakaiproject.yaft.impl.YaftPersistenceManage#getForumDiscussions(java.lang.String, boolean)
-	 */
-	public List<Discussion> getForumDiscussions(String forumId,boolean fully)
-	{
-		Connection connection = null;
-		try
-		{
-			connection = sakaiProxy.borrowConnection();
-			return getForumDiscussions(forumId,fully, connection);
-		}
-		catch (Exception e)
-		{
-			logger.error("Caught exception whilst getting forum discussions.", e);
-			return null;
-		}
-		finally
-		{
-			sakaiProxy.returnConnection(connection);
-		}
-	}
 
 	private List<Discussion> getForumDiscussions(String forumId,boolean fully,Connection connection) throws Exception
 	{
@@ -565,7 +542,8 @@ public class YaftPersistenceManager
 		
 			rs.close();
 		
-			return discussions;
+			return securityManager.filterDiscussions(discussions);
+			//return discussions;
 		}
 		finally
 		{
@@ -583,6 +561,7 @@ public class YaftPersistenceManager
 	private Discussion getDiscussionFromResults(ResultSet rs,boolean fully,Connection connection) throws Exception
 	{
 		String discussionId = rs.getString(ColumnNames.DISCUSSION_ID);
+		String forumId = rs.getString(ColumnNames.FORUM_ID);
 		
 		Statement st = null;
 		try
@@ -602,14 +581,13 @@ public class YaftPersistenceManager
 			Message firstMessage = getMessageFromResults(messageRS,connection);
 		
 			messageRS.close();
-			st.close();
 		
 			if(fully)
 				getMessageChildren(firstMessage, connection);
 			
 			Discussion discussion = new Discussion();
 			discussion.setFirstMessage(firstMessage);
-			discussion.setForumId(rs.getString(ColumnNames.FORUM_ID));
+			discussion.setForumId(forumId);
 			discussion.setStatus(rs.getString("STATUS"));
 			discussion.setLockedForReading(rs.getBoolean("LOCKED_FOR_READING"));
 			discussion.setLockedForWriting(rs.getBoolean("LOCKED_FOR_WRITING"));
@@ -624,6 +602,23 @@ public class YaftPersistenceManager
 		
 			discussion.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 			discussion.setLastMessageDate(rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE).getTime());
+			Forum forum = getForum(forumId,ForumPopulatedStates.EMPTY,connection);
+			if(forum.getGroups().size() > 0) {
+				// Parent forum groups take precedence over child discussions
+				discussion.setGroups(forum.getGroups());
+				discussion.setGroupsInherited(true);
+			} else {
+				String groupsSql = sqlGenerator.getDiscussionGroupsSelectStatement(discussionId);
+				ResultSet groupsRS = st.executeQuery(groupsSql);
+				List<Group> groups = new ArrayList<Group>();
+				while(groupsRS.next()) {
+					groups.add(new Group(groupsRS.getString("GROUP_ID"),groupsRS.getString("TITLE")));
+				}
+				groupsRS.close();
+				
+				discussion.setGroups(groups);
+				discussion.setGroupsInherited(false);
+			}
 			int gradebookAssignmentId = rs.getInt("GRADEBOOK_ASSIGNMENT_ID");
 			if(gradebookAssignmentId != 0) {
 				Assignment  assignment = sakaiProxy.getGradebookAssignment(gradebookAssignmentId);
@@ -2153,6 +2148,7 @@ public class YaftPersistenceManager
 	{
 		PreparedStatement statement = null;
 		Connection connection = null;
+		List<PreparedStatement> groupsStatements = null;
 		
 		try
 		{
@@ -2167,6 +2163,16 @@ public class YaftPersistenceManager
 				
 				statement = sqlGenerator.getSetDiscussionDatesStatement(discussion,connection);
 				statement.executeUpdate();
+				
+				// If the parent forum is group restricted the same restrictions implicitly apply to child discussions
+				Forum forum = getForum(forumId, ForumPopulatedStates.EMPTY,connection);
+				if(forum.getGroups().size() <= 0) {
+					groupsStatements = sqlGenerator.getSetDiscussionGroupsStatements(discussion,connection);
+					for(PreparedStatement groupsStatement : groupsStatements) {
+						groupsStatement.executeUpdate();
+					}
+				}
+				
 				connection.commit();
 			}
 			catch(Exception e)
@@ -2205,6 +2211,15 @@ public class YaftPersistenceManager
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
+			
+			if(groupsStatements != null) {
+				for(PreparedStatement groupsStatement : groupsStatements) {
+					try {
+						groupsStatement.close();
+					}
+					catch (SQLException e) {}
+				}
+			}
 			
 			sakaiProxy.returnConnection(connection);
 		}

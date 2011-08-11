@@ -3,6 +3,7 @@ package org.sakaiproject.yaft.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.Forum;
@@ -33,6 +34,23 @@ public class YaftSecurityManager
 		
 		return filtered;
 	}
+	
+	public List<Discussion> filterDiscussions(List<Discussion> discussions)
+	{
+		String siteId = sakaiProxy.getCurrentSiteId();
+		
+		List<Discussion> filtered = new ArrayList<Discussion>();
+		
+		for(Discussion discussion : discussions)
+		{
+			if(filterDiscussion(discussion, siteId) == null)
+				continue;
+			
+			filtered.add(discussion);
+		}
+		
+		return filtered;
+	}
 
 	public Forum filterForum(Forum forum,String siteId)
 	{
@@ -53,5 +71,23 @@ public class YaftSecurityManager
 		}
 		
 		return forum;
+	}
+	
+	public Discussion filterDiscussion(Discussion discussion,String siteId)
+	{
+		if(discussion == null) return null;
+		
+		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
+		
+		List<Group> groups = discussion.getGroups();
+			
+		if(groups.size() > 0
+				&& !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups)
+				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
+		{
+			return null;
+		}
+		
+		return discussion;
 	}
 }

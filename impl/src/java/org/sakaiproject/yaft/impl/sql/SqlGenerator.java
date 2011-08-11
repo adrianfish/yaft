@@ -129,4 +129,8 @@ public interface SqlGenerator
 	PreparedStatement getSelectDiscussionAuthors(String discussionId, Connection conn) throws Exception;
 
 	PreparedStatement getSelectMessagesForAuthorInDiscussion(String authorId, String discussionId, Connection conn) throws Exception;
+
+	List<PreparedStatement> getSetDiscussionGroupsStatements(Discussion discussion, Connection connection) throws Exception;
+
+	String getDiscussionGroupsSelectStatement(String discussionId);
 }
