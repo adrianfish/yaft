@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2523,5 +2524,66 @@ public class YaftPersistenceManager
 		}
 		
 		return null;
+	}
+
+	public boolean setDiscussionGroups(String discussionId, Collection<String> groupIds) {
+		
+		if(groupIds.size() <= 0) return false;
+		
+		Connection connection = null;
+		List<PreparedStatement> groupsStatements = null;
+		
+		try {
+			connection = sakaiProxy.borrowConnection();
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+			
+			try {
+				// If the parent forum is group restricted the same restrictions implicitly apply to child discussions
+				Discussion discussion = getDiscussion(discussionId,false);
+				Forum forum = getForum(discussion.getForumId(), ForumPopulatedStates.EMPTY,connection);
+				if(forum.getGroups().size() <= 0) {
+					List<Group> groups = new ArrayList<Group>(groupIds.size());
+					for(String groupId : groupIds) {
+						groups.add(new Group(groupId,null));
+					}
+					discussion.setGroups(groups);
+					groupsStatements = sqlGenerator.getSetDiscussionGroupsStatements(discussion,connection);
+					for(PreparedStatement groupsStatement : groupsStatements) {
+						groupsStatement.executeUpdate();
+					}
+				}
+				
+				connection.commit();
+				
+				return true;
+			}
+			catch(Exception e) {
+				logger.error("Caught exception whilst setting discussion groups. Rolling back ...",e);
+				connection.rollback();
+				
+				return false;
+			}
+			finally {
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
+		}
+		catch (Exception e) {
+			logger.error("Caught exception whilst setting discussion groups.", e);
+			return false;
+		}
+		finally {
+			
+			if(groupsStatements != null) {
+				for(PreparedStatement groupsStatement : groupsStatements) {
+					try {
+						groupsStatement.close();
+					}
+					catch (SQLException e) {}
+				}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
 	}
 }

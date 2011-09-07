@@ -809,4 +809,8 @@ public class YaftForumServiceImpl implements YaftForumService
 	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
 		return persistenceManager.getMessagesForAuthorInDiscussion(authorId,discussionId);
 	}
+
+	public boolean setDiscussionGroups(String discussionId, Collection<String> groups) {
+		return persistenceManager.setDiscussionGroups(discussionId,groups);
+	}
 }

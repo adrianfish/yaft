@@ -15,6 +15,7 @@
  */
 package org.sakaiproject.yaft.api;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -129,4 +130,6 @@ public interface YaftForumService extends EntityProducer
 
 	public List<Message> getMessagesForAuthorInDiscussion(String authorId,
 			String discussionId);
+	
+	public boolean setDiscussionGroups(String discussionId,Collection<String> groups);
 }
