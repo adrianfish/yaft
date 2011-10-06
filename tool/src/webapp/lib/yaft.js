@@ -436,6 +436,7 @@ function switchState(state,arg) {
    			success: function(responseText,statusText,xhr) {
 					yaftCurrentDiscussion = YAFTUTILS.getDiscussion(yaftCurrentDiscussion.id);
 					YAFTUTILS.markReadMessagesInCurrentDiscussion();
+					YAFTUTILS.addFormattedDatesToCurrentDiscussion();
 					switchState('full');
    				},
    			error : function(xmlHttpRequest,textStatus,errorThrown) {
