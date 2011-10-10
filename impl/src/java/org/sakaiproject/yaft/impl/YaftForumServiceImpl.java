@@ -477,13 +477,13 @@ public class YaftForumServiceImpl implements YaftForumService
 					continue;
 
 				if (logger.isInfoEnabled())
-					logger.info("SakaiProxy.sendEmail() attempting to send email to: " + user.getId());
+					logger.info("Attempting to send email to: " + user.getId());
 				
 				RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
 			
 				if (template == null)
 				{
-					logger.error("SakaiProxy.sendEmail() no template with key: " + templateKey);
+					logger.error("No template with key: " + templateKey);
 					return; // no template
 				}
 
