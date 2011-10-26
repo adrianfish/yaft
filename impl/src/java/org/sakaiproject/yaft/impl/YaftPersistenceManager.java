@@ -172,15 +172,14 @@ public class YaftPersistenceManager
 		
 		String sql = sqlGenerator.getForumSelectStatement(forumId);
 		Statement st = null;
+		ResultSet rs = null;
 		
 		try
 		{
 			st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			if(rs.next())
 				forum = getForumFromResults(rs,connection);
-			
-			rs.close();
 			
 			if(ForumPopulatedStates.FULL.equals(state))
 				forum.setDiscussions(getForumDiscussions(forumId,true,connection));
@@ -189,6 +188,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			try
 			{
 				if(st != null) st.close();
@@ -207,13 +212,14 @@ public class YaftPersistenceManager
 		
 		Connection connection = null;
 		Statement st = null;
+		ResultSet rs = null;
 
 		try
 		{
 			connection = sakaiProxy.borrowConnection();
 			String sql = sqlGenerator.getForaSelectStatement(siteId);
 			st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			while(rs.next())
 			{
 				Forum forum = getForumFromResults(rs,connection);
@@ -228,8 +234,6 @@ public class YaftPersistenceManager
 				}
 				fora.add(forum);
 			}
-			
-			rs.close();
 		}
 		catch (Exception e)
 		{
@@ -237,6 +241,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -426,13 +436,14 @@ public class YaftPersistenceManager
 		
 		Connection connection = null;
 		Statement st = null;
+		ResultSet rs = null;
 
 		try
 		{
 			connection = sakaiProxy.borrowConnection();
 			String sql = sqlGenerator.getForaSelectStatement();
 			st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			while(rs.next())
 			{
@@ -445,8 +456,6 @@ public class YaftPersistenceManager
 				// Only add this forum to the list if is has not been deleted
 				if(!"DELETED".equals(forum.getStatus())) fora.add(forum);
 			}
-			
-			rs.close();
 		}
 		catch (Exception e)
 		{
@@ -454,6 +463,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -472,24 +487,29 @@ public class YaftPersistenceManager
 	private void getMessageChildren(Message message,Connection connection) throws Exception
 	{
 		Statement statement = null;
+		ResultSet rs = null;
 		
 		try
 		{
 			statement = connection.createStatement();
 			String sql = sqlGenerator.getMessageChildrenSelectStatement(message.getId());
 	
-			ResultSet rs = statement.executeQuery(sql);
+			rs = statement.executeQuery(sql);
 			while(rs.next())
 			{
 				Message child = getMessageFromResults(rs,connection);
 				getMessageChildren(child,connection);
 				message.addChild(child);
 			}
-		
-			rs.close();
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			if(statement != null)
 			{
 				try
@@ -506,12 +526,13 @@ public class YaftPersistenceManager
 		List<Discussion> discussions = new ArrayList<Discussion>();
 
 		Statement st = null;
+		ResultSet rs = null;
 		
 		try
 		{
 			String sql = sqlGenerator.getDiscussionsSelectStatement(forumId);
 			st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			while(rs.next())
 			{
@@ -521,12 +542,16 @@ public class YaftPersistenceManager
 					discussions.add(discussion);
 			}
 		
-			rs.close();
-		
 			return securityManager.filterDiscussions(discussions);
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -624,6 +649,7 @@ public class YaftPersistenceManager
 	{
 		Connection connection = null;
 		Statement st = null;
+		ResultSet rs = null;
 		
 		Discussion discussion = null;
 
@@ -632,7 +658,7 @@ public class YaftPersistenceManager
 			connection = sakaiProxy.borrowConnection();
 			st = connection.createStatement();
 			String sql = sqlGenerator.getDiscussionSelectStatement(discussionId);
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			if(rs.next())
 			{
@@ -642,8 +668,6 @@ public class YaftPersistenceManager
 			{
 				logger.error("No discussion with id: " + discussionId + ". Returning null ...");
 			}
-			
-			rs.close();
 		}
 		catch(Exception e)
 		{
@@ -651,6 +675,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -738,11 +768,15 @@ public class YaftPersistenceManager
 				
 				attachments.add(attachment);
 			}
-			
-			rs2.close();
 		}
 		finally
 		{
+			try
+			{
+				if(rs2 != null) rs2.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -788,12 +822,13 @@ public class YaftPersistenceManager
 		forum.setStatus(rs.getString("STATUS"));
 		
 		Statement st = null;
+		ResultSet groupRS = null;
 		
 		try
 		{
 			st = conn.createStatement();
 			String sql = sqlGenerator.getForumGroupsSelectStatement(forum.getId());
-			ResultSet groupRS = st.executeQuery(sql);
+			groupRS = st.executeQuery(sql);
 			
 			List<Group> groups = new ArrayList<Group>();
 		
@@ -801,8 +836,6 @@ public class YaftPersistenceManager
 				groups.add(new Group(groupRS.getString("GROUP_ID"),groupRS.getString("TITLE")));
 			
 			forum.setGroups(groups);
-		
-			groupRS.close();
 		}
 		catch(Exception e)
 		{
@@ -810,6 +843,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(groupRS != null) groupRS.close();
+			}
+			catch(Exception e) {}
+			
 			if(st != null)
 			{
 				try
@@ -1217,8 +1256,6 @@ public class YaftPersistenceManager
 			
 			while(rs.next())
 				discussions.add(rs.getString(ColumnNames.DISCUSSION_ID));
-			
-			rs.close();
 		}
 		catch (Exception e)
 		{
@@ -1229,6 +1266,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -1381,6 +1423,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -1418,6 +1465,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -1483,11 +1535,15 @@ public class YaftPersistenceManager
 				for(String sql : updateSql)
 					statement.executeUpdate(sql);
 			}
-			
-			rs.close();
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
 			try
 			{
 				if(statement != null) statement.close();
@@ -1627,6 +1683,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -1795,6 +1856,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (Exception e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (Exception e) {}
@@ -1847,7 +1913,17 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(countST != null) countST.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(discussionIdsST != null) discussionIdsST.close();
 			}
 			catch (SQLException e) {}
@@ -1889,6 +1965,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -2010,8 +2091,6 @@ public class YaftPersistenceManager
 			
 			while(rs.next())
 				forums.add(rs.getString(ColumnNames.FORUM_ID));
-			
-			rs.close();
 		}
 		catch (Exception e)
 		{
@@ -2022,6 +2101,11 @@ public class YaftPersistenceManager
 			try
 			{
 				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
+			try
+			{
 				if(statement != null) statement.close();
 			}
 			catch (SQLException e) {}
@@ -2156,6 +2240,7 @@ public class YaftPersistenceManager
 		
 		Connection connection = null;
 		Statement statement = null;
+		ResultSet rs = null;
 
 		try
 		{
@@ -2165,14 +2250,13 @@ public class YaftPersistenceManager
 			
 			statement = connection.createStatement();
 				
-			ResultSet rs = statement.executeQuery(sql);
+			rs = statement.executeQuery(sql);
 			
 			if(rs.next())
 			{
 				yaftPreferences.setEmail(rs.getString("EMAIL_ALERTS"));
 				yaftPreferences.setView(rs.getString("VIEW_MODE"));
 			}
-			
 		}
 		catch (Exception e)
 		{
@@ -2180,6 +2264,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
 			if(statement != null)
 			{
 				try
@@ -2201,6 +2291,7 @@ public class YaftPersistenceManager
 		
 		Connection connection = null;
 		Statement statement = null;
+		ResultSet rs = null;
 		
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
 
@@ -2212,7 +2303,7 @@ public class YaftPersistenceManager
 			
 			statement = connection.createStatement();
 				
-			ResultSet rs = statement.executeQuery(sql);
+			rs = statement.executeQuery(sql);
 			
 			if(rs.next())
 			{
@@ -2227,6 +2318,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
 			if(statement != null)
 			{
 				try
@@ -2248,6 +2345,7 @@ public class YaftPersistenceManager
 		
 		Connection connection = null;
 		Statement statement = null;
+		ResultSet rs = null;
 		
 		try
 		{
@@ -2257,7 +2355,7 @@ public class YaftPersistenceManager
 			
 			statement = connection.createStatement();
 				
-			ResultSet rs = statement.executeQuery(sql);
+			rs = statement.executeQuery(sql);
 			
 			int count = 0;
 			
@@ -2284,6 +2382,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
 			if(statement != null)
 			{
 				try
@@ -2303,6 +2407,7 @@ public class YaftPersistenceManager
 	{
 		Connection connection = null;
 		Statement statement = null;
+		ResultSet rs = null;
 		
 		try
 		{
@@ -2312,7 +2417,7 @@ public class YaftPersistenceManager
 			
 			statement = connection.createStatement();
 				
-			ResultSet rs = statement.executeQuery(sql);
+			rs = statement.executeQuery(sql);
 			
 			if(rs.next())
 				return rs.getString("SITE_ID");
@@ -2324,6 +2429,12 @@ public class YaftPersistenceManager
 		}
 		finally
 		{
+			try
+			{
+				if(rs != null) rs.close();
+			}
+			catch (SQLException e) {}
+			
 			if(statement != null)
 			{
 				try
