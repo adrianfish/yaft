@@ -27,8 +27,8 @@ ${url}
 If you don't want to receive any further emails from this Sakai worksite follow the link below:
 ${unsubscribeUrl}
 	</message>
-	<locale>en</locale>
-	<version>2</version>
+	<locale></locale>
+	<version>3</version>
 	<owner>admin</owner>
 	<key>yaft.newDiscussion</key>
 </emailTemplate>

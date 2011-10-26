@@ -18,18 +18,6 @@
 -->
 <emailTemplate>
 	<subject>[ ${siteTitle} - ${forumMessage} ] ${forumTitle}</subject>
-	<htmlMessage>&lt;strong&gt;${creator}&lt;/strong&gt; created/updated the forum titled '${forumTitle}'
-&lt;br /&gt;
-&lt;br /&gt;
-To view this forum, follow the link below:
-&lt;br /&gt;
-${url}
-&lt;br /&gt;
-&lt;br /&gt;
-If you don't want to receive any further emails from this Sakai worksite follow the link below:
-&lt;br /&gt;
-${unsubscribeUrl}
-	</htmlMessage>
 	<message>
 ${creator} created/updated the forum titled '${forumTitle}'
 
@@ -39,8 +27,8 @@ ${url}
 If you don't want to receive any further emails from this Sakai worksite follow the link below:
 ${unsubscribeUrl}
 	</message>
-	<locale>en</locale>
-	<version>2</version>
+	<locale></locale>
+	<version>3</version>
 	<owner>admin</owner>
 	<key>yaft.newForum</key>
 </emailTemplate>

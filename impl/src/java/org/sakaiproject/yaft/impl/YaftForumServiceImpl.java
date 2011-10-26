@@ -391,20 +391,6 @@ public class YaftForumServiceImpl implements YaftForumService
 			
 			// Make sure the current user is included
 			users.add(sakaiProxy.getCurrentUser().getId());
-			
-			
-			boolean canSetHtml = false;
-		
-			// The 2.6.x version of EmailTemplateService doesn't have html
-			// methods. We need to test for it or else we'll get a runtime error
-			Class templateClass = EmailTemplate.class;
-		
-			try
-			{
-				templateClass.getDeclaredMethod("setHtmlMessage", new Class[] {String.class});
-				canSetHtml = true;
-			}
-			catch(NoSuchMethodException nsme) {}
 		
 			Map<String, String> replacementValues = new HashMap<String, String>();
 			
@@ -412,13 +398,7 @@ public class YaftForumServiceImpl implements YaftForumService
 
 			if (newDiscussion)
 			{
-			    if(includeMessageBodyInEmail && canSetHtml) {
-			    	templateKey = "yaft.newDiscussionWithBody";
-			    	replacementValues.put("messageContent", message.getContent());
-			    } else {
-			    	templateKey = "yaft.newDiscussion";
-			    }
-			    
+			   	templateKey = "yaft.newDiscussion";
 				replacementValues.put("discussionSubject", message.getSubject());
 			}
 			else if (newForum)
@@ -431,13 +411,7 @@ public class YaftForumServiceImpl implements YaftForumService
 			}
 			else
 			{
-			    if(includeMessageBodyInEmail && canSetHtml) {
-			    	templateKey = "yaft.newMessageWithBody";
-			    	replacementValues.put("messageContent", message.getContent());
-			    } else {
-			    	templateKey = "yaft.newMessage";
-			    }
-			    
+			   	templateKey = "yaft.newMessage";
 				replacementValues.put("messageSubject", message.getSubject());
 			}
 			
@@ -491,12 +465,7 @@ public class YaftForumServiceImpl implements YaftForumService
 				{
 					if (emailPref.equals(YaftPreferences.EACH))
 					{
-						if(includeMessageBodyInEmail && canSetHtml) {
-							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedHtmlMessage(),true);
-						}
-						else {
-							sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage(),false);
-						}
+						sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage(),false);
 					}
 					else if (emailPref.equals(YaftPreferences.DIGEST))
 						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());

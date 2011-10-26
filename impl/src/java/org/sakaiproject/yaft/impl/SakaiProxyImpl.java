@@ -775,8 +775,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return userDirectoryService.getUsers(userIds);
 	}
 
-	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String reference, Map<String, String> replacementValues) {
-		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, reference, replacementValues);
+	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String userReference, Map<String, String> replacementValues) {
+		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, userReference, replacementValues);
 	}
 
 	public Set<String> getPermissionsForCurrentUserAndSite() {
