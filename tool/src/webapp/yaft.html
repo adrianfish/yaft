@@ -648,6 +648,7 @@ ${yaft_forums_label}
 <a id="yaft_show_advanced_options_link" href="javascript:;">Show advanced options</a>
 <a id="yaft_hide_advanced_options_link" href="javascript:;" style="display: none;">Hide advanced options</a>
 <div id="yaft_advanced_options" style="display:none;">
+{if groups.length > 0}
 <fieldset id="yaft_groups_fieldset">
 <legend>${yaft_groups_box_label}</legend>
 <span class="instruction">${yaft_limit_forum_to_groups_label}</span>
@@ -658,6 +659,7 @@ ${yaft_forums_label}
     <br />
 {/for}
 </fieldset>
+{/if}
 <fieldset id="yaft_availability_fieldset">
 <legend>Availability</legend>
 <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
