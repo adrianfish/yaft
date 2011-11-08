@@ -223,7 +223,7 @@ public class Message implements Entity
 	 */
 	public String getReference()
 	{
-		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + "messages" + Entity.SEPARATOR + id;
+		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + siteId  + Entity.SEPARATOR + "messages" + Entity.SEPARATOR + id;
 	}
 
 	/**

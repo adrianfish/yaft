@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sakaiproject.api.app.profile.Profile;
+import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.EntityProducer;
+import org.sakaiproject.event.api.Event;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradeDefinition;
@@ -146,4 +148,6 @@ public interface SakaiProxy
 	public String getWysiwygEditor();
 
 	public boolean isCurrentUserMemberOfSite(String siteId);
+
+	public void pushSecurityAdvisor(SecurityAdvisor advisor);
 }

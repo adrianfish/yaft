@@ -50,7 +50,7 @@ var YAFTUTILS = (function($) {
 		
 		var description = $('#yaft_description_field').val();
 		
-		if(description.length > 64) {
+		if(description.length > 255) {
 			alert(yaft_description_too_long_message);
 			return;
 		}

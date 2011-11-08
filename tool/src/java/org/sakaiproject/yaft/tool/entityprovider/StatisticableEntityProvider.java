@@ -34,20 +34,13 @@ public class StatisticableEntityProvider extends AbstractEntityProvider implemen
 	
 	private static final String[] EVENT_KEYS
 		= new String[] {
-			YaftForumService.YAFT_FORUM_CREATED,
-			YaftForumService.YAFT_FORUM_DELETED,
-			YaftForumService.YAFT_DISCUSSION_CREATED,
-			YaftForumService.YAFT_DISCUSSION_DELETED,
-			YaftForumService.YAFT_MESSAGE_CREATED,
-			YaftForumService.YAFT_MESSAGE_DELETED
+			YaftForumService.YAFT_FORUM_CREATED_SS,
+			YaftForumService.YAFT_FORUM_DELETED_SS,
+			YaftForumService.YAFT_DISCUSSION_CREATED_SS,
+			YaftForumService.YAFT_DISCUSSION_DELETED_SS,
+			YaftForumService.YAFT_MESSAGE_CREATED_SS,
+			YaftForumService.YAFT_MESSAGE_DELETED_SS
 			};
-	
-	/*
-	public Object getSampleEntity()
-	{
-		return new Forum();
-	}
-	*/
 
 	public String getEntityPrefix()
 	{

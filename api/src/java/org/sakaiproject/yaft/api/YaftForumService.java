@@ -24,14 +24,22 @@ import org.sakaiproject.entity.api.EntityProducer;
 
 public interface YaftForumService extends EntityProducer
 {
+	
+	
 	public static final String ENTITY_PREFIX = "yaft";
 	public static final String REFERENCE_ROOT = Entity.SEPARATOR + ENTITY_PREFIX;
+	
+	// Events. The _SS ones are for SiteStats,Search etc. The others are for notifications
+	// and are conditional on the send email box being checked
 	public static final String YAFT_MESSAGE_CREATED = "yaft.message.created";
-	public static final String YAFT_MESSAGE_DELETED = "yaft.message.deleted";
+	public static final String YAFT_MESSAGE_CREATED_SS = "yaft.message.created.ss";
+	public static final String YAFT_MESSAGE_DELETED_SS = "yaft.message.deleted.ss";
 	public static final String YAFT_FORUM_CREATED = "yaft.forum.created";
-	public static final String YAFT_FORUM_DELETED = "yaft.forum.deleted";
+	public static final String YAFT_FORUM_CREATED_SS = "yaft.forum.created.ss";
+	public static final String YAFT_FORUM_DELETED_SS = "yaft.forum.deleted.ss";
 	public static final String YAFT_DISCUSSION_CREATED = "yaft.discussion.created";
-	public static final String YAFT_DISCUSSION_DELETED = "yaft.discussion.deleted";
+	public static final String YAFT_DISCUSSION_CREATED_SS = "yaft.discussion.created.ss";
+	public static final String YAFT_DISCUSSION_DELETED_SS = "yaft.discussion.deleted.ss";
 
 	/**
 	 * Get the forums for the specified site

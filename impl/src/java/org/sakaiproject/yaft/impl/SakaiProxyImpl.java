@@ -65,10 +65,13 @@ import org.sakaiproject.email.api.EmailService;
 import org.sakaiproject.emailtemplateservice.model.EmailTemplate;
 import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.emailtemplateservice.service.EmailTemplateService;
+import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
+import org.sakaiproject.event.api.NotificationEdit;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.event.api.UsageSessionService;
@@ -139,6 +142,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 	private EntityManager entityManager;
 
 	private EventTrackingService eventTrackingService;
+	
+	private NotificationService notificationService;
 
 	private CalendarService calendarService;
 
@@ -172,6 +177,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 		securityService = (SecurityService) componentManager.get(SecurityService.class);
 		contentHostingService = (ContentHostingService) componentManager.get(ContentHostingService.class);
 		eventTrackingService = (EventTrackingService) componentManager.get(EventTrackingService.class);
+		notificationService = (NotificationService) componentManager.get(NotificationService.class);
 		timeService = (TimeService) componentManager.get(TimeService.class);
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
@@ -185,6 +191,21 @@ public class SakaiProxyImpl implements SakaiProxy {
 		// emailTemplateService.processEmailTemplates(emailTemplates);
 		for (String templatePath : emailTemplates)
 			processEmailTemplate(templatePath);
+		
+		NotificationEdit ne = notificationService.addTransientNotification();
+		ne.setResourceFilter(YaftForumService.REFERENCE_ROOT);
+		ne.setFunction(YaftForumService.YAFT_FORUM_CREATED);
+		ne.setAction(new NewForumNotification());
+		
+		NotificationEdit ne2 = notificationService.addTransientNotification();
+		ne2.setResourceFilter(YaftForumService.REFERENCE_ROOT);
+		ne2.setFunction(YaftForumService.YAFT_DISCUSSION_CREATED);
+		ne2.setAction(new NewDiscussionNotification());
+		
+		NotificationEdit ne3 = notificationService.addTransientNotification();
+		ne3.setResourceFilter(YaftForumService.REFERENCE_ROOT);
+		ne3.setFunction(YaftForumService.YAFT_MESSAGE_CREATED);
+		ne3.setAction(new NewMessageNotification());
 	}
 
 	public boolean isAutoDDL() {
@@ -616,7 +637,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	public void postEvent(String event, String reference, boolean modify) {
 		UsageSession usageSession = usageSessionService.getSession();
-		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify), usageSession);
+		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify,NotificationService.NOTI_OPTIONAL), usageSession);
 	}
 
 	public byte[] getResourceBytes(String resourceId) {
@@ -1067,5 +1088,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 		Site currentSite = getCurrentSite();
 		if(currentSite == null) return false;
 		return (currentSite.getMember(userDirectoryService.getCurrentUser().getId()) != null);
+	}
+
+	public void pushSecurityAdvisor(SecurityAdvisor advisor) {
+		securityService.pushAdvisor(advisor);
 	}
 }

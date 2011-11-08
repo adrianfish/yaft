@@ -20,11 +20,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
+import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Discussion
+public class Discussion implements Entity
 {
 	/**
 	 * The number of messages in this discussion
@@ -283,5 +285,20 @@ public class Discussion
 	
 	public boolean isGroupsInherited() {
 		return this.groupsInherited;
+	}
+	public ResourceProperties getProperties() {
+		return null;
+	}
+	public String getReference() {
+		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + getSiteId() + Entity.SEPARATOR + "discussions" + Entity.SEPARATOR + getId();
+	}
+	public String getReference(String rootProperty) {
+		return getReference();
+	}
+	public String getUrl(String rootProperty) {
+		return getUrl();
+	}
+	public String getSiteId() {
+		return firstMessage.getSiteId();
 	}
 }

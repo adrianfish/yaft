@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.site.cover.SiteService;
@@ -30,7 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class Forum
+public class Forum implements Entity
 {
 	private String id = "";
 	private String title = "";
@@ -290,4 +292,24 @@ public class Forum
 	{
 		return groups;
 	}
+
+	// START ENTITY IMPL
+	
+	public ResourceProperties getProperties() {
+		return null;
+	}
+
+	public String getReference() {
+		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + siteId  + Entity.SEPARATOR + "forums" + Entity.SEPARATOR + id;
+	}
+
+	public String getReference(String rootProperty) {
+		return getReference();
+	}
+
+	public String getUrl(String rootProperty) {
+		return getUrl();
+	}
+	
+	// END ENTITY IMPL
 }
