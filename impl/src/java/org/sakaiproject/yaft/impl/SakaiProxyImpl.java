@@ -96,6 +96,7 @@ import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.BaseResourceProperties;
 import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
@@ -186,26 +187,27 @@ public class SakaiProxyImpl implements SakaiProxy {
 		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
 		gradebookService = (GradebookService) componentManager.get("org_sakaiproject_service_gradebook_GradebookService");
-
-		List<String> emailTemplates = (List<String>) componentManager.get("org.sakaiproject.yaft.api.emailtemplates.List");
-		// emailTemplateService.processEmailTemplates(emailTemplates);
-		for (String templatePath : emailTemplates)
-			processEmailTemplate(templatePath);
 		
 		NotificationEdit ne = notificationService.addTransientNotification();
 		ne.setResourceFilter(YaftForumService.REFERENCE_ROOT);
 		ne.setFunction(YaftForumService.YAFT_FORUM_CREATED);
-		ne.setAction(new NewForumNotification());
+		NewForumNotification yn = new NewForumNotification();
+		yn.setSakaiProxy(this);
+		ne.setAction(yn);
 		
 		NotificationEdit ne2 = notificationService.addTransientNotification();
 		ne2.setResourceFilter(YaftForumService.REFERENCE_ROOT);
 		ne2.setFunction(YaftForumService.YAFT_DISCUSSION_CREATED);
-		ne2.setAction(new NewDiscussionNotification());
+		NewDiscussionNotification dn = new NewDiscussionNotification();
+		dn.setSakaiProxy(this);
+		ne2.setAction(dn);
 		
 		NotificationEdit ne3 = notificationService.addTransientNotification();
 		ne3.setResourceFilter(YaftForumService.REFERENCE_ROOT);
 		ne3.setFunction(YaftForumService.YAFT_MESSAGE_CREATED);
-		ne3.setAction(new NewMessageNotification());
+		NewMessageNotification mn = new NewMessageNotification();
+		mn.setSakaiProxy(this);
+		ne3.setAction(mn);
 	}
 
 	public boolean isAutoDDL() {
@@ -640,149 +642,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify,NotificationService.NOTI_OPTIONAL), usageSession);
 	}
 
-	public byte[] getResourceBytes(String resourceId) {
-		try {
-			enableSecurityAdvisor();
-			ContentResource resource = contentHostingService.getResource(resourceId);
-			return resource.getContent();
-		} catch (Exception e) {
-			logger.error("Caught an exception with message '" + e.getMessage() + "'");
-		}
-
-		return null;
-	}
-
-	/**
-	 * Process the supplied template XML into an EmailTemplate object and save
-	 * it
-	 * 
-	 * @param templatePath
-	 * @return
-	 * @throws IOException
-	 * @throws XMLStreamException
-	 */
-	private void processEmailTemplate(String templatePath) {
-		final String ELEM_SUBJECT = "subject";
-		final String ELEM_MESSAGE = "message";
-		final String ELEM_HTML_MESSAGE = "htmlMessage";
-		final String ELEM_LOCALE = "locale";
-		final String ELEM_VERSION = "version";
-		final String ELEM_OWNER = "owner";
-		final String ELEM_KEY = "key";
-		final String ADMIN = "admin";
-
-		InputStream in = SakaiProxy.class.getClassLoader().getResourceAsStream(templatePath);
-		XMLInputFactory factory = (XMLInputFactory) XMLInputFactory.newInstance();
-		XMLStreamReader staxXmlReader = null;
-		EmailTemplate template = new EmailTemplate();
-
-		boolean canSetHtml = false;
-		boolean canSetVersion = false;
-
-		Class templateClass = EmailTemplate.class;
-
-		try {
-			templateClass.getDeclaredMethod("setHtmlMessage", new Class[] { String.class });
-			canSetHtml = true;
-		} catch (NoSuchMethodException nsme) {
-		}
-
-		try {
-			templateClass.getDeclaredMethod("setVersion", new Class[] { int.class });
-			canSetVersion = true;
-		} catch (NoSuchMethodException nsme) {
-		}
-
-		try {
-			staxXmlReader = (XMLStreamReader) factory.createXMLStreamReader(in);
-
-			for (int event = staxXmlReader.next(); event != XMLStreamConstants.END_DOCUMENT; event = staxXmlReader.next()) {
-				if (event == XMLStreamConstants.START_ELEMENT) {
-					String element = staxXmlReader.getLocalName();
-
-					// subject
-					if (StringUtils.equals(element, ELEM_SUBJECT)) {
-						template.setSubject(staxXmlReader.getElementText());
-					}
-					// message
-					if (StringUtils.equals(element, ELEM_MESSAGE)) {
-						template.setMessage(staxXmlReader.getElementText());
-					}
-					// html
-					if (canSetHtml && StringUtils.equals(element, ELEM_HTML_MESSAGE)) {
-						template.setHtmlMessage(staxXmlReader.getElementText());
-					}
-					// locale
-					if (StringUtils.equals(element, ELEM_LOCALE)) {
-						template.setLocale(staxXmlReader.getElementText());
-					}
-					// version - SAK-17637
-					if (canSetVersion && StringUtils.equals(element, ELEM_VERSION)) {
-						// set as integer version of value, or default to 0
-						template.setVersion(Integer.valueOf(NumberUtils.toInt(staxXmlReader.getElementText(), 0)));
-					}
-
-					// owner
-					if (StringUtils.equals(element, ELEM_OWNER)) {
-						template.setOwner(staxXmlReader.getElementText());
-					}
-					// key
-					if (StringUtils.equals(element, ELEM_KEY)) {
-						template.setKey(staxXmlReader.getElementText());
-					}
-				}
-			}
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				staxXmlReader.close();
-			} catch (XMLStreamException e) {
-				e.printStackTrace();
-			}
-			try {
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// check if we have an existing template of this key and locale
-		EmailTemplate existingTemplate = emailTemplateService.getEmailTemplate(template.getKey(), new Locale(template.getLocale()));
-		if (existingTemplate == null) {
-			// no existing, save this one
-			Session sakaiSession = sessionManager.getCurrentSession();
-			sakaiSession.setUserId(ADMIN);
-			sakaiSession.setUserEid(ADMIN);
-			emailTemplateService.saveTemplate(template);
-			sakaiSession.setUserId(null);
-			sakaiSession.setUserId(null);
-			logger.info("Saved email template: " + template.getKey() + " with locale: " + template.getLocale());
-			return;
-		}
-
-		if (canSetVersion) {
-			// check version, if local one newer than persisted, update it -
-			// SAK-17679
-			int existingTemplateVersion = existingTemplate.getVersion() != null ? existingTemplate.getVersion().intValue() : 0;
-			if (template.getVersion() > existingTemplateVersion) {
-				existingTemplate.setSubject(template.getSubject());
-				existingTemplate.setMessage(template.getMessage());
-				existingTemplate.setHtmlMessage(template.getHtmlMessage());
-				existingTemplate.setVersion(template.getVersion());
-				existingTemplate.setOwner(template.getOwner());
-
-				Session sakaiSession = sessionManager.getCurrentSession();
-				sakaiSession.setUserId(ADMIN);
-				sakaiSession.setUserEid(ADMIN);
-				emailTemplateService.updateTemplate(existingTemplate);
-				sakaiSession.setUserId(null);
-				sakaiSession.setUserId(null);
-				logger.info("Updated email template: " + template.getKey() + " with locale: " + template.getLocale());
-			}
-		}
-	}
-
 	public Site getSite(String siteId) {
 		try {
 			return siteService.getSite(siteId);
@@ -982,22 +841,27 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return false;
 	}
 
-	public Set<String> getGroupMemberIds(List<Group> groups) {
-		Set<String> members = new HashSet<String>();
+	public List<User> getGroupUsers(List<Group> groups) {
+		List<User> users = new ArrayList<User>();
 
 		for (Group group : groups) {
 			String groupId = "/site/" + getCurrentSiteId() + "/group/" + group.getId();
 			try {
 				AuthzGroup ag = authzGroupService.getAuthzGroup(groupId);
 				Set<Member> groupMembers = ag.getMembers();
-				for (Member member : groupMembers)
-					members.add(member.getUserId());
+				for (Member member : groupMembers) {
+					try {
+						users.add(userDirectoryService.getUser(member.getUserId()));
+					} catch (UserNotDefinedException e) {
+						logger.error("No user for id '" + member.getUserId() + "'");
+					}
+				}
 			} catch (GroupNotDefinedException e) {
 				logger.error("Forum group '" + groupId + "' not found.");
 			}
 		}
 
-		return members;
+		return users;
 	}
 
 	public List<Group> getCurrentSiteGroups() {
@@ -1071,9 +935,18 @@ public class SakaiProxyImpl implements SakaiProxy {
 		}
 	}
 
-	public Set<String> getCurrentSiteMaintainers() {
+	public List<User> getCurrentSiteMaintainers() {
 		Site currentSite = getCurrentSite();
-		return currentSite.getUsersHasRole(currentSite.getMaintainRole());
+		Set<String> userIds = currentSite.getUsersHasRole(currentSite.getMaintainRole());
+		List<User> maintainers = new ArrayList<User>();
+		for(String userId : userIds) {
+			try {
+				maintainers.add(userDirectoryService.getUser(userId));
+			} catch (UserNotDefinedException e) {
+				logger.error("No users for id '" + userId + "'");
+			}
+		}
+		return maintainers;
 	}
 
 	public boolean getIncludeMessageBodyInEmailSetting() {

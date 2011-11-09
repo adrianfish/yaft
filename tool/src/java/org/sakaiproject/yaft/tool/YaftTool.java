@@ -817,6 +817,19 @@ public class YaftTool extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}
+		} else if(parts.length >= 2) {
+			String op = parts[1];
+			
+			if("delete".equals(op)) {
+				String[] forumIds = request.getParameterValues("forumIds[]");
+				
+				for(String forumId : forumIds) {
+					yaftForumService.deleteForum(forumId);
+				}
+				
+				response.setStatus(HttpServletResponse.SC_OK);
+				return;
+			}
 		}
 	}
 

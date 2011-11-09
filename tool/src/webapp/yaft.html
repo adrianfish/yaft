@@ -121,6 +121,13 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_forums_content_template" style="display:none"><!--
+<div>
+<div class="navIntraToolLink viewNav" style="float: right;">
+    <span>
+        <input type="button" id="yaft_bulk_forum_delete_button" value="${yaft_delete_label}" disabled="disabled"/>
+    <span>
+</div>
+</div>
 <table id="yaft_forum_table" class="listHier">
 	<thead>
 	<tr>
@@ -130,6 +137,7 @@ ${yaft_forums_label}
 		<th><div>${yaft_unread_label}</div></th>
 		<th><div>${yaft_last_message_label}</div></th>
 		<th><div>${yaft_options_label}</div></th>
+		<th align="center"><input id="yaft_all_fora_checkbox" type="checkbox"/></th>
 	</tr>
 	</thead>
 	<tbody>
@@ -168,6 +176,7 @@ ${yaft_forums_label}
 			<a href="#" onclick="return YAFTUTILS.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
 		{/if}
 		</td>
+        <td align="center"><input type="checkbox" class="yaft_bulk_option_candidate" id="${forum.id}"/></td>
 	</tr>
 	{/if}
 	{/for}

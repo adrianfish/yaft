@@ -124,3 +124,4 @@ yaft_graded_in_label = 'Graded in';
 yaft_grade_label = 'Grade';
 yaft_unsubscribed_message = "You have unsubscribed from the alert messages for this worksite. If you would like to re-enable the alerts, click on the 'Preferences' link";
 yaft_month_names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+yaft_delete_selected_fora_message = 'Are you sure you want to delete the selected fora?';

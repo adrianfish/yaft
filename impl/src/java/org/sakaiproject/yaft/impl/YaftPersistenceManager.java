@@ -484,7 +484,7 @@ public class YaftPersistenceManager
 		return securityManager.filterFora(fora);
 	}
 
-	private void getMessageChildren(Message message,Connection connection) throws Exception
+	private void getMessageChildren(Message message,List<Group> groups, Connection connection) throws Exception
 	{
 		Statement statement = null;
 		ResultSet rs = null;
@@ -498,7 +498,8 @@ public class YaftPersistenceManager
 			while(rs.next())
 			{
 				Message child = getMessageFromResults(rs,connection);
-				getMessageChildren(child,connection);
+				child.setGroups(groups);
+				getMessageChildren(child,groups,connection);
 				message.addChild(child);
 			}
 		}
@@ -586,9 +587,6 @@ public class YaftPersistenceManager
 			Message firstMessage = getMessageFromResults(messageRS,connection);
 		
 			messageRS.close();
-		
-			if(fully)
-				getMessageChildren(firstMessage, connection);
 			
 			Discussion discussion = new Discussion();
 			discussion.setFirstMessage(firstMessage);
@@ -624,6 +622,12 @@ public class YaftPersistenceManager
 				discussion.setGroups(groups);
 				discussion.setGroupsInherited(false);
 			}
+			
+			firstMessage.setGroups(discussion.getGroups());
+			
+			if(fully)
+				getMessageChildren(firstMessage, discussion.getGroups(), connection);
+			
 			int gradebookAssignmentId = rs.getInt("GRADEBOOK_ASSIGNMENT_ID");
 			if(gradebookAssignmentId != 0) {
 				Assignment  assignment = sakaiProxy.getGradebookAssignment(gradebookAssignmentId);

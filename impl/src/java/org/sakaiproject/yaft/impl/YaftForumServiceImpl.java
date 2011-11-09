@@ -170,6 +170,10 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 			return false;
 
 		// persistenceManager.markMessageRead(message.getId(), forumId, message.getDiscussionId());
+		
+		// We need to  set the groups up so notifications get filtered correctly
+		//Discussion parentDiscussion = getDiscussion(message.getDiscussionId(), false);
+		//message.setGroups(parentDiscussion.getGroups());
 
 		// SiteStats/Search etc event
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
@@ -354,145 +358,15 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		persistenceManager.moveDiscussion(discussionId, currentForumId, newForumId);
 	}
 
-	private void sendEmail(String siteId, String forumId, Message message, boolean newDiscussion)
-	{
-		try
-		{
-			Site site = null;
-
-			if (siteId == null)
-				site = sakaiProxy.getCurrentSite();
-			else
-				site = sakaiProxy.getSite(siteId);
-
-			String siteTitle = "";
-
-			if (site != null)
-				siteTitle = site.getTitle();
-			
-			Set<String> users = null;
-			
-			boolean newForum = false;
-			
-			if(message == null) newForum = true;
-			
-			Forum forum = persistenceManager.getForum(forumId, ForumPopulatedStates.EMPTY);
-			
-			List<Group> groups = forum.getGroups();
-			
-			if(groups.size() > 0)
-			{
-			    // This forum is limited to groups. Make sure the alert only goes
-			    // to the group members
-			    users = sakaiProxy.getGroupMemberIds(groups);
-			    
-			    // Maintainers need to get emails also.
-			    users.addAll(sakaiProxy.getCurrentSiteMaintainers());
-			}
-			else
-			{
-				users = site.getUsers();
-			}
-			
-			// Make sure the current user is included
-			users.add(sakaiProxy.getCurrentUser().getId());
-		
-			Map<String, String> replacementValues = new HashMap<String, String>();
-			
-			String templateKey = "";
-
-			if (newDiscussion)
-			{
-			   	templateKey = "yaft.newDiscussion";
-				replacementValues.put("discussionSubject", message.getSubject());
-			}
-			else if (newForum)
-			{
-				templateKey = "yaft.newForum";
-				
-				replacementValues.put("forumTitle", forum.getTitle());
-				replacementValues.put("forumDescription", forum.getDescription());
-				
-			}
-			else
-			{
-			   	templateKey = "yaft.newMessage";
-				replacementValues.put("messageSubject", message.getSubject());
-			}
-			
-			replacementValues.put("forumMessage", "Forum Message");
-			replacementValues.put("siteTitle", siteTitle);
-			replacementValues.put("creator", sakaiProxy.getCurrentUser().getDisplayName());
-			
-			String url = "";
-
-			if(!newForum)
-			{
-				List<String> unsubscribers = persistenceManager.getDiscussionUnsubscribers(message.getDiscussionId());
-
-				for (String excludedId : unsubscribers)
-					users.remove(excludedId);
-
-				url = sakaiProxy.getDirectUrl(siteId, "/messages/" + message.getId() + ".html");
-			}
-			else
-				url = sakaiProxy.getDirectUrl(siteId, "/forums/" + forumId + ".html");
-			
-			replacementValues.put("url", url);
-			
-			String unsubscribeUrl = sakaiProxy.getDirectUrl(siteId, "/unsubscribe");
-			replacementValues.put("unsubscribeUrl", unsubscribeUrl);
-
-			List<User> sakaiUsers = sakaiProxy.getUsers(users);
-
-			// get the rendered template for each user
-			for (User user : sakaiUsers)
-			{
-				YaftPreferences prefs = persistenceManager.getPreferencesForUser(user.getId(), siteId);
-
-				String emailPref = prefs.getEmail();
-
-				if (YaftPreferences.NEVER.equals(emailPref))
-					continue;
-
-				if (logger.isInfoEnabled())
-					logger.info("Attempting to send email to: " + user.getId());
-				
-				RenderedTemplate template = sakaiProxy.getRenderedTemplateForUser(templateKey, user.getReference(), replacementValues);
-			
-				if (template == null)
-				{
-					logger.error("No template with key: " + templateKey);
-					return; // no template
-				}
-
-				try
-				{
-					if (emailPref.equals(YaftPreferences.EACH))
-					{
-						sakaiProxy.sendEmail(user.getId(), template.getRenderedSubject(), template.getRenderedMessage(),false);
-					}
-					else if (emailPref.equals(YaftPreferences.DIGEST))
-						sakaiProxy.addDigestMessage(user.getId(), template.getRenderedSubject(), template.getRenderedMessage());
-				}
-				catch (Exception e)
-				{
-					logger.error("SakaiProxy.sendEmail() error retrieving template for user: " + user.getId() + " with key: " + templateKey + " : " + e.getClass() + " : " + e.getMessage());
-					continue; // try next user
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error("Failed to send message email.", e);
-		}
-	}
-
 	public void publishMessage(String forumId, Message message)
 	{
 		persistenceManager.publishMessage(forumId, message.getId());
+		
+		// SiteStats/Search etc event
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
 
-		sendEmail(null, forumId, message, false);
+		// Notification event
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
 	}
 
 	/** START EntityProducer IMPLEMENTATION */

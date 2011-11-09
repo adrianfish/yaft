@@ -102,8 +102,6 @@ public interface SakaiProxy
 	
 	public void postEvent(String event,String reference,boolean modify);
 
-	public byte[] getResourceBytes(String resourceId);
-
 	public void addDigestMessage(String user,String subject, String body);
 
 	public Site getSite(String siteId);
@@ -122,7 +120,7 @@ public interface SakaiProxy
 
 	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups);
 
-	public Set<String> getGroupMemberIds(List<Group> groups);
+	public List<User> getGroupUsers(List<Group> groups);
 
 	public List<Group> getCurrentSiteGroups();
 
@@ -141,7 +139,7 @@ public interface SakaiProxy
 
 	public GradeDefinition getAssignmentGrade(String userId, long assignmentId);
 
-	public Set<String> getCurrentSiteMaintainers();
+	public List<User> getCurrentSiteMaintainers();
 
 	public boolean getIncludeMessageBodyInEmailSetting();
 

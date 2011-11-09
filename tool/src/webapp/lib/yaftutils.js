@@ -243,12 +243,73 @@ var YAFTUTILS = (function($) {
 			ajaxSettings: {type: 'GET'}
 		});
 	};
+
+    my.deleteSelectedFora  = function() {
+    
+		if(!confirm(yaft_delete_selected_fora_message)) {
+			return;
+		}
+		
+        var candidates = $('.yaft_bulk_option_candidate:checked');
+
+        var forumIds = [];
+
+        for(var i=0,j=candidates.length;i<j;i++) {
+            forumIds.push(candidates[i].id);
+        }
+
+    	jQuery.ajax( {
+			url : yaftBaseDataUrl + "forums/delete",
+			type : 'POST',
+        	dataType : "text",
+        	async : false,
+			cache: false,
+        	data : { 'forumIds[]': forumIds },
+        	success : function(results,textStatus) {
+        		YAFTUTILS.setCurrentForums(/*render=*/true);
+        	},
+        	error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete forums. Status: " + textStatus + ". Error: " + errorThrown);
+			}
+		});
+    };
 	
 	my.renderCurrentForums = function() {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_forums_content_template',{'items':yaftCurrentForums},'yaft_content');
 	 	$(document).ready(function() {
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
+
+            // If there are no fora, hide the check all checkbox
+            if(!yaftCurrentForums || yaftCurrentForums.length <= 0) {
+                $('#yaft_all_fora_checkbox').hide();
+            }
+
+            $('#yaft_bulk_forum_delete_button').click(function () {
+                YAFTUTILS.deleteSelectedFora();
+            });
+            $('.yaft_bulk_option_candidate').click(function () {
+                if($(this).attr('checked')) {
+                    $('#yaft_bulk_forum_delete_button').removeAttr('disabled');
+                    $('#yaft_bulk_forum_delete_button').addClass('enabled');
+                } else {
+                    // Only enable the delete button if no other forum is checked
+                    if($('.yaft_bulk_option_candidate:checked').length <= 0) {
+                        $('#yaft_bulk_forum_delete_button').attr('disabled','disabled');
+                        $('#yaft_bulk_forum_delete_button').removeClass('enabled');
+                    }
+                }
+            });
+
+            $('#yaft_all_fora_checkbox').click(function () {
+                if($(this).attr('checked')) {
+                    $('.yaft_bulk_option_candidate').attr('checked','true');
+                    $('#yaft_bulk_forum_delete_button').removeAttr('disabled');
+                    $('#yaft_bulk_forum_delete_button').addClass('enabled');
+                } else {
+                    $('.yaft_bulk_option_candidate').removeAttr('checked');
+                    $('#yaft_bulk_forum_delete_button').attr('disabled','disabled');
+                    $('#yaft_bulk_forum_delete_button').removeClass('enabled');
+                }
+            });
 	 			
             if(yaftCurrentForums.length > 0) {
 	 		    $("#yaft_forum_table").tablesorter({
@@ -258,12 +319,16 @@ var YAFTUTILS = (function($) {
 	 			    headers:
 	 				    {
 	 					    4: {sorter: "isoDate"},
-	 					    5: {sorter: false}
+	 					    5: {sorter: false},
+	 					    6: {sorter: false}
 	 				    },
                     sortList: [[0,0]],
 	 			    widgets: ['zebra']
 	 		    });
             }
+            
+			if(window.frameElement)
+				setMainFrameHeight(window.frameElement.id);
 	 	});
 	};
 	
@@ -847,12 +912,6 @@ var YAFTUTILS = (function($) {
         	data : {'searchTerms':searchTerms},
         	success : function(results,textStatus) {
         		var hits = results;
-				/*
-				for(var i=0,j=hits.length;i<j;i++) {
-					var messageId = hits[i].id;
-					hits[i].url = "javascript: switchState('minimal',{messageId:'" + messageId + "'});";
-				}
-				*/
 				$('#yaft_breadcrumb').html('');
 				SAKAIUTILS.renderTrimpathTemplate('yaft_search_results_content_template',{'results':hits},'yaft_content');
 	 			$(document).ready(function() {

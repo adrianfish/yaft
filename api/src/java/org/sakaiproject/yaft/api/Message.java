@@ -52,6 +52,14 @@ public class Message implements Entity
 	private String placementId = "";
 	private String siteId = "";
 	
+	private List<Group> groups = new ArrayList<Group>();
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
+	}
+	public List<Group> getGroups() {
+		return groups;
+	}
+	
 	public Message()
 	{
 		id = UUID.randomUUID().toString();
