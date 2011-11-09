@@ -34,17 +34,6 @@
      	<property name="searchIndexBuilder"><ref bean="org.sakaiproject.search.api.SearchIndexBuilder" /></property>
      	
     </bean>
-    
-	<!-- Setup email templates -->
-	<bean id="org.sakaiproject.yaft.api.emailtemplates.List" class="java.util.ArrayList">
-		<constructor-arg>
-      		<list>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newMessage.xml</value>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newDiscussion.xml</value>
-        		<value>org/sakaiproject/yaft/api/emailtemplates/template-newForum.xml</value>
-      		</list>      
-    	</constructor-arg>
-  	</bean>
   	
   	<bean id="org.sakaiproject.yaft.api.YaftUserNotificationPreferencesRegistration"
       parent="org.sakaiproject.user.api.UserNotificationPreferencesRegistration"
