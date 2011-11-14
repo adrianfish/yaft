@@ -27,8 +27,6 @@ var YAFTUTILS = (function($) {
 
 				markReadMessagesInFora();
 
-				setupForumUnsubscriptions();
-
                 if(render) {
                     YAFTUTILS.renderCurrentForums();
                 }
@@ -388,71 +386,6 @@ var YAFTUTILS = (function($) {
 		return currentForum;
 	};
 	
-	my.setupCurrentForumUnsubscriptions = function() {
-		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-			var discussion = yaftCurrentForum.discussions[i];
-			discussion["unsubscribed"] = false;
-			for(var k=0,m=yaftDiscussionUnsubscriptions.length;k<m;k++) {
-				var d = yaftDiscussionUnsubscriptions[k];
-				if(d == discussion.id) {
-					discussion["unsubscribed"] = true;
-					break;
-				}
-			}
-		}
-	};
-	
-	my.getDiscussionUnsubscriptions = function()
-	{
-		var data = null;
-		jQuery.ajax( {
-	   		url : yaftBaseDataUrl + "discussions/unsubscriptions.json",
-	   		dataType : "json",
-	   		async : false,
-	   		cache : false,
-	   		success : function(unsubscriptions,status) {
-				data = unsubscriptions;
-			},
-            error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get unsubscription data. Reason: " + errorThrown);
-			}
-	  	});
-	  	
-	  	return data;
-	};
-	
-	my.getForumUnsubscriptions = function() {
-		var data = null;
-		jQuery.ajax( {
-	   		url : yaftBaseDataUrl + "unsubscriptions.json",
-	   		dataType : "json",
-	   		async : false,
-	   		cache : false,
-	   		success : function(unsubscriptions,status) {
-				data = unsubscriptions;
-			},
-            error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get forum unsubscription data. Reason: " + errorThrown);
-			}
-	  	});
-	  	
-	  	return data;
-	};
-
-	function setupForumUnsubscriptions() {
-		for(var i=0,j=yaftCurrentForums.length;i<j;i++) {
-			var forum = yaftCurrentForums[i];
-			forum["unsubscribed"] = false;
-			for(var k=0,m=yaftForumUnsubscriptions.length;k<m;k++) {
-				var f = yaftForumUnsubscriptions[k];
-				if(f == forum.id) {
-					forum["unsubscribed"] = true;
-					break;
-				}
-			}
-		}
-	}
-	
 	my.getDiscussion = function(discussionId) {
 		var discussion = null;
 		
@@ -759,123 +692,6 @@ var YAFTUTILS = (function($) {
 		return false;
 	};
 	
-	my.subscribeToDiscussion = function(discussionId){
-		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/subscribe",
-	   		dataType : "text",
-			cache: false,
-		   	success : function(text,status) {
-				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-					if(yaftCurrentForum.discussions[i].id == discussionId) {
-						yaftCurrentForum.discussions[i].unsubscribed = false;
-						
-						// Remove this discussion id from the unsubscriptions list
-						for(var k=0,m=yaftDiscussionUnsubscriptions.length;k<m;k++) {
-							if(yaftDiscussionUnsubscriptions[k] == discussionId)
-								yaftDiscussionUnsubscriptions.splice(k,1);
-						}
-					}
-				}
-
-				//renderCurrentForumContent();
-
-				switchState('forum');
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to subscribe to discussion. Reason: " + textStatus);
-			}
-		});
-		
-		return false;
-	};
-	
-	my.unsubscribeFromDiscussion = function(discussionId) {
-		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/unsubscribe",
-	   		dataType : "text",
-		   	success : function(text,textStatus) {
-				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-					if(yaftCurrentForum.discussions[i].id === text) {
-						yaftCurrentForum.discussions[i].unsubscribed = true;
-						
-						// Add this discussion id to the unsubscriptions list
-						yaftDiscussionUnsubscriptions.push(text);
-					}
-				}
-
-                //setupCurrentForumUnsubscriptions();
-				//renderCurrentForumContent();
-
-				switchState('forum');
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to unsubscribe from discussion. Reason: " + errorThrown);
-			}
-		});
-		
-		return false;
-	};
-
-	my.subscribeToForum = function(forumId) {
-		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forums/" + forumId + "/subscribe",
-	   		dataType : "text",
-   			async : false,
-			cache: false,
-		   	success : function(text,textStatus) {
-				for(var i=0,j=yaftCurrentForums.length;i<j;i++) {
-					var forum = yaftCurrentForums[i];
-					if(forum.id == forumId) {
-						for(var k=0,m=forum.discussions.length;k<m;k++)
-							forum.discussions[k]['unsubscribed'] = false;
-
-						forum['unsubscribed'] = false;
-					}
-				}
-
-				yaftForumUnsubscriptions = getForumUnsubscriptions();
-				yaftDiscussionUnsubscriptions = getDiscussionUnsubscriptions();
-
-				renderCurrentForums();
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to subscribe to forum. Reason: " + textStatus);
-			}
-		});
-
-		return false;
-	};
-
-	my.unsubscribeFromForum = function(forumId) {
-		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forums/" + forumId + "/unsubscribe",
-	   		dataType : "text",
-   			async : false,
-			cache: false,
-		   	success : function(text,status) {
-				for(var i=0,j=yaftCurrentForums.length;i<j;i++) {
-					var forum = yaftCurrentForums[i];
-					if(forum.id == forumId) {
-						for(var k=0,m=forum.discussions.length;k<m;k++)
-							forum.discussions[k]['unsubscribed'] = true;
-
-						forum['unsubscribed'] = true;
-					}
-				}
-
-				yaftForumUnsubscriptions = getForumUnsubscriptions();
-				yaftDiscussionUnsubscriptions = getDiscussionUnsubscriptions();
-				
-				renderCurrentForums();
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to unsubscribe to forum. Reason: " + textStatus);
-			}
-		});
-
-		return false;
-	};
-    
     function getDescendantIds(messageId,testMessage,descendantIds) {
     	for(var i=0,j=testMessage.children.length;i<j;i++) {
     		descendantIds.push(testMessage.children[i].id);

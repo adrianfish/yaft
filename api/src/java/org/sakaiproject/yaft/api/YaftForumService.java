@@ -84,12 +84,6 @@ public interface YaftForumService extends EntityProducer
 	
 	public void undeleteMessage(Message messageId,String forumId);
 
-	public boolean unsubscribeFromDiscussion(String userId, String discussionId);
-
-	public List<String> getDiscussionUnsubscriptions(String userId);
-
-	public boolean subscribeToDiscussion(String userId, String discussionId);
-
 	public void showMessage(Message messageId);
 
 	public void deleteAttachment(String attachmentId, String messageId);
@@ -113,18 +107,6 @@ public interface YaftForumService extends EntityProducer
 	public Map<String,Integer> getReadMessageCountForAllFora();
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId);
-
-	public void subscribeToForum(String forumId);
-	
-	public void unsubscribeFromForum(String forumId);
-
-	public List<String> getForumUnsubscriptions(String userId);
-
-	public boolean savePreferences(YaftPreferences preferences);
-
-	public YaftPreferences getPreferencesForCurrentUserAndSite();
-	
-	public YaftPreferences getPreferencesForUser(String userId,String siteId);
 
 	public List<ActiveDiscussion> getActiveDiscussions(String siteId);
 

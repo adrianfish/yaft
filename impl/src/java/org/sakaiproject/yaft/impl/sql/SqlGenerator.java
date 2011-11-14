@@ -23,7 +23,6 @@ import java.util.List;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
-import org.sakaiproject.yaft.api.YaftPreferences;
 
 public interface SqlGenerator
 {
@@ -59,14 +58,6 @@ public interface SqlGenerator
 	
 	List<String> getUndeleteMessageStatements(Message message,String forumId);
 	
-	String getDiscussionUnsubscribersStatement(String discussionId);
-
-	String getUnsubscribeFromDiscussionStatement(String userId, String discussionId);
-
-	String getDiscussionUnsubscriptionsStatement(String userId);
-
-	String getSubscribeToDiscussionStatement(String userId, String discussionId);
-	
 	public String getMessageAttachmentsSelectStatement(String messageId);
 
 	String getDeleteAttachmentStatement(String attachmentId, String messageId);
@@ -99,17 +90,7 @@ public interface SqlGenerator
 
 	String getSelectForumIdForTitleStatement(String title,String siteId);
 
-	List<String> getSubscribeToForumStatements(String userId, Forum forum);
-
-	List<String> getUnsubscribeFromForumStatements(String userId, Forum forum);
-
-	String getForumUnsubscriptionsStatement(String userId);
-
 	PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception;
-
-	String getSavePreferencesStatement(YaftPreferences preferences, String id, String currentSiteId,Connection conn) throws Exception;
-
-	String getSelectPreferencesStatement(String userId, String siteId);
 
 	String getSelectActiveDiscussionsStatement(String siteId);
 

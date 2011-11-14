@@ -18,9 +18,6 @@ var yaftPlacementId = null;
 var yaftSiteId = null;
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
-var yaftCurrentUserPreferences = null;
-var yaftDiscussionUnsubscriptions = null;
-var yaftForumUnsubscriptions = null;
 var likeServiceAvailable = false;
 var yaftCurrentForums = null;
 /* Needed for show author messages */
@@ -101,10 +98,6 @@ var yaftBaseDataUrl = "";
 	$('#yaft_show_deleted_link').click(YAFTUTILS.showDeleted);
 	$('#yaft_hide_deleted_link').click(YAFTUTILS.hideDeleted);
 
-	$('#yaft_preferences_link').click(function (e) {
-		switchState('preferences');
-	});
-
 	$('#yaft_authors_view_link').click(function (e) {
 		switchState('authors');
 	});
@@ -137,10 +130,6 @@ var yaftBaseDataUrl = "";
 	if(arg.likeServiceAvailable && "true" === arg.likeServiceAvailable) {
 		likeServiceAvailable = true;
 	}
-
-	yaftCurrentUserPreferences = data.preferences;
-	yaftDiscussionUnsubscriptions = YAFTUTILS.getDiscussionUnsubscriptions();
-	yaftForumUnsubscriptions = YAFTUTILS.getForumUnsubscriptions();
 	
 	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null) {
 		// Now switch into the requested state
@@ -169,7 +158,6 @@ function switchState(state,arg) {
 	if(arg && arg.forumId) {
 
 		yaftCurrentForum = YAFTUTILS.getForum(arg.forumId,"part");
-		YAFTUTILS.setupCurrentForumUnsubscriptions();
 	}
 
 	if('forums' === state) {
@@ -647,33 +635,6 @@ function switchState(state,arg) {
 			if(window.frameElement)
 				setMainFrameHeight(window.frameElement.id);
 		});
-	}
-	else if('preferences' === state) {
-		SAKAIUTILS.renderTrimpathTemplate('yaft_preferences_breadcrumb_template',arg,'yaft_breadcrumb');
-		SAKAIUTILS.renderTrimpathTemplate('yaft_preferences_template',{},'yaft_content');
-		$('#yaft_email_' + yaftCurrentUserPreferences.email + '_option').attr('checked',true);
-		$('#yaft_view_' + yaftCurrentUserPreferences.view + '_option').attr('checked',true);
-	 	$(document).ready(function() {
-	 		var savePreferencesOptions = { 
-				dataType: 'json',
-				timeout: 30000,
-				async: false,
-   				success: function(preferences,statusText,xhr) {
-   					yaftCurrentUserPreferences = preferences;
-					switchState('forums');
-   				},
-   				error : function(xmlHttpRequest,textStatus,errorThrown) {
-				}
-   			}; 
- 
-   			$('#yaft_preferences_form').ajaxForm(savePreferencesOptions);
-   			
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
-	 	});
-	}
-	else if('unsubscribed' === state) {
-		SAKAIUTILS.renderTrimpathTemplate('yaft_unsubscribed_template',{},'yaft_content');
 	}
 
 	return false;

@@ -15,28 +15,15 @@
  */
 package org.sakaiproject.yaft.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.api.app.profile.Profile;
@@ -62,14 +49,9 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.email.api.DigestService;
 import org.sakaiproject.email.api.EmailService;
-import org.sakaiproject.emailtemplateservice.model.EmailTemplate;
-import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
-import org.sakaiproject.emailtemplateservice.service.EmailTemplateService;
-import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.NotificationEdit;
 import org.sakaiproject.event.api.NotificationService;
@@ -91,21 +73,16 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.time.api.TimeRange;
 import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.Placement;
-import org.sakaiproject.tool.api.Session;
-import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.BaseResourceProperties;
-import org.sakaiproject.util.Validator;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * All Sakai API calls go in here. If Sakai changes all we have to do if mod
@@ -150,11 +127,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	private TimeService timeService;
 
-	private SessionManager sessionManager;
 
 	private UsageSessionService usageSessionService;
-
-	private EmailTemplateService emailTemplateService;
 
 	private SearchService searchService;
 
@@ -182,9 +156,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 		timeService = (TimeService) componentManager.get(TimeService.class);
 		calendarService = (CalendarService) componentManager.get(CalendarService.class);
 		entityManager = (EntityManager) componentManager.get(EntityManager.class);
-		sessionManager = (SessionManager) componentManager.get(SessionManager.class);
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
-		emailTemplateService = (EmailTemplateService) componentManager.get(EmailTemplateService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
 		gradebookService = (GradebookService) componentManager.get("org_sakaiproject_service_gradebook_GradebookService");
 		
@@ -639,7 +611,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	public void postEvent(String event, String reference, boolean modify) {
 		UsageSession usageSession = usageSessionService.getSession();
-		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify,NotificationService.NOTI_OPTIONAL), usageSession);
+		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify), usageSession);
 	}
 
 	public Site getSite(String siteId) {
@@ -653,10 +625,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	public List<User> getUsers(Collection<String> userIds) {
 		return userDirectoryService.getUsers(userIds);
-	}
-
-	public RenderedTemplate getRenderedTemplateForUser(String emailTemplateKey, String userReference, Map<String, String> replacementValues) {
-		return emailTemplateService.getRenderedTemplateForUser(emailTemplateKey, userReference, replacementValues);
 	}
 
 	public Set<String> getPermissionsForCurrentUserAndSite() {

@@ -17,8 +17,6 @@ package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -54,7 +52,6 @@ import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.api.YaftPreferences;
 
 /**
  * This servlet handles all of the REST type stuff. At some point this may all
@@ -204,28 +201,12 @@ public class YaftTool extends HttpServlet {
 					return;
 				}
 
-				else if ("unsubscriptions.json".equals(part1)) {
-					List<String> unsubs = yaftForumService.getForumUnsubscriptions(user.getId());
-					JSONArray data = JSONArray.fromObject(unsubs);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
-					response.getWriter().write(data.toString());
-					return;
-				}
-
 				else if ("discussions".equals(part1)) {
 					doDiscussionsGet(request, response, parts, siteId, placementId, languageCode);
 				}
 
 				else if ("messages".equals(part1)) {
 					doMessagesGet(request, response, parts, siteId, placementId, languageCode);
-				} else if ("unsubscribe".equals(part1)) {
-					YaftPreferences preferences = new YaftPreferences(YaftPreferences.NEVER, YaftPreferences.FULL);
-					if (yaftForumService.savePreferences(preferences)) {
-						String url = "/yaft-tool/yaft.html?state=unsubscribed&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&likeServiceAvailable=" + likeServiceAvailable + "&editor=" + sakaiProxy.getWysiwygEditor();
-						response.sendRedirect(url);
-						return;
-					}
 				}
 			}
 		}
@@ -309,21 +290,6 @@ public class YaftTool extends HttpServlet {
 					response.getWriter().close();
 					return;
 				}
-				if ("subscribe".equals(forumOp)) {
-					yaftForumService.subscribeToForum(forumId);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
-					response.getWriter().write("success");
-					response.getWriter().close();
-					return;
-				} else if ("unsubscribe".equals(forumOp)) {
-					yaftForumService.unsubscribeFromForum(forumId);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
-					response.getWriter().write("success");
-					response.getWriter().close();
-					return;
-				}
 			}
 		}
 	}
@@ -333,15 +299,7 @@ public class YaftTool extends HttpServlet {
 			String discussionId = parts[1];
 
 			if (parts.length == 2) {
-				if ("unsubscriptions.json".equals(discussionId)) {
-					List<String> unsubs = yaftForumService.getDiscussionUnsubscriptions(sakaiProxy.getCurrentUser().getId());
-					JSONArray data = JSONArray.fromObject(unsubs);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
-					response.getWriter().write(data.toString());
-					response.getWriter().close();
-					return;
-				} else if ("discussionContainingMessage".equals(discussionId)) {
+				if ("discussionContainingMessage".equals(discussionId)) {
 					String messageId = (String) request.getParameter("messageId");
 
 					if (messageId == null)
@@ -400,28 +358,6 @@ public class YaftTool extends HttpServlet {
 					response.getWriter().write("success");
 					response.getWriter().close();
 					return;
-				} else if ("subscribe".equals(discussionOp)) {
-					if (yaftForumService.subscribeToDiscussion(null, discussionId)) {
-						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("text/plain");
-						response.getWriter().write(discussionId);
-						response.getWriter().close();
-					} else {
-						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					}
-
-					return;
-				} else if ("unsubscribe".equals(discussionOp)) {
-					if (yaftForumService.unsubscribeFromDiscussion(null, discussionId)) {
-						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("text/plain");
-						response.getWriter().write(discussionId);
-						response.getWriter().close();
-						return;
-					} else {
-						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-						return;
-					}
 				} else if ("markRead".equals(discussionOp)) {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
 					String forumId = forum.getId();
@@ -610,14 +546,11 @@ public class YaftTool extends HttpServlet {
 	private void doUserDataGet(HttpServletResponse response, String siteId) throws ServletException, IOException {
 		System.out.println("BLAH");
 		Set<String> perms = sakaiProxy.getPermissionsForCurrentUserAndSite();
-		YaftPreferences prefs = yaftForumService.getPreferencesForUser(sakaiProxy.getCurrentUser().getId(), siteId);
 
-		JSONObject prefsData = JSONObject.fromObject(prefs);
 		JSONArray permsData = JSONArray.fromObject(perms);
 
 		JSONObject data = new JSONObject();
 		data.accumulate("permissions", permsData);
-		data.accumulate("preferences", prefsData);
 
 		if (sakaiProxy.currentUserHasFunction("gradebook.editAssignments")) {
 			List<Assignment> assignments = sakaiProxy.getGradebookAssignments();
@@ -667,25 +600,6 @@ public class YaftTool extends HttpServlet {
 				doPermsPost(request, response);
 			else if ("search".equals(part1))
 				doSearchPost(request, response);
-			else if ("preferences.json".equals(part1)) {
-				String emailPreference = request.getParameter("emailPreference");
-				String viewPreference = request.getParameter("viewPreference");
-				if (logger.isDebugEnabled()) {
-					logger.debug("emailPreference: " + emailPreference);
-					logger.debug("viewPreference: " + viewPreference);
-				}
-
-				YaftPreferences preferences = new YaftPreferences(emailPreference, viewPreference);
-
-				if (yaftForumService.savePreferences(preferences)) {
-					JSONObject data = JSONObject.fromObject(preferences);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
-					response.getWriter().write(data.toString());
-					response.getWriter().close();
-					return;
-				}
-			}
 		}
 
 		String function = request.getParameter("function");

@@ -17,7 +17,6 @@ package org.sakaiproject.yaft.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,26 +24,20 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.authz.api.SecurityAdvisor;
-import org.sakaiproject.emailtemplateservice.model.EmailTemplate;
-import org.sakaiproject.emailtemplateservice.model.RenderedTemplate;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.site.api.Site;
-import org.sakaiproject.user.api.User;
 import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.ForumPopulatedStates;
-import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
-import org.sakaiproject.yaft.api.YaftPreferences;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -273,44 +266,6 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	public void undeleteMessage(Message message, String forumId)
 	{
 		persistenceManager.undeleteMessage(message, forumId);
-	}
-
-	public boolean unsubscribeFromDiscussion(String userId, String discussionId)
-	{
-		if (userId == null)
-			userId = sakaiProxy.getCurrentUser().getId();
-
-		return persistenceManager.unsubscribeFromDiscussion(userId, discussionId);
-	}
-
-	public List<String> getDiscussionUnsubscriptions(String userId)
-	{
-		if (userId == null)
-			userId = sakaiProxy.getCurrentUser().getId();
-
-		return persistenceManager.getDiscussionUnsubscriptions(userId);
-	}
-
-	public boolean subscribeToDiscussion(String userId, String discussionId)
-	{
-		if (userId == null)
-			userId = sakaiProxy.getCurrentUser().getId();
-
-		return persistenceManager.subscribeToDiscussion(userId, discussionId);
-	}
-
-	public void subscribeToForum(String forumId)
-	{
-		String userId = sakaiProxy.getCurrentUser().getId();
-
-		persistenceManager.subscribeToForum(userId, forumId);
-	}
-
-	public void unsubscribeFromForum(String forumId)
-	{
-		String userId = sakaiProxy.getCurrentUser().getId();
-
-		persistenceManager.unsubscribeFromForum(userId, forumId);
 	}
 
 	public void showMessage(Message message)
@@ -576,12 +531,19 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	{
 		String[] parts = referenceString.split(Entity.SEPARATOR);
 
-		if (!parts[1].equals("yaft") || parts.length != 5) // Leading slash adds an empty element
+		if (!parts[1].equals("yaft")) // Leading slash adds an empty element
 			return false;
+		
+		if(parts.length == 2) {
+			reference.set("sakai:yaft", "", "", null, "");
+			return true;
+		}
 		
 		String siteId = parts[2];
 		String type = parts[3];
 		String entityId = parts[4];
+		
+		System.out.println("TYPE:" + reference.getType());
 		
 		if ("forums".equals(type)) {
 			reference.set("yaft","forums" , entityId, null, siteId);
@@ -623,29 +585,6 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	public Forum getForumForTitle(String title, String state, String siteId)
 	{
 		return securityManager.filterForum(persistenceManager.getForumForTitle(title, state, siteId),siteId);
-	}
-
-	public List<String> getForumUnsubscriptions(String userId)
-	{
-		if (userId == null)
-			userId = sakaiProxy.getCurrentUser().getId();
-
-		return persistenceManager.getForumUnsubscriptions(userId);
-	}
-
-	public boolean savePreferences(YaftPreferences preferences)
-	{
-		return persistenceManager.savePreferences(preferences);
-	}
-
-	public YaftPreferences getPreferencesForUser(String user, String siteId)
-	{
-		return persistenceManager.getPreferencesForUser(user, siteId);
-	}
-
-	public YaftPreferences getPreferencesForCurrentUserAndSite()
-	{
-		return persistenceManager.getPreferencesForCurrentUserAndSite();
 	}
 
 	public List<ActiveDiscussion> getActiveDiscussions(String siteId)

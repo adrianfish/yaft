@@ -26,9 +26,6 @@
         <commons-lang.version>2.4</commons-lang.version>
         <calendar.version>2.7.0</calendar.version> <!-- 2.7.x build -->
 	  	<profile-api.version>2.7-SNAPSHOT</profile-api.version>
-		<emailtemplateservice.version>0.4.5</emailtemplateservice.version>
-    	<stax.api.version>1.0.1</stax.api.version>
-    	<stax.version>1.2.0</stax.version>
     	<url.localsite>scp://source.sakaiproject.org/var/www/html/release/yaft/${project.version}</url.localsite>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -179,13 +176,6 @@
                 <version>${calendar.version}</version>
 	  			<scope>provided</scope>
             </dependency>
-            
-			<dependency>
-    			<groupId>org.sakaiproject.emailtemplateservice</groupId>
-    			<artifactId>emailtemplateservice-api</artifactId>
-    			<version>${emailtemplateservice.version}</version>
-    			<scope>provided</scope>
-    		</dependency>
 
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -200,18 +190,6 @@
                 <version>${servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
-			<!-- StAX is bundled with JDK1.6, need this for 1.5 though (impl/pom.xml as well) -->
-			<dependency>
-				<groupId>stax</groupId>
-				<artifactId>stax-api</artifactId>
-				<version>${stax.api.version}</version>
-			</dependency>
-			<dependency>
-    			<groupId>stax</groupId>
-    			<artifactId>stax</artifactId>
-    			<version>${stax.version}</version>
-			</dependency>
 
         </dependencies>
     </dependencyManagement>

@@ -1,11 +1,13 @@
 package org.sakaiproject.yaft.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.cover.EntityManager;
 import org.sakaiproject.event.api.Event;
+import org.sakaiproject.event.api.Notification;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.user.api.User;
@@ -102,19 +104,22 @@ public class NewForumNotification extends SiteEmailNotification{
 		Reference ref = EntityManager.newReference(event.getResource());
         Forum forum = (Forum) ref.getEntity();
         
+        List<User> users = new ArrayList<User>();
+        
         List<Group> groups = forum.getGroups();
         if(groups.size() > 0) {
         	// This forum is limited to groups. Make sure the alert only goes
 		    // to the group members
-		    List<User> users = sakaiProxy.getGroupUsers(groups);
+		    users = sakaiProxy.getGroupUsers(groups);
 		    
 		    // Maintainers need to get emails also.
 		    users.addAll(sakaiProxy.getCurrentSiteMaintainers());
-        	return users;
         }
         else {
-        	return super.getRecipients(event);
+        	users = super.getRecipients(event);
         }
+        
+	    return users;
 	}
 	
 	protected String getTag(String title, boolean shouldUseHtml) {
@@ -131,5 +136,14 @@ public class NewForumNotification extends SiteEmailNotification{
 	
 	protected String getResourceAbility() {
 		return YaftFunctions.YAFT_MESSAGE_READ;
+	}
+	
+	protected int getOption(User user,Notification notification,Event event) {
+		int option = super.getOption(user, notification, event);
+		return option;
+	}
+	protected int getOption(User user,Notification notification,String resourceFilter,int eventPriority, Event event) {
+		int option = super.getOption(user, notification, event);
+		return option;
 	}
 }

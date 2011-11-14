@@ -91,7 +91,6 @@
 		<a style="display: none;" id="yaft_full_link" title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a>
 		<a style="display: none;" id="yaft_show_deleted_link" title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a>
 		<a style="display: none;" id="yaft_hide_deleted_link" title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a>
-		<a id="yaft_preferences_link" title="${yaft_preferences_tooltip}" href="javascript:;">${yaft_preferences_label}</a>
 		<a id="yaft_authors_view_link" title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a>
 	</div>
 	<div id="yaft_search_bar">
@@ -111,7 +110,6 @@
         <li id="yaft_full_link" style="display: none;" role="menuItem"><span><a title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a></span></li>
         <li id="yaft_show_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a></span></li>
         <li id="yaft_hide_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a></span></li>
-        <li id="yaft_preferences_link" role="menuItem"><span><a title="${yaft_preferences_tooltip}" href="javascript:;">${yaft_preferences_label}</a></span></li>
         <li id="yaft_authors_view_link" role="menuItem"><span><a title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a></span></li>
 </ul-->
 
@@ -166,11 +164,6 @@ ${yaft_forums_label}
 		<td align="center">
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
 			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
-		{/if}
-		{if forum.unsubscribed}
-		<a href="#" onClick="return YAFTUTILS.subscribeToForum('${forum.id}');" title="${yaft_subscribe_to_forum_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
-		{else}
-		<a href="#" onClick="return YAFTUTILS.unsubscribeFromForum('${forum.id}');" title="${yaft_unsubscribe_from_forum_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
 			<a href="#" onclick="return YAFTUTILS.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
@@ -228,11 +221,6 @@ ${yaft_forums_label}
 		{/if}
 		{if yaftCurrentUserPermissions.discussionCreate && ((yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id) || yaftCurrentUserPermissions.discussionDeleteAny)}
 		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>{/if}
-		{/if}
-		{if discussion.unsubscribed}
-		<a href="#" onClick="return YAFTUTILS.subscribeToDiscussion('${discussion.id}');" title="${yaft_subscribe_to_discussion_tooltip}"><img src="/library/image/silk/email_add.png" width="16" height="16"/></a>
-		{else}
-		<a href="#" onClick="return YAFTUTILS.unsubscribeFromDiscussion('${discussion.id}');" title="${yaft_unsubscribe_from_discussion_tooltip}"><img src="/library/image/silk/email_delete.png" width="16" height="16"/></a>
 		{/if}
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
 			<a href="#" onClick="return YAFTUTILS.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
@@ -929,36 +917,6 @@ ${yaft_forums_label}
 -->
 </div>
 
-<div id="yaft_preferences_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${yaftPlacementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_preferences_label}
--->
-</div>
-
-<div id="yaft_preferences_template" style="display:none"><!--
-<form id="yaft_preferences_form" action="${yaftBaseDataUrl}preferences.json" method="POST">
-<fieldset id="yaft_email_preferences_fieldset">
-<legend>${yaft_email_alerts_label}</legend>
-<input id="yaft_email_never_option" type="radio" name="emailPreference" value="never"/>${yaft_email_never_label}
-<br />
-<input id="yaft_email_each_option" type="radio" name="emailPreference" value="each"/>${yaft_email_each_label}
-<br />
-<input id="yaft_email_digest_option" type="radio" name="emailPreference" value="digest"/>${yaft_email_digest_label}
-<br />
-</fieldset>
-<fieldset style="display: none;" id="yaft_view_preferences_fieldset">
-<legend>Message View</legend>
-<input id="yaft_view_full_option" type="radio" name="viewPreference" value="full"/>Full
-<br />
-<input id="yaft_view_minimal_option" type="radio" name="viewPreference" value="minimal"/>Minimal
-</fieldset>
-<br />
-
-<input type="submit" value="${yaft_save_label}"/>
-<input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
-</form>
--->
-</div>
-
 <div id="yaft_authors_template" style="display:none;"><!--
 <table id="yaft_author_table" class="listHier">
     <thead>
@@ -1022,11 +980,6 @@ ${yaft_forums_label}
 		</div>
     {/for}
     {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
--->
-</div>
-
-<div id="yaft_unsubscribed_template" style="display:none;"><!--
-<h3>${yaft_unsubscribed_message}</h3>
 -->
 </div>
 
