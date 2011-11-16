@@ -18,9 +18,9 @@
 -->
 <registration>
 
-	<tool id="sakai.sitehome.yaft"
-        title="Yaft Homepage"
-    	description="YAFT for site homepages">
+	<tool id="sakai.synoptic.yaft"
+        title="Recent Discussion Messages"
+    	description="YAFT for My Workspace sites">
     </tool>
 
 </registration>
