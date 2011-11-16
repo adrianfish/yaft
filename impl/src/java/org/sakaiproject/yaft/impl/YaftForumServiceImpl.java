@@ -587,9 +587,9 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		return securityManager.filterForum(persistenceManager.getForumForTitle(title, state, siteId),siteId);
 	}
 
-	public List<ActiveDiscussion> getActiveDiscussions(String siteId)
+	public List<ActiveDiscussion> getActiveDiscussions()
 	{
-		return persistenceManager.getActiveDiscussions(siteId);
+		return persistenceManager.getActiveDiscussions();
 	}
 
 	public String getIdOfSiteContainingMessage(String messageId)

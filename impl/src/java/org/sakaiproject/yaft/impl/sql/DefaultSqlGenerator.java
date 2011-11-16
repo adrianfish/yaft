@@ -712,9 +712,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return st;
 	}
 
-	public String getSelectActiveDiscussionsStatement(String siteId)
+	public String getSelectActiveDiscussionsStatement()
 	{
-		return "SELECT * FROM YAFT_ACTIVE_DISCUSSIONS WHERE SITE_ID = '" + siteId + "'";
+		return "SELECT * FROM YAFT_ACTIVE_DISCUSSIONS ORDER BY LAST_MESSAGE_DATE DESC";
 	}
 
 	public List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, Connection connection) throws Exception

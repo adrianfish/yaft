@@ -610,14 +610,7 @@ public class YaftPersistenceManager
 				discussion.setGroups(forum.getGroups());
 				discussion.setGroupsInherited(true);
 			} else {
-				String groupsSql = sqlGenerator.getDiscussionGroupsSelectStatement(discussionId);
-				ResultSet groupsRS = st.executeQuery(groupsSql);
-				List<Group> groups = new ArrayList<Group>();
-				while(groupsRS.next()) {
-					groups.add(new Group(groupsRS.getString("GROUP_ID"),groupsRS.getString("TITLE")));
-				}
-				groupsRS.close();
-				
+				List<Group> groups = getGroupsForDiscussion(discussionId, connection);
 				discussion.setGroups(groups);
 				discussion.setGroupsInherited(false);
 			}
@@ -1925,7 +1918,7 @@ public class YaftPersistenceManager
 		}
 	}
 
-	List<ActiveDiscussion> getActiveDiscussions(String siteId)
+	List<ActiveDiscussion> getActiveDiscussions()
 	{
 		List<ActiveDiscussion> discussions = new ArrayList<ActiveDiscussion>();
 		
@@ -1937,7 +1930,7 @@ public class YaftPersistenceManager
 		{
 			connection = sakaiProxy.borrowConnection();
 			
-			String sql = sqlGenerator.getSelectActiveDiscussionsStatement(siteId);
+			String sql = sqlGenerator.getSelectActiveDiscussionsStatement();
 			
 			statement = connection.createStatement();
 				
@@ -1945,18 +1938,23 @@ public class YaftPersistenceManager
 			
 			int count = 0;
 			
-			while(rs.next() && count <= activeDiscussionLimit)
+			while(rs.next() && count < activeDiscussionLimit)
 			{
 				ActiveDiscussion discussion = new ActiveDiscussion();
 				
 				String discussionId = rs.getString("DISCUSSION_ID"); 
+				String siteId = rs.getString("SITE_ID"); 
 				Site site = sakaiProxy.getSite(siteId);
 				ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
-				String url = "/portal/tool/" + tc.getId() + "/discussions/" + discussionId;
+				String url = "/portal/tool/" + tc.getId() + "/discussions/" + discussionId + ".html";
 				discussion.setUrl(url);
 				discussion.setSubject(rs.getString("SUBJECT"));
+				discussion.setSiteId(siteId);
 				discussion.setLastMessageDate(rs.getTimestamp("LAST_MESSAGE_DATE").getTime());
 				discussion.setLatestMessageSubject(rs.getString("LATEST_MESSAGE_SUBJECT"));
+				
+				List<Group> groups = getGroupsForDiscussion(discussionId, connection);
+				discussion.setGroups(groups);
 				discussions.add(discussion);
 				
 				count++;
@@ -1986,7 +1984,35 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return discussions;
+		return securityManager.filterActiveDiscussions(discussions);
+	}
+	
+	private List<Group> getGroupsForDiscussion(String discussionId, Connection conn) throws Exception{
+		
+		Statement st = null;
+		ResultSet groupsRS = null;
+		
+		try {
+			st = conn.createStatement();
+			String groupsSql = sqlGenerator.getDiscussionGroupsSelectStatement(discussionId);
+			groupsRS = st.executeQuery(groupsSql);
+			List<Group> groups = new ArrayList<Group>();
+			while(groupsRS.next()) {
+				groups.add(new Group(groupsRS.getString("GROUP_ID"),groupsRS.getString("TITLE")));
+			}
+			return groups;
+		} finally {
+			if(groupsRS != null) {
+				try {
+					groupsRS.close();
+				} catch (SQLException ignore) {}
+			}
+			if(st != null) {
+				try {
+					st.close();
+				} catch (SQLException ignore) {}
+			}
+		}
 	}
 
 	String getIdOfSiteContainingMessage(String messageId)

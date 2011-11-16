@@ -926,12 +926,28 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean isCurrentUserMemberOfSite(String siteId) {
-		Site currentSite = getCurrentSite();
-		if(currentSite == null) return false;
-		return (currentSite.getMember(userDirectoryService.getCurrentUser().getId()) != null);
+		
+		Site site = null;
+		if(siteId == null) {
+			site = getCurrentSite();
+		} else {
+			try {
+				site = siteService.getSite(siteId);
+			} catch (IdUnusedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(site == null) return false;
+		
+		return (site.getMember(userDirectoryService.getCurrentUser().getId()) != null);
 	}
 
 	public void pushSecurityAdvisor(SecurityAdvisor advisor) {
 		securityService.pushAdvisor(advisor);
+	}
+
+	public boolean isCurrentUserSuperUser() {
+		return securityService.isSuperUser();
 	}
 }

@@ -92,7 +92,7 @@ public interface SqlGenerator
 
 	PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception;
 
-	String getSelectActiveDiscussionsStatement(String siteId);
+	String getSelectActiveDiscussionsStatement();
 
 	List<PreparedStatement> getAddNewMessageToActiveDiscussionsStatements(Message message, Connection connection) throws Exception;
 
