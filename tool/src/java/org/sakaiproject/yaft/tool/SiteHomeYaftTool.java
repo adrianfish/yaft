@@ -16,19 +16,25 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import net.sf.json.JSONArray;
+
 import org.apache.log4j.Logger;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.ResourceLoader;
+import org.sakaiproject.yaft.api.ActiveDiscussion;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 
@@ -69,13 +75,54 @@ public class SiteHomeYaftTool extends HttpServlet
 		}
 		
 		String siteId = sakaiProxy.getCurrentSiteId();
+		String placementId = sakaiProxy.getCurrentToolId();
 		
 		// We need to pass the language code to the JQuery code in the pages.
 		Locale locale = (new ResourceLoader(user.getId())).getLocale();
 		String languageCode = locale.getLanguage();
+		
+		String pathInfo = request.getPathInfo();
 
-		response.sendRedirect("/yaft-tool/sitehome_yaft.html?siteId=" + siteId + "&language=" + languageCode);
-		return;
+		String uri = request.getRequestURI();
+
+		//response.sendRedirect("/yaft-tool/sitehome_yaft.html?placementId=" + placementId + "&language=" + languageCode);
+		//return;
+		
+		if (pathInfo == null || pathInfo.length() < 1) {
+			// There's no path info, so this is the initial state
+
+			if (uri.contains("/portal/pda/")) {
+				// The PDA portal is frameless for redirects don't work. It also
+				// means that we can't pass url parameters to the page.We can
+				// use a cookie and the JS will pull the initial state from that
+				// instead.
+				Cookie params = new Cookie("sakai-tool-params", "placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin());
+				response.addCookie(params);
+
+				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/sitehome_yaft.html");
+				dispatcher.include(request, response);
+				return;
+			} else {
+				String url = "/yaft-tool/sitehome_yaft.html?placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin();
+				response.sendRedirect(url);
+				return;
+			}
+		} else {
+			String[] parts = pathInfo.substring(1).split("/");
+
+			if (parts.length >= 1) {
+				String part1 = parts[0];
+
+				if ("activeDiscussions.json".equals(part1)) {
+					List<ActiveDiscussion> activeDiscussions = yaftForumService.getActiveDiscussions();
+					JSONArray data = JSONArray.fromObject(activeDiscussions);
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json");
+					response.getWriter().write(data.toString());
+					return;
+				}
+			}
+		}
 	}
 
 	/**
