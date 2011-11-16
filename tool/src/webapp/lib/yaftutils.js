@@ -202,6 +202,39 @@ var YAFTUTILS = (function($) {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_forum_content_template',yaftCurrentForum,'yaft_content');
 			
         $(document).ready(function() {
+        
+            // If there are no discussions in the current forum, hide the check all checkbox
+            if(!yaftCurrentForum || yaftCurrentForum.discussions.length <= 0) {
+                $('#yaft_all_discussions_checkbox').hide();
+            }
+
+            $('#yaft_bulk_discussions_delete_button').click(function () {
+                YAFTUTILS.deleteSelectedDiscussions();
+            });
+            $('.yaft_bulk_option_candidate').click(function () {
+                if($(this).attr('checked')) {
+                    $('#yaft_bulk_discussions_delete_button').removeAttr('disabled');
+                    $('#yaft_bulk_discussions_delete_button').addClass('enabled');
+                } else {
+                    // Only enable the delete button if no other discussion is checked
+                    if($('.yaft_bulk_option_candidate:checked').length <= 0) {
+                        $('#yaft_bulk_discussions_delete_button').attr('disabled','disabled');
+                        $('#yaft_bulk_discussions_delete_button').removeClass('enabled');
+                    }
+                }
+            });
+
+            $('#yaft_all_discussions_checkbox').click(function () {
+                if($(this).attr('checked')) {
+                    $('.yaft_bulk_option_candidate').attr('checked','true');
+                    $('#yaft_bulk_discussions_delete_button').removeAttr('disabled');
+                    $('#yaft_bulk_discussions_delete_button').addClass('enabled');
+                } else {
+                    $('.yaft_bulk_option_candidate').removeAttr('checked');
+                    $('#yaft_bulk_discussions_delete_button').attr('disabled','disabled');
+                    $('#yaft_bulk_discussions_delete_button').removeClass('enabled');
+                }
+            });
 									
             // We need to check this as tablesorter complains at empty tbody
             if(yaftCurrentForum.discussions.length > 0) {
@@ -212,7 +245,8 @@ var YAFTUTILS = (function($) {
 	 							headers:
 	 								{
 	 									4:{sorter: "isoDate"},
-	 									5:{sorter: false}
+	 									5:{sorter: false},
+	 									6:{sorter: false}
 	 								},
                                 sortList: [[0,0]],
 	 							widgets: ['zebra']
@@ -272,6 +306,36 @@ var YAFTUTILS = (function($) {
 		});
     };
 	
+    my.deleteSelectedDiscussions  = function() {
+    
+		if(!confirm(yaft_delete_selected_discussions_message)) {
+			return;
+		}
+		
+        var candidates = $('.yaft_bulk_option_candidate:checked');
+
+        var discussionIds = [];
+
+        for(var i=0,j=candidates.length;i<j;i++) {
+            discussionIds.push(candidates[i].id);
+        }
+
+    	jQuery.ajax( {
+			url : yaftBaseDataUrl + "discussions/delete",
+			type : 'POST',
+        	dataType : "text",
+        	async : false,
+			cache: false,
+        	data : { 'discussionIds[]': discussionIds },
+        	success : function(results,textStatus) {
+        		switchState('forum',{'forumId':yaftCurrentForum.id});
+        	},
+        	error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to delete discussions. Status: " + textStatus + ". Error: " + errorThrown);
+			}
+		});
+    };
+    
 	my.renderCurrentForums = function() {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_forums_content_template',{'items':yaftCurrentForums},'yaft_content');
 	 	$(document).ready(function() {

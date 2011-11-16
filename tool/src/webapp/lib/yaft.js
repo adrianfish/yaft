@@ -590,7 +590,7 @@ function switchState(state,arg) {
 		YAFTUTILS.setCurrentForums();
 		var discussion = null;
 		jQuery.ajax( {
-			url : "/portal/tool/" + yaftPlacementId + "/discussions/" + arg.discussionId,
+			url : "/portal/tool/" + yaftPlacementId + "/discussions/" + arg.discussionId + ".json",
 			dataType : "json",
 			async : false,
 			cache: false,
