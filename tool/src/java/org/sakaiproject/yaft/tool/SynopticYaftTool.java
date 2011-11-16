@@ -44,9 +44,9 @@ import org.sakaiproject.yaft.api.YaftForumService;
  * 
  * @author Adrian Fish (a.fish@lancaster.ac.uk)
  */
-public class SiteHomeYaftTool extends HttpServlet
+public class SynopticYaftTool extends HttpServlet
 {
-	private Logger logger = Logger.getLogger(SiteHomeYaftTool.class);
+	private Logger logger = Logger.getLogger(SynopticYaftTool.class);
 
 	private YaftForumService yaftForumService = null;
 
@@ -85,7 +85,7 @@ public class SiteHomeYaftTool extends HttpServlet
 
 		String uri = request.getRequestURI();
 
-		//response.sendRedirect("/yaft-tool/sitehome_yaft.html?placementId=" + placementId + "&language=" + languageCode);
+		//response.sendRedirect("/yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode);
 		//return;
 		
 		if (pathInfo == null || pathInfo.length() < 1) {
@@ -99,11 +99,11 @@ public class SiteHomeYaftTool extends HttpServlet
 				Cookie params = new Cookie("sakai-tool-params", "placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin());
 				response.addCookie(params);
 
-				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/sitehome_yaft.html");
+				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/synoptic_yaft.html");
 				dispatcher.include(request, response);
 				return;
 			} else {
-				String url = "/yaft-tool/sitehome_yaft.html?placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin();
+				String url = "/yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin();
 				response.sendRedirect(url);
 				return;
 			}

@@ -168,15 +168,6 @@ public class YaftTool extends HttpServlet {
 					doUserDataGet(response, siteId);
 				}
 
-				else if ("activeDiscussions".equals(part1)) {
-					List<ActiveDiscussion> activeDiscussions = yaftForumService.getActiveDiscussions(siteId);
-					JSONArray data = JSONArray.fromObject(activeDiscussions);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
-					response.getWriter().write(data.toString());
-					return;
-				}
-
 				else if ("forumContainingMessage".equals(part1)) {
 					String messageId = (String) request.getParameter("messageId");
 
@@ -247,14 +238,8 @@ public class YaftTool extends HttpServlet {
 
 			if (parts.length == 2) {
 				try {
-					boolean isHtmlRequest = false;
-
-					if (forumId.endsWith(".html")) {
-						isHtmlRequest = true;
+					if (!forumId.endsWith(".json")) {
 						forumId = forumId.substring(0, forumId.length() - 5);
-					}
-
-					if (isHtmlRequest) {
 						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 						return;
 					}
@@ -881,6 +866,19 @@ public class YaftTool extends HttpServlet {
 				response.setContentType("text/html");
 				response.getWriter().write("ERROR");
 				response.getWriter().close();
+				return;
+			}
+		} else if(parts.length >= 2) {
+			String op = parts[1];
+			
+			if("delete".equals(op)) {
+				String[] discussionIds = request.getParameterValues("discussionIds[]");
+				
+				for(String discussionId : discussionIds) {
+					yaftForumService.deleteDiscussion(discussionId);
+				}
+				
+				response.setStatus(HttpServletResponse.SC_OK);
 				return;
 			}
 		}
