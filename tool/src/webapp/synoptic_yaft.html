@@ -23,31 +23,32 @@
       lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script type="text/javascript" src="/library/js/jquery/jquery-ui/js/jquery.js"></script>
-<script type="text/javascript" src="/library/js/jquery/jquery-ui/js/jquery-ui.js"></script>
-<script type="text/javascript" src="/library/js/trimpath-template-latest.js"></script>
-<script type="text/javascript" src="/library/js/headscripts.js"></script>
-<script type="text/javascript" src="lib/sakai_utils.js"></script>
-<script type="text/javascript" src="lib/querystring.js"></script>
-<script type="text/javascript" src="lib/jquery.localisation.js"></script>
-<script type="text/javascript" src="lib/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="js/yaft_utils.js"></script>
-<script type="text/javascript" src="yaft-translations.js"></script>
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
-<link rel="stylesheet" type="text/css" href="/library/skin/default/tool.css" />
-<link rel="stylesheet" type="text/css" href="/library/js/jquery/jquery-ui/css/smoothness/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="css/yaft.css" />
-<script type="text/javascript" language="JavaScript">
-var arg = SakaiUtils.getParameters();
-if(arg['language'])
-{
-	$.localise('yaft-translations',{language:arg['language'],loadBase: true});
-}
-else
-	$.localise('yaft-translations');
-</script>
+<link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
+<link rel="stylesheet" type="text/css" href="/prufile2-tool/css/profile2-profile-entity.css" media="all" />
+<link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
+<script type="text/javascript" src="/library/js/headscripts.js"></script>
+<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
+<script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
 </head>
 <body>
+<script>
+    var arg = SAKAIUTILS.getParameters();
+    $.ajax({
+        url: '/library/skin/'+arg['skin']+'/tool.css',
+        dataType: 'text/css',
+        success: function(data, textStatus) {
+            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
+        }
+    });
+</script>
+
+<div class="portletBody">
+
 <div id="synoptic-yaft_container">
 	<div id="synoptic_yaft_content"></div>
 </div>
@@ -78,8 +79,10 @@ else
 
 <!--  Templates End -->
 
-<script type="text/javascript" language="JavaScript" src="js/sitehome-yaft.js"></script>
-<link rel="stylesheet" type="text/css" href="css/jquery.cluetip.css" />
+</div> <!-- /portletBody-->
+
+<script type="text/javascript" language="JavaScript" src="/yaft-tool/js/sitehome-yaft.js"></script>
+<link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 
 </body>
 </html>

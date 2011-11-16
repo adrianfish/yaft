@@ -167,10 +167,7 @@ ${yaft_forums_label}
 		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toLocaleString()}{/if}</td>
 		<td align="center">
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
-			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
-		{/if}
-		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
-			<a href="#" onclick="return YAFTUTILS.deleteForum('${forum.id}','${forum.title.replace(/\'/g,"\\'")}');" title="${yaft_delete_forum_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16" alt="Delete Forum"/></a>
+			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}">${yaft_edit_label}</a>
 		{/if}
 		</td>
 		{if yaftCurrentUserPermissions.forumDeleteAny}
@@ -191,6 +188,13 @@ ${yaft_forums_label}
 
 <div id="yaft_forum_content_template" style="display:none"><!--
 <div id="yaft_forum_description">${description}</div>
+<div>
+<div class="navIntraToolLink viewNav" style="float: right;">
+    <span>
+        <input type="button" id="yaft_bulk_discussions_delete_button" value="${yaft_delete_label}" disabled="disabled"/>
+    <span>
+</div>
+</div>
 <table id="yaft_discussion_table" class="listHier">
 	<thead>
 	<tr>
@@ -200,6 +204,9 @@ ${yaft_forums_label}
 		<th align="left"><div>${yaft_unread_label}</div></th>
 		<th align="left"><div>${yaft_last_message_label}</div></th>
 		<th align="left"><div>${yaft_options_label}</div></th>
+		{if yaftCurrentUserPermissions.forumDeleteAny}
+		<th align="center"><input id="yaft_all_discussions_checkbox" type="checkbox"/></th>
+		{/if}
 	</tr>
 	</thead>
 	<tbody>
@@ -223,15 +230,15 @@ ${yaft_forums_label}
 		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
 		<td align="center">
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
-			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}"><img src="/library/image/silk/pencil.png" width="16" height="16" alt="Edit Forum"/></a>
+			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}">${yaft_edit_label}</a>&nbsp;|&nbsp;
 		{/if}
 		{if yaftCurrentUserPermissions.discussionCreate && ((yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id) || yaftCurrentUserPermissions.discussionDeleteAny)}
-		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}"><img src="/library/image/silk/arrow_switch.png" width="16" height="16"/></a>{/if}
-		{/if}
-		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
-			<a href="#" onClick="return YAFTUTILS.deleteDiscussion('${discussion.id}','${discussion.subject.replace(/\'/g,"\\'")}');" title="${yaft_delete_discussion_tooltip}"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}">${yaft_move_discussion_label2}</a>{/if}
 		{/if}
 		</td>
+		{if yaftCurrentUserPermissions.forumDeleteAny}
+        <td align="center"><input type="checkbox" class="yaft_bulk_option_candidate" id="${discussion.id}"/></td>
+        {/if}
 	</tr>
 	{/if}
 	{/for}
