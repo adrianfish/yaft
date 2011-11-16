@@ -144,4 +144,6 @@ public interface SakaiProxy
 	public boolean isCurrentUserMemberOfSite(String siteId);
 
 	public void pushSecurityAdvisor(SecurityAdvisor advisor);
+
+	public boolean isCurrentUserSuperUser();
 }

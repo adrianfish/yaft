@@ -108,7 +108,7 @@ public interface YaftForumService extends EntityProducer
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId);
 
-	public List<ActiveDiscussion> getActiveDiscussions(String siteId);
+	public List<ActiveDiscussion> getActiveDiscussions();
 
 	public String getIdOfSiteContainingMessage(String messageId);
 	

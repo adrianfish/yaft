@@ -15,6 +15,8 @@
  */
 package org.sakaiproject.yaft.api;
 
+import java.util.List;
+
 public class ActiveDiscussion
 {
 	private int newMessages = 0;
@@ -22,6 +24,8 @@ public class ActiveDiscussion
 	private String subject = "";
 	private String latestMessageSubject = "";
 	private long lastMessageDate = 0L;
+	private List<Group> groups;
+	private String siteId;
 	
 	public void setNewMessages(int newMessages)
 	{
@@ -62,5 +66,20 @@ public class ActiveDiscussion
 	public String getLatestMessageSubject()
 	{
 		return latestMessageSubject;
+	}
+	
+	public List<Group> getGroups() {
+		return groups;
+	}
+	
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
+	}
+	public String getSiteId() {
+		return siteId;
+	}
+	
+	public void setSiteId(String siteId) {
+		this.siteId = siteId;
 	}
 }
