@@ -14,44 +14,47 @@
  * limitations under the License.
  */
 /* Stuff that we always expect to be setup */
-var yaftSiteId = null;
+var yaftPlacementId = null;
 
 (function()
 {
-	var arg = SakaiUtils.getParameters();
+	var arg = SAKAIUTILS.getParameters();
 	
-	if(!arg || !arg.siteId)
+	if(!arg || !arg.placementId)
 	{
-		alert('The site id MUST be supplied as a page parameter');
+		alert('The placement id MUST be supplied as a page parameter');
 		return;
 	}
 	
+	if(arg['language']) {
+    	$.localise('yaft-translations',{language:arg['language'],loadBase: true});
+    } else {
+   		$.localise('yaft-translations');
+   	}
+	
 	// Stuff that we always expect to be setup
-	yaftSiteId = arg.siteId;
+	yaftPlacementId = arg.placementId;
 	
 	var activeDiscussions = null;
 		
 	$.ajax(
 	{
-		url : '/direct/yaft-forum/' + yaftSiteId + '/activeDiscussions.json',
+	  	url : "/portal/tool/" + yaftPlacementId + "/activeDiscussions.json",
 		dataType : "json",
 		cache: false,
 		async : false,
 		success : function(ads)
 		{
-			activeDiscussions = ads['yaft-forum_collection'];
+			activeDiscussions = ads;
 		},
 		error : function(xmlHttpRequest,status)
 		{
 		}
 	});
 			
-	SakaiUtils.renderTrimpathTemplate('synoptic_yaft_content_template',{'discussions':activeDiscussions},'synoptic_yaft_content');
+	SAKAIUTILS.renderTrimpathTemplate('synoptic_yaft_content_template',{'discussions':activeDiscussions},'synoptic_yaft_content');
 	
-	$(document).ready(function()
-		{
-			YaftUtils.applyBanding();
-									
+	$(document).ready(function() {
 			$("#yaft_active_discussion_table").tablesorter({
 	 							cssHeader:'yaftSortableTableHeader',
 	 							cssAsc:'yaftSortableTableHeaderSortUp',
@@ -59,7 +62,8 @@ var yaftSiteId = null;
 	 							headers:
 	 								{
 	 									2:{sorter: "isoDate"}
-	 								}
+	 								},
+	 							widgets: ['zebra']
 	 						});
 
 			setMainFrameHeight(window.frameElement.id);
