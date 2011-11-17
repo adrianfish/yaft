@@ -950,4 +950,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 	public boolean isCurrentUserSuperUser() {
 		return securityService.isSuperUser();
 	}
+
+	public String getString(String property, String defaultValue) {
+		return serverConfigurationService.getString(property, defaultValue);
+	}
 }

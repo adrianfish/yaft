@@ -146,4 +146,6 @@ public interface SakaiProxy
 	public void pushSecurityAdvisor(SecurityAdvisor advisor);
 
 	public boolean isCurrentUserSuperUser();
+	
+	public String getString(String property, String defaultValue);
 }

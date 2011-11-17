@@ -84,6 +84,12 @@ public class YaftPersistenceManager
 			logger.warn("'" + dbVendor + "' not directly supported. Defaulting to DefaultSqlGenerator.");
 			sqlGenerator = new DefaultSqlGenerator();
 		}
+		
+		try {
+			activeDiscussionLimit = Integer.parseInt(sakaiProxy.getString("yaft.activeDiscussionLimit","5"));
+		} catch(NumberFormatException nfe) {
+			logger.warn("yaft.activeDiscussionLimit needs to be a number. Defaulting to " + activeDiscussionLimit);
+		}
 	}
 	
 	void setupTables() {
