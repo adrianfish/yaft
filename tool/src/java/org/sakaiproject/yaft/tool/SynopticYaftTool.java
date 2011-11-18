@@ -84,9 +84,6 @@ public class SynopticYaftTool extends HttpServlet
 		String pathInfo = request.getPathInfo();
 
 		String uri = request.getRequestURI();
-
-		//response.sendRedirect("/yaft-tool/synoptic_yaft.html?placementId=" + placementId + "&language=" + languageCode);
-		//return;
 		
 		if (pathInfo == null || pathInfo.length() < 1) {
 			// There's no path info, so this is the initial state

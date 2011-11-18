@@ -389,9 +389,7 @@ function switchState(state,arg) {
 				$('#yaft_message_editor').val('');
 			}
 			else {
-       			//var instance = SAKAIUTILS.getWysiwygEditor(yaftEditor,'yaft_message_editor');
 				SAKAIUTILS.updateEditorElement(yaftEditor,'yaft_message_editor');
-				//instance.Events.FireEvent( 'OnAfterLinkedFieldUpdate' );
 			}
 		});
 
@@ -440,13 +438,12 @@ function switchState(state,arg) {
 				$('#yaft_message_editor').val('');
 			}
 			else {
-       			//var instance = SAKAIUTILS.getWysiwygEditor(yaftEditor,'yaft_message_editor');
 				SAKAIUTILS.updateEditorElement(yaftEditor,'yaft_message_editor');
-				//instance.Events.FireEvent( 'OnAfterLinkedFieldUpdate' );
 			}
 		});
 
 	  	jQuery(document).ready(function() {
+			$("#yaft_message_subject_field").val('Re: ' + messageBeingRepliedTo.subject);
 			$('#yaft_attachment').MultiFile(
 			{
 				max: 5,
