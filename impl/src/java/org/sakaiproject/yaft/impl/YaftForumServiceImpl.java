@@ -530,8 +530,8 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	public boolean parseEntityReference(String referenceString, Reference reference)
 	{
 		String[] parts = referenceString.split(Entity.SEPARATOR);
-
-		if (!parts[1].equals("yaft")) // Leading slash adds an empty element
+		
+		if (parts.length < 2 || !parts[1].equals("yaft")) // Leading slash adds an empty element
 			return false;
 		
 		if(parts.length == 2) {
