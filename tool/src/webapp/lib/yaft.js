@@ -443,7 +443,13 @@ function switchState(state,arg) {
 		});
 
 	  	jQuery(document).ready(function() {
-			$("#yaft_message_subject_field").val('Re: ' + messageBeingRepliedTo.subject);
+	  		var replySubject = messageBeingRepliedTo.subject;
+	  		if( ! replySubject.match(/^Re:.*/) ) {
+				replySubject = 'Re: ' + messageBeingRepliedTo.subject;
+	  		}
+	  		
+			$("#yaft_message_subject_field").val(replySubject);
+			
 			$('#yaft_attachment').MultiFile(
 			{
 				max: 5,
