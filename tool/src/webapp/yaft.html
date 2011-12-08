@@ -590,7 +590,7 @@ ${yaft_forums_label}
 				{/if}
 				{if parent && 'DELETED' != status && ( (yaftCurrentUserPermissions.messageDeleteOwn && yaftCurrentUser.id == creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
 				{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YAFTUTILS.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
-				{if children.length > 0 && yaftViewMode != 'minimal'}<span><a href="#" onclick="YAFTUTILS.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
+				{if children.length > 0 && yaftViewMode != 'minimal'}<span><a class="yaft_collapse_expand_link" href="#" onclick="YAFTUTILS.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
 				{if status == 'DRAFT' && yaftCurrentUser.id == creatorId}<span><a href="#" onClick="return YAFTUTILS.publishMessage('${id}');">${yaft_publish_label}</a></span>{/if}
 				{if yaftCurrentUser.id != creatorId}
 				{if defined('read') && read == true}

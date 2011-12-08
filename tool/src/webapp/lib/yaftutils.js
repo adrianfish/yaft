@@ -644,8 +644,12 @@ var YAFTUTILS = (function($) {
     	getDescendantIds(messageId,message,descendantIds);
 
 		if(message.collapsed) {
-    		for(var i=0,j=descendantIds.length;i<j;i++)
+    		for(var i=0,j=descendantIds.length;i<j;i++) {
+    			$("#" + descendantIds[i] + ' .yaft_collapse_expand_link').html(yaft_collapse_label);
     			$("#" + descendantIds[i]).show();
+		        var descendant = YAFTUTILS.findMessage(descendantIds[i]);
+                descendant.collapsed = false;
+           	}
 
 			e.innerHTML = yaft_collapse_label;
 			message.collapsed = false;
