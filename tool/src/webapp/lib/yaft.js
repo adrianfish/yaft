@@ -22,7 +22,7 @@ var likeServiceAvailable = false;
 var yaftCurrentForums = null;
 /* Needed for show author messages */
 var yaftCurrentAuthors = null;
-var yaftGradebookAssignments = null;
+var yaftGradebookAssignments = [];
 
 /* State specific stuff */
 var yaftCurrentForum = null;
@@ -113,7 +113,9 @@ var yaftBaseDataUrl = "";
 
 	var data = YAFTUTILS.getCurrentUserData();
 
-    yaftGradebookAssignments = data.assignments;
+    if(data.assignments) {
+        yaftGradebookAssignments = data.assignments;
+    }
 
 	yaftCurrentUserPermissions = new YaftPermissions(data.permissions);
 
@@ -156,8 +158,8 @@ function switchState(state,arg) {
 	// state. We need to do it here as the breadcrumb in various states uses
 	// the information.
 	if(arg && arg.forumId) {
-
 		yaftCurrentForum = YAFTUTILS.getForum(arg.forumId,"part");
+        YAFTUTILS.addFormattedDatesToDiscussionsInCurrentForum();
 	}
 
 	if('forums' === state) {
@@ -328,8 +330,10 @@ function switchState(state,arg) {
 	else if('editForum' === state) {
 		var forum = {'id':'','title':'','description':'',start: -1,end: -1,'groups': []};
 
-		if(arg && arg.forumId)
+		if(arg && arg.forumId) {
+            // This is an edit of a current forum.
 			forum = YAFTUTILS.findForum(arg.forumId);
+        }
 			
 		var groups = YAFTUTILS.getGroupsForCurrentSite();
 
@@ -339,14 +343,36 @@ function switchState(state,arg) {
 		setupAvailability(forum);
 	
 	 	$(document).ready(function() {
+	 			// If this forum is already group limited, show the groups options.
+                if(forum.groups.length > 0) {
+                    $('#yaft_group_options').show();
+                }
 				for(var i=0,j=forum.groups.length;i<j;i++) {
 					$('#' + forum.groups[i].id).attr('checked','true');
 				}
 
 	 			$('#yaft_title_field').focus();
 	 			$('#yaft_forum_save_button').click(YAFTUTILS.saveForum);
-	 			$('#yaft_show_advanced_options_link').click(YAFTUTILS.showAdvancedOptions);
-                $('#yaft_hide_advanced_options_link').click(YAFTUTILS.hideAdvancedOptions);
+	 			
+	 			$('#yaft_toggle_group_options_link').click(function () {
+                    $('#yaft_group_options').toggle();
+                    if(window.frameElement) {
+                        setMainFrameHeight(window.frameElement.id);
+                    }
+                });
+
+                $('#yaft_toggle_availability_options_link').click(function () {
+                    $('#yaft_availability_options').toggle();
+                    if(window.frameElement) {
+                        setMainFrameHeight(window.frameElement.id);
+                    }
+                });
+
+		        if(arg && arg.forumId) {
+                    // This is an edit of a current forum.
+                    $('#yaft_send_email_checkbox').removeAttr('checked');
+                }
+                
 	 			$('#yaft_title_field').keypress(function(e) {
 						if(e.keyCode == '13') { // Enter key
 							YAFTUTILS.saveForum();
@@ -551,12 +577,38 @@ function switchState(state,arg) {
 		setupAvailability(discussion);
 
    		$(document).ready(function() {
+   			// If this discussion is already group limited, show the groups options.
+            if(discussion.groups.length > 0) {
+                $('#yaft_group_options').show();
+            }
 			for(var i=0,j=discussion.groups.length;i<j;i++) {
 				$('#' + discussion.groups[i].id).attr('checked','true');
 			}
 			
-	 		$('#yaft_show_advanced_options_link').click(YAFTUTILS.showAdvancedOptions);
-            $('#yaft_hide_advanced_options_link').click(YAFTUTILS.hideAdvancedOptions);
+            $('#yaft_toggle_group_options_link').click(function () {
+                $('#yaft_group_options').toggle();
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            });
+
+            $('#yaft_toggle_availability_options_link').click(function () {
+                $('#yaft_availability_options').toggle();
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            });
+
+            $('#yaft_toggle_gradebook_options_link').click(function () {
+                $('#yaft_gradebook_options').toggle();
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            });
+		    if(arg && arg.discussionId) {
+                // This is an edit of a current discussion.
+                $('#yaft_send_email_checkbox').removeAttr('checked');
+            }
 	    	$('#yaft_attachment').MultiFile(
 		            {
 		            	max: 5,
@@ -678,7 +730,26 @@ function yaftShowMessage(messageId) {
 function setupAvailability(element) {
 
 	var startDate = $('#yaft_start_date');
+
+	startDate.datepicker({
+		altField: '#yaft_start_date_millis',
+		altFormat: '@',
+		dateFormat: 'dd mm yy',
+		defaultDate: new Date(),
+		minDate: new Date(),
+		hideIfNoPrevNext: true
+	});
+
 	var endDate = $('#yaft_end_date');
+
+	endDate.datepicker({
+		altField: '#yaft_end_date_millis',
+		altFormat: '@',
+		dateFormat: 'dd mm yy',
+		defaultDate: new Date(),
+		minDate: new Date(),
+		hideIfNoPrevNext: true
+	});
 
 	if(element.start != -1 && element.end != -1) {
 		startDate.attr('disabled',false);
@@ -694,7 +765,11 @@ function setupAvailability(element) {
 		$('#yaft_end_minute_selector').attr('disabled',false);
 		$('#yaft_end_minute_selector').css('background-color','white');
 
-		var start = new Date(element.start);
+		var test = new Date(element.start);
+        var localOffset = test.getTimezoneOffset() * 60000;
+
+		var start = new Date(element.start + localOffset);
+	    startDate.datepicker("setDate",start);
 		startDate.val(start.getDate() + ' ' + (1 + start.getMonth()) + ' ' + start.getFullYear());
 
 		var hours = start.getHours();
@@ -702,46 +777,41 @@ function setupAvailability(element) {
 		var minutes = start.getMinutes();
 		if(minutes == 0) minutes += '0';
 
-		$('#yaft_start_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-		$('#yaft_start_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
+		$('#yaft_start_hours option:contains(' + hours + ')').attr('selected','selected');
+		$('#yaft_start_minutes option:contains(' + minutes + ')').attr('selected','selected');
 
-		var end = new Date(element.end);
+		var end = new Date(element.end + localOffset);
+	    endDate.datepicker("setDate",end);
 		endDate.val(end.getDate() + ' ' + (1 + end.getMonth()) + ' ' + end.getFullYear());
 
 		hours = end.getHours();
-		if(hours < 10)  hours = '0' + hours;
-			minutes = end.getMinutes();
-		if(minutes == 0) minutes += '0';
+		if(hours < 10) {
+            hours = '0' + hours;
+        }
 
-		$('#yaft_end_hour_selector option:contains(' + hours + ')').attr('selected','selected');
-		$('#yaft_end_minute_selector option:contains(' + minutes + ')').attr('selected','selected');
+		minutes = end.getMinutes();
+		if(minutes == 0) {
+            minutes += '0';
+        }
+
+		$('#yaft_end_hours option:contains(' + hours + ')').attr('selected','selected');
+		$('#yaft_end_minutes option:contains(' + minutes + ')').attr('selected','selected');
+
 	}
 
 	var writingCheckbox = $('#yaft_lock_writing_checkbox');
 
 	var readingCheckbox = $('#yaft_lock_reading_checkbox');
+	
+	if(element.lockedForWriting) {
+        $('#yaft_lock_writing_checkbox').attr('checked',true);
+        $('#yaft_availability_options').show();
+    }
 
-	if(element.lockedForWriting)
-		$('#yaft_lock_writing_checkbox').attr('checked',true);
-
-	if(element.lockedForReading)
-		$('#yaft_lock_reading_checkbox').attr('checked',true);
+    if(element.lockedForReading) {
+        $('#yaft_lock_reading_checkbox').attr('checked',true);
+        $('#yaft_availability_options').show();
+    }
 		
-	startDate.datepicker({
-		altField: '#yaft_start_date_millis',
-		altFormat: '@',
-		dateFormat: 'dd mm yy',
-		defaultDate: new Date(),
-		minDate: new Date(),
-		hideIfNoPrevNext: true
-	});
 
-	endDate.datepicker({
-		altField: '#yaft_end_date_millis',
-		altFormat: '@',
-		dateFormat: 'dd mm yy',
-		defaultDate: new Date(),
-		minDate: new Date(),
-		hideIfNoPrevNext: true
-	});
 }

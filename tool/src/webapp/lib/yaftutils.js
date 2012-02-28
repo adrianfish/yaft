@@ -27,6 +27,8 @@ var YAFTUTILS = (function($) {
 
 				markReadMessagesInFora();
 
+				addFormattedDatesToFora();
+
                 if(render) {
                     YAFTUTILS.renderCurrentForums();
                 }
@@ -81,6 +83,8 @@ var YAFTUTILS = (function($) {
 			'title':title,
 			'description':description,
 			'sendEmail':$('#yaft_send_email_checkbox').attr('checked'),
+			'lockWriting':$('#yaft_lock_writing_checkbox').attr('checked'),
+			'lockReading':$('#yaft_lock_reading_checkbox').attr('checked'),
 			'discussions': [],
 			'groups': groups
 		};
@@ -125,10 +129,12 @@ var YAFTUTILS = (function($) {
 	my.clearDates = function() {
 		$('#yaft_start_date').val('');
 		$('#yaft_end_date').val('');
-		$('#yaft_start_hour_selector').get(0).selectedIndex = 0;
-		$('#yaft_start_minute_selector').get(0).selectedIndex = 0;
-		$('#yaft_end_hour_selector').get(0).selectedIndex = 0;
-		$('#yaft_end_minute_selector').get(0).selectedIndex = 0;
+		$('#yaft_start_hours').get(0).selectedIndex = 0;
+		$('#yaft_start_minutes').get(0).selectedIndex = 0;
+		$('#yaft_end_hours').get(0).selectedIndex = 0;
+		$('#yaft_end_minutes').get(0).selectedIndex = 0;
+		$('#yaft_start_date_millis').val('');
+		$('#yaft_end_date_millis').val('');
 	};
 	
 	my.getGroupsForCurrentSite = function() {
@@ -162,29 +168,6 @@ var YAFTUTILS = (function($) {
 				alert('failed');
 			}
 		});
-	};
-
-	my.showAdvancedOptions = function() {
-		$('#yaft_advanced_options').show();
-		$('#yaft_show_advanced_options_link').hide();
-		$('#yaft_hide_advanced_options_link').show();
-	 	$(document).ready(function() {
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
-		});
-		
-		return false;
-	};
-
-	my.hideAdvancedOptions = function() {
-		$('#yaft_advanced_options').hide();
-		$('#yaft_show_advanced_options_link').show();
-		$('#yaft_hide_advanced_options_link').hide();
-	 	$(document).ready(function() {
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
-		});
-		return false;
 	};
 
 	my.hideDeleted = function() {
@@ -853,6 +836,54 @@ var YAFTUTILS = (function($) {
 			}
 		}
 	}
+
+    my.addFormattedDatesToDiscussionsInCurrentForum = function () {
+		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
+			var discussion = yaftCurrentForum.discussions[i];
+            if(discussion.start > -1) {
+                var d = new Date(discussion.start);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                var formattedStartDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                discussion.formattedStartDate = formattedStartDate;
+            }
+            if(discussion.end > -1) {
+                var d = new Date(discussion.end);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                var formattedEndDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                discussion.formattedEndDate = formattedEndDate;
+            }
+		}
+    };
+
+    function addFormattedDatesToFora() {
+		for(var i=0,j=yaftCurrentForums.length;i<j;i++) {
+			var forum = yaftCurrentForums[i];
+            if(forum.start > -1) {
+                var d = new Date(forum.start);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                var formattedStartDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                forum.formattedStartDate = formattedStartDate;
+            }
+            if(forum.end > -1) {
+                var d = new Date(forum.end);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                var formattedEndDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                forum.formattedEndDate = formattedEndDate;
+            }
+		}
+    };
 	
 	my.markReadMessagesInCurrentDiscussion = function() {
 		var readMessages = [];
