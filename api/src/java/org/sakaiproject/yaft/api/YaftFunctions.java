@@ -31,4 +31,5 @@ public class YaftFunctions
 	public static  final String YAFT_MESSAGE_DELETE_ANY = "yaft.message.deleteAny";
 	public static  final String YAFT_MESSAGE_READ = "yaft.message.read";
 	public static final String YAFT_VIEW_INVISIBLE = "yaft.view.invisible";
+	public static final String YAFT_SEND_ALERTS = "yaft.sendAlerts";
 }

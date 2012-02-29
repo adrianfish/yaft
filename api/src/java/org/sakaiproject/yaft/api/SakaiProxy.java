@@ -63,8 +63,6 @@ public interface SakaiProxy
 	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate);
 	
 	public boolean removeCalendarEntry(String title,String description);
-	
-	public void sendEmail(final String userId, final String subject, String message,boolean html);
 
 	public User getCurrentUser();
 
@@ -99,8 +97,6 @@ public interface SakaiProxy
 	public void registerEntityProducer(EntityProducer entityProducer);
 	
 	public void postEvent(String event,String reference,boolean modify);
-
-	public void addDigestMessage(String user,String subject, String body);
 
 	public Site getSite(String siteId);
 

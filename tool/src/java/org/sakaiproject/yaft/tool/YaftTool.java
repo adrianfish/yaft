@@ -52,6 +52,7 @@ import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
+import org.sakaiproject.yaft.api.YaftSettings;
 
 /**
  * This servlet handles all of the REST type stuff. At some point this may all

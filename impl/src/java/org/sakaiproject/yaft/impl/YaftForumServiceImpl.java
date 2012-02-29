@@ -38,6 +38,7 @@ import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
+import org.sakaiproject.yaft.api.YaftSettings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -80,6 +81,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_ANY);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_READ);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
+		sakaiProxy.registerFunction(YaftFunctions.YAFT_SEND_ALERTS);
 
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
@@ -616,5 +618,4 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	public boolean setDiscussionGroups(String discussionId, Collection<String> groups) {
 		return persistenceManager.setDiscussionGroups(discussionId,groups);
 	}
-
 }

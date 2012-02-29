@@ -23,6 +23,7 @@ import java.util.List;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.YaftSettings;
 
 public interface SqlGenerator
 {

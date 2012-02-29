@@ -34,6 +34,7 @@ import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.YaftSettings;
 
 public class DefaultSqlGenerator implements SqlGenerator
 {
@@ -83,6 +84,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 		statements.add("CREATE TABLE YAFT_ACTIVE_DISCUSSIONS (DISCUSSION_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,SUBJECT " + VARCHAR + "(255) NOT NULL,LAST_MESSAGE_DATE " + DATETIME + " NOT NULL,LATEST_MESSAGE_SUBJECT " + VARCHAR + "(255) NOT NULL)");
 		
 		statements.add("CREATE TABLE YAFT_DISCUSSION_GROUP (DISCUSSION_ID CHAR(36) NOT NULL,GROUP_ID " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_discussion_group_pk PRIMARY KEY (DISCUSSION_ID,GROUP_ID))");
+		
+		statements.add("CREATE TABLE YAFT_SETTINGS (SITE_ID " + VARCHAR + "(99) NOT NULL,ALERT_ROLES " + VARCHAR + "(255),CONSTRAINT yaft_settings_pk PRIMARY KEY (SITE_ID))");
 		
 		return statements;
 	}

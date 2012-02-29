@@ -59,12 +59,11 @@ var yaftBaseDataUrl = "";
         yaftBaseDataUrl = "/portal/tool/" + yaftPlacementId + "/";
     }
     
-        if(arg['language']) {
-            $.localise('yaft-translations',{language:arg['language'],loadBase: true});
-        }
-        else {
-            $.localise('yaft-translations');
-        }
+    if(arg['language']) {
+        $.localise('yaft-translations',{language:arg['language'],loadBase: true});
+    } else {
+        $.localise('yaft-translations');
+    }
     
 	// We need the toolbar in a template so we can swap in the translations
     
@@ -121,8 +120,10 @@ var yaftBaseDataUrl = "";
 
 	if(yaftCurrentUserPermissions.modifyPermissions) {
 		$("#yaft_permissions_link").show();
+		$("#yaft_settings_link").show();
 	} else {
 		$("#yaft_permissions_link").hide();
+		$("#yaft_settings_link").hide();
 	}
 		
 	if(arg.viewMode) {

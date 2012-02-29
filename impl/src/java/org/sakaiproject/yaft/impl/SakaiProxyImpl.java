@@ -47,8 +47,6 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.db.api.SqlService;
-import org.sakaiproject.email.api.DigestService;
-import org.sakaiproject.email.api.EmailService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.entity.api.ResourceProperties;
@@ -109,10 +107,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	private AuthzGroupService authzGroupService;
 
-	private EmailService emailService;
-
-	private DigestService digestService;
-
 	private ContentHostingService contentHostingService;
 
 	private SecurityService securityService;
@@ -147,8 +141,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		profileManager = (ProfileManager) componentManager.get(ProfileManager.class);
 		functionManager = (FunctionManager) componentManager.get(FunctionManager.class);
 		authzGroupService = (AuthzGroupService) componentManager.get(AuthzGroupService.class);
-		emailService = (EmailService) componentManager.get(EmailService.class);
-		digestService = (DigestService) componentManager.get(DigestService.class);
 		securityService = (SecurityService) componentManager.get(SecurityService.class);
 		contentHostingService = (ContentHostingService) componentManager.get(ContentHostingService.class);
 		eventTrackingService = (EventTrackingService) componentManager.get(EventTrackingService.class);
@@ -302,121 +294,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		} catch (Exception e) {
 			return ""; // this can happen if the user does not longer exist in
 			// the system
-		}
-	}
-
-	public void sendEmail(final String userId, final String subject, String message, boolean html) {
-		class EmailSender implements Runnable {
-			private Thread runner;
-
-			private String userId;
-
-			private String subject;
-
-			private String message;
-			
-			private boolean html = false;
-
-			public final String MULTIPART_BOUNDARY = "======sakai-multi-part-boundary======";
-
-			public final String BOUNDARY_LINE = "\n\n--" + MULTIPART_BOUNDARY + "\n";
-
-			public final String TERMINATION_LINE = "\n\n--" + MULTIPART_BOUNDARY + "--\n\n";
-
-			public final String MIME_ADVISORY = "This message is for MIME-compliant mail readers.";
-
-			public final String PLAIN_TEXT_HEADERS = "Content-Type: text/plain\n\n";
-
-			public final String HTML_HEADERS = "Content-Type: text/html; charset=ISO-8859-1\n\n";
-
-			public final String HTML_END = "\n  </body>\n</html>\n";
-
-			public EmailSender(String userId, String subject, String message, boolean html) {
-				this.userId = userId;
-				this.subject = subject;
-				this.message = message;
-				this.html = html;
-				runner = new Thread(this, "YAFT EmailSender thread");
-				runner.start();
-			}
-
-			// do it!
-			public synchronized void run() {
-				try {
-
-					// get User to send to
-					User user = userDirectoryService.getUser(userId);
-
-					String email = user.getEmail();
-
-					if (email == null || email.length() == 0) {
-						logger.error("SakaiProxy.sendEmail() failed. No email for userId: " + userId);
-						return;
-					}
-
-					List<User> receivers = new ArrayList<User>();
-					receivers.add(user);
-
-					final List<String> additionalHeaders = new ArrayList<String>();
-
-					if (html) {
-						additionalHeaders.add("Content-Type: text/html; charset=ISO-8859-1");
-					}
-
-					// do it
-					final String emailFromAddress = "\"" + serverConfigurationService.getString("ui.service") + "\" <no-reply@" + serverConfigurationService.getServerName() + ">";
-					emailService.send(emailFromAddress, email, subject, formatMessage(subject, message), email, null, additionalHeaders);
-
-					logger.info("Email sent to: " + userId);
-				} catch (Exception e) {
-					logger.error("SakaiProxy.sendEmail() failed for userId: " + userId + " : " + e.getClass() + " : " + e.getMessage());
-				}
-			}
-
-			/** helper methods for formatting the message */
-			private String formatMessage(String subject, String message) {
-				StringBuilder sb = new StringBuilder();
-				
-				if(html) {
-					sb.append(htmlPreamble(subject));
-				}
-				
-				sb.append(message);
-				
-				if(html) {
-					sb.append(HTML_END);
-				}
-				
-				return sb.toString();
-			}
-
-			private String htmlPreamble(String subject) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n");
-				sb.append("\"http://www.w3.org/TR/html4/loose.dtd\">\n");
-				sb.append("<html>\n");
-				sb.append("<head><title>");
-				sb.append(subject);
-				sb.append("</title></head>\n");
-				sb.append("<body>\n");
-
-				return sb.toString();
-			}
-		}
-
-		// instantiate class to format, then send the mail
-		new EmailSender(userId, subject, message,html);
-	}
-
-	public void addDigestMessage(String user, String subject, String body) {
-		try {
-			try {
-				digestService.digest(user, subject, body);
-			} catch (Exception e) {
-				logger.error("Failed to add message to digest. Message: " + e.getMessage());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

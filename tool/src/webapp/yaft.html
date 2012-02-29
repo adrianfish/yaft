@@ -336,9 +336,11 @@ ${yaft_forums_label}
 		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${discussion.firstMessage.content}</textarea>
 		<br />
 		<br />
+        {if yaftCurrentUserPermissions.sendAlerts}
 		<input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 		<br />
 		<br />
+        {/if}
 		<span>Add Attachments:</span>
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
@@ -501,7 +503,7 @@ ${yaft_forums_label}
 			<th width="5px"></th>
 			<th colspan="3">${yaft_message_label}</th>
 			<th width="5px"></th>
-			<th colspan="2">Other</th>
+			<th colspan="3">Other</th>
 		</tr>
 		<tr class="listHier">
 			<th align="left">Role</th>
@@ -521,6 +523,7 @@ ${yaft_forums_label}
 			<th style="background: white;"></th>
 			<th style="text-align:center;">view.invisible</th>
 			<th style="text-align:center;">modify.permissions</th>
+			<th style="text-align:center;">sendAlerts</th>
 		</tr>
 	</thead>
 <tbody>
@@ -543,6 +546,7 @@ ${yaft_forums_label}
 	<td></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_view_invisible}checked="checked"{/if}" id="${p.role}:yaft.view.invisible"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_modify_permissions}checked="checked"{/if}" id="${p.role}:yaft.modify.permissions"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_sendAlerts}checked="checked"{/if}" id="${p.role}:yaft.sendAlerts"/></td>
 </tr>
 {/for}
 </tbody>
@@ -679,9 +683,11 @@ ${yaft_forums_label}
 <tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="255" value="${forum.description}"/></td></tr>
 </table>
 <br />
+{if yaftCurrentUserPermissions.sendAlerts}
 <input type="checkbox" id="yaft_send_email_checkbox" value="true" checked/>${yaft_send_email_alert_label}
 <br />
 <br />
+{/if}
 {if groups.length > 0}
 <a id="yaft_toggle_group_options_link" href="javascript:;">Groups</a>
 <br />
@@ -891,9 +897,11 @@ ${yaft_forums_label}
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
 	<br />
 	<br />
+    {if yaftCurrentUserPermissions.sendAlerts}
 	<input type="checkbox" id="yaft_send_email_checkbox" value="true" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 	<br />
 	<br />
+    {/if}
 	<span>${yaft_add_attachments_label}</span>
 	<br />
 	<input id="yaft_attachment" name="attachment" type="file" class="multi"/>
@@ -931,9 +939,11 @@ ${yaft_forums_label}
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
 	<br />
 	<br />
+    {if yaftCurrentUserPermissions.sendAlerts}
 	<input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 	<br />
 	<br />
+    {/if}
     <span id="current_attachments_label">${yaft_current_attachments_label}</span>
     <br />
     <br />
