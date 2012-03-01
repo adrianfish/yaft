@@ -831,4 +831,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 	public String getString(String property, String defaultValue) {
 		return serverConfigurationService.getString(property, defaultValue);
 	}
+
+	public boolean canCurrentUserSendAlerts() {
+		return authzGroupService.isAllowed(getCurrentUser().getId(), YaftFunctions.YAFT_SEND_ALERTS, "/site/" + getCurrentSiteId());
+	}
 }

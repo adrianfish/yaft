@@ -124,7 +124,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		return addOrUpdateForum(forum, true);
 	}
 
-	public boolean addOrUpdateForum(Forum forum, boolean sendEmail)
+	public boolean addOrUpdateForum(Forum forum, boolean sendMail)
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("addOrUpdateForum()");
@@ -142,7 +142,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 			// SiteStats/Search etc event
 			sakaiProxy.postEvent(YAFT_FORUM_CREATED_SS, forum.getReference(), true);
 			
-			if(sendEmail) {
+			if(sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
 				// NotificationService event
 				sakaiProxy.postEvent(YAFT_FORUM_CREATED, forum.getReference(), true);
 			}
@@ -173,7 +173,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		// SiteStats/Search etc event
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
 
-		if (sendMail && "READY".equals(message.getStatus()))
+		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts())
 				sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
 
 		return true;
@@ -199,7 +199,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED_SS, discussion.getReference(), true);
 			}
 
-			if (sendMail)
+			if (sendMail && sakaiProxy.canCurrentUserSendAlerts())
 				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, discussion.getReference(), true);
 		}
 

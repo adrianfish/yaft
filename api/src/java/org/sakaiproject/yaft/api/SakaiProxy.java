@@ -144,4 +144,6 @@ public interface SakaiProxy
 	public boolean isCurrentUserSuperUser();
 	
 	public String getString(String property, String defaultValue);
+
+	public boolean canCurrentUserSendAlerts();
 }
