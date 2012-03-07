@@ -16,20 +16,10 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -37,22 +27,14 @@ import net.sf.json.JsonConfig;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
-import org.sakaiproject.yaft.api.ActiveDiscussion;
-import org.sakaiproject.yaft.api.Attachment;
-import org.sakaiproject.yaft.api.Discussion;
-import org.sakaiproject.yaft.api.Forum;
-import org.sakaiproject.yaft.api.Group;
-import org.sakaiproject.yaft.api.Message;
-import org.sakaiproject.yaft.api.Author;
-import org.sakaiproject.yaft.api.SakaiProxy;
-import org.sakaiproject.yaft.api.YaftForumService;
-import org.sakaiproject.yaft.api.YaftSettings;
+import org.sakaiproject.yaft.api.*;
 
 /**
  * This servlet handles all of the REST type stuff. At some point this may all
@@ -66,14 +48,6 @@ public class YaftTool extends HttpServlet {
 	private YaftForumService yaftForumService = null;
 
 	private SakaiProxy sakaiProxy;
-
-	private boolean likeServiceAvailable = false;
-
-	public void destroy() {
-		logger.info("destroy");
-
-		super.destroy();
-	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (logger.isDebugEnabled())
@@ -108,14 +82,14 @@ public class YaftTool extends HttpServlet {
 				// means that we can't pass url parameters to the page.We can
 				// use a cookie and the JS will pull the initial state from that
 				// instead.
-				Cookie params = new Cookie("sakai-tool-params", "state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal&likeServiceAvailable=" + likeServiceAvailable);
+				Cookie params = new Cookie("sakai-tool-params", "state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal");
 				response.addCookie(params);
 
 				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");
 				dispatcher.include(request, response);
 				return;
 			} else {
-				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&likeServiceAvailable=" + likeServiceAvailable + "&editor=" + sakaiProxy.getWysiwygEditor();
+				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor();
 				response.sendRedirect(url);
 				return;
 			}
@@ -1052,11 +1026,6 @@ public class YaftTool extends HttpServlet {
 			ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
 			yaftForumService = (YaftForumService) componentManager.get(YaftForumService.class);
 			sakaiProxy = yaftForumService.getSakaiProxy();
-
-			// If the LikeService is in Spring, we can use it.
-			Object likeService = componentManager.get("org.sakaiproject.likeservice.impl.entity.LikeServiceEntityProvider");
-			if (likeService != null)
-				likeServiceAvailable = true;
 		} catch (Throwable t) {
 			throw new ServletException("Failed to initialise YaftTool servlet.", t);
 		}

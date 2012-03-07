@@ -34,7 +34,6 @@ import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
-import org.sakaiproject.yaft.api.YaftSettings;
 
 public class DefaultSqlGenerator implements SqlGenerator
 {

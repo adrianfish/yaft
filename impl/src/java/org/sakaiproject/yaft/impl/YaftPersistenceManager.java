@@ -42,7 +42,6 @@ import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
-import org.sakaiproject.yaft.api.YaftSettings;
 import org.sakaiproject.yaft.impl.sql.ColumnNames;
 import org.sakaiproject.yaft.impl.sql.DefaultSqlGenerator;
 import org.sakaiproject.yaft.impl.sql.HypersonicGenerator;

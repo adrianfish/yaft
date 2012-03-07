@@ -18,7 +18,6 @@ var yaftPlacementId = null;
 var yaftSiteId = null;
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
-var likeServiceAvailable = false;
 var yaftCurrentForums = null;
 /* Needed for show author messages */
 var yaftCurrentAuthors = null;
@@ -128,10 +127,6 @@ var yaftBaseDataUrl = "";
 		
 	if(arg.viewMode) {
 		yaftViewMode = arg.viewMode;
-	}
-	
-	if(arg.likeServiceAvailable && "true" === arg.likeServiceAvailable) {
-		likeServiceAvailable = true;
 	}
 	
 	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null) {

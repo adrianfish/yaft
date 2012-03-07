@@ -38,7 +38,6 @@ import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.XmlDefs;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
-import org.sakaiproject.yaft.api.YaftSettings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -323,7 +322,9 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
 
 		// Notification event
-		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
+		if(sakaiProxy.canCurrentUserSendAlerts()) {
+			sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
+		}
 	}
 
 	/** START EntityProducer IMPLEMENTATION */

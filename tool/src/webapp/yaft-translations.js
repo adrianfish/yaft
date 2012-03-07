@@ -37,7 +37,6 @@ yaft_options_label = 'Options';
 yaft_discussion_label = 'Topic';
 yaft_started_by_label = 'Started By';
 yaft_publish_label = 'Publish';
-yaft_like_label = 'Like Author';
 yaft_save_label = 'Save';
 yaft_save_draft_label = 'Save as Draft';
 yaft_cancel_label = 'Cancel';
