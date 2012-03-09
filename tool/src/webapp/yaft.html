@@ -25,7 +25,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="/library/skin/tool_base.css" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
-<link rel="stylesheet" type="text/css" href="/prufile2-tool/css/profile2-profile-entity.css" media="all" />
+<link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
 <script type="text/javascript" src="/library/editor/FCKeditor/fckeditor.js"></script>
 <script type="text/javascript" src="/library/editor/ckeditor/ckeditor.js"></script>
@@ -570,21 +570,16 @@ ${yaft_forums_label}
 		{if yaftCurrentUserPermissions.messageDeleteAny}
 			<div class="yaft_message yaft_deleted_message">
 		{/if}
-	{elseif status == 'DRAFT'}
-		{if creatorId == yaftCurrentUser.id}
-			<div class="yaft_message">
-		{/if}
 	{else}
 		<div class="yaft_message">
 	{/if}
 		
-	{if (status != 'DELETED' && status != 'DRAFT') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny) || (status == 'DRAFT' && yaftCurrentUser.id == creatorId)}
+	{if (status != 'DELETED') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny)}
 		<div style="margin:5px;overflow:hidden;">
 			<a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
 			<div style="margin-left:2px;overflow: hidden;">
 				<div style="float:left;">
 					<a id="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>
-					{if status == 'DRAFT'} - <span style="font-weight: bold;">${yaft_draft_message}</span>{/if}
 					<br/>
 					<span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${formattedDate}</span>
 				</div>
@@ -621,7 +616,6 @@ ${yaft_forums_label}
 				{if parent && 'DELETED' != status && ( (yaftCurrentUserPermissions.messageDeleteOwn && yaftCurrentUser.id == creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
 				{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YAFTUTILS.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
 				{if children.length > 0 && yaftViewMode != 'minimal'}<span><a class="yaft_collapse_expand_link" href="#" onclick="YAFTUTILS.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
-				{if status == 'DRAFT' && yaftCurrentUser.id == creatorId}<span><a href="#" onClick="return YAFTUTILS.publishMessage('${id}');">${yaft_publish_label}</a></span>{/if}
 				{if yaftCurrentUser.id != creatorId}
 				{if defined('read') && read == true}
 					<span><a href="javascript:;" onClick="return YAFTUTILS.markMessageRead(YAFTUTILS.findMessage('${id}'),false);">${yaft_mark_message_unread_label}</a></span>
@@ -821,9 +815,9 @@ ${yaft_forums_label}
     <br />
 
 	{macro displayMinimum(message)}
-		{if message.status == 'READY' || (message.status == 'DRAFT' && yaftCurrentUser.id == message.creatorId)}
+		{if message.status == 'READY'}
 			<div id="${message.id}_link" class="yaft_message_minimised">
-				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a>{if message.status == 'DRAFT'}<span id="${message.id}_draft_label"> - ${yaft_draft_label}{/if}</span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
+				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a></span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
 				<img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
 				{for attachment in message.attachments}
 					<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
@@ -915,7 +909,6 @@ ${yaft_forums_label}
     <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
 	
 	<input type="submit" value="${yaft_publish_label}"/>
-	<input type="submit" value="${yaft_save_draft_label}" onClick="$('#yaft_message_status_field').val('DRAFT');"/>
 	<input type="button" value="${yaft_cancel_label}" onclick="return switchState('${yaftViewMode}',{'messageId':'${id}'})"/>
 	
 	</form>

@@ -227,14 +227,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return sql;
 	}
 
-	public List<PreparedStatement> getAddOrUpdateMessageStatements(String forumId, Message message, Connection connection) throws Exception
-	{
+	public List<PreparedStatement> getAddOrUpdateMessageStatements(String forumId, Message message, Connection connection) throws Exception {
 		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
 
-		if (message.getId().length() > 0)
-		{
-			// This is an existing message
-
+		if (message.getId().length() > 0) {
 			// This is an existing message
 			String updateSql = "UPDATE YAFT_MESSAGE SET " + "SUBJECT = ?,CONTENT = ? WHERE MESSAGE_ID = ?";
 
@@ -245,28 +241,27 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 			statements.add(ps);
 		}
-		else
-		{
+		else {
 			// This is a new message
-
 			message.setId(UUID.randomUUID().toString());
 
 			String insertSql = "INSERT INTO YAFT_MESSAGE (" + "MESSAGE_ID,";
 
-			if (message.hasParent())
+			if (message.hasParent()) {
 				insertSql += "PARENT_MESSAGE_ID,";
+			}
 
 			insertSql += "DISCUSSION_ID," + "SITE_ID," + "STATUS," + "SUBJECT," + "CONTENT," + "CREATOR_ID," + "CREATED_DATE) VALUES(?,";
 
-			if (message.hasParent())
+			if (message.hasParent()) {
 				insertSql += "?,";
+			}
 
 			insertSql += "?,?,?,?,?,?,?)";
 
 			PreparedStatement insertMessagePS = connection.prepareStatement(insertSql);
 			insertMessagePS.setString(1, message.getId());
-			if (message.hasParent())
-			{
+			if (message.hasParent()) {
 				// This is a reply
 
 				insertMessagePS.setString(2, message.getParent());
@@ -285,14 +280,12 @@ public class DefaultSqlGenerator implements SqlGenerator
 				childrenPS.setString(2, message.getId());
 				statements.add(childrenPS);
 
-				if (message.getStatus().equals("READY"))
-				{
+				if (message.getStatus().equals("READY")) {
 					statements.add(getIncrementDiscussionMessageCountStatement(message, connection));
 					statements.add(getIncrementForumMessageCountStatement(forumId, message, connection));
 				}
 			}
-			else
-			{
+			else {
 				// This is a discussion
 
 				// The fact that this message doesn't have a parent means that
@@ -329,8 +322,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 			statements.add(insertMessagePS);
 		}
 
-		for (Attachment attachment : message.getAttachments())
-		{
+		for (Attachment attachment : message.getAttachments()) {
 			String insertSql = "INSERT INTO YAFT_MESSAGE_ATTACHMENTS VALUES(?,?)";
 			PreparedStatement attachmentPS = connection.prepareStatement(insertSql);
 			attachmentPS.setString(1, message.getId());
@@ -629,26 +621,6 @@ public class DefaultSqlGenerator implements SqlGenerator
 			catch(Exception e1) {}
 		}
 		
-		return statements;
-	}
-
-	public List<PreparedStatement> getPublishMessageStatements(String forumId, Message message, Connection connection) throws SQLException
-	{
-		long currentDate = new Date().getTime();
-
-		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
-
-		String sql = "UPDATE YAFT_MESSAGE SET STATUS = 'READY',CREATED_DATE = ? WHERE MESSAGE_ID = ? AND STATUS = 'DRAFT'";
-		PreparedStatement updateMessageStatement = connection.prepareStatement(sql);
-		updateMessageStatement.setTimestamp(1, new Timestamp(currentDate));
-		updateMessageStatement.setString(2, message.getId());
-		statements.add(updateMessageStatement);
-
-		message.setCreatedDate(currentDate);
-
-		statements.add(getIncrementForumMessageCountStatement(forumId, message, connection));
-		statements.add(getIncrementDiscussionMessageCountStatement(message, connection));
-
 		return statements;
 	}
 

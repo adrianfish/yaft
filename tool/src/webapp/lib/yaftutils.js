@@ -505,38 +505,6 @@ var YAFTUTILS = (function($) {
 	
 	/* START MESSAGE OPERATIONS */
 	
-	my.publishMessage = function(messageId) {
-		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/messages/" + messageId + "/publish",
-	   		dataType : "text",
-	   		async : false,
-			cache: false,
-		   	success : function(text,textStatus) {
-				var message = YAFTUTILS.findMessage(messageId);
-				
-				message.status = 'READY';
-				for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-					var testDiscussion = yaftCurrentForum.discussions[i];
-					if(testDiscussion.id == yaftCurrentDiscussion.id)
-						testDiscussion['messageCount'] = testDiscussion['messageCount'] + 1;
-				}
-				
-				SAKAIUTILS.renderTrimpathTemplate('yaft_message_template',message,message.id);
-
-				$('#' + message.id + '_draft_label').hide();
-				
-				$(document).ready(function() {
-					attachProfilePopup();
-			    });
-			},
-			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to publish message. Reason: " + errorThrown);
-			}
-		});
-
-		return false;
-	};
-	
 	my.deleteMessage = function(messageId) {
 		if(!confirm(yaft_delete_message_message))
 			return false;

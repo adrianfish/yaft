@@ -102,8 +102,6 @@ public interface YaftForumService extends EntityProducer
 
 	public void moveDiscussion(String discussionId, String currentForumId,String newForumId);
 
-	public void publishMessage(String forumId,Message message);
-
 	public Map<String,Integer> getReadMessageCountForAllFora();
 
 	public Map<String, Integer> getReadMessageCountForForum(String forumId);

@@ -314,19 +314,6 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		persistenceManager.moveDiscussion(discussionId, currentForumId, newForumId);
 	}
 
-	public void publishMessage(String forumId, Message message)
-	{
-		persistenceManager.publishMessage(forumId, message.getId());
-		
-		// SiteStats/Search etc event
-		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
-
-		// Notification event
-		if(sakaiProxy.canCurrentUserSendAlerts()) {
-			sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
-		}
-	}
-
 	/** START EntityProducer IMPLEMENTATION */
 
 	public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments)

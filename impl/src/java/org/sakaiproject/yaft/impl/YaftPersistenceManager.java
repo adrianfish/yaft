@@ -328,35 +328,31 @@ public class YaftPersistenceManager
 		}
 	}
 
-	boolean addOrUpdateMessage(String siteId, String forumId,Message message,Connection connection)
-	{
+	boolean addOrUpdateMessage(String siteId, String forumId,Message message,Connection connection) {
 		if(logger.isDebugEnabled()) logger.debug("addOrUpdateMessage()");
 		
 		boolean isLocalConnection = false;
 		
+		// If a connection was passed in we don't want to release it here
 		if(connection == null)
 			isLocalConnection = true;
 			
 		List<PreparedStatement> messageStatements = null;
 		List<PreparedStatement> newStatements = null;
 
-		try
-		{
+		try {
 			boolean oldAutoCommitFlag = false;
 			
-			if(isLocalConnection)
-			{
+			if(isLocalConnection) {
 				connection = sakaiProxy.borrowConnection();
 				oldAutoCommitFlag = connection.getAutoCommit();
 				connection.setAutoCommit(false);
 			}
 
-			try
-			{
-				for(Attachment attachment : message.getAttachments())
-				{
-					if(attachment.getResourceId().length() == 0)
-					{
+			try {
+				// Save any attachments in content hosting
+				for(Attachment attachment : message.getAttachments()) {
+					if(attachment.getResourceId().length() == 0) {
 						String resourceId = sakaiProxy.saveFile(siteId, message.getCreatorId(),attachment.getName(),attachment.getMimeType(),attachment.getData());
 						attachment.setResourceId(resourceId);
 					}
@@ -364,11 +360,11 @@ public class YaftPersistenceManager
 				
 				messageStatements = sqlGenerator.getAddOrUpdateMessageStatements(forumId,message,connection);
 				
-				for(PreparedStatement statement : messageStatements)
+				for(PreparedStatement statement : messageStatements) {
 					statement.executeUpdate();
+				}
 			
-				if(!"DRAFT".equals(message.getStatus()))
-				{
+				if(!"DRAFT".equals(message.getStatus())) {
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
 					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
@@ -382,47 +378,36 @@ public class YaftPersistenceManager
 				
 				return true;
 			}
-			catch(Exception e)
-			{
-				if(isLocalConnection)
-				{
+			catch(Exception e) {
+				if(isLocalConnection) {
 					logger.error("Caught exception whilst adding or updating a message. Rolling back ...",e);
 					connection.rollback();
 				}
 				
 				return false;
 			}
-			finally
-			{
+			finally {
 				if(isLocalConnection)
 					connection.setAutoCommit(oldAutoCommitFlag);
 			}
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			logger.error("Caught exception whilst adding or updating message", e);
 			return false;
 		}
-		finally
-		{
-			if(messageStatements != null)
-			{
-				for(PreparedStatement st : messageStatements)
-				{
-					try
-					{
+		finally {
+			if(messageStatements != null) {
+				for(PreparedStatement st : messageStatements) {
+					try {
 						st.close();
 					}
 					catch (Exception e) {}
 				}
 			}
 			
-			if(newStatements != null)
-			{
-				for(PreparedStatement st : newStatements)
-				{
-					try
-					{
+			if(newStatements != null) {
+				for(PreparedStatement st : newStatements) {
+					try {
 						st.close();
 					}
 					catch (Exception e) {}
@@ -1612,121 +1597,33 @@ public class YaftPersistenceManager
 		}
 	}
 
-	boolean publishMessage(String forumId,String messageId)
-	{
-		Connection connection = null;
-		List<PreparedStatement> statements = null;
-		List<PreparedStatement> newStatements = null;
-
-		try
-		{
-			connection = sakaiProxy.borrowConnection();
-			boolean oldAutoCommitFlag = connection.getAutoCommit();
-			connection.setAutoCommit(false);
-
-			try
-			{
-				Message message = getMessage(messageId);
-				statements = sqlGenerator.getPublishMessageStatements(forumId, message, connection);
-				
-				for(PreparedStatement statement : statements)
-					statement.execute();
-				
-				markMessageRead(messageId, forumId, message.getDiscussionId(),connection);
-				
-				//if(useSynopticFunctionality)
-				//{
-					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
-			
-					for(PreparedStatement statement : newStatements)
-						statement.executeUpdate();
-				//}
-				
-				connection.commit();
-				
-				return true;
-			}
-			catch (Exception e)
-			{
-				logger.error("Caught exception whilst moving discussion. Rolling back ...", e);
-				connection.rollback();
-				return false;
-			}
-			finally
-			{
-				connection.setAutoCommit(oldAutoCommitFlag);
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error("Caught exception whilst moving discussion.", e);
-			return false;
-		}
-		finally
-		{
-			if(statements != null)
-			{
-				for(PreparedStatement st : statements)
-				{
-					try
-					{
-						st.close();
-					}
-					catch(Exception e) {}
-				}
-			}
-			
-			if(newStatements != null)
-			{
-				for(PreparedStatement st : newStatements)
-				{
-					try
-					{
-						st.close();
-					}
-					catch (Exception e) {}
-				}
-			}
-			
-			sakaiProxy.returnConnection(connection);
-		}
-	}
-
-	Map<String,Integer> getReadMessageCountForAllFora(String userId)
-	{
-		String sql = sqlGenerator.getSelectReadMessageCountForAllForaStatement(userId);
-		
+	Map<String,Integer> getReadMessageCountForAllFora(String userId) {
 		Map<String,Integer> counts = new HashMap<String,Integer>();
 		
 		Connection connection = null;
 		Statement statement = null;
 		ResultSet rs = null;
-		try
-		{
+		try {
 			connection = sakaiProxy.borrowConnection();
 			statement = connection.createStatement();
+			String sql = sqlGenerator.getSelectReadMessageCountForAllForaStatement(userId);
 			rs = statement.executeQuery(sql);
-			while(rs.next())
-			{
+			while(rs.next()) {
 				String forumId = rs.getString("FORUM_ID");
 				int read = rs.getInt("NUMBER_READ");
 				counts.put(forumId, read);
 			}
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			logger.error("Caught exception whilst getting read message ids.", e);
 		}
-		finally
-		{
-			try
-			{
+		finally {
+			try {
 				if(rs != null) rs.close();
 			}
 			catch (Exception e) {}
 			
-			try
-			{
+			try {
 				if(statement != null) statement.close();
 			}
 			catch (Exception e) {}
@@ -1737,32 +1634,28 @@ public class YaftPersistenceManager
 		return counts;
 	}
 
-	Map<String, Integer> getReadMessageCountForForum(String userId, String forumId)
-	{
-		String discussionIdsQuery = sqlGenerator.getSelectDiscussionIdsForForumStatement(forumId);
-		
+	Map<String, Integer> getReadMessageCountForForum(String userId, String forumId) {
 		Map<String,Integer> counts = new HashMap<String,Integer>();
 		
 		Connection connection = null;
 		Statement discussionIdsST = null;
 		PreparedStatement countST = null;
 		ResultSet rs = null;
-		try
-		{
+		
+		try {
 			connection = sakaiProxy.borrowConnection();
 			countST = sqlGenerator.getSelectReadMessageCountForDiscussionStatement(userId,connection);
 			discussionIdsST = connection.createStatement();
 			
+			String discussionIdsQuery = sqlGenerator.getSelectDiscussionIdsForForumStatement(forumId);
 			ResultSet idsRS = discussionIdsST.executeQuery(discussionIdsQuery);
-			while(idsRS.next())
-			{
+			while(idsRS.next()) {
 				String discussionId = idsRS.getString("DISCUSSION_ID");
 				
 				countST.setString(1, discussionId);
 				
 				ResultSet countRS = countST.executeQuery();
-				if(countRS.next())
-				{
+				if(countRS.next()) {
 					int count = countRS.getInt("NUMBER_READ");
 					counts.put(discussionId, count);
 				}
@@ -1770,26 +1663,21 @@ public class YaftPersistenceManager
 				countRS.close();
 			}
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			logger.error("Caught exception whilst getting read message ids.", e);
 		}
-		finally
-		{
-			try
-			{
+		finally {
+			try {
 				if(rs != null) rs.close();
 			}
 			catch (SQLException e) {}
 			
-			try
-			{
+			try {
 				if(countST != null) countST.close();
 			}
 			catch (SQLException e) {}
 			
-			try
-			{
+			try {
 				if(discussionIdsST != null) discussionIdsST.close();
 			}
 			catch (SQLException e) {}

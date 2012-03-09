@@ -441,14 +441,6 @@ public class YaftTool extends HttpServlet {
 				response.getWriter().write("success");
 				response.getWriter().close();
 				return;
-
-			} else if ("publish".equals(messageOp)) {
-				yaftForumService.publishMessage(forum.getId(), message);
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain");
-				response.getWriter().write("success");
-				response.getWriter().close();
-				return;
 			} else if ("attachments".equals(messageOp)) {
 				if (parts.length >= 4) {
 					String attachmentId = parts[3];

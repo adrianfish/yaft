@@ -76,8 +76,6 @@ public interface SqlGenerator
 
 	List<String> getMoveDiscussionStatements(String discussionId, String currentForumId,String newForumId,Connection conn);
 
-	List<PreparedStatement> getPublishMessageStatements(String forumId,Message message,Connection connection) throws SQLException;
-
 	String getShowMessageStatement(Message message);
 
 	String getSelectReadMessageCountForAllForaStatement(String userId);
