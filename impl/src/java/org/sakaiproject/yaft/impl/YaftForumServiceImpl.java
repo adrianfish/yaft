@@ -43,6 +43,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sun.media.Log;
+
 public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 {
 	private Logger logger = Logger.getLogger(YaftForumServiceImpl.class);
@@ -143,7 +145,11 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 			
 			if(sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
 				// NotificationService event
-				sakaiProxy.postEvent(YAFT_FORUM_CREATED, forum.getReference(), true);
+				try {
+					sakaiProxy.postEvent(YAFT_FORUM_CREATED, forum.getReference(), true);
+				} catch(Exception e) {
+					logger.error("Failed to post forum created event",e);
+				}
 			}
 		}
 
@@ -172,8 +178,14 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		// SiteStats/Search etc event
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
 
-		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts())
+		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts()) {
+			// NotificationService event
+			try {
 				sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
+			} catch(Exception e) {
+				logger.error("Failed to post message created event",e);
+			}
+		}
 
 		return true;
 	}
@@ -198,8 +210,14 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED_SS, discussion.getReference(), true);
 			}
 
-			if (sendMail && sakaiProxy.canCurrentUserSendAlerts())
-				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, discussion.getReference(), true);
+			if (sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
+				// NotificationService event
+				try {
+					sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, discussion.getReference(), true);
+				} catch(Exception e) {
+					logger.error("Failed to post message created event",e);
+				}
+			}
 		}
 
 		return discussion;
