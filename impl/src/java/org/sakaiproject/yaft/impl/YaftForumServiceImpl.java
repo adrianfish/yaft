@@ -43,8 +43,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.media.Log;
-
 public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 {
 	private Logger logger = Logger.getLogger(YaftForumServiceImpl.class);
