@@ -57,9 +57,13 @@ public interface YaftForumService extends EntityProducer
 	 */
 	public Forum getForum(String forumId,String state);
 	
+	public Forum getUnfilteredForum(String forumId, String state);
+	
 	public Forum getForumForTitle(String title,String state,String siteId);
 	
 	public Discussion getDiscussion(String discussionId,boolean fully);
+	
+	public Discussion getUnfilteredDiscussion(String discussionId, boolean fully);
 	
 	public SakaiProxy getSakaiProxy();
 
@@ -120,4 +124,5 @@ public interface YaftForumService extends EntityProducer
 			String discussionId);
 	
 	public boolean setDiscussionGroups(String discussionId,Collection<String> groups);
+
 }

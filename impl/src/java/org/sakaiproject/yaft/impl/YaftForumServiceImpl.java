@@ -81,6 +81,25 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_READ);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_VIEW_INVISIBLE);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_SEND_ALERTS);
+		
+		if(sakaiProxy.isDashboardInstalled()) {
+			YaftForumEntityType fet = new YaftForumEntityType();
+			fet.setForumService(this);
+			fet.setSakaiProxy(sakaiProxy);
+			YaftDiscussionEntityType det = new YaftDiscussionEntityType();
+			det.setForumService(this);
+			det.setSakaiProxy(sakaiProxy);
+			YaftMessageEntityType met = new YaftMessageEntityType();
+			met.setForumService(this);
+			met.setSakaiProxy(sakaiProxy);
+			YaftNewForumEventProcessor proc = new YaftNewForumEventProcessor();
+			proc.setForumService(this);
+			YaftNewDiscussionEventProcessor dproc = new YaftNewDiscussionEventProcessor();
+			dproc.setForumService(this);
+			YaftNewMessageEventProcessor mproc = new YaftNewMessageEventProcessor();
+			mproc.setForumService(this);
+			sakaiProxy.registerDashboardEventProcessor(proc,dproc,mproc,fet,det,met);
+		}
 
 		persistenceManager = new YaftPersistenceManager();
 		persistenceManager.setSakaiProxy(sakaiProxy);
@@ -101,12 +120,20 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 
 		return securityManager.filterForum(persistenceManager.getForum(forumId, state),null);
 	}
-
-	public Discussion getDiscussion(String discussionId, boolean fully)
+	
+	public Forum getUnfilteredForum(String forumId, String state)
 	{
 		if (logger.isDebugEnabled())
-			logger.debug("getDiscussion()");
+			logger.debug("getForum()");
 
+		return persistenceManager.getForum(forumId, state);
+	}
+
+	public Discussion getDiscussion(String discussionId, boolean fully) {
+		return securityManager.filterDiscussion(persistenceManager.getDiscussion(discussionId, fully),null);
+	}
+	
+	public Discussion getUnfilteredDiscussion(String discussionId, boolean fully) {
 		return persistenceManager.getDiscussion(discussionId, fully);
 	}
 
