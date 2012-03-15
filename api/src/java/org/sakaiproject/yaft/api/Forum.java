@@ -49,6 +49,7 @@ public class Forum implements Entity
 	private String creatorId = "";
 	private List<Discussion> discussions= new ArrayList<Discussion>();
 	private String url = "";
+	private String fullUrl = "";
 	private List<Group> groups = new ArrayList<Group>();
 	
 	public Forum()
@@ -97,6 +98,7 @@ public class Forum implements Entity
 			Site site = SiteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			url = "/portal/tool/" + tc.getId() + "/forums/" + id + ".html";
+			fullUrl = "/portal/directtool/" + tc.getId() + "/forums/" + id + ".html";
 		}
 		catch(Exception e)
 		{
@@ -121,6 +123,10 @@ public class Forum implements Entity
 	public String getUrl()
 	{
 		return url;
+	}
+	public String getFullUrl()
+	{
+		return fullUrl;
 	}
 
 	public void setMessageCount(int messageCount)

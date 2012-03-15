@@ -161,6 +161,10 @@ public class Discussion implements Entity
 	{
 		return "/portal/tool/" + getPlacementId() + "/discussions/" + getId() + ".html";
 	}
+	
+	public String getFullUrl() {
+		return "/portal/directtool/" + getPlacementId() + "/discussions/" + getId() + ".html";
+	}
 
 	public String getPlacementId()
 	{

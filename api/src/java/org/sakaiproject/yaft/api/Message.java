@@ -49,6 +49,7 @@ public class Message implements Entity
 	private String status = "DRAFT";
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	private String url = "";
+	private String fullUrl = "";
 	private String placementId = "";
 	private String siteId = "";
 	
@@ -199,6 +200,7 @@ public class Message implements Entity
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			placementId = tc.getId();
 			url = "/portal/tool/" + tc.getId() + "/messages/" + id + ".html";
+			fullUrl = "/portal/directtool/" + tc.getId() + "/messages/" + id + ".html";
 		}
 		catch(Exception e)
 		{
@@ -252,6 +254,11 @@ public class Message implements Entity
 	public String getUrl()
 	{
 		return url;
+	}
+	
+	public String getFullUrl()
+	{
+		return fullUrl;
 	}
 
 	/**
