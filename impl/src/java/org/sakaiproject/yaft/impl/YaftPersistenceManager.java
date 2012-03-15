@@ -207,7 +207,7 @@ public class YaftPersistenceManager
 			catch(Exception e) {}
 		}
 		
-		return securityManager.filterForum(forum,null);
+		return forum;
 	}
 
 	List<Forum> getFora(String siteId,boolean fully)
@@ -681,7 +681,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return securityManager.filterDiscussion(discussion,null);
+		return discussion;
 	}
 	
 	private boolean deleteFromActiveDiscussions(String discussionId)
