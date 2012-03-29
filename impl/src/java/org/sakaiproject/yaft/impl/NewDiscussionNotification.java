@@ -132,8 +132,4 @@ public class NewDiscussionNotification extends SiteEmailNotification{
         rv.add(getTo(event));
         return rv;
     }
-	
-	protected String getResourceAbility() {
-		return YaftFunctions.YAFT_MESSAGE_READ;
-	}
 }

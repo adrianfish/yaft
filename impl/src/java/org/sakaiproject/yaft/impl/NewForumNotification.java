@@ -133,17 +133,4 @@ public class NewForumNotification extends SiteEmailNotification{
         rv.add(getTo(event));
         return rv;
     }
-	
-	protected String getResourceAbility() {
-		return YaftFunctions.YAFT_MESSAGE_READ;
-	}
-	
-	protected int getOption(User user,Notification notification,Event event) {
-		int option = super.getOption(user, notification, event);
-		return option;
-	}
-	protected int getOption(User user,Notification notification,String resourceFilter,int eventPriority, Event event) {
-		int option = super.getOption(user, notification, event);
-		return option;
-	}
 }
