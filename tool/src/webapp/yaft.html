@@ -119,6 +119,11 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_forums_content_template" style="display:none"><!--
+{if yaftCurrentForums.length <= 0}
+<div class="textblock">
+    <p>${yaft_forums_get_started}</p>
+</div>
+{/if}
 {if yaftCurrentUserPermissions.forumDeleteAny}
 <div>
 <div class="navIntraToolLink viewNav" style="float: right;">
@@ -192,6 +197,11 @@ ${yaft_forums_label}
 
 <div id="yaft_forum_content_template" style="display:none"><!--
 <div id="yaft_forum_description">${description}</div>
+{if discussions.length <= 0}
+<div class="textblock">
+    <p>${yaft_discussions_get_started}</p>
+</div>
+{/if}
 <div>
 <div class="navIntraToolLink viewNav" style="float: right;">
     <span>
@@ -668,6 +678,13 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_edit_forum_content_template" style="display:none;"><!--
+<div>
+<span class="instruction">
+    ${yaft_create_forum_instruction}
+</span>
+<br />
+<br />
+</div>
 <div id="yaft_edit_forum_container">
 <form>
 <input id="yaft_id_field" type="hidden" name="id" value="${forum.id}"/>
