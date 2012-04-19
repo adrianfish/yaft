@@ -422,8 +422,6 @@ function switchState(state,arg) {
 					    namePattern: '$name_$i'
 					});
 		    SAKAIUTILS.setupWysiwygEditor(yaftEditor,'yaft_message_editor',800,500,'Default',yaftSiteId);
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
 	    });
 	}
 	else if('reply' === state) {
@@ -479,8 +477,6 @@ function switchState(state,arg) {
 			});
 				
 			SAKAIUTILS.setupWysiwygEditor(yaftEditor,'yaft_message_editor',800,500,'Default',yaftSiteId);
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
 	 	});
 	}
 	else if('startDiscussion' === state) {
@@ -526,7 +522,7 @@ function switchState(state,arg) {
                     for(var i=0,j=arr.length;i<j;i++) {
                     	if('subject' === arr[i].name) {
                         	if(!arr[i].value || arr[i].value.length < 4) {
-                            	alert("You must supply a subject of at least 4 characters");
+                            	alert(yaft_subject_too_short);
                                 return false;
                             }
                      	}
@@ -534,7 +530,7 @@ function switchState(state,arg) {
             	},
    			success: function(responseText,statusText,xhr) {
    					if(responseText.match(/^ERROR.*/)) {
-   						alert("Failed to create/edit discussion");
+   						alert(yaft_failed_to_create_edit_discussion);
    					}
    					else {
 						var discussion = YAFTUTILS.getDiscussion(responseText);
@@ -553,7 +549,7 @@ function switchState(state,arg) {
 					}
    				},
    			error : function(xmlHttpRequest,textStatus,errorThrown) {
-   				alert("Failed to create/edit discussion");
+   				alert(yaft_failed_to_create_edit_discussion);
 				}
    			}; 
  
@@ -610,7 +606,6 @@ function switchState(state,arg) {
 		            	max: 5,
 					    namePattern: '$name_$i'
 					});
-			SAKAIUTILS.setupWysiwygEditor(yaftEditor,'yaft_discussion_editor',800,500,'Default',yaftSiteId);
 			$('#yaft_subject_field').focus();
 
             if(yaftGradebookAssignments && yaftGradebookAssignments.length > 0) {
@@ -630,9 +625,8 @@ function switchState(state,arg) {
                 $('#yaft_assignment_selector').show();
                 $("#yaft_assignment_selector option[value='" + discussion.assignment.id + "']").attr('selected', 'selected');
             }
-
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
+            
+			SAKAIUTILS.setupWysiwygEditor(yaftEditor,'yaft_discussion_editor',800,500,'Default',yaftSiteId);
    		});
 	}
 	else if('moveDiscussion' === state) {
@@ -649,7 +643,7 @@ function switchState(state,arg) {
 				discussion = d;
 			},
 			error : function(xhr,textStatus,errorThrown) {
-				alert("Failed to get discussion. Reason: " + errorThrown);
+				alert(yaft_failed_to_get_discussion + errorThrown);
 			}
 		});
 				
@@ -674,6 +668,7 @@ function switchState(state,arg) {
 	}
 	else if('permissions' === state) {
 		var perms = YAFTUTILS.getSitePermissionMatrix();
+		SAKAIUTILS.renderTrimpathTemplate('yaft_permissions_breadcrumb_template',arg,'yaft_breadcrumb');
 		SAKAIUTILS.renderTrimpathTemplate('yaft_permissions_content_template',{'perms':perms},'yaft_content');
 
 	 	$(document).ready(function() {
@@ -730,7 +725,6 @@ function setupAvailability(element) {
 	startDate.datepicker({
 		altField: '#yaft_start_date_millis',
 		altFormat: '@',
-		dateFormat: 'dd mm yy',
 		defaultDate: new Date(),
 		minDate: new Date(),
 		hideIfNoPrevNext: true
@@ -741,7 +735,6 @@ function setupAvailability(element) {
 	endDate.datepicker({
 		altField: '#yaft_end_date_millis',
 		altFormat: '@',
-		dateFormat: 'dd mm yy',
 		defaultDate: new Date(),
 		minDate: new Date(),
 		hideIfNoPrevNext: true
@@ -766,7 +759,7 @@ function setupAvailability(element) {
 
 		var start = new Date(element.start + localOffset);
 	    startDate.datepicker("setDate",start);
-		startDate.val(start.getDate() + ' ' + (1 + start.getMonth()) + ' ' + start.getFullYear());
+		startDate.val(start.toString(Date.CultureInfo.formatPatterns.shortDate));
 
 		var hours = start.getHours();
 		if(hours < 10)  hours = '0' + hours;
@@ -778,7 +771,7 @@ function setupAvailability(element) {
 
 		var end = new Date(element.end + localOffset);
 	    endDate.datepicker("setDate",end);
-		endDate.val(end.getDate() + ' ' + (1 + end.getMonth()) + ' ' + end.getFullYear());
+		endDate.val(end.toString(Date.CultureInfo.formatPatterns.shortDate));
 
 		hours = end.getHours();
 		if(hours < 10) {

@@ -162,6 +162,7 @@
                        	<exclude>js/*.js</exclude>
                        	<exclude>css/*.*</exclude>
                        	<exclude>lib/jquery-ui/**/*.*</exclude>
+                        <exclude>lib/datejs/*.*</exclude>
                     </excludes>
                     <aggregations>
             			<aggregation>

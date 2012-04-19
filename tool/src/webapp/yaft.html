@@ -35,6 +35,7 @@
 <script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/datetime_locale.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
 
 <!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
@@ -173,7 +174,7 @@ ${yaft_forums_label}
 		<td align="center">${forum.discussionCount}</td>
 		<td align="center">${forum.messageCount}</td>
 		<td align="center">${forum.unread}</td>
-		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toLocaleString()}{/if}</td>
+		<td>{if forum.lastMessageDate == -1}n/a{else}${new Date(forum.lastMessageDate).toString(dateTimeFormat)}{/if}</td>
 		<td align="center">
 		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == yaftCurrentUser.id)}
 			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}">${yaft_edit_label}</a>
@@ -245,7 +246,7 @@ ${yaft_forums_label}
 		<td><a href="javascript:;" class="profile" rel="/direct/profile/${discussion.creatorId}/formatted">${discussion.creatorDisplayName}</a></td>
 		<td>${discussion.messageCount}</td>
 		<td>${discussion.unread}</td>
-		<td>${new Date(discussion.lastMessageDate).toLocaleString()}</td>
+		<td>${new Date(discussion.lastMessageDate).toString(dateTimeFormat)}</td>
 		<td align="center">
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
 			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}">${yaft_edit_label}</a>&nbsp;
@@ -334,14 +335,14 @@ ${yaft_forums_label}
 		<input type="hidden" name="id" value="${discussion.id}"/>
 		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
 		<input type="hidden" name="siteId" value="${yaftSiteId}"/>
-		<h4>Type your message</h4>
+		<h4>${yaft_type_your_message_label}</h4>
 		<br />
-		<span>Subject: *</span>
+		<span>${yaft_subject_label} *</span>
 		<br />
 		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${discussion.subject}"/>
 		<br />
 		<br />
-		<span>Message</span>
+		<span>${yaft_message_label}</span>
 		<br />
 		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${discussion.firstMessage.content}</textarea>
 		<br />
@@ -351,7 +352,7 @@ ${yaft_forums_label}
 		<br />
 		<br />
         {/if}
-		<span>Add Attachments:</span>
+		<span>${yaft_add_attachments_label}</span>
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
 	
@@ -374,19 +375,19 @@ ${yaft_forums_label}
 {/if}
 <br />
 
-<a id="yaft_toggle_availability_options_link" href="javascript:;">Availability</a>
+<a id="yaft_toggle_availability_options_link" href="javascript:;">${yaft_availability_label}</a>
 <br />
 <div id="yaft_availability_options" style="display:none;">
     <fieldset id="yaft_availability_fieldset">
-    <legend>Availability</legend>
-    <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
+    <legend>${yaft_availability_label}</legend>
+	<input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>${yaft_availability_lock_for_writing_label}
     <br />
-    <input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>Lock for reading
+	<input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>${yaft_availability_lock_for_reading_label}
     <br />
     <br />
     <input type="hidden" name="startDate" id="yaft_start_date_millis"/>
     <input type="hidden" name="endDate" id="yaft_end_date_millis"/>
-    <span>Except between ...</span>
+    <span>${yaft_availability_except_between_label}</span>
     <br />
     <br />
     <input id="yaft_start_date" type="text"/>
@@ -423,7 +424,7 @@ ${yaft_forums_label}
                     </select>
                     <br />
                     <br />
-    <span>... and ...</span>
+    <span>${yaft_availability_except_between_and_label}</span>
     <br />
     <br />
     <input id="yaft_end_date" type="text"/>
@@ -460,20 +461,20 @@ ${yaft_forums_label}
                     </select>
     <br />
     <br />
-    <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
+    <a href="#" onclick="YAFTUTILS.clearDates();">${yaft_availability_clear_date_label}</a>
     </fieldset>
     <br />
 </div>
 
 <br />
 
-{if yaftGradebookAssignments.length > 0 }
+{if yaftGradebookAssignments && yaftGradebookAssignments.length > 0 }
 <a id="yaft_toggle_gradebook_options_link" href="javascript:;">Grading</a>
 <br />
 <div id="yaft_gradebook_options" style="display:none;">
     <fieldset id="yaft_grading_fieldset" style="display: none;">
     <legend>Grading</legend>
-    <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>Grade this discussion in Gradebook (pick from the list of current Gradebook assignments)
+    <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>${yaft_grading_message}
     <br />
     <select id="yaft_assignment_selector" class="indnt4" name="assignmentId" style="display: none;">
     {for gbAssignment in yaftGradebookAssignments}
@@ -513,26 +514,26 @@ ${yaft_forums_label}
 			<th width="5px"></th>
 			<th colspan="3">${yaft_message_label}</th>
 			<th width="5px"></th>
-			<th colspan="3">Other</th>
+			<th colspan="2">${yaft_other_label}</th>
 		</tr>
 		<tr class="listHier">
-			<th align="left">Role</th>
+			<th align="left">${yaft_role_label}</th>
 			<th style="background: white;"></th>
-			<th style="text-align:center;">create</th>
-			<th style="text-align:center;">delete.own</th>
-			<th style="text-align:center;">delete.any</th>
-			<th style="text-align:center;">viewGroups</th>
+			<th style="text-align:center;">${yaft_permissions_create}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_own}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_any}</th>
+			<th style="text-align:center;">${yaft_permissions_view_groups}</th>
 			<th style="background: white;"></th>
-			<th style="text-align:center;">create</th>
-			<th style="text-align:center;">delete.own</th>
-			<th style="text-align:center;">delete.any</th>
+			<th style="text-align:center;">${yaft_permissions_create}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_own}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_any}</th>
 			<th style="background: white;"></th>
-			<th style="text-align:center;">create</th>
-			<th style="text-align:center;">delete.own</th>
-			<th style="text-align:center;">delete.any</th>
+			<th style="text-align:center;">${yaft_permissions_create}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_own}</th>
+			<th style="text-align:center;">${yaft_permissions_delete_any}</th>
 			<th style="background: white;"></th>
-			<th style="text-align:center;">view.invisible</th>
-			<th style="text-align:center;">modify.permissions</th>
+			<th style="text-align:center;">${yaft_permissions_view_invisible}</th>
+			<th style="text-align:center;">${yaft_permissions_modify_permissions}</th>
 			<th style="text-align:center;">sendAlerts</th>
 		</tr>
 	</thead>
@@ -595,7 +596,7 @@ ${yaft_forums_label}
 				</div>
 				<div style="float: right;">
 					{if attachments.length > 0}
-					<span>Attachments: </span>
+					<span>${yaft_attachments_label}</span>
 					{/if}
 					{for attachment in attachments}
 						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
@@ -649,7 +650,7 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
 	<br />
 	<br />
 
@@ -667,7 +668,7 @@ ${yaft_forums_label}
 	
 	<br />
 	
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
 	{/if}
 -->
 </div>
@@ -716,19 +717,19 @@ ${yaft_forums_label}
 <br />
 {/if}
 
-<a id="yaft_toggle_availability_options_link" href="javascript:;">Availability</a>
+<a id="yaft_toggle_availability_options_link" href="javascript:;">${yaft_availability_label}</a>
 <br />
 <div id="yaft_availability_options" style="display:none;">
     <fieldset id="yaft_availability_fieldset">
-    <legend>Availability</legend>
-    <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>Lock for writing
+    <legend>${yaft_availability_label}</legend>
+    <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>${yaft_availability_lock_for_writing_label}
     <br />
-    <input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>Lock for reading
+    <input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>${yaft_availability_lock_for_reading_label}
     <br />
     <br />
     <input type="hidden" name="startDate" id="yaft_start_date_millis"/>
     <input type="hidden" name="endDate" id="yaft_end_date_millis"/>
-    <span>Except between ...</span>
+	<span>${yaft_availability_except_between_label}</span>
     <br />
     <br />
     <input id="yaft_start_date" type="text" name="startDate"/>
@@ -765,7 +766,7 @@ ${yaft_forums_label}
                     </select>
     <br />
                     <br />
-    <span>... and ...</span>
+	<span>${yaft_availability_except_between_and_label}</span>
     <br />
     <br />
     <input id="yaft_end_date" type="text" name="endDate"/>
@@ -802,7 +803,7 @@ ${yaft_forums_label}
                     </select>
     <br />
     <br />
-    <a href="#" onclick="YAFTUTILS.clearDates();">Clear dates</a>
+    <a href="#" onclick="YAFTUTILS.clearDates();">${yaft_availability_clear_date_label}</a>
     </fieldset>
     <br />
 </div>
@@ -827,7 +828,7 @@ ${yaft_forums_label}
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">Mark entire discussion as read</a>
+	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);"${yaft_mark_discussion_read_label}</a>
     <br />
     <br />
 
@@ -938,12 +939,12 @@ ${yaft_forums_label}
 	<form id="yaft_message_form" method="POST" action="/portal/tool/${yaftPlacementId}/messages">
     <h4>Type your message</h4>
     <br />
-    <span>Subject:</span>
+    <span>${yaft_subject_label}</span>
     <br />
     <input name="subject" type="text" size="48" value="${subject}"/>
     <br />
     <br />
-    <span>Message</span>
+    <span>${yaft_message_label}</span>
     <br />
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
 	<br />
@@ -967,7 +968,7 @@ ${yaft_forums_label}
     {/for}
     <br />
 
-    <span>Add Attachments:</span>
+    <span>${yaft_add_attachments_label}</span>
     <br />
     <input id="yaft_attachment" name="attachment" type="file" class="multi"/>
     <br/>
@@ -988,7 +989,7 @@ ${yaft_forums_label}
 <div id="yaft_authors_template" style="display:none;"><!--
 <table id="yaft_author_table" class="listHier">
     <thead>
-        <tr><th>Name</th><th>Number of Posts</th>{if yaftCurrentUserPermissions.gradeAll && yaftCurrentDiscussion.graded}<th>${yaft_grade_label}</th>{/if}</tr>
+        <tr><th>${yaft_name_label}</th><th>${yaft_number_of_posts_label}</th>{if yaftCurrentUserPermissions.gradeAll && yaftCurrentDiscussion.graded}<th>${yaft_grade_label}</th>{/if}</tr>
     </thead>
     <tbody>
         {for author in authors}
@@ -1022,6 +1023,7 @@ ${yaft_forums_label}
 				<div style="float: right;">
 					{if message.attachments.length > 0}
 					<span>Attachments: </span>
+					<span>${yaft_attachments_label}</span>
 					{/if}
 					{for attachment in message.attachments}
 						<a onclick="window.open('${attachment.url}');" title="${attachment.name}">

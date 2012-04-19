@@ -69,6 +69,7 @@ public class YaftTool extends HttpServlet {
 		// We need to pass the language code to the JQuery code in the pages.
 		Locale locale = (new ResourceLoader(user.getId())).getLocale();
 		String languageCode = locale.getLanguage();
+		String countryCode = locale.getCountry();
 
 		String pathInfo = request.getPathInfo();
 
@@ -82,14 +83,14 @@ public class YaftTool extends HttpServlet {
 				// means that we can't pass url parameters to the page.We can
 				// use a cookie and the JS will pull the initial state from that
 				// instead.
-				Cookie params = new Cookie("sakai-tool-params", "state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal");
+				Cookie params = new Cookie("sakai-tool-params", "state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&country=" + countryCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal");
 				response.addCookie(params);
 
 				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");
 				dispatcher.include(request, response);
 				return;
 			} else {
-				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor();
+				String url = "/yaft-tool/yaft.html?state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&country=" + countryCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor();
 				response.sendRedirect(url);
 				return;
 			}
@@ -100,7 +101,7 @@ public class YaftTool extends HttpServlet {
 				String part1 = parts[0];
 
 				if (part1.startsWith("forums")) {
-					doForumsGet(request, response, parts, siteId, placementId, languageCode);
+					doForumsGet(request, response, parts, siteId, placementId, locale);
 				} else if ("authors".equals(part1)) {
 					if (parts.length == 1) {
 						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
@@ -168,17 +169,17 @@ public class YaftTool extends HttpServlet {
 				}
 
 				else if ("discussions".equals(part1)) {
-					doDiscussionsGet(request, response, parts, siteId, placementId, languageCode);
+					doDiscussionsGet(request, response, parts, siteId, placementId, locale);
 				}
 
 				else if ("messages".equals(part1)) {
-					doMessagesGet(request, response, parts, siteId, placementId, languageCode);
+					doMessagesGet(request, response, parts, siteId, placementId, locale);
 				}
 			}
 		}
 	}
 
-	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, String languageCode) throws ServletException, IOException {
+	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale) throws ServletException, IOException {
 		String state = request.getParameter("state");
 
 		if (state == null)
@@ -215,7 +216,7 @@ public class YaftTool extends HttpServlet {
 				try {
 					if (!forumId.endsWith(".json")) {
 						forumId = forumId.substring(0, forumId.length() - 5);
-						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
+						response.sendRedirect("/yaft-tool/yaft.html?state=forum&forumId=" + forumId + "&siteId=" + siteId + "&placementId=" + placementId + "&language=" + locale.getLanguage() + "&country=" + locale.getCountry() + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 						return;
 					}
 					
@@ -254,7 +255,7 @@ public class YaftTool extends HttpServlet {
 		}
 	}
 
-	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, String languageCode) throws ServletException, IOException {
+	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale) throws ServletException, IOException {
 		if (parts.length >= 2) {
 			String discussionId = parts[1];
 
@@ -292,7 +293,7 @@ public class YaftTool extends HttpServlet {
 
 				if (isHtmlRequest) {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
-					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + discussionId + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
+					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + discussionId + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + locale.getLanguage() + "&country=" + locale.getCountry() + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor());
 					return;
 				}
 				
@@ -367,7 +368,7 @@ public class YaftTool extends HttpServlet {
 		}
 	}
 
-	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, String languageCode) throws ServletException, IOException {
+	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale) throws ServletException, IOException {
 		if (parts.length >= 2) {
 			String messageId = parts[1];
 
@@ -383,7 +384,7 @@ public class YaftTool extends HttpServlet {
 
 			if (parts.length == 2) {
 				if (isHtmlRequest) {
-					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + message.getDiscussionId() + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + languageCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor() + "#message-" + messageId);
+					response.sendRedirect("/yaft-tool/yaft.html?state=full&discussionId=" + message.getDiscussionId() + "&siteId=" + siteId + "&placementId=" + placementId + "&forumId=" + forum.getId() + "&language=" + locale.getLanguage() + "&country=" + locale.getCountry() + "&skin=" + sakaiProxy.getSakaiSkin() + "&editor=" + sakaiProxy.getWysiwygEditor() + "#message-" + messageId);
 					return;
 				}
 

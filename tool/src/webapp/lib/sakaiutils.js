@@ -144,6 +144,10 @@ var SAKAIUTILS = (function ($) {
 
 		oFCKeditor.Config['CustomConfigurationsPath'] = "/library/editor/FCKeditor/config.js";
 		oFCKeditor.ReplaceTextarea();
+		
+        if(window.frameElement) {
+            setMainFrameHeight(window.frameElement.id);
+        }
 	};
 	
 	my.setupCKEditor = function(textarea_id,width,height,toolbarSet,siteId) {
@@ -166,6 +170,7 @@ var SAKAIUTILS = (function ($) {
 			width:width,
 			height:height,
 			toolbar:toolbarSet,
+			skin: 'v2',
 			customConfigurationsPath:"/library/editor/ckeditor/config.js",
 			/* using FCK browser: see https://jira.sakaiproject.org/browse/SAK-17885 */
 			filebrowserBrowseUrl:fckBasePath + "editor/filemanager/browser/default/browser.html",
@@ -176,6 +181,12 @@ var SAKAIUTILS = (function ($) {
 			filebrowserFlashUploadUrl:fckBasePath + "/sakai-fck-connector/filemanager/connector?Type=Flash&Command=QuickUpload&Type=Flash&CurrentFolder=" + collectionId,
 			filebrowserLinkUploadUrl:fckBasePath + "/sakai-fck-connector/filemanager/connector?Type=File&Command=QuickUpload&Type=Link&CurrentFolder=" + collectionId
 		});
+		
+		CKEDITOR.instances[textarea_id].on('instanceReady',function (e) {
+            if(window.frameElement) {
+                setMainFrameHeight(window.frameElement.id);
+            }
+        });
 	}
 	
 	my.setupWysiwygEditor = function(editorId,textarea_id,width,height,toolbarSet,siteId) {
