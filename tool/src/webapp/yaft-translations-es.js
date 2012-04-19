@@ -86,3 +86,5 @@ yaft_editing_label = 'Editando: ';
 yaft_type_your_message_label = 'Escriba su mensaje';
 yaft_subject_label = 'Asunto:';
 yaft_add_attachments_label = 'A\u00F1adir adjuntos:';
+yaft_forums_get_started = "No ha creado ya foros en este sitio. Para crear una foro, pulse 'Nuevo Foro'.";
+yaft_discussions_get_started = "No ha creado ya discusiones en este foro. Para crear una discusi\u00F3n , pulse 'Nueva discusi\u00F3n'.";
