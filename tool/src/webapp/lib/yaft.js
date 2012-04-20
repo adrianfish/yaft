@@ -398,6 +398,14 @@ function switchState(state,arg) {
 					YAFTUTILS.markReadMessagesInCurrentDiscussion();
 					switchState('full');
    				},
+   			beforeSubmit: function(arr, $form, options) {
+					if($('#yaft_message_editor').val() === '') {
+						alert(yaft_missing_message_message);
+   						return false;
+   					}
+   					
+   					return true;
+   				},
    			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				}
    			}; 
@@ -445,7 +453,7 @@ function switchState(state,arg) {
 					YAFTUTILS.addFormattedDatesToCurrentDiscussion();
 					switchState('full');
    				},
-   			beforeSubmit: function(arr, $form, optins) {
+   			beforeSubmit: function(arr, $form, options) {
 					if($('#yaft_message_editor').val() === '') {
 						alert(yaft_missing_message_message);
    						return false;
@@ -535,6 +543,12 @@ function switchState(state,arg) {
                             }
                      	}
                   	}
+					if($('#yaft_discussion_editor').val() === '') {
+						alert(yaft_missing_message_message);
+   						return false;
+   					}
+   					
+   					return true;
             	},
    			success: function(responseText,statusText,xhr) {
    					if(responseText.match(/^ERROR.*/)) {
