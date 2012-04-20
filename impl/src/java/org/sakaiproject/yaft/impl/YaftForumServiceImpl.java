@@ -557,8 +557,6 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		String type = parts[3];
 		String entityId = parts[4];
 		
-		System.out.println("TYPE:" + reference.getType());
-		
 		if ("forums".equals(type)) {
 			reference.set("yaft","forums" , entityId, null, siteId);
 			return true;

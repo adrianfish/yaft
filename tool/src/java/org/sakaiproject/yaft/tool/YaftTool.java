@@ -497,7 +497,6 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doUserDataGet(HttpServletResponse response, String siteId) throws ServletException, IOException {
-		System.out.println("BLAH");
 		Set<String> perms = sakaiProxy.getPermissionsForCurrentUserAndSite();
 
 		JSONArray permsData = JSONArray.fromObject(perms);
