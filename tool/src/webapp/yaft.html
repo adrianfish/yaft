@@ -337,12 +337,12 @@ ${yaft_forums_label}
 		<input type="hidden" name="siteId" value="${yaftSiteId}"/>
 		<h4>${yaft_type_your_message_label}</h4>
 		<br />
-		<span>${yaft_subject_label} *</span>
+		<span>${yaft_subject_label}: *</span>
 		<br />
 		<input id="yaft_subject_field" name="subject" type="text" size="48" value="${discussion.subject}"/>
 		<br />
 		<br />
-		<span>${yaft_message_label}</span>
+		<span>${yaft_message_label}: *</span>
 		<br />
 		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${discussion.firstMessage.content}</textarea>
 		<br />
@@ -898,12 +898,12 @@ ${yaft_forums_label}
 	<form id="yaft_message_form" onSubmit="return YAFTUTILS.validateMessageSubmission('${escape(subject)}');" action="/portal/tool/${yaftPlacementId}/messages" method="POST">
 	<h4>${yaft_type_your_message_label}</h4>
 	<br />
-	<span>${yaft_subject_label}:</span>
+	<span>${yaft_subject_label}: *</span>
 	<br />
 	<input id="yaft_message_subject_field" name="subject" type="text" size="48"/>
 	<br />
 	<br />
-	<span>${yaft_message_label}</span>
+	<span>${yaft_message_label}: *</span>
 	<br />
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
 	<br />
@@ -944,7 +944,7 @@ ${yaft_forums_label}
     <input name="subject" type="text" size="48" value="${subject}"/>
     <br />
     <br />
-    <span>${yaft_message_label}</span>
+    <span>${yaft_message_label}: *</span>
     <br />
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
 	<br />

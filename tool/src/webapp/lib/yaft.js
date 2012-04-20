@@ -445,6 +445,14 @@ function switchState(state,arg) {
 					YAFTUTILS.addFormattedDatesToCurrentDiscussion();
 					switchState('full');
    				},
+   			beforeSubmit: function(arr, $form, optins) {
+					if($('#yaft_message_editor').val() === '') {
+						alert(yaft_missing_message_message);
+   						return false;
+   					}
+   					
+   					return true;
+   				},
    			error : function(xmlHttpRequest,textStatus,errorThrown) {
 				}
    			}; 
