@@ -69,34 +69,34 @@ var yaftBaseDataUrl = "";
 	// We need the toolbar in a template so we can swap in the translations
 	SAKAIUTILS.renderTrimpathTemplate('yaft_toolbar_template',{},'yaft_toolbar');
 
-	$('#yaft_home_link').click(function (e) {
+	$('#yaft_home_link > span > a').click(function (e) {
 		switchState('forums');
 	});
 
-	$('#yaft_add_forum_link').click(function (e) {
+	$('#yaft_add_forum_link > span > a').click(function (e) {
 		switchState('editForum');
 	});
 
-	$('#yaft_add_discussion_link').click(function (e) {
+	$('#yaft_add_discussion_link > span > a').click(function (e) {
 		switchState('startDiscussion');
 	});
 
-	$('#yaft_permissions_link').click(function (e) {
+	$('#yaft_permissions_link > span > a').click(function (e) {
 		switchState('permissions');
 	});
 
-	$('#yaft_minimal_link').click(function (e) {
+	$('#yaft_minimal_link > span > a').click(function (e) {
 		switchState('minimal');
 	});
 
-	$('#yaft_full_link').click(function (e) {
+	$('#yaft_full_link > span > a').click(function (e) {
 		switchState('full');
 	});
 
-	$('#yaft_show_deleted_link').click(YAFTUTILS.showDeleted);
-	$('#yaft_hide_deleted_link').click(YAFTUTILS.hideDeleted);
+	$('#yaft_show_deleted_link > span > a').click(YAFTUTILS.showDeleted);
+	$('#yaft_hide_deleted_link > span > a').click(YAFTUTILS.hideDeleted);
 
-	$('#yaft_authors_view_link').click(function (e) {
+	$('#yaft_authors_view_link > span > a').click(function (e) {
 		switchState('authors');
 	});
 	
@@ -139,6 +139,8 @@ var yaftBaseDataUrl = "";
 
 function switchState(state,arg) {
 
+	$('#yaft_toolbar > li > span').removeClass('current');
+
 	$("#yaft_minimal_link").hide();
 	$("#yaft_full_link").hide();
 	$("#yaft_show_deleted_link").hide();
@@ -159,6 +161,7 @@ function switchState(state,arg) {
 	}
 
 	if('forums' === state) {
+	    $('#yaft_home_link > span').addClass('current');
 
 		if(yaftCurrentUserPermissions.forumCreate)
 			$("#yaft_add_forum_link").show();
@@ -170,6 +173,9 @@ function switchState(state,arg) {
 		YAFTUTILS.setCurrentForums(/* render = */ true);
 	}
 	else if('authors' === state) {
+	    $('#yaft_authors_view_link').show();
+	    $('#yaft_authors_view_link > span').addClass('current');
+
 		$("#yaft_breadcrumb").html(yaft_authors_label);
         YAFTUTILS.getAuthors();
     }
@@ -324,6 +330,9 @@ function switchState(state,arg) {
 		});
 	}
 	else if('editForum' === state) {
+
+	    $('#yaft_add_forum_link > span').addClass('current');
+
 		var forum = {'id':'','title':'','description':'',start: -1,end: -1,'groups': []};
 
 		if(arg && arg.forumId) {
@@ -496,6 +505,8 @@ function switchState(state,arg) {
 	 	});
 	}
 	else if('startDiscussion' === state) {
+	    $('#yaft_add_discussion_link').show();
+	    $('#yaft_add_discussion_link > span').addClass('current');
 
 		var discussion = {'id':''
 							,'subject':''
@@ -689,6 +700,7 @@ function switchState(state,arg) {
 		});
 	}
 	else if('permissions' === state) {
+	    $('#yaft_permissions_link > span').addClass('current');
 		var perms = YAFTUTILS.getSitePermissionMatrix();
 		SAKAIUTILS.renderTrimpathTemplate('yaft_permissions_breadcrumb_template',arg,'yaft_breadcrumb');
 		SAKAIUTILS.renderTrimpathTemplate('yaft_permissions_content_template',{'perms':perms},'yaft_content');

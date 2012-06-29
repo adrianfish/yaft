@@ -56,20 +56,17 @@
 
 </head>
 <body>
+
 <script>
     var arg = SAKAIUTILS.getParameters();
-    $.ajax({
-        url: '/library/skin/'+arg['skin']+'/tool.css',
-        dataType: 'text/css',
-        success: function(data, textStatus) {
-            $('head').append('<style type="text/css" rel="stylesheet">'+data+'</style>');
-        }
-    });
+    var url = '/library/skin/' + arg['skin'] + '/tool.css';
+    $('<link type="text/css" rel="stylesheet" href="' + url + '"/>').appendTo("head");
 </script>
 
 <div class="portletBody">
 
-<div id="yaft_toolbar"></div>
+<ul id="yaft_toolbar" class="navIntraTool actionToolBar" role="menu"></ul>
+
 <br />
 <div id="yaft_container">
 	<div id="yaft_breadcrumb"></div>
@@ -82,37 +79,17 @@
 <!--  Templates Start -->
 
 <div id="yaft_toolbar_template" style="display:none;"><!--
-<div style="overflow: hidden;" class="navIntraTool">
-	<div id="yaft_toolbar_items">
-		<a style="display: none;" id="yaft_home_link" title="${yaft_home_tooltip}" href="javascript:;">${yaft_home_label}</a>
-		<a style="display: none;" id="yaft_add_forum_link" title="${yaft_add_forum_tooltip}" href="javascript:;">${yaft_new_forum_label}</a>
-		<a style="display: none;" id="yaft_add_discussion_link" title="${yaft_add_discussion_tooltip}" href="javascript:;">${yaft_new_discussion_label}</a>
-		<a style="display: none;" id="yaft_permissions_link" title="${yaft_permissions_tooltip}" href="javascript:;">${yaft_permissions_label}</a>
-		<a style="display: none;" id="yaft_minimal_link" title="${yaft_minimal_tooltip}" href="javascript:;">${yaft_minimal_label}</a>
-		<a style="display: none;" id="yaft_full_link" title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a>
-		<a style="display: none;" id="yaft_show_deleted_link" title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a>
-		<a style="display: none;" id="yaft_hide_deleted_link" title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a>
-		<a id="yaft_authors_view_link" title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a>
-	</div>
-	<div id="yaft_search_bar">
-	<input id="yaft_search_field" type="text"/><input type="button" value="${yaft_search_label}"/>
-	</div>
-	<div style="clear:both;"></div>
-</div>
+    <li id="yaft_home_link" role="menuitem"><span class="firstToolBarItem current"><a title="${yaft_home_tooltip}" href="javascript:;">${yaft_home_label}</a></span></li>
+	<li id="yaft_add_forum_link" role="menuitem"><span><a title="${yaft_add_forum_tooltip}" href="javascript:;">${yaft_new_forum_label}</a></span></li>
+	<li id="yaft_add_discussion_link" role="menuitem"><span><a title="${yaft_add_discussion_tooltip}" href="javascript:;">${yaft_new_discussion_label}</a></span></li>
+	<li id="yaft_minimal_link" role="menuitem"><span><a title="${yaft_minimal_tooltip}" href="javascript:;">${yaft_minimal_label}</a></span></li>
+	<li id="yaft_full_link" role="menuitem"><span><a title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a></span></li>
+	<li id="yaft_show_deleted_link" role="menuitem"><span><a title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a></span></li>
+	<li id="yaft_hide_deleted_link" role="menuitem"><span><a title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a></span></li>
+	<li id="yaft_authors_view_link" role="menuitem"><span><a title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a></span></li>
+	<li id="yaft_permissions_link" role="menuitem"><span><a title="${yaft_permissions_tooltip}" href="javascript:;">${yaft_permissions_label}</a></span></li>
 -->
 </div>
-
-<!--ul class="navIntraTool actionToolBar" role="menu">
-        <li id="yaft_home_link" class="firstToolBarItem" role="menuItem"><span><a title="${yaft_home_tooltip}" href="javascript:;">${yaft_home_label}</a></span></li> 
-        <li id="yaft_add_forum_link" style="display: none;" role="menuItem"><span><a title="${yaft_add_forum_tooltip}" href="javascript:;">${yaft_new_forum_label}</a></span></li>
-        <li id="yaft_add_discussion_link" style="display: none;" role="menuItem"><span><a title="${yaft_add_discussion_tooltip}" href="javascript:;">${yaft_new_discussion_label}</a></span></li>
-        <li id="yaft_permissions_link" style="display: none;" role="menuItem"><span><a title="${yaft_permissions_tooltip}" href="javascript:;">${yaft_permissions_label}</a></span></li>
-        <li id="yaft_minimal_link" style="display: none;" role="menuItem"><span><a title="${yaft_minimal_tooltip}" href="javascript:;">${yaft_minimal_label}</a></span></li>
-        <li id="yaft_full_link" style="display: none;" role="menuItem"><span><a title="${yaft_full_tooltip}" href="javascript:;">${yaft_full_label}</a></span></li>
-        <li id="yaft_show_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_show_deleted_tooltip}" href="javascript:;">${yaft_show_deleted_label}</a></span></li>
-        <li id="yaft_hide_deleted_link" style="display: none;" role="menuItem"><span><a title="${yaft_hide_deleted_tooltip}" href="javascript:;">${yaft_hide_deleted_label}</a></span></li>
-        <li id="yaft_authors_view_link" role="menuItem"><span><a title="${yaft_authors_view_tooltip}" href="javascript:;">${yaft_authors_label}</a></span></li>
-</ul-->
 
 <div id="yaft_forums_breadcrumb_template" style="display:none;"><!--
 ${yaft_forums_label}
