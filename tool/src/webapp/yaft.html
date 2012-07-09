@@ -830,6 +830,7 @@ ${yaft_forums_label}
 					{/if}
 					</a>
 				{/for}
+				{if message.parent && 'DELETED' != message.status && ( (yaftCurrentUserPermissions.messageDeleteOwn && yaftCurrentUser.id == message.creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${message.id}');">${yaft_delete_label}</a></span>{/if}
 			</div>
 			<div class="yaft_full_message" id="${message.id}" style="display: none;overflow: auto;margin-top:5px;"></div>
 		{/if}
