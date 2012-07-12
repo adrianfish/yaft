@@ -23,17 +23,16 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.yaft.api.Attachment;
 import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Forum;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
+import org.sakaiproject.yaft.api.YaftGBAssignment;
 
 public class DefaultSqlGenerator implements SqlGenerator
 {
@@ -386,6 +385,21 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		return statements;
 	}
+	
+	public List<String> getClearDiscussionStatements(String forumId, String discussionId)
+	{
+		List<String> statements = new ArrayList<String>();
+
+		statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - (SELECT MESSAGE_COUNT FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = '" + discussionId + "') + 1 WHERE FORUM_ID = '" + forumId + "'");
+		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = (SELECT MAX(yd.LAST_MESSAGE_DATE) FROM YAFT_FORUM_DISCUSSION AS yfd,YAFT_DISCUSSION AS yd WHERE yfd.DISCUSSION_ID = yd.DISCUSSION_ID AND yfd.FORUM_ID = '" + forumId + "') WHERE FORUM_ID = '" + forumId + "'");
+		statements.add("UPDATE YAFT_FORUM SET LAST_MESSAGE_DATE = NULL WHERE FORUM_ID = '" + forumId + "' AND MESSAGE_COUNT  = 0");
+		// Delete the child messages, not the topic starter
+		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE DISCUSSION_ID = '" + discussionId + "' AND PARENT_MESSAGE_ID IS NOT NULL");
+		statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
+		statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");
+
+		return statements;
+	}
 
 	public List<String> getDeleteMessageStatements(Message message, String forumId,Connection conn)
 	{
@@ -671,10 +685,10 @@ public class DefaultSqlGenerator implements SqlGenerator
 		st.setBoolean(3, discussion.isLockedForWriting());
 		st.setBoolean(4, discussion.isLockedForReading());
 		
-		Assignment gradebookAssignment = discussion.getAssignment();
+		YaftGBAssignment gradebookAssignment = discussion.getAssignment();
 		
 		if(gradebookAssignment != null) {
-			st.setLong(5, gradebookAssignment.getId());
+			st.setLong(5, gradebookAssignment.id);
 		} else {
 			st.setNull(5,Types.INTEGER);
 		}

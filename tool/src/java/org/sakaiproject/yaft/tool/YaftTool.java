@@ -24,6 +24,8 @@ import javax.servlet.http.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonValueProcessor;
+import net.sf.json.processors.JsonValueProcessor;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -225,6 +227,7 @@ public class YaftTool extends HttpServlet {
 					Forum forum = yaftForumService.getForum(forumId, state);
 					JsonConfig config = new JsonConfig();
 					config.setExcludes(new String[] { "properties", "reference" });
+					//config.registerJsonBeanProcessor("sqldateprocessor", new JsDateJsonValueProcessor());
 					JSONObject forumObject = JSONObject.fromObject(forum, config);
 					Map<String, Integer> counts = yaftForumService.getReadMessageCountForForum(forumId);
 					JSONObject countsObject = JSONObject.fromObject(counts);
@@ -363,6 +366,17 @@ public class YaftTool extends HttpServlet {
 							return;
 						}
 					}
+				} else if ("clear".equals(discussionOp)) {
+					yaftForumService.clearDiscussion(discussionId);
+					Discussion discussion = yaftForumService.getDiscussion(discussionId,false);
+					JsonConfig config = new JsonConfig();
+					config.setExcludes(new String[] { "properties", "reference" });
+					JSONObject json = JSONObject.fromObject(discussion,config);
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json");
+					response.getWriter().write(json.toString());
+					response.getWriter().close();
+					return;
 				}
 			}
 		}
@@ -505,10 +519,11 @@ public class YaftTool extends HttpServlet {
 		data.accumulate("permissions", permsData);
 
 		if (sakaiProxy.currentUserHasFunction("gradebook.editAssignments")) {
-			List<Assignment> assignments = sakaiProxy.getGradebookAssignments();
-			JsonConfig config = new JsonConfig();
-			config.setExcludes(new String[] { "dueDate" });
-			JSONArray assignmentsData = JSONArray.fromObject(assignments, config);
+			List<YaftGBAssignment> assignments = sakaiProxy.getGradebookAssignments();
+			//JsonConfig config = new JsonConfig();
+			//config.setExcludes(new String[] { "dueDate" });
+			//JSONArray assignmentsData = JSONArray.fromObject(assignments, config);
+			JSONArray assignmentsData = JSONArray.fromObject(assignments);
 			data.accumulate("assignments", assignmentsData);
 		}
 

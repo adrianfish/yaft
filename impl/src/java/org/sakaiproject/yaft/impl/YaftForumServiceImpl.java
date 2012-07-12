@@ -628,4 +628,8 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 	public boolean setDiscussionGroups(String discussionId, Collection<String> groups) {
 		return persistenceManager.setDiscussionGroups(discussionId,groups);
 	}
+
+	public boolean clearDiscussion(String discussionId) {
+		return persistenceManager.clearDiscussion(discussionId);
+	}
 }

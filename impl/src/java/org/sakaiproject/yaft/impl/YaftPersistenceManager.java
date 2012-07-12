@@ -22,14 +22,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -42,6 +40,7 @@ import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.Author;
 import org.sakaiproject.yaft.api.SakaiProxy;
+import org.sakaiproject.yaft.api.YaftGBAssignment;
 import org.sakaiproject.yaft.impl.sql.ColumnNames;
 import org.sakaiproject.yaft.impl.sql.DefaultSqlGenerator;
 import org.sakaiproject.yaft.impl.sql.HypersonicGenerator;
@@ -614,7 +613,7 @@ public class YaftPersistenceManager
 			
 			int gradebookAssignmentId = rs.getInt("GRADEBOOK_ASSIGNMENT_ID");
 			if(gradebookAssignmentId != 0) {
-				Assignment  assignment = sakaiProxy.getGradebookAssignment(gradebookAssignmentId);
+				YaftGBAssignment  assignment = sakaiProxy.getGradebookAssignment(gradebookAssignmentId);
 				discussion.setAssignment(assignment);
 			}
 		
@@ -2067,7 +2066,7 @@ public class YaftPersistenceManager
 				Author author = new Author( id,sakaiProxy.getDisplayNameForUser(id),rs.getInt("NUMBER_OF_POSTS") );
 				
 				if(discussion.isGraded()) {
-					GradeDefinition grade = sakaiProxy.getAssignmentGrade(id,discussion.getAssignment().getId());
+					GradeDefinition grade = sakaiProxy.getAssignmentGrade(id,discussion.getAssignment().id);
 					author.setGrade(grade);
 				}
 				
@@ -2199,6 +2198,72 @@ public class YaftPersistenceManager
 					}
 					catch (SQLException e) {}
 				}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+	}
+
+	public boolean clearDiscussion(String discussionId) {
+		Connection connection = null;
+		Statement statement = null;
+
+		try
+		{
+			Discussion discussion = getDiscussion(discussionId, false);
+			
+			if(discussion == null)
+			{
+				logger.error("No discussion for id: " + discussionId + ". Returning false ...");
+				return false;
+			}
+			
+			String forumId = discussion.getForumId();
+			connection = sakaiProxy.borrowConnection();
+			boolean oldAutoCommitFlag = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			try
+			{
+				List<String> statements = sqlGenerator.getClearDiscussionStatements(forumId,discussionId);
+				
+				statement = connection.createStatement();
+				
+				for(String sql : statements)
+					statement.executeUpdate(sql);
+				
+				String deleteActiveDiscussionSql = sqlGenerator.getDeleteFromActiveDiscussionStatement(discussionId);
+				statement.executeUpdate(deleteActiveDiscussionSql);
+				
+				connection.commit();
+				
+				return true;
+			}
+			catch (SQLException sqle)
+			{
+				logger.error("Caught exception whilst clearing discussion. Rolling back ...", sqle);
+				connection.rollback();
+				return false;
+			}
+			finally
+			{
+				connection.setAutoCommit(oldAutoCommitFlag);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Caught exception whilst clearing discussion.", e);
+			return false;
+		}
+		finally
+		{
+			if(statement != null)
+			{
+				try
+				{
+					statement.close();
+				}
+				catch (Exception e) {}
 			}
 			
 			sakaiProxy.returnConnection(connection);

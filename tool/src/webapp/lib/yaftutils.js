@@ -710,6 +710,32 @@ var YAFTUTILS = (function($) {
 		
 		return false;
 	};
+
+	my.clearDiscussion = function(discussionId,discussionTitle) {
+		if(!confirm(yaft_clear_discussion_message_one + "'" + discussionTitle + "'" + yaft_clear_discussion_message_two))
+			return false;
+		
+		jQuery.ajax( {
+	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/clear",
+	   		dataType : "json",
+	   		async : false,
+			cache: false,
+		   	success : function(data,textStatus) {
+		   		// Switch the updated discussion into the current forum
+		   		alert(data);
+		   		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
+		   			if(yaftCurrentForums.discussions[i].id === data.id) {
+		   			}
+		   		}
+				switchState('forum',{'forumId':yaftCurrentForum.id});
+			},
+			error : function(xhr,textStatus,errorThrown) {
+				alert("Failed to clear discussion. Reason: " + textStatus);
+			}
+		});
+		
+		return false;
+	};
 	
     function getDescendantIds(messageId,testMessage,descendantIds) {
     	for(var i=0,j=testMessage.children.length;i<j;i++) {

@@ -22,7 +22,6 @@ import java.util.Stack;
 
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -61,14 +60,14 @@ public class Discussion implements Entity
 		return groups;
 	}
 	
-	private Assignment assignment = null;
+	private YaftGBAssignment assignment = null;
 
 	
-	public void setAssignment(Assignment assignment) {
+	public void setAssignment(YaftGBAssignment assignment) {
 		this.assignment = assignment;
 	}
 
-	public Assignment getAssignment() {
+	public YaftGBAssignment getAssignment() {
 		return assignment;
 	}
 	

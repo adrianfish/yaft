@@ -125,4 +125,5 @@ public interface YaftForumService extends EntityProducer
 	
 	public boolean setDiscussionGroups(String discussionId,Collection<String> groups);
 
+	public boolean clearDiscussion(String discussionId);
 }

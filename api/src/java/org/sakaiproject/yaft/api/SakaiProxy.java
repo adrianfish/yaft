@@ -125,9 +125,9 @@ public interface SakaiProxy
 	//public void createGradebookAssignment(String subject);
 
 	/** Gets the list of assignments for the current worksite*/
-	public List<Assignment> getGradebookAssignments();
+	public List<YaftGBAssignment> getGradebookAssignments();
 
-	public Assignment getGradebookAssignment(int gradebookAssignmentId);
+	public YaftGBAssignment getGradebookAssignment(int gradebookAssignmentId);
 
 	public GradeDefinition getAssignmentGrade(String userId, long assignmentId);
 

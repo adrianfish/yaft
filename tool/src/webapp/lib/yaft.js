@@ -194,7 +194,6 @@ function switchState(state,arg) {
 			YAFTUTILS.setCurrentForums();
 		}
 		
-		
 		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentUser.id == yaftCurrentForum.creatorId)) {
 			$("#yaft_add_discussion_link").show();
 		}

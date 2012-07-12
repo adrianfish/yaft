@@ -228,6 +228,9 @@ ${yaft_forums_label}
 		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
 			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}">${yaft_edit_label}</a>&nbsp;
 		{/if}
+		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id)}
+			<a href="javascript:;" onclick="return YAFTUTILS.clearDiscussion('${discussion.id}','${discussion.subject}');" title="${yaft_clear_discussion_tooltip}">${yaft_clear_label}</a>&nbsp;
+		{/if}
 		{if yaftCurrentUserPermissions.discussionCreate && ((yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaftCurrentUser.id) || yaftCurrentUserPermissions.discussionDeleteAny)}
 		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}">${yaft_move_discussion_label2}</a>{/if}
 		{/if}

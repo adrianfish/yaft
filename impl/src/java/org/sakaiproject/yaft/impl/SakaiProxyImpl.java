@@ -81,6 +81,7 @@ import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftForumService;
 import org.sakaiproject.yaft.api.YaftFunctions;
+import org.sakaiproject.yaft.api.YaftGBAssignment;
 
 /**
  * All Sakai API calls go in here. If Sakai changes all we have to do if mod
@@ -744,22 +745,26 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return siteSkin != null ? siteSkin : (skin != null ? skin : "default");
 	}
 
-	public List<Assignment> getGradebookAssignments() {
-		List<Assignment> assignments = new ArrayList<Assignment>();
+	public List<YaftGBAssignment> getGradebookAssignments() {
+		List<YaftGBAssignment> yaftGBAssignments = new ArrayList<YaftGBAssignment>();
 		try {
-			return gradebookService.getAssignments(getCurrentSiteId());
+			List<Assignment> gbAssignments = gradebookService.getAssignments(getCurrentSiteId());
+			for(Assignment gbAss : gbAssignments) {
+				yaftGBAssignments.add(new YaftGBAssignment(gbAss.getId(),gbAss.getName()));
+			}
 		} catch (GradebookNotFoundException gnfe) {
 			// Normal. GB has not been added to the site yet.
 		} catch (Exception e) {
 			logger.error("Caught exception whilst getting gradebook assignments for current site. Message: " + e.getMessage());
 		}
 
-		return assignments;
+		return yaftGBAssignments;
 	}
 
-	public Assignment getGradebookAssignment(int gradebookAssignmentId) {
+	public YaftGBAssignment getGradebookAssignment(int gradebookAssignmentId) {
 		try {
-			return gradebookService.getAssignment(getCurrentSiteId(), (long) gradebookAssignmentId);
+			Assignment gbAss = gradebookService.getAssignment(getCurrentSiteId(), (long) gradebookAssignmentId);
+			return new YaftGBAssignment(gbAss.getId(),gbAss.getName());
 		} catch (AssessmentNotFoundException e) {
 			return null;
 		}
