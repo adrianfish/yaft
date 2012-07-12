@@ -509,10 +509,10 @@ function switchState(state,arg) {
 
 		var discussion = {'id':''
 							,'subject':''
-							,lockedForWriting:yaftCurrentForum.lockedForWriting
-							,lockedForReading:yaftCurrentForum.lockedForReading
-							,start: yaftCurrentForum.start
-							,end: yaftCurrentForum.end
+							,'lockedForWriting':yaftCurrentForum.lockedForWriting
+							,'lockedForReading':yaftCurrentForum.lockedForReading
+							,'start': yaftCurrentForum.startDate
+							,'end': yaftCurrentForum.endDate
 							,'firstMessage':{'content':''}
 							,'grade': false
 							,'groups':[]
@@ -562,7 +562,7 @@ function switchState(state,arg) {
             	},
    			success: function(responseText,statusText,xhr) {
    					if(responseText.match(/^ERROR.*/)) {
-   						alert(yaft_failed_to_create_edit_discussion);
+   						alert(yaft_failed_to_create_edit_discussion + ". Reason: " + responseText);
    					}
    					else {
 						var discussion = YAFTUTILS.getDiscussion(responseText);
@@ -773,7 +773,7 @@ function setupAvailability(element) {
 		hideIfNoPrevNext: true
 	});
 
-	if(element.start != -1 && element.end != -1) {
+	if(element.start > 0 && element.end > 0) {
 		startDate.attr('disabled',false);
 		startDate.css('background-color','white');
 		$('#yaft_start_hour_selector').attr('disabled',false);
