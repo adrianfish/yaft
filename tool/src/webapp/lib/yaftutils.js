@@ -722,9 +722,9 @@ var YAFTUTILS = (function($) {
 			cache: false,
 		   	success : function(data,textStatus) {
 		   		// Switch the updated discussion into the current forum
-		   		alert(data);
 		   		for(var i=0,j=yaftCurrentForum.discussions.length;i<j;i++) {
-		   			if(yaftCurrentForums.discussions[i].id === data.id) {
+		   			if(yaftCurrentForum.discussions[i].id === data.id) {
+		   			    yaftCurrentForum.discussions[i] = data;
 		   			}
 		   		}
 				switchState('forum',{'forumId':yaftCurrentForum.id});
