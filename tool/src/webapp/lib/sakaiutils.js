@@ -207,7 +207,7 @@ var SAKAIUTILS = (function ($) {
 	
 	my.getEditorData = function(editorId,textarea_id) {
 		if ('FCKeditor' === editorId) {
-			return this.getWysiwygEditor(editorId,textarea_id).EditorDocument.body.text;
+			return this.getWysiwygEditor(editorId,textarea_id).GetData();
 		} else if ('ckeditor' === editorId) {
 			return this.getWysiwygEditor(editorId,textarea_id).getData();
 		} else {
