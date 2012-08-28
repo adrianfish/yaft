@@ -1706,7 +1706,7 @@ public class YaftPersistenceManager
 			else
 				return null;
 			
-			return securityManager.filterForum(getForum(forumId,state),null);
+			return securityManager.filterForum(getForum(forumId,state),siteId);
 		}
 		catch (Exception e)
 		{
