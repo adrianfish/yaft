@@ -264,7 +264,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return securityManager.filterFora(fora);
+		return securityManager.filterFora(fora,siteId);
 	}
 
 	boolean addOrUpdateForum(Forum forum)
@@ -471,7 +471,7 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 		
-		return securityManager.filterFora(fora);
+		return securityManager.filterFora(fora,null);
 	}
 
 	private void getMessageChildren(Message message,List<Group> groups, Connection connection) throws Exception

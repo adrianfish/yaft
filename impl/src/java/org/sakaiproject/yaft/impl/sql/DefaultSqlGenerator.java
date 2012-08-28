@@ -108,8 +108,25 @@ public class DefaultSqlGenerator implements SqlGenerator
 	{
 		List<PreparedStatement> statements = new ArrayList<PreparedStatement>();
 		
-		if (forum.getId().length() > 0)
-		{
+		// If the forum has an id, it is probably an existing one. Maybe not though ...
+		boolean existing = (forum.getId().length() > 0);
+		
+		if(existing) {
+			// Do a proper check against the DB
+			Statement testST = null;
+		
+			try {
+				testST = connection.createStatement();
+				ResultSet testRS = testST.executeQuery("SELECT FORUM_ID FROM YAFT_FORUM WHERE FORUM_ID = '" + forum.getId() + "'");
+				if(testRS.next()) existing = true; // If we get a record, it exists.
+				testRS.close();
+			} catch(SQLException sqle) {
+			} finally {
+				if(testST != null) testST.close();
+			}
+		}
+		
+		if (existing) {
 			String updateSql = "UPDATE YAFT_FORUM SET TITLE = ?, DESCRIPTION = ?,START_DATE = ?,END_DATE = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ? WHERE FORUM_ID = ?";
 
 			PreparedStatement ps = connection.prepareStatement(updateSql);

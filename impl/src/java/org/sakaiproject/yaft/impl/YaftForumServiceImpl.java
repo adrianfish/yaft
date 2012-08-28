@@ -123,7 +123,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		if (logger.isDebugEnabled())
 			logger.debug("getSiteForums()");
 		
-		return securityManager.filterFora(persistenceManager.getFora(siteId, fully));
+		return securityManager.filterFora(persistenceManager.getFora(siteId, fully),siteId);
 	}
 	
 	public boolean addOrUpdateForum(Forum forum)
@@ -234,7 +234,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		if (logger.isDebugEnabled())
 			logger.debug("getFora()");
 
-		return securityManager.filterFora(persistenceManager.getFora(fully));
+		return securityManager.filterFora(persistenceManager.getFora(fully),null);
 	}
 
 	/**

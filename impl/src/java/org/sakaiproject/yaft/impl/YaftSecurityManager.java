@@ -19,13 +19,15 @@ public class YaftSecurityManager
 		this.sakaiProxy = sakaiProxy;
 	}
 	
-	public List<Forum> filterFora(List<Forum> fora)
+	public List<Forum> filterFora(List<Forum> fora,String siteId)
 	{
 		if("IndexManager".equals(Thread.currentThread().getName())) {
 			return fora;
 		}
 		
-		String siteId = sakaiProxy.getCurrentSiteId();
+		if(siteId == null || siteId.length() == 0) {
+			siteId = sakaiProxy.getCurrentSiteId();
+		}
 		
 		List<Forum> filtered = new ArrayList<Forum>();
 		
