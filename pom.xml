@@ -25,7 +25,7 @@
         <servlet-api.version>2.4</servlet-api.version>
         <commons-lang.version>2.4</commons-lang.version>
         <calendar.version>2.7.0</calendar.version> <!-- 2.7.x build -->
-	  	<profile-api.version>2.7-SNAPSHOT</profile-api.version>
+	  	<profile-api.version>2.7.3</profile-api.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
   	
