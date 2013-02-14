@@ -819,4 +819,11 @@ public class DefaultSqlGenerator implements SqlGenerator
 		
 		return statements;
 	}
+
+	@Override
+	public PreparedStatement getSelectSiteForaStatement(String siteId, Connection connection) throws Exception {
+		PreparedStatement st = connection.prepareStatement("SELECT * FROM YAFT_FORUM WHERE SITE_ID = ?");
+		st.setString(1,siteId);
+		return st;
+	}
 } 

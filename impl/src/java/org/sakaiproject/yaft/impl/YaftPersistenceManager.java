@@ -2269,4 +2269,38 @@ public class YaftPersistenceManager
 			sakaiProxy.returnConnection(connection);
 		}
 	}
+
+	public List<Forum> getForaForSite(String siteId) {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		List<Forum> fora = new ArrayList<Forum>();
+
+		try {
+			connection = sakaiProxy.borrowConnection();
+			statement = sqlGenerator.getSelectSiteForaStatement(siteId,connection);
+			rs = statement.executeQuery();
+			while(rs.next()) {
+				fora.add(getForumFromResults(rs, connection));
+			}
+		} catch(Exception e) {
+			logger.warn("Caught exception whilst getting fora for site " + siteId + ". Reason: " + e.getMessage() + ". An empty list will be returned.");
+		} finally {
+			if(rs != null) {
+				try {
+					rs.close();
+				}
+				catch (Exception e) {}
+			}
+			if(statement != null) {
+				try {
+					statement.close();
+				}
+				catch (Exception e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+		return fora;
+	}
 }

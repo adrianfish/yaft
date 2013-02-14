@@ -484,7 +484,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public void registerEntityProducer(EntityProducer entityProducer) {
-		entityManager.registerEntityProducer(entityProducer, YaftForumService.ENTITY_PREFIX);
+		entityManager.registerEntityProducer(entityProducer, YaftForumService.REFERENCE_ROOT);
 	}
 
 	public void postEvent(String event, String reference, boolean modify) {

@@ -25,6 +25,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.EntityTransferrer;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
@@ -43,7 +44,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
+public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer, SecurityAdvisor
 {
 	private Logger logger = Logger.getLogger(YaftForumServiceImpl.class);
 
@@ -195,6 +196,30 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 
 		return true;
 	}
+	
+	public boolean addMessageRecursively(String siteId, String forumId, Message message,String parentId, String discussionId) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("addOrUpdateMessage()");
+		}
+		
+		message.setId("");
+		message.setSiteId(siteId);
+		message.setParent(parentId);
+		message.setDiscussionId(discussionId);
+
+		if (!persistenceManager.addOrUpdateMessage(siteId, forumId, message,null)) {
+			return false;
+		}
+
+		// SiteStats/Search etc event
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
+		
+		for(Message child : message.getChildren()) {
+			addMessageRecursively(siteId, forumId, child,message.getId(),discussionId);
+		}
+
+		return true;
+	}
 
 	public Discussion addDiscussion(String siteId, String forumId, Discussion discussion, boolean sendMail)
 	{
@@ -245,7 +270,7 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 		if (logger.isDebugEnabled())
 			logger.debug("getForumDiscussions(" + forumId + ")");
 
-		Forum forum = persistenceManager.getForum(forumId, ForumPopulatedStates.PART);
+		Forum forum = persistenceManager.getForum(forumId, (fully) ? ForumPopulatedStates.FULL : ForumPopulatedStates.PART);
 		return securityManager.filterDiscussions(forum.getDiscussions());
 	}
 
@@ -631,5 +656,48 @@ public class YaftForumServiceImpl implements YaftForumService, SecurityAdvisor
 
 	public boolean clearDiscussion(String discussionId) {
 		return persistenceManager.clearDiscussion(discussionId);
+	}
+	
+	private List<Forum> getForaForSite(String siteId) {
+		return persistenceManager.getForaForSite(siteId);
+	}
+
+	public String[] myToolIds() {
+		String[] toolIds = { "sakai.yaft" };
+		return toolIds;
+	}
+
+	public void transferCopyEntities(String fromContext, String toContext, List ids) {
+		List<Forum> fora = getForaForSite(fromContext);
+		for(Forum forum : fora) {
+			// Get the discussions before we null the forum id !
+			List<Discussion> discussions = getForumDiscussions(forum.getId(), true);
+			forum.setId(""); // This'll force a new GUID for the copy
+			forum.setSiteId(toContext);
+			addOrUpdateForum(forum, false);
+			for(Discussion discussion : discussions) {
+				discussion.setForumId(forum.getId());
+				discussion.getFirstMessage().setId(""); // Again, this'll force a new GUID id
+				addDiscussion(toContext, forum.getId(), discussion, false);
+				Message firstMessage = discussion.getFirstMessage();
+				
+				for(Message child : firstMessage.getChildren()) {
+					addMessageRecursively(toContext, forum.getId(), child, firstMessage.getId(),discussion.getId());
+				}
+			}
+		}
+	}
+
+	public void transferCopyEntities(String fromContext, String toContext, List ids, boolean cleanup) {
+		
+		if(cleanup) {
+			// Deep delete the target context's forum data.
+			List<Forum> fora = getForaForSite(toContext);
+			for(Forum forum : fora) {
+				deleteForum(forum.getId());
+			}
+		}
+		
+		transferCopyEntities(fromContext, toContext, ids);
 	}
 }
