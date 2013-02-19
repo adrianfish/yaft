@@ -16,6 +16,7 @@
 package org.sakaiproject.yaft.tool;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import javax.servlet.*;
@@ -85,7 +86,7 @@ public class YaftTool extends HttpServlet {
 				// means that we can't pass url parameters to the page.We can
 				// use a cookie and the JS will pull the initial state from that
 				// instead.
-				Cookie params = new Cookie("sakai-tool-params", "state=forums&siteId=" + siteId + "&placementId=" + placementId + "&langage=" + languageCode + "&country=" + countryCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal");
+				Cookie params = new Cookie("sakai-tool-params", URLEncoder.encode("state=forums&siteId=" + siteId + "&placementId=" + placementId + "&language=" + languageCode + "&country=" + countryCode + "&skin=" + sakaiProxy.getSakaiSkin() + "&viewMode=minimal","UTF-8"));
 				response.addCookie(params);
 
 				RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/yaft.html");

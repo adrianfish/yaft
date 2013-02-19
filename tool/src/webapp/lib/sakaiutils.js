@@ -86,7 +86,7 @@ var SAKAIUTILS = (function ($) {
 		}
 		else {
 			// No url params. Let's try the cookie
-			var paramString = this.readCookie('sakai-tool-params');
+			var paramString = unescape(this.readCookie('sakai-tool-params'));
 		}
 			
 		if(paramString.indexOf("#") != -1)
