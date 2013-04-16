@@ -158,3 +158,6 @@ yaft_delete_selected_discussions_message = 'Are you sure you want to delete the 
 yaft_forums_get_started = "You haven't created any forums in this worksite yet. To create a forum, just click the 'New Forum' button above.";
 yaft_create_forum_instruction = "To create a forum, just enter a title more than four characters in length then click 'Save'. If you don't want the other members of this site to get an alert, just uncheck the 'Send email alert' box.";
 yaft_discussions_get_started = "You haven't created any topics in this forum yet. To create a topic, just click the 'New Topic' button above.";
+yaft_previous_author_tooltip = "View the previous author's messages."
+yaft_next_author_tooltip = "View the next author's messages."
+yaft_messages_by = "Messages by";

@@ -1005,6 +1005,11 @@ ${yaft_forums_label}
 
 <div id="yaft_author_messages_template" style="display:none"><!--
     {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
+    <div id="yaft_author_nav_buttons">
+    	<img id="yaft_previous_author_button" src="/library/image/silk/resultset_previous.png" title="${yaft_previous_author_tooltip}" alt="${yaft_previous_author_tooltip}"/>
+    	<img id="yaft_next_author_button" src="/library/image/silk/resultset_next.png" title="${yaft_next_author_tooltip}" alt="${yaft_next_author_tooltip}" />
+    	<span>${yaft_messages_by} <b>${displayName}</b></span>
+    </div>
     {for message in messages}
 		<div class="yaft_message">
 		

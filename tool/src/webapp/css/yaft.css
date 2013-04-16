@@ -224,3 +224,7 @@ th.yaftSortableTableHeaderSortDown {
     font-weight: bold;
     text-align: center;
 }
+
+#yaft_author_nav_buttons {
+    padding-bottom: 5px;
+}

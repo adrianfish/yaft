@@ -15,12 +15,13 @@
  */
  
  
-/* Stuff that we always expect to be setup */
 var yaftCurrentUser = null;
 var yaftCurrentUserPermissions = null;
 var yaftCurrentForums = null;
+
 /* Needed for show author messages */
-var yaftCurrentAuthors = null;
+var yaftCurrentAuthors = [];
+
 var yaftGradebookAssignments = [];
 
 /* State specific stuff */
@@ -29,6 +30,9 @@ var yaftCurrentDiscussion = null;
 var yaftShowingDeleted = false;
 
 var yaftBaseDataUrl = "";
+
+// This is used in the author_messages view.
+var yaftSortedAuthorIds = [];
 
 (function() {
 	

@@ -1082,6 +1082,11 @@ var YAFTUTILS = (function($) {
             async: false,
 		   	success : function(data,textStatus) {
                 yaftCurrentAuthors = data;
+                yaftCurrentAuthors.sort(function(a,b) {
+                    if(a.displayName < b.displayName) return -1;
+                    else if(a.displayName > b.displayName) return 1;
+                    else return 0;
+                });
 			},
 			error : function(xhr,textStatus,errorThrown) {
 				alert("Failed to get the current set of authors. Status: " + textStatus + ". Error: " + errorThrown);
@@ -1108,8 +1113,12 @@ var YAFTUTILS = (function($) {
 	   		dataType : "json",
 	   		cache : false,
 		   	success : function(data,textStatus) {
-                var stuff = {'messages': data,'assignment':yaftCurrentDiscussion.assignment};
-                if(author.grade) stuff.grade = author.grade.grade;
+                var stuff = {'messages': data,'assignment':yaftCurrentDiscussion.assignment,'displayName':author.displayName};
+
+                if(author.grade) {
+                    stuff.grade = author.grade.grade;
+                }
+
                 SAKAIUTILS.renderTrimpathTemplate('yaft_author_messages_template',stuff,'yaft_content');
 
 	  	        $(document).ready(function() {
@@ -1132,6 +1141,26 @@ var YAFTUTILS = (function($) {
 			                error : function(xhr,textStatus,errorThrown) {
 			                }
                         });
+                    });
+
+                    $('#yaft_previous_author_button').click(function () {
+                        for(var i=0,j=yaftCurrentAuthors.length;i<j;i++) {
+                            if(yaftCurrentAuthors[i].id === authorId) {
+                                if(i > 0) {
+                                    YAFTUTILS.showAuthorPosts(yaftCurrentAuthors[i - 1].id);
+                                }
+                            }
+                        }
+                    });
+
+                    $('#yaft_next_author_button').click(function () {
+                        for(var i=0,j=yaftCurrentAuthors.length;i<j;i++) {
+                            if(yaftCurrentAuthors[i].id === authorId) {
+                                if(i < (j - 1)) {
+                                    YAFTUTILS.showAuthorPosts(yaftCurrentAuthors[i + 1].id);
+                                }
+                            }
+                        }
                     });
 
 			        if(window.frameElement) {
