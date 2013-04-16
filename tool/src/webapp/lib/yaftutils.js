@@ -76,7 +76,7 @@ var YAFTUTILS = (function($) {
 		}
 
 	   	var forum = {
-	   		'siteId':yaftSiteId,
+	   		'siteId':startupArgs.siteId,
 			'id':$('#yaft_id_field').val(),
 			'startDate':startDate,
 			'endDate':endDate,
@@ -90,7 +90,7 @@ var YAFTUTILS = (function($) {
 		};
 	   		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forums",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/forums",
 	   		dataType : "text",
 	   		type: 'POST',
 	   		'data': forum,
@@ -141,7 +141,7 @@ var YAFTUTILS = (function($) {
         var groups = null;
 
         $.ajax( {
-            url : "/portal/tool/" + yaftPlacementId + "/siteGroups",
+            url : "/portal/tool/" + startupArgs.placementId + "/siteGroups",
             dataType : "json",
             cache: false,
             async : false,
@@ -157,7 +157,7 @@ var YAFTUTILS = (function($) {
 	
 	my.clearActiveDiscussionsForCurrentUser = function() {
 		$.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/activeDiscussions/clear",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/activeDiscussions/clear",
 			dataType : "text",
 			cache: false,
 			async : false,
@@ -456,7 +456,7 @@ var YAFTUTILS = (function($) {
 		var discussion = null;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/discussionContainingMessage?messageId=" + messageId,
+	   		url : "/portal/tool/" + startupArgs.placementId + "/discussions/discussionContainingMessage?messageId=" + messageId,
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -475,7 +475,7 @@ var YAFTUTILS = (function($) {
 		var forum = null;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forumContainingMessage?messageId=" + messageId,
+	   		url : "/portal/tool/" + startupArgs.placementId + "/forumContainingMessage?messageId=" + messageId,
 			dataType : "json",
 			cache: false,
 			async : false,
@@ -510,7 +510,7 @@ var YAFTUTILS = (function($) {
 			return false;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/messages/" + messageId + "/delete",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/messages/" + messageId + "/delete",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -564,7 +564,7 @@ var YAFTUTILS = (function($) {
 			return false;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/messages/" + messageId + "/undelete",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/messages/" + messageId + "/undelete",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -615,7 +615,7 @@ var YAFTUTILS = (function($) {
 
     my.markCurrentDiscussionRead = function(read) {
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/markRead",
+	 		url : "/portal/tool/" + startupArgs.placementId + "/discussions/" + yaftCurrentDiscussion.id + "/markRead",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -644,7 +644,7 @@ var YAFTUTILS = (function($) {
 		if(!read) func = 'markUnRead';
 		
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/messages/" + message.id + "/" + func,
+	 		url : "/portal/tool/" + startupArgs.placementId + "/messages/" + message.id + "/" + func,
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -676,7 +676,7 @@ var YAFTUTILS = (function($) {
 			return false;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/forums/" + forumId + "/delete",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/forums/" + forumId + "/delete",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -696,7 +696,7 @@ var YAFTUTILS = (function($) {
 			return false;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/delete",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/discussions/" + discussionId + "/delete",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -716,7 +716,7 @@ var YAFTUTILS = (function($) {
 			return false;
 		
 		jQuery.ajax( {
-	   		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + discussionId + "/clear",
+	   		url : "/portal/tool/" + startupArgs.placementId + "/discussions/" + discussionId + "/clear",
 	   		dataType : "json",
 	   		async : false,
 			cache: false,
@@ -749,7 +749,7 @@ var YAFTUTILS = (function($) {
 			return;
 
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/messages/" + messageId + "/attachments/" + attachmentId + "/delete",
+	 		url : "/portal/tool/" + startupArgs.placementId + "/messages/" + messageId + "/attachments/" + attachmentId + "/delete",
 	   		dataType : "text",
 	   		async : false,
 			cache: false,
@@ -765,7 +765,7 @@ var YAFTUTILS = (function($) {
 
 	my.showSearchResults = function(searchTerms) {
     	jQuery.ajax( {
-			url : "/portal/tool/" + yaftPlacementId + "/search",
+			url : "/portal/tool/" + startupArgs.placementId + "/search",
 			type : 'POST',
         	dataType : "json",
         	async : false,
@@ -852,6 +852,16 @@ var YAFTUTILS = (function($) {
                 var formattedEndDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
                 discussion.formattedEndDate = formattedEndDate;
             }
+            if(discussion.lastMessageDate > -1) {
+                var d = new Date(discussion.lastMessageDate);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                discussion.formattedLastMessageDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+            } else {
+            	discussion.formattedLastMessageDate = 'n/a';
+            }
 		}
     };
 
@@ -864,8 +874,7 @@ var YAFTUTILS = (function($) {
 		        if(hours < 10)  hours = '0' + hours;
                 var minutes = d.getMinutes();
 		        if(minutes < 10)  minutes = '0' + minutes;
-                var formattedStartDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
-                forum.formattedStartDate = formattedStartDate;
+                forum.formattedStartDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
             }
             if(forum.end > -1) {
                 var d = new Date(forum.end);
@@ -873,8 +882,17 @@ var YAFTUTILS = (function($) {
 		        if(hours < 10)  hours = '0' + hours;
                 var minutes = d.getMinutes();
 		        if(minutes < 10)  minutes = '0' + minutes;
-                var formattedEndDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
-                forum.formattedEndDate = formattedEndDate;
+                forum.formattedEndDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+            }
+            if(forum.lastMessageDate > -1) {
+                var d = new Date(forum.lastMessageDate);
+                var hours = d.getHours();
+		        if(hours < 10)  hours = '0' + hours;
+                var minutes = d.getMinutes();
+		        if(minutes < 10)  minutes = '0' + minutes;
+                forum.formattedLastMessageDate = d.getDate() + " " + yaft_month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+            } else {
+            	forum.formattedLastMessageDate = 'n/a';
             }
 		}
     };
@@ -1058,7 +1076,7 @@ var YAFTUTILS = (function($) {
 
     my.setCurrentAuthors = function() {
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors",
+	 		url : "/portal/tool/" + startupArgs.placementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors",
 	   		dataType : "json",
 	   		cache : false,
             async: false,
@@ -1086,7 +1104,7 @@ var YAFTUTILS = (function($) {
         }
 
 		jQuery.ajax( {
-	 		url : "/portal/tool/" + yaftPlacementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors/" + authorId + "/messages",
+	 		url : "/portal/tool/" + startupArgs.placementId + "/discussions/" + yaftCurrentDiscussion.id + "/authors/" + authorId + "/messages",
 	   		dataType : "json",
 	   		cache : false,
 		   	success : function(data,textStatus) {
@@ -1101,7 +1119,7 @@ var YAFTUTILS = (function($) {
                         var gradePoints = $('#yaft_grade_field').val();
 
                         jQuery.ajax( {
-	 		                url : "/portal/tool/" + yaftPlacementId + "/assignments/" + yaftCurrentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
+	 		                url : "/portal/tool/" + startupArgs.placementId + "/assignments/" + yaftCurrentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
 	   		                dataType : "text",
 	   		                cache : false,
 		   	                success : function(data,textStatus) {

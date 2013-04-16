@@ -3,8 +3,7 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
 
 (function()
 {
-    var params = SAKAIUTILS.getParameters();
-    var datejs = "/yaft-tool/lib/datejs/date-"+params['language']+"-"+params['country']+".js";
+    var datejs = "/yaft-tool/lib/datejs/date-" + startupArgs.language + "-" + startupArgs.country + ".js";
     
     $.ajax({
         url: datejs,
@@ -14,7 +13,7 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
             dateTimeFormat = Date.CultureInfo.formatPatterns.shortDate + " " + Date.CultureInfo.formatPatterns.shortTime;
         },
         error: function() {
-            alert("datetime_locale: Unable to load translation for " + params['language']+"-"+params['country']);
+            alert("datetime_locale: Unable to load translation for " + startupArgs.language + "-" + country);
         }
     });
 
@@ -33,12 +32,12 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
             error: function() { 
                 // Try without country code
                 if (locale.country) {
-                    fetchDatepicker({language: params['language']});
+                    fetchDatepicker({language: language});
                 }
             }
         });
     }
 
-    fetchDatepicker({language: params['language'], country: params['country']});
+    fetchDatepicker({language: startupArgs.language, country: startupArgs.country});
     
 }) ();

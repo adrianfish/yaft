@@ -740,18 +740,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public String getSakaiSkin() {
-		// Shouldn't have to do any of this fudging. getSiteSkin should do it.
-        String defaultSkin = serverConfigurationService.getString("skin.default","default");
-        String siteSkin = siteService.getSiteSkin(getCurrentSiteId());
-        String templates = serverConfigurationService.getString("portal.templates", "neoskin");
-        if("neoskin".equals(templates))
-        {
-            String prefix = serverConfigurationService.getString("portal.neoprefix", "neo-");
-            defaultSkin = prefix + defaultSkin;
-            if(siteSkin != null) siteSkin = prefix + siteSkin;
-        }
-
-        return siteSkin != null ? siteSkin : defaultSkin;
+        return siteService.getSiteSkin(getCurrentSiteId());
 	}
 
 	public List<YaftGBAssignment> getGradebookAssignments() {

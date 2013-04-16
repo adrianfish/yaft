@@ -16,28 +16,6 @@
 var SAKAIUTILS = (function ($) {
     var my = {};
 		
-	my.readCookie = function (name) {
-    	var nameEQ = name + "=";
-    	var ca = document.cookie.split(';');
-    	for(var i=0;i < ca.length;i++) {
-        	var c = ca[i];
-        	while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        	if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    	}
-    	return null;
-	};
-
-	my.createCookie = function (name,value,days) {
-    	if (days) {
-        	var date = new Date();
-        	date.setTime(date.getTime()+(days*24*60*60*1000));
-        	var expires = "; expires="+date.toGMTString();
-    	}
-    	else var expires = "";
-    	
-    	document.cookie = name+"="+value+expires+"; path=/";
-	};
-		
 	my.getCurrentUser = function () {
 		var user = null;
 		jQuery.ajax( {
@@ -73,34 +51,6 @@ var SAKAIUTILS = (function ($) {
 	   	});
 
 		return profile;
-	};
-		
-	my.getParameters = function () {
-		var arg = new Object();
-		var href = document.location.href;
-
-		var paramString = '';
-		
-		if ( href.indexOf( "?") != -1) {
-			var paramString = href.split( "?")[1];
-		}
-		else {
-			// No url params. Let's try the cookie
-			var paramString = unescape(this.readCookie('sakai-tool-params'));
-		}
-			
-		if(paramString.indexOf("#") != -1)
-			paramString = paramString.split("#")[0];
-				
-		var params = paramString.split("&");
-
-		for (var i = 0; i < params.length; ++i) {
-			var name = params[i].split( "=")[0];
-			var value = params[i].split( "=")[1];
-			arg[name] = unescape(value);
-		}
-	
-		return arg;
 	};
 
 	my.renderTrimpathTemplate = function (templateName,contextObject,output) {
