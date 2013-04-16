@@ -3,7 +3,7 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
 
 (function()
 {
-    var datejs = "/yaft-tool/lib/datejs/date-" + startupArgs.language + "-" + startupArgs.country + ".js";
+    var datejs = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + "-" + sakai.locale.userCountry + ".js";
     
     $.ajax({
         url: datejs,
@@ -13,7 +13,7 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
             dateTimeFormat = Date.CultureInfo.formatPatterns.shortDate + " " + Date.CultureInfo.formatPatterns.shortTime;
         },
         error: function() {
-            alert("datetime_locale: Unable to load translation for " + startupArgs.language + "-" + country);
+            alert("datetime_locale: Unable to load translation for " + sakai.locale.userLanguage + "-" + sakai.locale.userCountry);
         }
     });
 
@@ -38,6 +38,6 @@ var dateTimeFormat = "yyyy-MM-dd HH:mm";
         });
     }
 
-    fetchDatepicker({language: startupArgs.language, country: startupArgs.country});
+    fetchDatepicker({language: sakai.locale.userLanguage, country: sakai.locale.userCountry});
     
 }) ();

@@ -923,7 +923,7 @@ var YAFTUTILS = (function($) {
 		if(readMessages != null) {
 			var firstMessage = yaftCurrentDiscussion.firstMessage;
 		
-			if(contains(readMessages,firstMessage.id) || firstMessage.creatorId == yaftCurrentUser.id)
+			if(contains(readMessages,firstMessage.id) || firstMessage.creatorId == startupArgs.userId)
 				firstMessage['read'] = true;
 			else
 				firstMessage['read'] = false;
@@ -934,7 +934,7 @@ var YAFTUTILS = (function($) {
 
 	function markReadMessages(messages,readMessages) {
 		for(var i=0,j=messages.length;i<j;i++) {
-            if(contains(readMessages,messages[i].id) || messages[i].creatorId == yaftCurrentUser.id)
+            if(contains(readMessages,messages[i].id) || messages[i].creatorId == startupArgs.userId)
 				messages[i]["read"] = true;
 			else
 				messages[i]["read"] = false;

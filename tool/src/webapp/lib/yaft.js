@@ -15,7 +15,7 @@
  */
  
  
-var yaftCurrentUser = null;
+//var yaftCurrentUserId = '';
 var yaftCurrentUserPermissions = null;
 var yaftCurrentForums = null;
 
@@ -42,7 +42,7 @@ var yaftSortedAuthorIds = [];
         yaftBaseDataUrl = "/portal/tool/" + startupArgs.placementId + "/";
     }
     
-    $.localise('yaft-translations',{language: startupArgs.language,loadBase: true});
+    $.localise('yaft-translations',{language: sakai.locale.userLanguage,loadBase: true});
     
 	// We need the toolbar in a template so we can swap in the translations
     
@@ -87,7 +87,7 @@ var yaftSortedAuthorIds = [];
 		YAFTUTILS.showSearchResults(e.target.value);
 	});
 	
-	yaftCurrentUser = SAKAIUTILS.getCurrentUser();
+	//yaftCurrentUser = SAKAIUTILS.getCurrentUser();
 
 	var data = YAFTUTILS.getCurrentUserData();
 
@@ -105,7 +105,7 @@ var yaftSortedAuthorIds = [];
 		$("#yaft_settings_link").hide();
 	}
 	
-	if(yaftCurrentUser != null && yaftCurrentUserPermissions != null) {
+	if(startupArgs.userId != '' && yaftCurrentUserPermissions != null) {
 		// Now switch into the requested state
 		switchState(startupArgs.state,startupArgs);
 	} else {
@@ -170,7 +170,7 @@ function switchState(state,arg) {
 			YAFTUTILS.setCurrentForums();
 		}
 		
-		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentUser.id == yaftCurrentForum.creatorId)) {
+		if(yaftCurrentUserPermissions.discussionCreate && (!yaftCurrentForum.lockedForWritingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || startupArgs.userId === yaftCurrentForum.creatorId)) {
 			$("#yaft_add_discussion_link").show();
 		}
 		else {
@@ -224,7 +224,7 @@ function switchState(state,arg) {
 			SAKAIUTILS.renderTrimpathTemplate('yaft_discussion_breadcrumb_template',yaftCurrentDiscussion,'yaft_breadcrumb');
 			SAKAIUTILS.renderTrimpathTemplate('yaft_discussion_content_template',yaftCurrentDiscussion,'yaft_content');
 
-			if(!yaftCurrentDiscussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentDiscussion.creatorId == yaftCurrentUser.id) {
+			if(!yaftCurrentDiscussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || yaftCurrentDiscussion.creatorId === startupArgs.userId) {
 				SAKAIUTILS.renderTrimpathTemplate('yaft_message_template',yaftCurrentDiscussion.firstMessage,yaftCurrentDiscussion.firstMessage.id);
 				renderChildMessages(yaftCurrentDiscussion.firstMessage);
 			}
@@ -240,7 +240,7 @@ function switchState(state,arg) {
 	   	$(document).ready(function() {
 			YAFTUTILS.attachProfilePopup();
 
-	   		if(arg.messageId) {
+	   		if(arg && arg.messageId) {
 	   			window.location.hash = "message-" + arg.messageId;
 	   		}
 
@@ -413,7 +413,7 @@ function switchState(state,arg) {
 		            	max: 5,
 					    namePattern: '$name_$i'
 					});
-		    SAKAIUTILS.setupWysiwygEditor(startupArgs.editor,'yaft_message_editor',800,500,'Default',startupArgs.siteId);
+		    SAKAIUTILS.setupWysiwygEditor(startupArgs.editor,'yaft_message_editor',800,500,'Default');
 	    });
 	}
 	else if('reply' === state) {

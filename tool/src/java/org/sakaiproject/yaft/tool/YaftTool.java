@@ -32,7 +32,8 @@ import org.apache.log4j.Logger;
 
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.search.api.SearchResult;
-import org.sakaiproject.user.api.User;
+import org.sakaiproject.tool.api.Session;
+import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.*;
@@ -48,6 +49,7 @@ import org.apache.velocity.app.VelocityEngine;
  * @author Adrian Fish (a.fish@lancaster.ac.uk)
  */
 public class YaftTool extends HttpServlet {
+	
 	private Logger logger = Logger.getLogger(YaftTool.class);
 
 	private YaftForumService yaftForumService = null;
@@ -57,24 +59,30 @@ public class YaftTool extends HttpServlet {
 	private Template bootstrapTemplate = null;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (logger.isDebugEnabled())
+		
+		if (logger.isDebugEnabled()) {
 			logger.debug("doGet()");
+		}
 
 		if (yaftForumService == null || sakaiProxy == null)
 			throw new ServletException("yaftForumService and sakaiProxy MUST be initialised.");
-
-		User user = sakaiProxy.getCurrentUser();
-
-		if (user == null) {
+		
+		String userId = null;
+		Session session = (Session) request.getAttribute(RequestFilter.ATTR_SESSION);
+		if(session != null) {
+			userId = session.getUserId();
+		} else {
 			// We are not logged in
 			throw new ServletException("getCurrentUser returned null.");
 		}
 
 		String siteId = sakaiProxy.getCurrentSiteId();
-		String placementId = sakaiProxy.getCurrentToolId();
+		String placementId = (String) request.getAttribute(Tool.PLACEMENT_ID);
+		
+		String sakaiHtmlHead = (String) request.getAttribute("sakai.html.head");
 
 		// We need to pass the language code to the JQuery code in the pages.
-		Locale locale = (new ResourceLoader(user.getId())).getLocale();
+		Locale locale = (new ResourceLoader(userId)).getLocale();
 		String language = locale.getLanguage();
 		String country = locale.getCountry();
 		
@@ -86,16 +94,16 @@ public class YaftTool extends HttpServlet {
         
 		VelocityContext ctx = new VelocityContext();
 		
+		// This is needed so certain trimpath variables don't get parsed.
 		ctx.put("D", "$");
        
-		ctx.put("skin",sakaiProxy.getSakaiSkin());
+		ctx.put("sakaiHtmlHead",sakaiHtmlHead);
+		
+	    ctx.put("userId",userId);
 	    ctx.put("siteId",siteId);
 	    ctx.put("state","forums");
 	    ctx.put("placementId",placementId);
 	    ctx.put("isolanguage",isoLanguage);
-	    ctx.put("country",country);
-	    ctx.put("language",language);
-	    ctx.put("country",country);
 	    ctx.put("editor",sakaiProxy.getWysiwygEditor());
 
 		String pathInfo = request.getPathInfo();
@@ -655,7 +663,7 @@ public class YaftTool extends HttpServlet {
 			}
 
 			yaftForumService.moveDiscussion(discussionId, currentForumId, newForumId);
-			response.sendRedirect("/portal/tool/" + sakaiProxy.getCurrentToolId() + "/forums/" + currentForumId);
+			response.sendRedirect("/portal/tool/" + (String) request.getAttribute(Tool.PLACEMENT_ID) + "/forums/" + currentForumId);
 			return;
 		}
 	}
