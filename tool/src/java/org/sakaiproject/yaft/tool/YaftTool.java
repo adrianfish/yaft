@@ -89,7 +89,7 @@ public class YaftTool extends HttpServlet {
 		String isoLanguage = language;
 
         if(country != null && !country.equals("")) {
-            isoLanguage += "_" + country;
+            isoLanguage += "-" + country;
         }
         
 		VelocityContext ctx = new VelocityContext();
@@ -103,7 +103,7 @@ public class YaftTool extends HttpServlet {
 	    ctx.put("siteId",siteId);
 	    ctx.put("state","forums");
 	    ctx.put("placementId",placementId);
-	    ctx.put("isolanguage",isoLanguage);
+	    ctx.put("isoLanguage",isoLanguage);
 	    ctx.put("editor",sakaiProxy.getWysiwygEditor());
 
 		String pathInfo = request.getPathInfo();

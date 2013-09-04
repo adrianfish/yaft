@@ -41,10 +41,41 @@ var yaftSortedAuthorIds = [];
     } else {
         yaftBaseDataUrl = "/portal/tool/" + startupArgs.placementId + "/";
     }
+
+    var locale = sakai.locale.userLanguage;
+
+    if(typeof sakai.locale.userCountry != 'undefined' && sakai.locale.userCountry != '') {
+        locale += '-' + sakai.locale.userCountry;
+    }
     
-    $.localise('yaft-translations',{language: sakai.locale.userLanguage,loadBase: true});
+    $.localise('yaft-translations',{language: locale,loadBase: true,path: '/yaft-tool/'});
+
+    var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage;
+    if (sakai.locale.userCountry) dpUrl += "-" + sakai.locale.userCountry
+    dpUrl += ".js";
     
-	// We need the toolbar in a template so we can swap in the translations
+    $.ajax({
+        url: dpUrl,
+        dataType: "script",
+        success: function() {},
+        error: function() {
+            // The full code failed. Try just the language code.
+            var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage;
+            $.getScript(dpUrl);
+        }
+    });
+
+    var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + "-" + sakai.locale.userCountry + ".js";
+    
+    $.ajax({
+        url: djsUrl,
+        async: false,
+        dataType: "script",
+        error: function() {
+            var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + ".js";
+            $.getScript(djsUrl);
+        }
+    });
     
 	// We need the toolbar in a template so we can swap in the translations
 	SAKAIUTILS.renderTrimpathTemplate('yaft_toolbar_template',{},'yaft_toolbar');

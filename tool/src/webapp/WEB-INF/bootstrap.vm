@@ -19,8 +19,8 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html  
       xmlns="http://www.w3.org/1999/xhtml"  
-      xml:lang="${isolanguage}"
-      lang="${isolanguage}">
+      xml:lang="${isoLanguage}"
+      lang="${isoLanguage}">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript">
@@ -44,14 +44,8 @@ ${sakaiHtmlHead}
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
-<script type="text/javascript" src="/yaft-tool/yaft-translations.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/all.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/datetime_locale.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
 
-<!--script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
@@ -65,7 +59,11 @@ ${sakaiHtmlHead}
 <script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.2.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.form.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script-->
+<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script>
+
+<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
 
 </head>
 <body>
