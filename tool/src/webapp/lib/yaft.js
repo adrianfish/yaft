@@ -50,9 +50,7 @@ var yaftSortedAuthorIds = [];
     
     $.localise('yaft-translations',{language: locale,loadBase: true,path: '/yaft-tool/'});
 
-    var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage;
-    if (sakai.locale.userCountry) dpUrl += "-" + sakai.locale.userCountry
-    dpUrl += ".js";
+    var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + locale + ".js";
     
     $.ajax({
         url: dpUrl,
@@ -65,7 +63,7 @@ var yaftSortedAuthorIds = [];
         }
     });
 
-    var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + "-" + sakai.locale.userCountry + ".js";
+    var djsUrl = "/yaft-tool/lib/datejs/date-" + locale + ".js";
     
     $.ajax({
         url: djsUrl,
