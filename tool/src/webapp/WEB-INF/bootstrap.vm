@@ -588,7 +588,7 @@ ${yaft_forums_label}
             {/if}
 			<div style="margin-left:2px;overflow: hidden;">
 				<div style="float:left;">
-					<a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>
+					<a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>{if anonymous && creatorId == startupArgs.userId}<span class="yaft_small_graded_in_label"> - ${yaft_anonymous_label}</span>{/if}
 					<br/>
                     {if anonymous}
                         {if creatorId == startupArgs.userId || yaftCurrentUserPermissions.discussionViewAnonymous}
@@ -1065,7 +1065,7 @@ ${yaft_forums_label}
 		</div>
 		</div>
     {/for}
-    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
+    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_mrade_success_message">Grade Updated!</span><br /><br />{/if}
 -->
 </div>
 
