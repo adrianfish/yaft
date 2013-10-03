@@ -88,7 +88,7 @@ public interface SqlGenerator
 
 	String getSelectForumIdForTitleStatement(String title,String siteId);
 
-	PreparedStatement getSetDiscussionDatesStatement(Discussion discussion,Connection conn) throws Exception;
+	PreparedStatement getSetDiscussionDataStatement(Discussion discussion,Connection conn) throws Exception;
 
 	String getSelectActiveDiscussionsStatement();
 

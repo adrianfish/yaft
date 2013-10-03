@@ -342,7 +342,7 @@ function switchState(state,arg) {
             // This is an edit of a current forum.
 			forum = YAFTUTILS.findForum(arg.forumId);
         }
-			
+
 		var groups = YAFTUTILS.getGroupsForCurrentSite();
 
 		SAKAIUTILS.renderTrimpathTemplate('yaft_edit_forum_breadcrumb_template',arg,'yaft_breadcrumb');
@@ -456,6 +456,12 @@ function switchState(state,arg) {
 		SAKAIUTILS.renderTrimpathTemplate('yaft_edit_message_breadcrumb_template',messageBeingRepliedTo,'yaft_breadcrumb');
 		SAKAIUTILS.renderTrimpathTemplate('yaft_reply_message_content_template',messageBeingRepliedTo,'yaft_content');
 
+        $('#yaft_publish_anonymously_button').click(function (e) {
+            $('#yaft_anonymous_flag').val('true');
+   		    $('#yaft_message_form').submit();
+            return false;
+        });
+
 		var saveMessageOptions = { 
 			dataType: 'text',
 			timeout: 30000,
@@ -478,8 +484,9 @@ function switchState(state,arg) {
 				}
    			}; 
  
-   		$('#yaft_message_form').ajaxForm(saveMessageOptions);
-		$('#yaft_message_form').bind('form-pre-serialize', function(event, $form, formOptions, veto) {
+   		$('#yaft_message_form')
+            .ajaxForm(saveMessageOptions)
+            .bind('form-pre-serialize', function(event, $form, formOptions, veto) {
 
        		var data = SAKAIUTILS.getEditorData(startupArgs.editor,'yaft_message_editor');
 		
@@ -514,6 +521,7 @@ function switchState(state,arg) {
 
 		var discussion = {'id':''
 							,'subject':''
+                            ,'allowAnonymousPosting': false
 							,'lockedForWriting':yaftCurrentForum.lockedForWriting
 							,'lockedForReading':yaftCurrentForum.lockedForReading
 							,'start': yaftCurrentForum.startDate
@@ -531,6 +539,10 @@ function switchState(state,arg) {
 
 		SAKAIUTILS.renderTrimpathTemplate('yaft_start_discussion_breadcrumb_template',arg,'yaft_breadcrumb');
 		SAKAIUTILS.renderTrimpathTemplate('yaft_start_discussion_content_template',{'discussion':discussion,'groups':groups},'yaft_content');
+
+        if(discussion.allowAnonymousPosting) {
+            $('#yaft_allow_anonymous_posting_checkbox').attr('checked','checked');
+        }
 		
 		var saveDiscussionOptions = { 
 			dataType: 'html',

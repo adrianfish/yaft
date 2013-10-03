@@ -8,11 +8,15 @@ import org.sakaiproject.yaft.api.Discussion;
 import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.Forum;
+import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.YaftFunctions;
+import org.sakaiproject.util.ResourceLoader;
 
 public class YaftSecurityManager
 {
 	private SakaiProxy sakaiProxy;
+
+    private ResourceLoader messages = new ResourceLoader("org.sakaiproject.yaft.impl.bundle.Messages");
 	
 	public YaftSecurityManager(SakaiProxy sakaiProxy)
 	{
@@ -92,6 +96,12 @@ public class YaftSecurityManager
 		
 		return forum;
 	}
+
+	public Message filterMessage(Message message) {
+
+        recursivelySetAnonymousCreatorDisplayName(message);
+        return message;
+    }
 	
 	public Discussion filterDiscussion(Discussion discussion,String siteId)
 	{
@@ -116,9 +126,25 @@ public class YaftSecurityManager
 		{
 			return null;
 		}
+
+        // Check for anon messages
+        recursivelySetAnonymousCreatorDisplayName(discussion.getFirstMessage());
 		
 		return discussion;
 	}
+
+    private void recursivelySetAnonymousCreatorDisplayName(Message message) {
+
+        if(message.isAnonymous()
+                && !sakaiProxy.getCurrentUser().getId().equals(message.getCreatorId())
+				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_DISCUSSION_VIEW_ANONYMOUS)) {
+            message.setCreatorDisplayName(messages.getString("anonymous"));
+        }
+
+        for(Message child : message.getChildren()) {
+            recursivelySetAnonymousCreatorDisplayName(child);
+        }
+    }
 
 	public List<ActiveDiscussion> filterActiveDiscussions(List<ActiveDiscussion> discussions) {
 		

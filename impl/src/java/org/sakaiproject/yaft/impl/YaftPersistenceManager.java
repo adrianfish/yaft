@@ -382,6 +382,8 @@ public class YaftPersistenceManager
 					logger.error("Caught exception whilst adding or updating a message. Rolling back ...",e);
 					connection.rollback();
 				}
+
+				logger.error("Caught exception whilst adding or updating a message.",e);
 				
 				return false;
 			}
@@ -595,6 +597,7 @@ public class YaftPersistenceManager
 		
 			discussion.setMessageCount(rs.getInt(ColumnNames.MESSAGE_COUNT));
 			discussion.setLastMessageDate(rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE).getTime());
+		    discussion.setAllowAnonymousPosting(rs.getBoolean(ColumnNames.ALLOW_ANONYMOUS));
 			Forum forum = getForum(forumId,ForumPopulatedStates.EMPTY,connection);
 			if(forum.getGroups().size() > 0) {
 				// Parent forum groups take precedence over child discussions
@@ -729,6 +732,7 @@ public class YaftPersistenceManager
 		message.setCreatedDate(createdTimestamp.getTime());
 		String creatorId = rs.getString(ColumnNames.CREATOR_ID);
 		message.setCreatorId(creatorId);
+		message.setAnonymous(rs.getBoolean(ColumnNames.ANONYMOUS));
 		message.setStatus(rs.getString(ColumnNames.STATUS));
 		message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(creatorId));
 		
@@ -1748,7 +1752,7 @@ public class YaftPersistenceManager
 				if(!addOrUpdateMessage(siteId, forumId, discussion.getFirstMessage(),connection))
 					throw new Exception("addOrUpdateMessage returned false");
 				
-				statement = sqlGenerator.getSetDiscussionDatesStatement(discussion,connection);
+				statement = sqlGenerator.getSetDiscussionDataStatement(discussion,connection);
 				statement.executeUpdate();
 				
 				// If the parent forum is group restricted the same restrictions implicitly apply to child discussions

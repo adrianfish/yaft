@@ -46,6 +46,13 @@ public class Message implements Entity
 	private String parent = "";
 	private String creatorDisplayName = "";
 	private String discussionId = "";
+    private boolean anonymous = false;
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
+    }
+    public boolean isAnonymous() {
+        return anonymous;
+    }
 	private String status = "DRAFT";
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	private String url = "";

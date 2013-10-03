@@ -75,6 +75,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_CREATE);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_OWN);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_DELETE_ANY);
+		sakaiProxy.registerFunction(YaftFunctions.YAFT_DISCUSSION_VIEW_ANONYMOUS);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_CREATE);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_CENSOR);
 		sakaiProxy.registerFunction(YaftFunctions.YAFT_MESSAGE_DELETE_OWN);
@@ -330,7 +331,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 
 	public Message getMessage(String messageId)
 	{
-		return persistenceManager.getMessage(messageId);
+		return securityManager.filterMessage(persistenceManager.getMessage(messageId));
 	}
 
 	public Forum getForumContainingMessage(String messageId)
@@ -639,7 +640,16 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	}
 
 	public List<Message> getMessagesForAuthorInCurrentSite(String authorId) {
-		return persistenceManager.getMessagesForAuthorInCurrentSite(authorId);
+
+		List<Message> messages =  persistenceManager.getMessagesForAuthorInCurrentSite(authorId);
+
+        for(Message message : messages) {
+            if(message.isAnonymous()) {
+                messages.remove(message);
+            }
+        }
+
+        return messages;
 	}
 
 	public List<Author> getAuthorsForDiscussion(String discussionId) {
@@ -647,7 +657,16 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	}
 
 	public List<Message> getMessagesForAuthorInDiscussion(String authorId, String discussionId) {
-		return persistenceManager.getMessagesForAuthorInDiscussion(authorId,discussionId);
+
+		List<Message> messages = persistenceManager.getMessagesForAuthorInDiscussion(authorId,discussionId);
+
+        for(Message message : messages) {
+            if(message.isAnonymous()) {
+                messages.remove(message);
+            }
+        }
+
+        return messages;
 	}
 
 	public boolean setDiscussionGroups(String discussionId, Collection<String> groups) {

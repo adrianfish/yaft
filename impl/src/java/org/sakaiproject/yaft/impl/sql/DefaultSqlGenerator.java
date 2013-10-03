@@ -65,9 +65,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		statements.add("CREATE TABLE YAFT_FORUM_DISCUSSION (FORUM_ID CHAR(36) NOT NULL,DISCUSSION_ID CHAR(36) NOT NULL,CONSTRAINT yaft_forum_discussion_pk PRIMARY KEY (FORUM_ID,DISCUSSION_ID))");
 
-		statements.add("CREATE TABLE YAFT_DISCUSSION (DISCUSSION_ID CHAR(36) NOT NULL," + "LAST_MESSAGE_DATE " + DATETIME + " NOT NULL," + "MESSAGE_COUNT " + INT + " NOT NULL," + "STATUS " + VARCHAR + "(36) NOT NULL," + "START_DATE " + DATETIME + "," + "END_DATE " + DATETIME + "," + "LOCKED_FOR_WRITING " + BOOL + " NOT NULL," + "LOCKED_FOR_READING " + BOOL + " NOT NULL,GRADEBOOK_ASSIGNMENT_ID BIGINT(20),"+ "CONSTRAINT yaft_discussion_pk PRIMARY KEY (DISCUSSION_ID))");
+		statements.add("CREATE TABLE YAFT_DISCUSSION (DISCUSSION_ID CHAR(36) NOT NULL," + "LAST_MESSAGE_DATE " + DATETIME + " NOT NULL,MESSAGE_COUNT " + INT + " NOT NULL,ALLOW_ANONYMOUS " + BOOL + ",STATUS " + VARCHAR + "(36) NOT NULL,START_DATE " + DATETIME + ",END_DATE " + DATETIME + ",LOCKED_FOR_WRITING " + BOOL + " NOT NULL,LOCKED_FOR_READING " + BOOL + " NOT NULL,GRADEBOOK_ASSIGNMENT_ID BIGINT(20),CONSTRAINT yaft_discussion_pk PRIMARY KEY (DISCUSSION_ID))");
 
-		statements.add("CREATE TABLE YAFT_MESSAGE (MESSAGE_ID CHAR(36) NOT NULL," + "SITE_ID " + VARCHAR + "(99) NOT NULL," + "PARENT_MESSAGE_ID CHAR(36)," + "DISCUSSION_ID CHAR(36)," + "SUBJECT " + VARCHAR + "(255) NOT NULL," + "CONTENT " + MEDIUMTEXT + " NOT NULL," + "CREATOR_ID " + VARCHAR + "(99) NOT NULL," + "CREATED_DATE " + DATETIME + " NOT NULL," + "STATUS " + VARCHAR + "(36)," + "CONSTRAINT yaft_message_pk PRIMARY KEY (MESSAGE_ID))");
+		statements.add("CREATE TABLE YAFT_MESSAGE (MESSAGE_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,PARENT_MESSAGE_ID CHAR(36),DISCUSSION_ID CHAR(36),SUBJECT " + VARCHAR + "(255) NOT NULL,CONTENT " + MEDIUMTEXT + " NOT NULL,CREATOR_ID " + VARCHAR + "(99) NOT NULL,ANONYMOUS " + BOOL + " NOT NULL,CREATED_DATE " + DATETIME + " NOT NULL,STATUS " + VARCHAR + "(36),CONSTRAINT yaft_message_pk PRIMARY KEY (MESSAGE_ID))");
 
 		statements.add("CREATE TABLE YAFT_MESSAGE_CHILDREN (MESSAGE_ID CHAR(36) NOT NULL," + "CHILD_MESSAGE_ID CHAR(36) NOT NULL," + "CONSTRAINT yaft_message_children_pk PRIMARY KEY (MESSAGE_ID,CHILD_MESSAGE_ID))");
 
@@ -248,12 +248,13 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		if (message.getId().length() > 0) {
 			// This is an existing message
-			String updateSql = "UPDATE YAFT_MESSAGE SET " + "SUBJECT = ?,CONTENT = ? WHERE MESSAGE_ID = ?";
+			String updateSql = "UPDATE YAFT_MESSAGE SET " + "SUBJECT = ?,CONTENT = ?,ANONYMOUS = ? WHERE MESSAGE_ID = ?";
 
 			PreparedStatement ps = connection.prepareStatement(updateSql);
 			ps.setString(1, message.getSubject());
 			ps.setString(2, message.getContent());
-			ps.setString(3, message.getId());
+			ps.setBoolean(3, message.isAnonymous());
+			ps.setString(4, message.getId());
 
 			statements.add(ps);
 		}
@@ -267,13 +268,13 @@ public class DefaultSqlGenerator implements SqlGenerator
 				insertSql += "PARENT_MESSAGE_ID,";
 			}
 
-			insertSql += "DISCUSSION_ID," + "SITE_ID," + "STATUS," + "SUBJECT," + "CONTENT," + "CREATOR_ID," + "CREATED_DATE) VALUES(?,";
+			insertSql += "DISCUSSION_ID,SITE_ID,STATUS,SUBJECT,CONTENT,CREATOR_ID,ANONYMOUS,CREATED_DATE) VALUES(?,";
 
 			if (message.hasParent()) {
 				insertSql += "?,";
 			}
 
-			insertSql += "?,?,?,?,?,?,?)";
+			insertSql += "?,?,?,?,?,?,?,?)";
 
 			PreparedStatement insertMessagePS = connection.prepareStatement(insertSql);
 			insertMessagePS.setString(1, message.getId());
@@ -287,7 +288,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				insertMessagePS.setString(6, message.getSubject());
 				insertMessagePS.setString(7, message.getContent());
 				insertMessagePS.setString(8, message.getCreatorId());
-				insertMessagePS.setTimestamp(9, new Timestamp(message.getCreatedDate()));
+				insertMessagePS.setBoolean(9, message.isAnonymous());
+				insertMessagePS.setTimestamp(10, new Timestamp(message.getCreatedDate()));
 
 				String childrenSql = "INSERT INTO YAFT_MESSAGE_CHILDREN VALUES(?,?)";
 
@@ -312,7 +314,8 @@ public class DefaultSqlGenerator implements SqlGenerator
 				insertMessagePS.setString(5, message.getSubject());
 				insertMessagePS.setString(6, message.getContent());
 				insertMessagePS.setString(7, message.getCreatorId());
-				insertMessagePS.setTimestamp(8, new Timestamp(message.getCreatedDate()));
+				insertMessagePS.setBoolean(8, false);
+				insertMessagePS.setTimestamp(9, new Timestamp(message.getCreatedDate()));
 
 				insertSql = "INSERT INTO YAFT_DISCUSSION (DISCUSSION_ID,LAST_MESSAGE_DATE,MESSAGE_COUNT,STATUS,LOCKED_FOR_WRITING,LOCKED_FOR_READING) VALUES(?,?,1,'READY',0,0)";
 				PreparedStatement discussionPS = connection.prepareStatement(insertSql);
@@ -681,9 +684,9 @@ public class DefaultSqlGenerator implements SqlGenerator
 		return "SELECT FORUM_ID FROM YAFT_FORUM WHERE TITLE = '" + title + "' AND SITE_ID = '" + siteId + "' AND STATUS <> 'DELETED'";
 	}
 
-	public PreparedStatement getSetDiscussionDatesStatement(Discussion discussion, Connection conn) throws Exception
+	public PreparedStatement getSetDiscussionDataStatement(Discussion discussion, Connection conn) throws Exception
 	{
-		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START_DATE = ?,END_DATE = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ?,GRADEBOOK_ASSIGNMENT_ID = ? WHERE DISCUSSION_ID = ?");
+		PreparedStatement st = conn.prepareStatement("UPDATE YAFT_DISCUSSION SET START_DATE = ?,END_DATE = ?,ALLOW_ANONYMOUS = ?,LOCKED_FOR_WRITING = ?,LOCKED_FOR_READING = ?,GRADEBOOK_ASSIGNMENT_ID = ? WHERE DISCUSSION_ID = ?");
 
 		long start = discussion.getStart();
 		long end = discussion.getEnd();
@@ -699,18 +702,19 @@ public class DefaultSqlGenerator implements SqlGenerator
 			st.setNull(2, Types.NULL);
 		}
 
-		st.setBoolean(3, discussion.isLockedForWriting());
-		st.setBoolean(4, discussion.isLockedForReading());
+		st.setBoolean(3, discussion.isAllowAnonymousPosting());
+		st.setBoolean(4, discussion.isLockedForWriting());
+		st.setBoolean(5, discussion.isLockedForReading());
 		
 		YaftGBAssignment gradebookAssignment = discussion.getAssignment();
 		
 		if(gradebookAssignment != null) {
-			st.setLong(5, gradebookAssignment.id);
+			st.setLong(6, gradebookAssignment.id);
 		} else {
-			st.setNull(5,Types.INTEGER);
+			st.setNull(6,Types.INTEGER);
 		}
 
-		st.setString(6, discussion.getId());
+		st.setString(7, discussion.getId());
 
 		return st;
 	}

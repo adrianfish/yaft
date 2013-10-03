@@ -669,6 +669,7 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doForumsPost(HttpServletRequest request, HttpServletResponse response, String[] parts) throws ServletException, IOException {
+
 		String siteId = sakaiProxy.getCurrentSiteId();
 		String state = request.getParameter("state");
 
@@ -800,6 +801,7 @@ public class YaftTool extends HttpServlet {
 			String content = (String) request.getParameter("content");
 			String forumId = (String) request.getParameter("forumId");
 			String sendEmailString = (String) request.getParameter("sendEmail");
+            String allowAnonymousPostingString = (String) request.getParameter("allowAnonymousPosting");
 			String startDate = (String) request.getParameter("startDate");
 			String endDate = (String) request.getParameter("endDate");
 			String lockWritingString = (String) request.getParameter("lockWriting");
@@ -823,6 +825,13 @@ public class YaftTool extends HttpServlet {
 				sendEmail = sendEmailString.equals("true");
 			else
 				sendEmail = false;
+
+            boolean allowAnonymousPosting = true;
+
+            if (allowAnonymousPostingString != null)
+                allowAnonymousPosting = allowAnonymousPostingString.equals("true");
+            else
+                allowAnonymousPosting = false;
 
 			boolean lockWriting = true;
 			boolean lockReading = true;
@@ -854,7 +863,6 @@ public class YaftTool extends HttpServlet {
 			message.setContent(content);
 			message.setSiteId(siteId);
 			message.setCreatorId(currentUserId);
-			message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(currentUserId));
 			message.setAttachments(getAttachments(request));
 
 			// The first messages in discussions always have the same id as the
@@ -865,6 +873,7 @@ public class YaftTool extends HttpServlet {
 
 			Discussion discussion = new Discussion();
 			discussion.setFirstMessage(message);
+            discussion.setAllowAnonymousPosting(allowAnonymousPosting);
 			discussion.setLockedForWriting(lockWriting);
 			discussion.setLockedForReading(lockReading);
 			
@@ -955,6 +964,7 @@ public class YaftTool extends HttpServlet {
 			String messageId = (String) request.getParameter("messageId");
 			String messageBeingRepliedTo = (String) request.getParameter("messageBeingRepliedTo");
 			String discussionId = (String) request.getParameter("discussionId");
+			String anonymousFlagString = (String) request.getParameter("anonymous");
 			String sendEmailString = (String) request.getParameter("sendEmail");
 
 			if (logger.isDebugEnabled()) {
@@ -963,6 +973,7 @@ public class YaftTool extends HttpServlet {
 				logger.debug("Content: " + content);
 				logger.debug("Forum ID: " + forumId);
 				logger.debug("View Mode: " + viewMode);
+				logger.debug("anonymousFlagString: " + anonymousFlagString);
 				logger.debug("Discussion ID: " + discussionId);
 				logger.debug("Message Being Replied To: " + messageBeingRepliedTo);
 			}
@@ -975,6 +986,13 @@ public class YaftTool extends HttpServlet {
 
 			if (viewMode == null || viewMode.length() <= 0)
 				viewMode = "full";
+
+			boolean anonymousFlag = true;
+
+			if (anonymousFlagString != null)
+				anonymousFlag = anonymousFlagString.equals("true");
+			else
+				anonymousFlag = false;
 
 			boolean sendEmail = true;
 
@@ -990,8 +1008,8 @@ public class YaftTool extends HttpServlet {
 			message.setSubject(subject);
 			message.setContent(content);
 			message.setSiteId(siteId);
+			message.setAnonymous(anonymousFlag);
 			message.setCreatorId(currentUserId);
-			message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(currentUserId));
 			message.setDiscussionId(discussionId);
 			message.setAttachments(getAttachments(request));
 

@@ -210,7 +210,7 @@ ${yaft_forums_label}
 	{for discussion in discussions}
 	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == startupArgs.userId}
    	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == startupArgs.userId) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
-		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${startupArgs.viewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}
+		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${startupArgs.viewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.allowAnonymousPosting}<br /><span class="yaft_small_graded_in_label"> - ${yaft_anonymous_allowed_label}</span>{/if}{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}
 		{if discussion.groups.length > 0}
 		<br />
 		<span class="yaftForumDescription">${yaft_group_message}
@@ -337,6 +337,9 @@ ${yaft_forums_label}
 		<br />
 		<br />
         {/if}
+        <input type="checkbox" id="yaft_allow_anonymous_posting_checkbox" name="allowAnonymousPosting" value="true" />${yaft_allow_anonymous_posting_label}
+        <br />
+        <br />
 		<span>${yaft_add_attachments_label}</span>
 		<br />
 		<input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
@@ -493,9 +496,9 @@ ${yaft_forums_label}
 		<tr>
 			<th></th>
 			<th width="5px"></th>
-			<th align="center" colspan="3">${yaft_forum_label}</th>
+			<th align="center" colspan="4">${yaft_forum_label}</th>
 			<th width="5px"></th>
-			<th colspan="3">${yaft_discussion_label}</th>
+			<th colspan="4">${yaft_discussion_label}</th>
 			<th width="5px"></th>
 			<th colspan="3">${yaft_message_label}</th>
 			<th width="5px"></th>
@@ -512,6 +515,7 @@ ${yaft_forums_label}
 			<th style="text-align:center;">${yaft_permissions_create}</th>
 			<th style="text-align:center;">${yaft_permissions_delete_own}</th>
 			<th style="text-align:center;">${yaft_permissions_delete_any}</th>
+			<th style="text-align:center;">${yaft_permissions_view_anonymous}</th>
 			<th style="background: white;"></th>
 			<th style="text-align:center;">${yaft_permissions_create}</th>
 			<th style="text-align:center;">${yaft_permissions_delete_own}</th>
@@ -535,6 +539,7 @@ ${yaft_forums_label}
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_create}checked="checked"{/if}" id="${p.role}:yaft.discussion.create"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.discussion.deleteOwn"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_deleteAny}checked="checked"{/if}" id="${p.role}:yaft.discussion.deleteAny"/></td>
+	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_discussion_viewAnonymous}checked="checked"{/if}" id="${p.role}:yaft.discussion.viewAnonymous"/></td>
 	<td></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_message_create}checked="checked"{/if}" id="${p.role}:yaft.message.create"/></td>
 	<td align="center"><input type="checkbox" class="yaft_permission_checkbox" {if p.yaft_message_deleteOwn}checked="checked"{/if}" id="${p.role}:yaft.message.deleteOwn"/></td>
@@ -572,12 +577,28 @@ ${yaft_forums_label}
 		
 	{if (status != 'DELETED') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny)}
 		<div style="margin:5px;overflow:hidden;">
-			<a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
+            {if anonymous}
+                {if creatorId == startupArgs.userId || yaftCurrentUserPermissions.discussionViewAnonymous}
+			    <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
+                {else}
+			    <img class="yaft_profile_image" src="/direct/profile/blank/image" width="35" />
+                {/if}
+            {else}
+			    <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
+            {/if}
 			<div style="margin-left:2px;overflow: hidden;">
 				<div style="float:left;">
 					<a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>
 					<br/>
-					<span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${formattedDate}</span>
+                    {if anonymous}
+                        {if creatorId == startupArgs.userId || yaftCurrentUserPermissions.discussionViewAnonymous}
+					    <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - ${formattedDate}</span>
+                        {else}
+					    <span>by ${creatorDisplayName} - ${formattedDate}</span>
+                        {/if}
+                    {else}
+					    <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${formattedDate}</span>
+                    {/if}
 				</div>
 				<div style="float: right;">
 					{if attachments.length > 0}
@@ -905,6 +926,7 @@ ${yaft_forums_label}
 	<br/>
 
 	<input type="hidden" name="function" value="createMessage"/>
+	<input id="yaft_anonymous_flag" type="hidden" name="anonymous" value="false" />
 	<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
 	<input type="hidden" name="siteId" value="${startupArgs.siteId}"/>
 	<input type="hidden" name="discussionId" value="${yaftCurrentDiscussion.id}"/>
@@ -913,6 +935,9 @@ ${yaft_forums_label}
     <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
 	
 	<input type="submit" value="${yaft_publish_label}"/>
+    {if yaftCurrentDiscussion.allowAnonymousPosting}
+    <input type="button" id="yaft_publish_anonymously_button" value="${yaft_publish_anonymously_label}"/>
+    {/if}
 	<input type="button" value="${yaft_cancel_label}" onclick="return switchState('${startupArgs.viewMode}',{'messageId':'${id}'})"/>
 	
 	</form>

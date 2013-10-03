@@ -158,7 +158,7 @@ public class Forum implements Entity
 	{
 		return creatorId;
 	}
-	
+
 	public Element toXml(Document doc,Stack stack)
 	{
 		Element forumElement = doc.createElement(XmlDefs.FORUM);

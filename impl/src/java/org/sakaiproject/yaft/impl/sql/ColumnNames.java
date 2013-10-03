@@ -26,6 +26,8 @@ public class ColumnNames
 	public static final String SUBJECT = "SUBJECT";
 	public static final String CONTENT = "CONTENT";
 	public static final String DESCRIPTION = "DESCRIPTION";
+	public static final String ALLOW_ANONYMOUS = "ALLOW_ANONYMOUS";
+	public static final String ANONYMOUS = "ANONYMOUS";
 	public static final String DISCUSSION_COUNT = "DISCUSSION_COUNT";
 	public static final String PARENT_MESSAGE_ID = "PARENT_MESSAGE_ID";
 	public static final String CREATOR_ID = "CREATOR_ID";

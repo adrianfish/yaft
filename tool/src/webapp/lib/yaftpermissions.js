@@ -20,6 +20,8 @@ function YaftPermissions(data) {
 			this.discussionCreate = true;
 		else if('yaft.discussion.deleteAny' === data[i])
 			this.discussionDeleteAny = true;
+		else if('yaft.discussion.viewAnonymous' === data[i])
+			this.discussionViewAnonymous = true;
 		else if('yaft.discussion.deleteOwn' === data[i])
 			this.discussionDeleteOwn = true;
 		else if('yaft.forum.create' === data[i])

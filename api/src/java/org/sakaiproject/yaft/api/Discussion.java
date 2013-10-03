@@ -46,6 +46,8 @@ public class Discussion implements Entity
 	
 	private long start = -1L;
 	private long end = -1L;
+
+	private boolean allowAnonymousPosting = false;
 	
 	private boolean lockedForWriting = false;
 	private boolean lockedForReading = false;
@@ -134,6 +136,16 @@ public class Discussion implements Entity
 	public String getForumId()
 	{
 		return forumId;
+	}
+
+	public void setAllowAnonymousPosting(boolean allowAnonymousPosting)
+	{
+		this.allowAnonymousPosting = allowAnonymousPosting;
+	}
+
+	public boolean isAllowAnonymousPosting()
+	{
+		return allowAnonymousPosting;
 	}
 
 	public void setLastMessageDate(long lastMessageDate)
