@@ -186,7 +186,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		// SiteStats/Search etc event
 		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
 
-		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts()) {
+		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts() && !message.isAnonymous()) {
 			// NotificationService event
 			try {
 				sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
