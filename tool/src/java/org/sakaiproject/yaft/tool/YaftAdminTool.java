@@ -121,7 +121,7 @@ public class YaftAdminTool extends HttpServlet
 					{
 						Forum yaftForum = new Forum();
 						yaftForum.setSiteId(siteId);
-						yaftForum.setTitle(forumRS.getString("TITLE"));
+						yaftForum.title = forumRS.getString("TITLE");
 						yaftForum.setDescription(forumRS.getString("SHORT_DESCRIPTION"));
 						//yaftForum.setPlacementId(tc.getId());
 						yaftForumService.addOrUpdateForum(yaftForum);

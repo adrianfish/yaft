@@ -26,7 +26,8 @@
         <commons-lang.version>2.4</commons-lang.version>
         <calendar.version>2.7.0</calendar.version> <!-- 2.7.x build -->
 	  	<profile-api.version>2.7.3</profile-api.version>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lombok.version>0.10.6</lombok.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
   	
   	<organization>
@@ -174,6 +175,13 @@
                 <artifactId>sakai-calendar-api</artifactId>
                 <version>${calendar.version}</version>
 	  			<scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>

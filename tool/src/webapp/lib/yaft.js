@@ -343,10 +343,10 @@ function switchState(state,arg) {
 			forum = YAFTUTILS.findForum(arg.forumId);
         }
 
-		var groups = YAFTUTILS.getGroupsForCurrentSite();
+		var siteGroups = YAFTUTILS.getGroupsForCurrentSite();
 
 		SAKAIUTILS.renderTrimpathTemplate('yaft_edit_forum_breadcrumb_template',arg,'yaft_breadcrumb');
-		SAKAIUTILS.renderTrimpathTemplate('yaft_edit_forum_content_template',{'forum':forum,'groups':groups},'yaft_content');
+		SAKAIUTILS.renderTrimpathTemplate('yaft_edit_forum_content_template',{'forum':forum,'siteGroups':siteGroups},'yaft_content');
 
 		setupAvailability(forum);
 	

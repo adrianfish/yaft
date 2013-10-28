@@ -44,8 +44,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer, SecurityAdvisor
-{
+public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer, SecurityAdvisor {
+
 	private Logger logger = Logger.getLogger(YaftForumServiceImpl.class);
 
 	private SakaiProxy sakaiProxy = null;
@@ -56,10 +56,11 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	
 	private boolean includeMessageBodyInEmail = false;
 
-	public void init()
-	{
-		if (logger.isDebugEnabled())
+	public void init() {
+
+		if (logger.isDebugEnabled()) {
 			logger.debug("init()");
+        }
 
 		sakaiProxy = new SakaiProxyImpl();
 		
@@ -96,10 +97,11 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		includeMessageBodyInEmail = sakaiProxy.getIncludeMessageBodyInEmailSetting();
 	}
 
-	public Forum getForum(String forumId, String state)
-	{
-		if (logger.isDebugEnabled())
+	public Forum getForum(String forumId, String state) {
+
+		if (logger.isDebugEnabled()) {
 			logger.debug("getForum()");
+        }
 
 		return securityManager.filterForum(persistenceManager.getForum(forumId, state),null);
 	}
@@ -139,8 +141,10 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 			logger.debug("addOrUpdateForum()");
 
 		// Every forum needs a title
-		if (forum.getTitle() == null || forum.getTitle().length() <= 0)
+		String title = forum.getTitle();
+		if (title == null || title.length() <= 0) {
 			return false;
+        }
 
 		boolean creating = (forum.getId().length() == 0);
 
@@ -149,12 +153,12 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		if (succeeded && creating)
 		{
 			// SiteStats/Search etc event
-			sakaiProxy.postEvent(YAFT_FORUM_CREATED_SS, forum.getReference(), true);
+			sakaiProxy.postEvent(YAFT_FORUM_CREATED_SS, forum.getReference());
 			
 			if(sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
 				// NotificationService event
 				try {
-					sakaiProxy.postEvent(YAFT_FORUM_CREATED, forum.getReference(), true);
+					sakaiProxy.postEvent(YAFT_FORUM_CREATED, forum.getReference());
 				} catch(Exception e) {
 					logger.error("Failed to post forum created event",e);
 				}
@@ -184,12 +188,12 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		//message.setGroups(parentDiscussion.getGroups());
 
 		// SiteStats/Search etc event
-		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference());
 
 		if (sendMail && "READY".equals(message.getStatus()) && sakaiProxy.canCurrentUserSendAlerts() && !message.isAnonymous()) {
 			// NotificationService event
 			try {
-				sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference(), true);
+				sakaiProxy.postEvent(YAFT_MESSAGE_CREATED, message.getReference());
 			} catch(Exception e) {
 				logger.error("Failed to post message created event",e);
 			}
@@ -213,7 +217,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 		}
 
 		// SiteStats/Search etc event
-		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference(), true);
+		sakaiProxy.postEvent(YAFT_MESSAGE_CREATED_SS, message.getReference());
 		
 		for(Message child : message.getChildren()) {
 			addMessageRecursively(siteId, forumId, child,message.getId(),discussionId);
@@ -239,13 +243,13 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 				// From the empty id we know this is a new discussion
 				
 				// SiteStats/Search etc event
-				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED_SS, discussion.getReference(), true);
+				sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED_SS, discussion.getReference());
 			}
 
 			if (sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
 				// NotificationService event
 				try {
-					sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, discussion.getReference(), true);
+					sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED, discussion.getReference());
 				} catch(Exception e) {
 					logger.error("Failed to post message created event",e);
 				}
@@ -279,7 +283,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	{
 		persistenceManager.deleteForum(forumId);
 		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/forums/" + forumId;
-		sakaiProxy.postEvent(YAFT_FORUM_DELETED_SS, reference, true);
+		sakaiProxy.postEvent(YAFT_FORUM_DELETED_SS, reference);
 	}
 
 	public boolean deleteDiscussion(String discussionId)
@@ -294,7 +298,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 				sakaiProxy.removeCalendarEntry("End of '" + discussion.getSubject() + "'", "End of '" + discussion.getSubject() + "' Discussion");
 
 				String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/discussions/" + discussionId;
-				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED_SS, reference, true);
+				sakaiProxy.postEvent(YAFT_DISCUSSION_DELETED_SS, reference);
 
 				return true;
 			}
@@ -311,7 +315,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	{
 		persistenceManager.deleteMessage(message, forumId);
 		String reference = YaftForumService.REFERENCE_ROOT + "/" + sakaiProxy.getCurrentSiteId() + "/messages/" + message.getId();
-		sakaiProxy.postEvent(YAFT_MESSAGE_DELETED_SS, reference, true);
+		sakaiProxy.postEvent(YAFT_MESSAGE_DELETED_SS, reference);
 	}
 
 	public void undeleteMessage(Message message, String forumId)

@@ -96,7 +96,7 @@ public interface SakaiProxy
 	
 	public void registerEntityProducer(EntityProducer entityProducer);
 	
-	public void postEvent(String event,String reference,boolean modify);
+	public void postEvent(String event, String reference);
 
 	public Site getSite(String siteId);
 

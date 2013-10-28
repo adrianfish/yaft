@@ -126,7 +126,8 @@ var YAFTUTILS = (function($) {
 		$('#yaft_hide_deleted_link').show();
 	};
 
-	my.clearDates = function() {
+	my.clearDates = function () {
+
 		$('#yaft_start_date').val('');
 		$('#yaft_end_date').val('');
 		$('#yaft_start_hours').get(0).selectedIndex = 0;
@@ -137,7 +138,8 @@ var YAFTUTILS = (function($) {
 		$('#yaft_end_date_millis').val('');
 	};
 	
-	my.getGroupsForCurrentSite = function() {
+	my.getGroupsForCurrentSite = function () {
+
         var groups = null;
 
         $.ajax( {

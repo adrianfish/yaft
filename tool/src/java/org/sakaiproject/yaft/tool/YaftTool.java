@@ -148,6 +148,7 @@ public class YaftTool extends HttpServlet {
 						response.getWriter().write(data.toString());
 						return;
 					} else if (parts.length == 3) {
+
 						String authorId = parts[1];
 						String authorOp = parts[2];
 
@@ -163,6 +164,7 @@ public class YaftTool extends HttpServlet {
 						}
 					}
 				} else if ("siteGroups".equals(part1)) {
+
 					List<Group> groups = sakaiProxy.getCurrentSiteGroups();
 					JSONArray data = JSONArray.fromObject(groups);
 					response.setStatus(HttpServletResponse.SC_OK);

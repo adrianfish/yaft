@@ -25,151 +25,83 @@ import org.sakaiproject.entity.api.ResourceProperties;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Discussion implements Entity
-{
-	/**
-	 * The number of messages in this discussion
-	 */
+import lombok.Getter;
+import lombok.Setter;
+
+public class Discussion implements Entity {
+     
+    @Getter @Setter
 	private int messageCount = 0;
 	
+    @Getter @Setter
 	private long lastMessageDate;
 
-	/** Top level message */
+    @Getter @Setter
 	private Message firstMessage;
 	
+    @Getter @Setter
 	private String forumId;
 	
+    @Getter @Setter
 	private String status = "READY";
 	
 	// We need this to build direct urls in the rendered pages. Bogus, but necessary.
+    @Getter @Setter
 	private String pageId;
 	
+    @Getter @Setter
 	private long start = -1L;
+
+    @Getter @Setter
 	private long end = -1L;
 
+    @Getter @Setter
 	private boolean allowAnonymousPosting = false;
 	
+    @Getter @Setter
 	private boolean lockedForWriting = false;
+
+    @Getter @Setter
 	private boolean lockedForReading = false;
 	
+    @Getter @Setter
 	private boolean groupsInherited = false;
 	
+    @Getter @Setter
 	private List<Group> groups = new ArrayList<Group>();
-	public void setGroups(List<Group> groups) {
-		this.groups = groups;
-	}
-	public List<Group> getGroups() {
-		return groups;
-	}
 	
+    @Getter @Setter
 	private YaftGBAssignment assignment = null;
-
 	
-	public void setAssignment(YaftGBAssignment assignment) {
-		this.assignment = assignment;
-	}
-
-	public YaftGBAssignment getAssignment() {
-		return assignment;
-	}
-	
-	public void setFirstMessage(Message firstMessage)
-	{
-		this.firstMessage = firstMessage;
-	}
-
-	public String getId()
-	{
+	public String getId() {
 		return firstMessage.getId();
 	}
 
-	public void setMessageCount(int messageCount)
-	{
-		this.messageCount = messageCount;
-	}
-	
-	public String getContent()
-	{
+	public String getContent() {
 		return firstMessage.getContent();
 	}
 
-	public int getMessageCount()
-	{
-		return messageCount;
-	}
-
-	public String getSubject()
-	{
+	public String getSubject() {
 		return firstMessage.getSubject();
 	}
 	
-	public void setSubject(String subject)
-	{
+	public void setSubject(String subject) {
 		firstMessage.setSubject(subject);
 	}
 
-	public long getCreatedDate()
-	{
+	public long getCreatedDate() {
 		return firstMessage.getCreatedDate();
 	}
 
-	public String getCreatorId()
-	{
+	public String getCreatorId() {
 		return firstMessage.getCreatorId();
 	}
 
-	public String getCreatorDisplayName()
-	{
+	public String getCreatorDisplayName() {
 		return firstMessage.getCreatorDisplayName();
 	}
 	
-	public Message getFirstMessage()
-	{
-		return firstMessage;
-	}
-
-	public void setForumId(String forumId)
-	{
-		this.forumId = forumId;
-	}
-
-	public String getForumId()
-	{
-		return forumId;
-	}
-
-	public void setAllowAnonymousPosting(boolean allowAnonymousPosting)
-	{
-		this.allowAnonymousPosting = allowAnonymousPosting;
-	}
-
-	public boolean isAllowAnonymousPosting()
-	{
-		return allowAnonymousPosting;
-	}
-
-	public void setLastMessageDate(long lastMessageDate)
-	{
-		this.lastMessageDate = lastMessageDate;
-	}
-
-	public long getLastMessageDate()
-	{
-		return lastMessageDate;
-	}
-
-	public void setPageId(String pageId)
-	{
-		this.pageId = pageId;
-	}
-
-	public String getPageId()
-	{
-		return pageId;
-	}
-
-	public String getUrl()
-	{
+	public String getUrl() {
 		return "/portal/tool/" + getPlacementId() + "/discussions/" + getId() + ".html";
 	}
 	
@@ -177,21 +109,18 @@ public class Discussion implements Entity
 		return "/portal/directtool/" + getPlacementId() + "/discussions/" + getId() + ".html";
 	}
 
-	public String getPlacementId()
-	{
+	public String getPlacementId() {
 		return firstMessage.getPlacementId();
 	}
 	
-	public Element toXml(Document doc,Stack stack)
-	{
+	public Element toXml(Document doc,Stack stack) {
+
 		Element discussionElement = doc.createElement(XmlDefs.DISCUSSION);
 
-		if (stack.isEmpty())
-		{
+		if (stack.isEmpty()) {
 			doc.appendChild(discussionElement);
 		}
-		else
-		{
+		else {
 			((Element) stack.peek()).appendChild(discussionElement);
 		}
 
@@ -215,78 +144,27 @@ public class Discussion implements Entity
 		return discussionElement;
 	}
 
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
+	public boolean isCurrent() {
 
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStart(long start)
-	{
-		this.start = start;
-	}
-
-	public long getStart()
-	{
-		return start;
-	}
-
-	public void setEnd(long end)
-	{
-		this.end = end;
-	}
-
-	public long getEnd()
-	{
-		return end;
-	}
-	
-	public boolean isCurrent()
-	{
-		if(start == -1 || end == -1)
+		if(start == -1 || end == -1) {
 			return false;
-		else
-		{
+        } else {
+
 			long currentDate = new Date().getTime();
 
-			if(start <= currentDate && currentDate <= end)
+			if(start <= currentDate && currentDate <= end) {
 				return true;
-			else
+            } else {
 				return false;
+            }
 		}
 	}
 	
-	public void setLockedForWriting(boolean lockedForWriting)
-	{
-		this.lockedForWriting = lockedForWriting;
-	}
-
-	public boolean isLockedForWriting()
-	{
-		return lockedForWriting;
-	}
-	
-	public boolean isLockedForWritingAndUnavailable()
-	{
+	public boolean isLockedForWritingAndUnavailable() {
 		return lockedForWriting && !isCurrent();
 	}
 
-	public void setLockedForReading(boolean lockedForReading)
-	{
-		this.lockedForReading = lockedForReading;
-	}
-
-	public boolean isLockedForReading()
-	{
-		return lockedForReading;
-	}
-	
-	public boolean isLockedForReadingAndUnavailable()
-	{
+	public boolean isLockedForReadingAndUnavailable() {
 		return lockedForReading && !isCurrent();
 	}
 
@@ -294,25 +172,22 @@ public class Discussion implements Entity
 		return assignment != null;
 	}
 	
-	public void setGroupsInherited(boolean b) {
-		this.groupsInherited = b;
-	}
-	
-	public boolean isGroupsInherited() {
-		return this.groupsInherited;
-	}
 	public ResourceProperties getProperties() {
 		return null;
 	}
+
 	public String getReference() {
 		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + getSiteId() + Entity.SEPARATOR + "discussions" + Entity.SEPARATOR + getId();
 	}
+
 	public String getReference(String rootProperty) {
 		return getReference();
 	}
+
 	public String getUrl(String rootProperty) {
 		return getUrl();
 	}
+
 	public String getSiteId() {
 		return firstMessage.getSiteId();
 	}

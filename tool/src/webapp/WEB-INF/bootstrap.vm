@@ -705,7 +705,7 @@ ${yaft_forums_label}
 <br />
 <br />
 {/if}
-{if groups.length > 0}
+{if siteGroups.length > 0}
 <a id="yaft_toggle_group_options_link" href="javascript:;">Groups</a>
 <br />
 <div id="yaft_group_options" style="display:none;">
@@ -714,8 +714,8 @@ ${yaft_forums_label}
     <span class="instruction">${yaft_limit_forum_to_groups_label}</span>
     <br />
     <br />
-    {for group in groups}
-    <input type="checkbox" class="yaft_group_checkbox" id="${group.id}" value="${group.title}"/>${group.title}
+    {for siteGroup in siteGroups}
+    <input type="checkbox" class="yaft_group_checkbox" id="${siteGroup.id}" value="${siteGroup.title}"/>${siteGroup.title}
     <br />
     {/for}
     </fieldset>

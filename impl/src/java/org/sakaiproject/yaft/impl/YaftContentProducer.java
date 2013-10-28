@@ -38,6 +38,7 @@ import org.sakaiproject.yaft.api.YaftForumService;
 import org.apache.log4j.Logger;
 
 public class YaftContentProducer implements EntityContentProducer {
+
 	private YaftForumService forumService = null;
 
 	public void setForumService(YaftForumService forumService) {
@@ -173,7 +174,7 @@ public class YaftContentProducer implements EntityContentProducer {
 			} else {
 				StringBuilder sb = new StringBuilder();
 
-				SearchUtils.appendCleanString(forum.getTitle(), sb);
+				SearchUtils.appendCleanString(forum.title, sb);
 				return sb.toString();
 			}
 		}
@@ -277,7 +278,7 @@ public class YaftContentProducer implements EntityContentProducer {
 				logger.error("No forum for id: " + id + ". Returning an empty title ...");
 				return "";
 			} else
-				return forum.getTitle();
+				return forum.title;
 		}
 
 		return "Unrecognised";

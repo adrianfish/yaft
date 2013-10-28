@@ -32,143 +32,86 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class Forum implements Entity
-{
+import lombok.Getter;
+import lombok.Setter;
+
+public class Forum implements Entity {
+
+    @Getter @Setter
 	private String id = "";
-	private String title = "";
+
+    @Getter @Setter
+	public String title = "";
+
+    @Getter @Setter
 	private String description = "";
+
+    @Getter @Setter
 	private int discussionCount = 0;
+
+    @Getter @Setter
 	private int messageCount = 0;
+
+    @Getter @Setter
 	private long lastMessageDate;
+
+    @Getter @Setter
 	private long start = -1L;
+
+    @Getter @Setter
 	private long end = -1L;
+
+    @Getter @Setter
 	private boolean lockedForWriting = false;
+
+    @Getter @Setter
 	private boolean lockedForReading = false;
+
+    @Getter
 	private String siteId = "";
+
+    @Getter @Setter
 	private String status = "READY";
+
+    @Getter @Setter
 	private String creatorId = "";
+
+    @Getter @Setter
 	private List<Discussion> discussions= new ArrayList<Discussion>();
+
 	private String url = "";
+
+    @Getter
 	private String fullUrl = "";
+
+    @Getter @Setter
 	private List<Group> groups = new ArrayList<Group>();
 	
-	public Forum()
-	{
+	public Forum() {
 		id = UUID.randomUUID().toString();
 	}
 	
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	public String getId()
-	{
-		return id;
-	}
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
-	public String getTitle()
-	{
-		return title;
-	}
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-	public String getDescription()
-	{
-		return description;
-	}
-	public void setDiscussionCount(int discussionCount)
-	{
-		this.discussionCount = discussionCount;
-	}
-	public int getDiscussionCount()
-	{
-		return discussionCount;
-	}
-	public void setSiteId(String siteId)
-	{
+	public void setSiteId(String siteId) {
+
 		this.siteId = siteId;
 		
-		try
-		{
+		try {
 			Site site = SiteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			url = "/portal/tool/" + tc.getId() + "/forums/" + id + ".html";
 			fullUrl = "/portal/directtool/" + tc.getId() + "/forums/" + id + ".html";
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
-	public String getSiteId()
-	{
-		return siteId;
-	}
 
-	public void setDiscussions(List<Discussion> discussions)
-	{
-		this.discussions = discussions;
-	}
+	public Element toXml(Document doc,Stack stack) {
 
-	public List<Discussion> getDiscussions()
-	{
-		return discussions;
-	}
-
-	public String getUrl()
-	{
-		return url;
-	}
-	public String getFullUrl()
-	{
-		return fullUrl;
-	}
-
-	public void setMessageCount(int messageCount)
-	{
-		this.messageCount = messageCount;
-	}
-
-	public int getMessageCount()
-	{
-		return messageCount;
-	}
-
-	public void setLastMessageDate(long lastMessageDate)
-	{
-		this.lastMessageDate = lastMessageDate;
-	}
-
-	public long getLastMessageDate()
-	{
-		return lastMessageDate;
-	}
-
-	public void setCreatorId(String creatorId)
-	{
-		this.creatorId = creatorId;
-	}
-
-	public String getCreatorId()
-	{
-		return creatorId;
-	}
-
-	public Element toXml(Document doc,Stack stack)
-	{
 		Element forumElement = doc.createElement(XmlDefs.FORUM);
 
-		if (stack.isEmpty())
-		{
+		if (stack.isEmpty()) {
 			doc.appendChild(forumElement);
-		}
-		else
-		{
+		} else {
 			((Element) stack.peek()).appendChild(forumElement);
 		}
 
@@ -192,113 +135,52 @@ public class Forum implements Entity
 		
 		stack.push(discussionsElement);
 		
-		for(Discussion discussion : discussions)
+		for(Discussion discussion : discussions) {
 			discussion.toXml(doc,stack);
+        }
 		
 		stack.pop();
 		
 		return forumElement;
 	}
 
-	public void fromXml(Element forumElement)
-	{
-		if(!forumElement.getTagName().equals(XmlDefs.FORUM))
-		{
+	public void fromXml(Element forumElement) {
+
+		if(!forumElement.getTagName().equals(XmlDefs.FORUM)) {
 			return;
 		}
 		
 		NodeList children = forumElement.getElementsByTagName(XmlDefs.TITLE);
-		setTitle(children.item(0).getFirstChild().getTextContent());
+		title = children.item(0).getFirstChild().getTextContent();
 		
 		children = forumElement.getElementsByTagName(XmlDefs.DESCRIPTION);
 		setDescription(children.item(0).getFirstChild().getTextContent());
 	}
 
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
+	public boolean isCurrent() {
 
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStart(long start)
-	{
-		this.start = start;
-	}
-
-	public long getStart()
-	{
-		return start;
-	}
-
-	public void setEnd(long end)
-	{
-		this.end = end;
-	}
-
-	public long getEnd()
-	{
-		return end;
-	}
-
-	public boolean isCurrent()
-	{
-		if(start == -1 || end == -1)
+		if(start == -1 || end == -1) {
 			return false;
-		else
-		{
+        } else {
+
 			long currentDate = new Date().getTime();
 
-			if(start <= currentDate && currentDate <= end)
+			if(start <= currentDate && currentDate <= end) {
 				return true;
-			else
+            } else {
 				return false;
+            }
 		}
 	}
 
-	public void setLockedForWriting(boolean lockedForWriting)
-	{
-		this.lockedForWriting = lockedForWriting;
-	}
-	
-	public boolean isLockedForWriting()
-	{
-		return lockedForWriting;
-	}
-
-	public boolean isLockedForWritingAndUnavailable()
-	{
+	public boolean isLockedForWritingAndUnavailable() {
 		return lockedForWriting && !isCurrent();
 	}
 
-	public void setLockedForReading(boolean lockedForReading)
-	{
-		this.lockedForReading = lockedForReading;
-	}
-
-	public boolean isLockedForReading()
-	{
-		return lockedForReading;
-	}
-	
-	public boolean isLockedForReadingAndUnavailable()
-	{
+	public boolean isLockedForReadingAndUnavailable() {
 		return lockedForReading && !isCurrent();
 	}
 	
-	public void setGroups(List<Group> groups)
-	{
-		this.groups = groups;
-	}
-
-	public List<Group> getGroups()
-	{
-		return groups;
-	}
-
 	// START ENTITY IMPL
 	
 	public ResourceProperties getProperties() {
@@ -311,6 +193,10 @@ public class Forum implements Entity
 
 	public String getReference(String rootProperty) {
 		return getReference();
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public String getUrl(String rootProperty) {

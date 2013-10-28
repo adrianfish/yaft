@@ -32,201 +32,95 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class Message implements Entity
-{
+import lombok.Getter;
+import lombok.Setter;
+
+public class Message implements Entity {
+
 	private static final String CDATA_SUFFIX = "]]>";
 	private static final String CDATA_PREFIX = "<![CDATA[";
 	
+    @Getter @Setter
 	private String id = "";
+    @Getter @Setter
 	private String subject = "";
+    @Getter
 	private List<Message> children = new ArrayList<Message>();
+    @Getter @Setter
 	private String creatorId = "";
+    @Getter @Setter
 	private long createdDate;
+    @Getter @Setter
 	private String content = "";
+    @Getter @Setter
 	private String parent = "";
+    @Getter @Setter
 	private String creatorDisplayName = "";
+    @Setter
 	private String discussionId = "";
+    @Getter @Setter
     private boolean anonymous = false;
-    public void setAnonymous(boolean anonymous) {
-        this.anonymous = anonymous;
-    }
-    public boolean isAnonymous() {
-        return anonymous;
-    }
+    @Getter @Setter
 	private String status = "DRAFT";
+    @Getter @Setter
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	private String url = "";
+    @Getter
 	private String fullUrl = "";
+    @Getter
 	private String placementId = "";
+    @Getter
 	private String siteId = "";
 	
+    @Getter @Setter
 	private List<Group> groups = new ArrayList<Group>();
-	public void setGroups(List<Group> groups) {
-		this.groups = groups;
-	}
-	public List<Group> getGroups() {
-		return groups;
-	}
 	
-	public Message()
-	{
+	public Message() {
+
 		id = UUID.randomUUID().toString();
 		createdDate = new Date().getTime();
 	}
 	
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	
-	public String getId()
-	{
-		return id;
-	}
-	
-	public void setCreatorId(String creatorId)
-	{
-		this.creatorId = creatorId;
-	}
-	
-	public String getCreatorId()
-	{
-		return creatorId;
-	}
-	
-	public void setCreatedDate(long createdDate)
-	{
-		this.createdDate = createdDate;
-	}
-	
-	public long getCreatedDate()
-	{
-		return createdDate;
-	}
-	
-	public void setContent(String content)
-	{
-		this.content = content;
-	}
-	
-	public String getContent()
-	{
-		return content;
-	}
-
-	public void setSubject(String subject)
-	{
-		this.subject = subject;
-	}
-
-	public String getSubject()
-	{
-		return subject;
-	}
-
-	public void setParent(String parent)
-	{
-		this.parent = parent;
-	}
-
-	public String getParent()
-	{
-		return parent;
-	}
-
-	public boolean hasParent()
-	{
+	public boolean hasParent() {
 		return (parent != null && parent.length() > 0);
 	}
 
-	public void setCreatorDisplayName(String creatorDisplayName)
-	{
-		this.creatorDisplayName = creatorDisplayName;
-	}
-
-	public String getCreatorDisplayName()
-	{
-		return creatorDisplayName;
-	}
-
-	public void addChild(Message child)
-	{
+	public void addChild(Message child) {
 		children.add(child);
 	}
 	
-	public List<Message> getChildren()
-	{
-		return children;
-	}
+	public String getDiscussionId() {
 
-	public void setDiscussionId(String discussionId)
-	{
-		this.discussionId = discussionId;
-	}
-
-	public String getDiscussionId()
-	{
-		if("".equals(parent))
+		if("".equals(parent)) {
 			return id;
+        }
 		
 		return discussionId;
 	}
 
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
+	public void setSiteId(String siteId) {
 
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setAttachments(List<Attachment> attachments)
-	{
-		this.attachments = attachments;
-	}
-
-	public List<Attachment> getAttachments()
-	{
-		return attachments;
-	}
-
-	public String getPlacementId()
-	{
-		return placementId;
-	}
-
-	public void setSiteId(String siteId)
-	{
 		this.siteId = siteId;
 		
-		try
-		{
+		try {
+
 			Site site = SiteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			placementId = tc.getId();
 			url = "/portal/tool/" + tc.getId() + "/messages/" + id + ".html";
 			fullUrl = "/portal/directtool/" + tc.getId() + "/messages/" + id + ".html";
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public String getSiteId()
-	{
-		return siteId;
-	}
-	
 	/** START Entity IMPLEMENTATION */
 
 	/**
 	 * From org.sakaiproject.entity.api.Entity
 	 */
-	public ResourceProperties getProperties()
-	{
+	public ResourceProperties getProperties() {
+
 		ResourceProperties rp = new BaseResourceProperties();
 		
 		rp.addProperty("id", getId());
@@ -238,18 +132,16 @@ public class Message implements Entity
 	 * 
 	 * @return
 	 */
-	public String getReference()
-	{
+	public String getReference() {
 		return YaftForumService.REFERENCE_ROOT + Entity.SEPARATOR + siteId  + Entity.SEPARATOR + "messages" + Entity.SEPARATOR + id;
 	}
 
 	/**
-	 * @see org.sakaiproject.entity.api.Entity#toXml()
+	 * @see org.sakaiproject.entity.api.Entity#getReference()
 	 * 
 	 * @return
 	 */
-	public String getReference(String rootProperty)
-	{
+	public String getReference(String rootProperty) {
 		return getReference();
 	}
 	
@@ -258,23 +150,16 @@ public class Message implements Entity
 	 * 
 	 * @return
 	 */
-	public String getUrl()
-	{
+	public String getUrl() {
 		return url;
 	}
 	
-	public String getFullUrl()
-	{
-		return fullUrl;
-	}
-
 	/**
 	 * @see org.sakaiproject.entity.api.Entity#toXml()
 	 * 
 	 * @return
 	 */
-	public String getUrl(String rootProperty)
-	{
+	public String getUrl(String rootProperty) {
 		return url;
 	}
 
@@ -283,16 +168,13 @@ public class Message implements Entity
 	 * 
 	 * @return
 	 */
-	public Element toXml(Document doc, Stack stack)
-	{
+	public Element toXml(Document doc, Stack stack) {
+
 		Element messageElement = doc.createElement(XmlDefs.MESSAGE);
 
-		if (stack.isEmpty())
-		{
+		if (stack.isEmpty()) {
 			doc.appendChild(messageElement);
-		}
-		else
-		{
+		} else {
 			((Element) stack.peek()).appendChild(messageElement);
 		}
 
@@ -313,8 +195,7 @@ public class Message implements Entity
 		
 		Element attachmentsElement = doc.createElement(XmlDefs.ATTACHMENTS);
 		
-		for(Attachment attachment : attachments)
-		{
+		for(Attachment attachment : attachments) {
 			Element attachmentElement = doc.createElement(XmlDefs.ATTACHMENT);
 			attachmentElement.setAttribute(XmlDefs.RESOURCE_ID, attachment.getResourceId());
 			attachmentsElement.appendChild(attachmentElement);
@@ -326,8 +207,9 @@ public class Message implements Entity
 		messageElement.appendChild(repliesElement);
 		stack.push(repliesElement);
 		
-		for(Message child : children)
+		for(Message child : children) {
 			child.toXml(doc, stack);
+        }
 
 		stack.pop();
 
@@ -336,15 +218,14 @@ public class Message implements Entity
 	
 	/** END Entity IMPLEMENTATION */
 	
-	private String wrapWithCDATA(String s)
-	{
+	private String wrapWithCDATA(String s) {
 		return CDATA_PREFIX + s + CDATA_SUFFIX;
 	}
 	
-	private String stripCDATA(String s)
-	{
-		if(s.startsWith(CDATA_PREFIX) && s.endsWith(CDATA_SUFFIX))
-		{
+	private String stripCDATA(String s) {
+
+		if(s.startsWith(CDATA_PREFIX) && s.endsWith(CDATA_SUFFIX)) {
+
 			s = s.substring(CDATA_PREFIX.length());
 			s = s.substring(0, s.length() - CDATA_SUFFIX.length());
 		}
@@ -352,15 +233,16 @@ public class Message implements Entity
 		return s;
 	}
 
-	public void fromXml(Element messageElement)
-	{
+	public void fromXml(Element messageElement) {
+
 		NodeList nodes = messageElement.getChildNodes();
 		
-		for(int i=0;i<nodes.getLength();i++)
-		{
+		for(int i=0;i<nodes.getLength();i++) {
+
 			Node node = nodes.item(i);
-			if(node.getNodeType() != Node.ELEMENT_NODE)
+			if(node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+            }
 			
 			Element element = (Element) node;
 			
@@ -370,19 +252,19 @@ public class Message implements Entity
 			if(XmlDefs.CONTENT.equals(element.getTagName()))
 				setContent(stripCDATA(element.getFirstChild().getTextContent()));
 			
-			if(XmlDefs.ATTACHMENTS.equals(element.getTagName()))
-			{
+			if(XmlDefs.ATTACHMENTS.equals(element.getTagName())) {
+
 				NodeList children = element.getChildNodes();
-				for(int j=0;j<children.getLength();j++)
-				{
+				for(int j=0;j<children.getLength();j++) {
+
 					Node child = children.item(j);
-					if(child.getNodeType() != Node.ELEMENT_NODE)
+					if(child.getNodeType() != Node.ELEMENT_NODE) {
 						continue;
+                    }
 					
 					Element childElement = (Element) child;
 					
-					if(XmlDefs.ATTACHMENT.equals(childElement.getTagName()))
-					{
+					if(XmlDefs.ATTACHMENT.equals(childElement.getTagName())) {
 						String resourceId = childElement.getAttribute(XmlDefs.RESOURCE_ID);
 						
 						Attachment attachment = new Attachment();

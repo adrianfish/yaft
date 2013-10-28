@@ -122,7 +122,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	private TimeService timeService;
 
-
 	private UsageSessionService usageSessionService;
 
 	private SearchService searchService;
@@ -487,9 +486,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 		entityManager.registerEntityProducer(entityProducer, YaftForumService.REFERENCE_ROOT);
 	}
 
-	public void postEvent(String event, String reference, boolean modify) {
+	public void postEvent(String event, String reference) {
 		UsageSession usageSession = usageSessionService.getSession();
-		eventTrackingService.post(eventTrackingService.newEvent(event, reference, modify), usageSession);
+		eventTrackingService.post(eventTrackingService.newEvent(event, reference, true), usageSession);
 	}
 
 	public Site getSite(String siteId) {
@@ -711,6 +710,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public List<Group> getCurrentSiteGroups() {
+
 		List<Group> groups = new ArrayList<Group>();
 
 		Collection<org.sakaiproject.site.api.Group> sakaiGroups = getCurrentSite().getGroups();
