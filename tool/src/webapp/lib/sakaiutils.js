@@ -73,6 +73,11 @@ var SAKAIUTILS = (function ($) {
 	};
 	
 	my.setupCKEditor = function(textarea_id,width,height,toolbarSet) {
+
+        var instance = CKEDITOR.instances[textarea_id];
+        if(typeof instance !== 'undefined') {
+            delete CKEDITOR.instances[textarea_id];
+        }
 	
 		sakai.editor.launch(textarea_id,{},width,height);
 		
