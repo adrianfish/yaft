@@ -609,7 +609,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 			AuthzGroup siteHelperAuthzGroup = authzGroupService.getAuthzGroup("!site.helper");
 			Role siteHelperRole = siteHelperAuthzGroup.getRole(siteRole.getId());
 
-			if (!securityService.isSuperUser() && !siteRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS) && !siteHelperRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS)) {
+			if (!securityService.isSuperUser() && !siteRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS) && !siteHelperRole.isAllowed(YaftFunctions.YAFT_MODIFY_PERMISSIONS) && !siteRole.isAllowed("site.upd")) {
 				logger.warn(userId + " attempted to update YAFT permissions for site " + site.getTitle());
 				return false;
 			}
