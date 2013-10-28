@@ -544,6 +544,10 @@ public class SakaiProxyImpl implements SakaiProxy {
 					filteredFunctions.add(function);
 				}
 			}
+
+            if (functions.contains("site.upd")) {
+                filteredFunctions.add(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
+            }
 		}
 
 		return filteredFunctions;
