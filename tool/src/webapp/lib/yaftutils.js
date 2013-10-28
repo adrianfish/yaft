@@ -116,10 +116,19 @@ var YAFTUTILS = (function($) {
 	};
 	
 	my.showDeleted = function() {
+
 		$(".yaft_deleted_message").show();
+
 	  	$(document).ready(function() {
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
+
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
+            }
 		});
 	  	yaftShowingDeleted = true;
 		$('#yaft_show_deleted_link').hide();
@@ -175,8 +184,15 @@ var YAFTUTILS = (function($) {
 	my.hideDeleted = function() {
 		$(".yaft_deleted_message").hide();
 	   	$(document).ready(function() {
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
+
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
+            }
 		});
 	  	yaftShowingDeleted = false;
 		$('#yaft_show_deleted_link').show();
@@ -240,8 +256,14 @@ var YAFTUTILS = (function($) {
 	            YAFTUTILS.attachProfilePopup();
             }
 
-			if(window.frameElement)
-		        setMainFrameHeight(window.frameElement.id);
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
+            }
 	    });
 	};
 	
@@ -374,8 +396,14 @@ var YAFTUTILS = (function($) {
 	 		    });
             }
             
-			if(window.frameElement)
-				setMainFrameHeight(window.frameElement.id);
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
+            }
 	 	});
 	};
 	
@@ -778,8 +806,14 @@ var YAFTUTILS = (function($) {
 				$('#yaft_breadcrumb').html('');
 				SAKAIUTILS.renderTrimpathTemplate('yaft_search_results_content_template',{'results':hits},'yaft_content');
 	 			$(document).ready(function() {
-					if(window.frameElement)
-						setMainFrameHeight(window.frameElement.id);
+                    try {
+                        if(window.frameElement) {
+                            setMainFrameHeight(window.frameElement.id);
+                        }
+                    } catch(err) {
+                        // This is likely under an LTI provision scenario.
+                        // XSS protection will block this call.
+                    }
 				});
         	},
         	error : function(xhr,textStatus,errorThrown) {
@@ -1071,8 +1105,15 @@ var YAFTUTILS = (function($) {
 	 				cssDesc:'yaftSortableTableHeaderSortDown',
 	 				widgets: ['zebra']
 	 		});
-	        if(window.frameElement)
-		        setMainFrameHeight(window.frameElement.id);
+
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
+            }
         });
     };
 
@@ -1165,8 +1206,13 @@ var YAFTUTILS = (function($) {
                         }
                     });
 
-			        if(window.frameElement) {
-				        setMainFrameHeight(window.frameElement.id);
+                    try {
+                        if(window.frameElement) {
+                            setMainFrameHeight(window.frameElement.id);
+                        }
+                    } catch(err) {
+                        // This is likely under an LTI provision scenario.
+                        // XSS protection will block this call.
                     }
 		        });
 			},

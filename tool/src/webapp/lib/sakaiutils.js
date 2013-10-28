@@ -37,6 +37,7 @@ var SAKAIUTILS = (function ($) {
 	};
 
 	my.renderTrimpathTemplate = function (templateName,contextObject,output) {
+
 		var templateNode = document.getElementById(templateName);
 		var firstNode = templateNode.firstChild;
 		var template = null;
@@ -50,8 +51,9 @@ var SAKAIUTILS = (function ($) {
 
    		var render = trimpathTemplate.process(contextObject);
 
-		if (output)
+		if (output) {
 			document.getElementById(output).innerHTML = render;
+        }
 
 		return render;
 	};
@@ -60,8 +62,13 @@ var SAKAIUTILS = (function ($) {
 	
 		sakai.editor.launch(textarea_id,{},width,height);
 		
-        if(window.frameElement) {
-            setMainFrameHeight(window.frameElement.id);
+        try {
+            if(window.frameElement) {
+                setMainFrameHeight(window.frameElement.id);
+            } 
+        } catch(err) {
+            // This is likely under an LTI provision scenario.
+            // XSS protection will block this call.
         }
 	};
 	
@@ -70,13 +77,19 @@ var SAKAIUTILS = (function ($) {
 		sakai.editor.launch(textarea_id,{},width,height);
 		
 		CKEDITOR.instances[textarea_id].on('instanceReady',function (e) {
-            if(window.frameElement) {
-                setMainFrameHeight(window.frameElement.id);
+            try {
+                if(window.frameElement) {
+                    setMainFrameHeight(window.frameElement.id);
+                }
+            } catch(err) {
+                // This is likely under an LTI provision scenario.
+                // XSS protection will block this call.
             }
         });
 	}
 	
 	my.setupWysiwygEditor = function(editorId,textarea_id,width,height,toolbarSet) {
+
 		if ('FCKeditor' === editorId) {
 			this.setupFCKEditor(textarea_id,width,height,toolbarSet);
 		} else if ('ckeditor' === editorId) {
@@ -85,6 +98,7 @@ var SAKAIUTILS = (function ($) {
 	}
 	
 	my.getWysiwygEditor = function(editorId,textarea_id) {
+
 		if ('FCKeditor' === editorId) {
 			return FCKeditorAPI.GetInstance(textarea_id);
 		} else if ('ckeditor' === editorId) {
