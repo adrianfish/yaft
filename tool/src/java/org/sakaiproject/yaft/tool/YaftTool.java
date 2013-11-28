@@ -29,7 +29,6 @@ import net.sf.json.JsonConfig;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.search.api.SearchResult;
 import org.sakaiproject.tool.api.Session;
@@ -37,7 +36,6 @@ import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.*;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -122,7 +120,7 @@ public class YaftTool extends HttpServlet {
 			}
 			
 	        response.setStatus(HttpServletResponse.SC_OK);
-	        response.setContentType("text/html");
+	        response.setContentType("text/html; charset=UTF-8");
 	        Writer writer = new BufferedWriter(response.getWriter());
 	        try {
 	        	bootstrapTemplate.merge(ctx,writer);
@@ -144,7 +142,7 @@ public class YaftTool extends HttpServlet {
 						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
 						JSONArray data = JSONArray.fromObject(authors);
 						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("application/json");
+						response.setContentType("application/json; charset=UTF-8");
 						response.getWriter().write(data.toString());
 						return;
 					} else if (parts.length == 3) {
@@ -158,7 +156,7 @@ public class YaftTool extends HttpServlet {
 							config.setExcludes(new String[] { "properties", "reference" });
 							JSONArray data = JSONArray.fromObject(messages, config);
 							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("application/json");
+							response.setContentType("application/json; charset=UTF-8");
 							response.getWriter().write(data.toString());
 							return;
 						}
@@ -168,7 +166,7 @@ public class YaftTool extends HttpServlet {
 					List<Group> groups = sakaiProxy.getCurrentSiteGroups();
 					JSONArray data = JSONArray.fromObject(groups);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(data.toString());
 					return;
 				} else if ("assignments".equals(part1)) {
@@ -202,7 +200,7 @@ public class YaftTool extends HttpServlet {
 
 					JSONObject data = JSONObject.fromObject(forum);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(data.toString());
 					return;
 				}
@@ -230,7 +228,7 @@ public class YaftTool extends HttpServlet {
 
 				JSONArray data = JSONArray.fromObject(fora);
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/json");
+				response.setContentType("application/json; charset=UTF-8");
 				response.getWriter().write(data.toString());
 				response.getWriter().close();
 				return;
@@ -246,7 +244,7 @@ public class YaftTool extends HttpServlet {
 				Map<String, Integer> read = yaftForumService.getReadMessageCountForAllFora();
 				JSONObject data = JSONObject.fromObject(read);
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/json");
+				response.setContentType("application/json; charset=UTF-8");
 				response.getWriter().write(data.toString());
 				return;
 			}
@@ -260,7 +258,7 @@ public class YaftTool extends HttpServlet {
 						ctx.put("state","forum");
 				        
 						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("text/html");
+						response.setContentType("text/html; charset=UTF-8");
 						Writer writer = new BufferedWriter(response.getWriter());
 						try {
 							bootstrapTemplate.merge(ctx,writer);
@@ -285,7 +283,7 @@ public class YaftTool extends HttpServlet {
 					data.accumulate("forum", forumObject);
 					data.accumulate("counts", countsObject);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(data.toString());
 					return;
 				} catch (Exception e) {
@@ -299,7 +297,7 @@ public class YaftTool extends HttpServlet {
 				if ("delete".equals(forumOp)) {
 					yaftForumService.deleteForum(forumId);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
+					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write("success");
 					response.getWriter().close();
 					return;
@@ -331,7 +329,7 @@ public class YaftTool extends HttpServlet {
 					config.setExcludes(new String[] { "properties", "reference" });
 					JSONArray data = JSONArray.fromObject(discussion, config);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(data.toString());
 					response.getWriter().close();
 					return;
@@ -352,7 +350,7 @@ public class YaftTool extends HttpServlet {
 				    ctx.put("state","full");
 				        
 				    response.setStatus(HttpServletResponse.SC_OK);
-				    response.setContentType("text/html");
+				    response.setContentType("text/html; charset=UTF-8");
 				    Writer writer = new BufferedWriter(response.getWriter());
 				    try {
 				    	bootstrapTemplate.merge(ctx,writer);
@@ -373,7 +371,7 @@ public class YaftTool extends HttpServlet {
 
 				JSONObject data = JSONObject.fromObject(discussion, config);
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/json");
+				response.setContentType("application/json; charset=UTF-8");
 				response.getWriter().write(data.toString());
 				response.getWriter().close();
 				return;
@@ -382,7 +380,7 @@ public class YaftTool extends HttpServlet {
 				if ("delete".equals(discussionOp)) {
 					yaftForumService.deleteDiscussion(discussionId);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
+					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write("success");
 					response.getWriter().close();
 					return;
@@ -390,7 +388,7 @@ public class YaftTool extends HttpServlet {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
 					String forumId = forum.getId();
 					if (yaftForumService.markDiscussionRead(discussionId, forumId)) {
-						response.setContentType("text/plain");
+						response.setContentType("text/plain; charset=UTF-8");
 						response.getWriter().write("success");
 						response.getWriter().close();
 					} else {
@@ -403,7 +401,7 @@ public class YaftTool extends HttpServlet {
 					List<String> ids = yaftForumService.getReadMessageIds(discussionId);
 					JSONArray data = JSONArray.fromObject(ids);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(data.toString());
 					response.getWriter().close();
 					return;
@@ -412,7 +410,7 @@ public class YaftTool extends HttpServlet {
 						List<Author> authors = yaftForumService.getAuthorsForDiscussion(discussionId);
 						JSONArray data = JSONArray.fromObject(authors);
 						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("application/json");
+						response.setContentType("application/json; charset=UTF-8");
 						response.getWriter().write(data.toString());
 						return;
 					} else if (parts.length == 5) {
@@ -425,7 +423,7 @@ public class YaftTool extends HttpServlet {
 							config.setExcludes(new String[] { "properties", "reference" });
 							JSONArray data = JSONArray.fromObject(messages, config);
 							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("application/json");
+							response.setContentType("application/json; charset=UTF-8");
 							response.getWriter().write(data.toString());
 							return;
 						}
@@ -437,7 +435,7 @@ public class YaftTool extends HttpServlet {
 					config.setExcludes(new String[] { "properties", "reference" });
 					JSONObject json = JSONObject.fromObject(discussion,config);
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json");
+					response.setContentType("application/json; charset=UTF-8");
 					response.getWriter().write(json.toString());
 					response.getWriter().close();
 					return;
@@ -469,7 +467,7 @@ public class YaftTool extends HttpServlet {
 				    ctx.put("messageId",messageId);
 				        
 				    response.setStatus(HttpServletResponse.SC_OK);
-				    response.setContentType("text/html");
+				    response.setContentType("text/html; charset=UTF-8");				    
 				    Writer writer = new BufferedWriter(response.getWriter());
 				    try {
 						bootstrapTemplate.merge(ctx,writer);
@@ -486,7 +484,7 @@ public class YaftTool extends HttpServlet {
 
 				JSONObject data = JSONObject.fromObject(message, config);
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/json");
+				response.setContentType("application/json; charset=UTF-8");
 				response.getWriter().write(data.toString());
 				response.getWriter().close();
 				return;
@@ -500,7 +498,7 @@ public class YaftTool extends HttpServlet {
 			if ("markRead".equals(messageOp)) {
 				if (yaftForumService.markMessageRead(messageId, forum.getId(), message.getDiscussionId())) {
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
+					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write("success");
 				} else
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -511,7 +509,7 @@ public class YaftTool extends HttpServlet {
 			} else if ("markUnRead".equals(messageOp)) {
 				if (yaftForumService.markMessageUnRead(messageId, forum.getId(), message.getDiscussionId())) {
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
+					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write("success");
 				} else {
 					logger.error("Failed to mark message with id '" + messageId + "' as un-read");
@@ -524,14 +522,14 @@ public class YaftTool extends HttpServlet {
 			} else if ("delete".equals(messageOp)) {
 				yaftForumService.deleteMessage(message, forum.getId());
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain");
+				response.setContentType("text/plain; charset=UTF-8");
 				response.getWriter().write("success");
 				response.getWriter().close();
 				return;
 			} else if ("undelete".equals(messageOp)) {
 				yaftForumService.undeleteMessage(message, forum.getId());
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain");
+				response.setContentType("text/plain; charset=UTF-8");
 				response.getWriter().write("success");
 				response.getWriter().close();
 				return;
@@ -545,7 +543,7 @@ public class YaftTool extends HttpServlet {
 							yaftForumService.deleteAttachment(attachmentId, messageId);
 
 							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("text/plain");
+							response.setContentType("text/plain; charset=UTF-8");
 							response.getWriter().write("success");
 							response.getWriter().close();
 							return;
@@ -560,7 +558,7 @@ public class YaftTool extends HttpServlet {
 
 				JSONObject data = JSONObject.fromObject(message, config);
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/json");
+				response.setContentType("application/json; charset=UTF-8");
 				response.getWriter().write(data.toString());
 				response.getWriter().close();
 				return;
@@ -607,7 +605,7 @@ public class YaftTool extends HttpServlet {
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		response.getWriter().write(data.toString());
 		response.getWriter().close();
 		return;
@@ -617,7 +615,7 @@ public class YaftTool extends HttpServlet {
 		Map<String, Set<String>> perms = sakaiProxy.getPermsForCurrentSite();
 		JSONObject data = JSONObject.fromObject(perms);
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		response.getWriter().write(data.toString());
 		response.getWriter().close();
 		return;
@@ -765,7 +763,7 @@ public class YaftTool extends HttpServlet {
 
 				if (yaftForumService.addOrUpdateForum(forum, sendEmail)) {
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain");
+					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write(forum.getId());
 					response.getWriter().close();
 					return;
@@ -815,7 +813,7 @@ public class YaftTool extends HttpServlet {
 
 			if (subject == null || subject.length() <= 0 || content == null || content.length() <= 0 || forumId == null || forumId.length() <= 0) {
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html");
+				response.setContentType("text/html; charset=UTF-8");
 				response.getWriter().write("ERROR:A forum id,subject and content must be supplied.");
 				response.getWriter().close();
 				return;
@@ -907,7 +905,7 @@ public class YaftTool extends HttpServlet {
 					if (start > 0L && end > 0L) {
 						if (end <= start) {
 							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("text/html");
+							response.setContentType("text/html; charset=UTF-8");
 							response.getWriter().write("ERROR:The end date MUST come after the start date.");
 							response.getWriter().close();
 							return;
@@ -918,7 +916,7 @@ public class YaftTool extends HttpServlet {
 					}
 				} catch (NumberFormatException pe) {
 					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/html");
+					response.setContentType("text/html; charset=UTF-8");
 					response.getWriter().write("ERROR:The start and end dates MUST be supplied in millisecond format.");
 					response.getWriter().close();
 					return;
@@ -927,13 +925,13 @@ public class YaftTool extends HttpServlet {
 
 			if (yaftForumService.addDiscussion(siteId, forumId, discussion, sendEmail) != null) {
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html");
+				response.setContentType("text/html; charset=UTF-8");
 				response.getWriter().write(discussion.getId());
 				response.getWriter().close();
 				return;
 			} else {
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html");
+				response.setContentType("text/html; charset=UTF-8");
 				response.getWriter().write("ERROR");
 				response.getWriter().close();
 				return;
@@ -1029,7 +1027,7 @@ public class YaftTool extends HttpServlet {
 
 			if (yaftForumService.addOrUpdateMessage(siteId, forumId, message, sendEmail)) {
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain");
+				response.setContentType("text/plain; charset=UTF-8");
 				response.getWriter().write("success");
 				response.getWriter().close();
 				return;
@@ -1043,7 +1041,7 @@ public class YaftTool extends HttpServlet {
 	private void doPermsPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (sakaiProxy.setPermsForCurrentSite(request.getParameterMap())) {
 			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("text/plain");
+			response.setContentType("text/plain; charset=UTF-8");
 			response.getWriter().write("success");
 			response.getWriter().close();
 			return;
@@ -1063,7 +1061,7 @@ public class YaftTool extends HttpServlet {
 
 		JSONArray data = JSONArray.fromObject(results);
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		response.getWriter().write(data.toString());
 		response.getWriter().close();
 		return;
@@ -1133,7 +1131,9 @@ public class YaftTool extends HttpServlet {
 			VelocityEngine ve = new VelocityEngine();
             Properties props = new Properties();
             props.setProperty("file.resource.loader.path",config.getServletContext().getRealPath("/WEB-INF"));
-            ve.init(props);
+            props.setProperty(VelocityEngine.INPUT_ENCODING, "UTF-8");
+            props.setProperty(VelocityEngine.OUTPUT_ENCODING, "UTF-8");
+            ve.init(props);            
             bootstrapTemplate = ve.getTemplate("bootstrap.vm");
 		} catch (Throwable t) {
 			throw new ServletException("Failed to initialise YaftTool servlet.", t);
