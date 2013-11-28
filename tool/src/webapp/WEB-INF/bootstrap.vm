@@ -150,7 +150,7 @@ ${yaft_forums_label}
 		{/if}
 		{if forum.start > -1}
 		<br />
-            <span id="yaft_availability_message" class="yaftForumDescription">Available between ${forum.formattedStartDate} and ${forum.formattedEndDate}</span>
+            <span id="yaft_availability_message" class="yaftForumDescription">${yaft_availability_message1}${forum.formattedStartDate}${yaft_availability_message2}${forum.formattedEndDate}</span>
 		{/if}
 		</td>
 		<td align="center">${forum.discussionCount}</td>
@@ -222,7 +222,7 @@ ${yaft_forums_label}
 		{/if}
 		{if discussion.start > -1}
 		<br />
-            <span id="yaft_availability_message" class="yaftForumDescription">Available between ${discussion.formattedStartDate} and ${discussion.formattedEndDate}</span>
+            <span id="yaft_availability_message" class="yaftForumDescription">${yaft_availability_message1}${discussion.formattedStartDate}${yaft_availability_message2}${discussion.formattedEndDate}</span>
 		{/if}
 		</td>
 		<td><a href="javascript:;" class="profile" rel="/direct/profile/${discussion.creatorId}/formatted">${discussion.creatorDisplayName}</a></td>
@@ -457,11 +457,11 @@ ${yaft_forums_label}
 <br />
 
 {if yaftGradebookAssignments && yaftGradebookAssignments.length > 0 }
-<a id="yaft_toggle_gradebook_options_link" href="javascript:;">Grading</a>
+<a id="yaft_toggle_gradebook_options_link" href="javascript:;">${yaft_grading_label}</a>
 <br />
 <div id="yaft_gradebook_options" style="display:none;">
     <fieldset id="yaft_grading_fieldset" style="display: none;">
-    <legend>Grading</legend>
+    <legend>${yaft_grading_label}</legend>
     <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>${yaft_grading_message}
     <br />
     <select id="yaft_assignment_selector" class="indnt4" name="assignmentId" style="display: none;">
@@ -706,7 +706,7 @@ ${yaft_forums_label}
 <br />
 {/if}
 {if siteGroups.length > 0}
-<a id="yaft_toggle_group_options_link" href="javascript:;">Groups</a>
+<a id="yaft_toggle_group_options_link" href="javascript:;">${yaft_groups_box_label}</a>
 <br />
 <div id="yaft_group_options" style="display:none;">
     <fieldset id="yaft_groups_fieldset">
