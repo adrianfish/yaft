@@ -1065,7 +1065,7 @@ ${yaft_forums_label}
 		</div>
 		</div>
     {/for}
-    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_mrade_success_message">Grade Updated!</span><br /><br />{/if}
+    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field2" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button2" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
 -->
 </div>
 
