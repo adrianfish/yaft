@@ -58,7 +58,7 @@ var yaftSortedAuthorIds = [];
         success: function() {},
         error: function() {
             // The full code failed. Try just the language code.
-            var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage;
+            var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage + ".js";
             $.getScript(dpUrl);
         }
     });
