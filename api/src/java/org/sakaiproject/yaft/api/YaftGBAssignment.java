@@ -11,4 +11,5 @@ public class YaftGBAssignment {
 	
 	public Long id;
 	public String name;
+	public Double points;
 }
