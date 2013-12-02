@@ -752,7 +752,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 		try {
 			List<Assignment> gbAssignments = gradebookService.getAssignments(getCurrentSiteId());
 			for(Assignment gbAss : gbAssignments) {
-				yaftGBAssignments.add(new YaftGBAssignment(gbAss.getId(),gbAss.getName()));
+				yaftGBAssignments.add(new YaftGBAssignment(gbAss.getId(),gbAss.getName(), gbAss.getPoints()));
 			}
 		} catch (GradebookNotFoundException gnfe) {
 			// Normal. GB has not been added to the site yet.
@@ -766,7 +766,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	public YaftGBAssignment getGradebookAssignment(int gradebookAssignmentId) {
 		try {
 			Assignment gbAss = gradebookService.getAssignment(getCurrentSiteId(), (long) gradebookAssignmentId);
-			return new YaftGBAssignment(gbAss.getId(),gbAss.getName());
+			return new YaftGBAssignment(gbAss.getId(),gbAss.getName(), gbAss.getPoints());
 		} catch (AssessmentNotFoundException e) {
 			return null;
 		}

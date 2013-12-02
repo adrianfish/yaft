@@ -132,7 +132,8 @@ yaft_availability_lock_for_reading_label = 'Lås för läsning';
 yaft_availability_except_between_label = 'Förutom mellan ...';
 yaft_availability_except_between_and_label = '... och ...';
 yaft_availability_clear_date_label = 'Rensa datum';
-
+yaft_availability_message1 = 'Tillgängligt mellan ';
+yaft_availability_message2 = ' och ';
 yaft_other_label = 'Övrigt';
 yaft_role_label = 'Roll';
 
@@ -151,3 +152,28 @@ yaft_failed_to_create_edit_discussion = 'Misslyckades med att skapa/ändra tråd
 yaft_failed_to_get_discussion = 'Misslyckades att hämta tråd. Fel: ';
 
 yaft_mark_discussion_read_label = 'Markera tråd som läst';
+
+yaft_move_discussion_label2 = 'Flytta';
+yaft_publish_anonymously_label = 'Publicera anonymt';
+yaft_anonymous_allowed_label = 'Anonym tillåten';
+yaft_clear_discussion_message_one = 'Är du säker på att du vill radera ämnet ';
+yaft_clear_discussion_message_two = ' ? Samtliga svar kommer att tas bort.';
+yaft_clear_discussion_tooltip = 'Radera alla svar på detta ämne';
+yaft_clear_label = 'Rensa';
+yaft_missing_message_message = 'Du måste ange ett inlägg.';
+yaft_limit_discussion_to_groups_label = 'Visa det här ämnet och dess innehåll till utvalda grupper/sektioner endast';
+yaft_group_message = 'Bara synlig för dessa grupper: ';
+yaft_allow_anonymous_posting_label = 'Allow participants to post anonymously';
+yaft_anonymous_label = 'Anonym';
+yaft_permissions_view_anonymous = 'Visa anonym';
+yaft_unsubscribed_message = "Du har avaktiverat notifieringar för den här sajten. Om du vill aktivera notifieringart igen, klicka på länken 'Inställningar'";
+yaft_month_names = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+yaft_delete_selected_fora_message = 'Är du säker på att du vill ta bort valda forum?';
+yaft_delete_selected_discussions_message = 'Är du säker på att du vill ta bort de valda ämnen?';
+
+yaft_forums_get_started = "Du har inte skapat några forum i den här sajten ännu. För att skapa ett forum, klickar du på 'Nytt forum' ovan.";
+yaft_create_forum_instruction = "För att skapa ett forum, skriv in en titel på mer än fyra tecken och klicka sedan på 'Spara'. Om du inte vill att de andra medlemmarna i denna sajt ska notifieras, avmarkera 'Skicka e-postnotifiering'.";
+yaft_discussions_get_started = "Du har inte skapat några ämnen i detta forum ännu. För att skapa ett ämne, klickar du på 'Ny tråd' ovan.";
+yaft_previous_author_tooltip = "Visa föregående författarens inlägg.";
+yaft_next_author_tooltip = "Visa nästa författarens inlägg.";
+yaft_messages_by = "Meddelanden av";

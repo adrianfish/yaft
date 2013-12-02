@@ -1176,6 +1176,7 @@ var YAFTUTILS = (function($) {
 	   		                cache : false,
 		   	                success : function(data,textStatus) {
                                 $('.yaft_grade_field').val(gradePoints);
+                                $('.yaft_grade_field2').val(gradePoints);
 
                                 $('.yaft_grade_success_message').show();
 
@@ -1185,7 +1186,28 @@ var YAFTUTILS = (function($) {
 			                }
                         });
                     });
+                    
+                    $('#yaft_grade_button2').click(function () {
 
+                        var gradePoints = $('#yaft_grade_field2').val();
+
+                        jQuery.ajax( {
+	 		                url : "/portal/tool/" + startupArgs.placementId + "/assignments/" + yaftCurrentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
+	   		                dataType : "text",
+	   		                cache : false,
+		   	                success : function(data,textStatus) {
+                                $('.yaft_grade_field').val(gradePoints);
+                                $('.yaft_grade_field2').val(gradePoints);
+
+                                $('.yaft_grade_success_message').show();
+
+                                window.setTimeout(function () { $('.yaft_grade_success_message').fadeOut(); },2000);
+                            },
+			                error : function(xhr,textStatus,errorThrown) {
+			                }
+                        });
+                    });
+                    
                     $('#yaft_previous_author_button').click(function () {
                         for(var i=0,j=yaftCurrentAuthors.length;i<j;i++) {
                             if(yaftCurrentAuthors[i].id === authorId) {
