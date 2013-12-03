@@ -877,10 +877,7 @@ function setupAvailability(element) {
 		$('#yaft_end_minute_selector').attr('disabled',false);
 		$('#yaft_end_minute_selector').css('background-color','white');
 
-		var test = new Date(element.start);
-        var localOffset = test.getTimezoneOffset() * 60000;
-
-		var start = new Date(element.start + localOffset);
+		var start = new Date(element.start);
 	    startDate.datepicker("setDate",start);
 		startDate.val(start.toString(Date.CultureInfo.formatPatterns.shortDate));
 
@@ -892,7 +889,7 @@ function setupAvailability(element) {
 		$('#yaft_start_hours option:contains(' + hours + ')').attr('selected','selected');
 		$('#yaft_start_minutes option:contains(' + minutes + ')').attr('selected','selected');
 
-		var end = new Date(element.end + localOffset);
+		var end = new Date(element.end);
 	    endDate.datepicker("setDate",end);
 		endDate.val(end.toString(Date.CultureInfo.formatPatterns.shortDate));
 
