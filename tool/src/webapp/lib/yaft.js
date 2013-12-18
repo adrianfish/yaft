@@ -71,7 +71,17 @@ var yaftSortedAuthorIds = [];
         dataType: "script",
         error: function() {
             var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + ".js";
-            $.getScript(djsUrl);
+            //
+            $.ajax({
+                url: djsUrl,
+                async: false,
+                dataType: "script",
+                error: function(){
+                	//when all fails, get the default
+                	var djsUrl = "/yaft-tool/lib/datejs/date.js";
+                	$.getScript(djsUrl);
+                }
+            });
         }
     });
     

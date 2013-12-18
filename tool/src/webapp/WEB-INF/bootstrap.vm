@@ -45,7 +45,6 @@ ${sakaiHtmlHead}
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 
-<script type="text/javascript" src="/yaft-tool/lib/datejs/date.js"></script> <!-- included as fallback -->
 <script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
