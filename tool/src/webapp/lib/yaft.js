@@ -71,7 +71,6 @@ var yaftSortedAuthorIds = [];
         dataType: "script",
         error: function() {
             var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + ".js";
-            //
             $.ajax({
                 url: djsUrl,
                 async: false,
