@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sakaiproject.api.app.profile.Profile;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.search.api.SearchResult;
@@ -56,8 +55,6 @@ public interface SakaiProxy
 
 	public String getSakaiHomePath();
 
-	public Profile getProfile(String userId);
-
 	public void registerFunction(String yaftForumCreate);
 	
 	public boolean addCalendarEntry(String title,String description, String type, long startDate,long endDate);
@@ -85,8 +82,6 @@ public interface SakaiProxy
 	public void getAttachment(String siteId, Attachment attachment);
 
 	public void deleteFile(String resourceId) throws Exception;
-
-	public String getUserBio(String id);
 
 	public List<Site> getAllSites();
 

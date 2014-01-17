@@ -25,7 +25,6 @@
         <servlet-api.version>2.4</servlet-api.version>
         <commons-lang.version>2.4</commons-lang.version>
         <calendar.version>2.7.0</calendar.version> <!-- 2.7.x build -->
-	  	<profile-api.version>2.7.3</profile-api.version>
         <lombok.version>0.10.6</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -90,7 +89,6 @@
     	<module>impl</module>
     	<module>components</module>
     	<module>tool</module>
-    	<module>assembly</module>
     	<module>help</module>
   	</modules>
 
@@ -140,22 +138,6 @@
                 <artifactId>entitybroker-utils</artifactId>
                 <version>${entitybroker.version}</version>
             </dependency>
-
-			<!-- 2.7.x build -->
-            <dependency>
-      			<groupId>org.sakaiproject.profile</groupId>
-      			<artifactId>profile-api</artifactId>
-	  			<version>${profile-api.version}</version>
-	  			<scope>provided</scope>
-    		</dependency>
-
-			<!-- 2.6.x build -->
-            <!--dependency>
-      			<groupId>org.sakaiproject</groupId>
-      			<artifactId>sakai-profile-api</artifactId>
-	  			<version>${profile-api.version}</version>
-	  			<scope>provided</scope>
-    		</dependency-->
 
             <dependency>
                 <groupId>org.sakaiproject.search</groupId>

@@ -26,8 +26,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.sakaiproject.api.app.profile.Profile;
-import org.sakaiproject.api.app.profile.ProfileManager;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.AuthzPermissionException;
@@ -102,8 +100,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	private ToolManager toolManager;
 
-	private ProfileManager profileManager;
-
 	private FunctionManager functionManager;
 
 	private AuthzGroupService authzGroupService;
@@ -138,7 +134,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		sqlService = (SqlService) componentManager.get(SqlService.class);
 		siteService = (SiteService) componentManager.get(SiteService.class);
 		toolManager = (ToolManager) componentManager.get(ToolManager.class);
-		profileManager = (ProfileManager) componentManager.get(ProfileManager.class);
 		functionManager = (FunctionManager) componentManager.get(FunctionManager.class);
 		authzGroupService = (AuthzGroupService) componentManager.get(AuthzGroupService.class);
 		securityService = (SecurityService) componentManager.get(SecurityService.class);
@@ -239,10 +234,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	public String getSakaiHomePath() {
 		return serverConfigurationService.getSakaiHomePath();
-	}
-
-	public Profile getProfile(String userId) {
-		return profileManager.getUserProfileById(userId);
 	}
 
 	public boolean addCalendarEntry(String title, String description, String type, long startDate, long endDate) {
@@ -452,17 +443,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 		enableSecurityAdvisor();
 		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + resourceId;
 		contentHostingService.removeResource(id);
-	}
-
-	public String getUserBio(String id) {
-		try {
-			Profile profile = profileManager.getUserProfileById(id);
-			if (profile != null)
-				return profile.getOtherInformation();
-		} catch (SecurityException se) {
-		}
-
-		return "";
 	}
 
 	public List<Site> getAllSites() {

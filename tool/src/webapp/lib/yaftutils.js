@@ -1083,7 +1083,7 @@ var YAFTUTILS = (function($) {
             async : false,
             dataType: 'text',
             success : function(result,textStatus) {
-                switchState('forums');
+                location.reload();
             },
             error : function(xhr,textStatus,errorThrown) {
                 alert("Failed to save permissions. Status: " + textStatus + '. Error: ' + errorThrown);
