@@ -745,32 +745,32 @@
         locale += '-' + sakai.locale.userCountry;
     }
     
-    //$.localise('yaft-translations',{language: locale,loadBase: true,path: '/yaft-tool/'});
-
-    var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + locale + ".js";
-    
     $.ajax({
-        url: dpUrl,
+        url: '/yaft-tool/js/jquery-ui/i18n/jquery.ui.datepicker-' + locale + ".js",
         dataType: "script",
-        success: function () {},
         error: function () {
 
             // The full code failed. Try just the language code.
-            var dpUrl = '/yaft-tool/lib/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage + ".js";
-            $.getScript(dpUrl);
+            $.getScript('/yaft-tool/js/jquery-ui/i18n/jquery.ui.datepicker-' + sakai.locale.userLanguage + ".js");
         }
     });
 
-    var djsUrl = "/yaft-tool/lib/datejs/date-" + locale + ".js";
-    
     $.ajax({
-        url: djsUrl,
+        url: "/yaft-tool/js/datejs/date-" + locale + ".js",
         async: false,
         dataType: "script",
         error: function () {
 
-            var djsUrl = "/yaft-tool/lib/datejs/date-" + sakai.locale.userLanguage + ".js";
-            $.getScript(djsUrl);
+            $.ajax({
+                url: "/yaft-tool/js/datejs/date-" + sakai.locale.userLanguage + ".js",
+                async: false,
+                dataType: "script",
+                error: function () {
+
+                    // When all fails, get the default
+                    $.getScript("/yaft-tool/js/datejs/date.js");
+                }
+            });
         }
     });
     

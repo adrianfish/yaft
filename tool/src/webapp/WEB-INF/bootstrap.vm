@@ -28,23 +28,20 @@ ${sakaiHtmlHead}
 <link rel="stylesheet" type="text/css" href="/yaft-tool/js/jquery-ui/css/smoothness/jquery-ui-1.10.4.custom.min.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
-
 <script type="text/javascript" src="/yaft-tool/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.cluetip.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.hoverIntent.minified.js"></script>
-<script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.MultiFile.pack.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/trimpath-template-latest.js"></script>
-<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
-
-<script type="text/javascript" src="/yaft-tool/js/yaftutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/yaftpermissions.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/yaftutils.js"></script>
+<script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 <script type="text/javascript" src="/yaft-tool/yaft-translations-en_GB.js"></script>
 <script type="text/javascript" src="/yaft-tool/yaft-translations-${isoLanguage}.js"></script>
-
 </head>
 <body>
 

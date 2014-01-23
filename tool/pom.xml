@@ -133,49 +133,5 @@
                 <directory>${basedir}/src/java</directory>
             </resource>
         </resources>
-		<plugins>
-            <!-- Compress CSS Stylesheets and Javascript -->
-            <plugin>
-                <groupId>net.sf.alchim</groupId>
-                <artifactId>yuicompressor-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                    	<phase>${yuicompressor.phase}</phase>
-                        <goals>
-                            <goal>compress</goal>
-                        </goals>
-                    </execution>
-                </executions>        
-                <configuration>
-                	<sourceDirectory>${basedir}/src/webapp</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
-                    <nosuffix>true</nosuffix>
-                    <jswarn>false</jswarn>
-                    <excludes>
-                       	<exclude>*.js</exclude>
-                       	<exclude>js/*.js</exclude>
-                       	<exclude>css/*.*</exclude>
-                       	<exclude>js/jquery-ui/**/*.*</exclude>
-                        <exclude>js/datejs/*.*</exclude>
-                    </excludes>
-                    <aggregations>
-            			<aggregation>
-              				<insertNewLine>true</insertNewLine>
-              				<output>${project.build.directory}/${project.build.finalName}/js/all.js</output>
-              				<includes>
-                				<include>jquery-1.9.1.min.js</include>
-                				<include>jquery-ui-1.10.4.custom.min.js</include>
-                				<include>jquery.cluetip.min.js</include>
-                				<include>jquery.hoverIntent.minified.js</include>
-                				<include>jquery.MultiFile.pack.js</include>
-                				<include>jquery.tablesorter.min.js</include>
-                				<include>jquery.form.min.js</include>
-                				<include>trimpath-template-latest.js</include>
-              				</includes>
-            			</aggregation>
-          			</aggregations>
-                </configuration>
-            </plugin>
-		</plugins>
 	</build>
 </project>
