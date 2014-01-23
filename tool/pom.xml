@@ -155,28 +155,21 @@
                        	<exclude>*.js</exclude>
                        	<exclude>js/*.js</exclude>
                        	<exclude>css/*.*</exclude>
-                       	<exclude>lib/jquery-ui/**/*.*</exclude>
-                        <exclude>lib/datejs/*.*</exclude>
+                       	<exclude>js/jquery-ui/**/*.*</exclude>
+                        <exclude>js/datejs/*.*</exclude>
                     </excludes>
                     <aggregations>
             			<aggregation>
               				<insertNewLine>true</insertNewLine>
-              				<output>${project.build.directory}/${project.build.finalName}/lib/all.js</output>
+              				<output>${project.build.directory}/${project.build.finalName}/js/all.js</output>
               				<includes>
-                				<include>jquery-1.4.4.js</include>
-                				<include>jquery.ui.core.js</include>
-                				<include>jquery.ui.widget.js</include>
-                				<include>jquery.ui.mouse.js</include>
-                				<include>jquery.ui.position.js</include>
-                				<include>jquery.ui.datepicker.js</include>
-                				<include>jquery.cluetip.js</include>
-                				<include>jquery.hoverIntent.js</include>
-                				<include>jquery.dimensions.js</include>
-                				<include>jquery.MultiFile.js</include>
-                				<include>jquery.localisation.js</include>
-                				<include>jquery.tablesorter.js</include>
-                				<include>jquery.scrollTo-1.4.2.js</include>
-                				<include>jquery.form.js</include>
+                				<include>jquery-1.9.1.min.js</include>
+                				<include>jquery-ui-1.10.4.custom.min.js</include>
+                				<include>jquery.cluetip.min.js</include>
+                				<include>jquery.hoverIntent.minified.js</include>
+                				<include>jquery.MultiFile.pack.js</include>
+                				<include>jquery.tablesorter.min.js</include>
+                				<include>jquery.form.min.js</include>
                 				<include>trimpath-template-latest.js</include>
               				</includes>
             			</aggregation>

@@ -1,20 +1,3 @@
-<!--
-
-    Copyright 2009 The Sakai Foundation
-
-    Licensed under the Educational Community License, Version 1.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.opensource.org/licenses/ecl1.php
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html  
@@ -25,45 +8,42 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript">
 
-    var startupArgs = {
-    	userId:'$!{userId}',
-    	siteId:'$!{siteId}',
-    	placementId:'$!{placementId}',
-    	state:'$!{state}',
-    	editor:'$!{editor}',
-    	forumId:'$!{forumId}',
-    	viewMode:'$!{viewMode}',
-    	discussionId:'$!{discussionId}',
-    	messageId:'$!{messageId}',
-    	onPDAPortal:'$!{onPDAPortal}'
+    var yaft = {
+        startupArgs: {
+            userId: '$!{userId}',
+            siteId: '$!{siteId}',
+            placementId: '$!{placementId}',
+            state: '$!{state}',
+            editor: '$!{editor}',
+            forumId: '$!{forumId}',
+            viewMode: '$!{viewMode}',
+            discussionId: '$!{discussionId}',
+            messageId: '$!{messageId}',
+            onPDAPortal: $!{onPDAPortal}
+        }
     };
     
 </script>
 ${sakaiHtmlHead}
-<link rel="stylesheet" type="text/css" href="/yaft-tool/lib/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />
+<link rel="stylesheet" type="text/css" href="/yaft-tool/js/jquery-ui/css/smoothness/jquery-ui-1.10.4.custom.min.css" />
 <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
+
+<script type="text/javascript" src="/yaft-tool/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery-ui-1.10.4.custom.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.cluetip.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.hoverIntent.minified.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.MultiFile.pack.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/trimpath-template-latest.js"></script>
 <script type="text/javascript" src="/profile2-tool/javascript/profile2-eb.js"></script>
 
-<script type="text/javascript" src="/yaft-tool/lib/jquery-1.4.4.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.ui.datepicker.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.cluetip.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.hoverIntent.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.dimensions.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.MultiFile.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.localisation.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.scrollTo-1.4.2.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/jquery.form.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/trimpath-template-latest.js"></script>
-
-<script type="text/javascript" src="/yaft-tool/lib/yaftutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/sakaiutils.js"></script>
-<script type="text/javascript" src="/yaft-tool/lib/yaftpermissions.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/yaftutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/yaftpermissions.js"></script>
+<script type="text/javascript" src="/yaft-tool/yaft-translations-en_GB.js"></script>
+<script type="text/javascript" src="/yaft-tool/yaft-translations-${isoLanguage}.js"></script>
 
 </head>
 <body>
@@ -102,12 +82,12 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_forums_content_template" style="display:none"><!--
-{if yaftCurrentForums.length <= 0}
+{if yaft.currentForums.length <= 0}
 <div class="textblock">
     <p>${yaft_forums_get_started}</p>
 </div>
 {/if}
-{if yaftCurrentUserPermissions.forumDeleteAny}
+{if yaft.currentUserPermissions.forumDeleteAny}
 <div>
 <div class="navIntraToolLink viewNav" style="float: right;">
     <span>
@@ -125,16 +105,16 @@ ${yaft_forums_label}
 		<th><div>${yaft_unread_label}</div></th>
 		<th><div>${yaft_last_message_label}</div></th>
 		<th><div>${yaft_options_label}</div></th>
-		{if yaftCurrentUserPermissions.forumDeleteAny}
+		{if yaft.currentUserPermissions.forumDeleteAny}
 		<th align="center"><input id="yaft_all_fora_checkbox" type="checkbox"/></th>
 		{/if}
 	</tr>
 	</thead>
 	<tbody>
 	{for forum in items}
-	{if !forum.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || forum.creatorId == startupArgs.userId}
-   	<tr class="yaftForumRow {if (yaftCurrentUserPermissions.viewInvisible || forum.creatorId == startupArgs.userId) && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable)} yaftInvisible{/if}">
-		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
+	{if !forum.lockedForReadingAndUnavailable || yaft.currentUserPermissions.viewInvisible || forum.creatorId == yaft.startupArgs.userId}
+   	<tr class="yaftForumRow {if (yaft.currentUserPermissions.viewInvisible || forum.creatorId == yaft.startupArgs.userId) && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable)} yaftInvisible{/if}">
+		<td style="{if navigator.appName=="Microsoft Internet Explorer"}width: 350px;{else}max-width: 200px;{/if}"><a href="${forum.url}" title="${yaft_forum_link_tooltip}" onClick="return yaft.switchState('forum',{'forumId':'${forum.id}'});">${forum.title}</a>
 		{if forum.description.length > 0}
 		<br/>
 		<span class="yaftForumDescription">${forum.description}</span>
@@ -158,11 +138,11 @@ ${yaft_forums_label}
 		<td align="center">${forum.unread}</td>
 		<td>${forum.formattedLastMessageDate}</td>
 		<td align="center">
-		{if yaftCurrentUserPermissions.forumDeleteAny || (yaftCurrentUserPermissions.forumDeleteOwn && forum.creatorId == startupArgs.userId)}
-			<a href="#" onclick="return switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}">${yaft_edit_label}</a>
+		{if yaft.currentUserPermissions.forumDeleteAny || (yaft.currentUserPermissions.forumDeleteOwn && forum.creatorId == yaft.startupArgs.userId)}
+			<a href="#" onclick="return yaft.switchState('editForum',{'forumId':'${forum.id}'});" title="${yaft_edit_forum_tooltip}">${yaft_edit_label}</a>
 		{/if}
 		</td>
-		{if yaftCurrentUserPermissions.forumDeleteAny}
+		{if yaft.currentUserPermissions.forumDeleteAny}
         <td align="center"><input type="checkbox" class="yaft_bulk_option_candidate" id="${forum.id}"/></td>
         {/if}
 	</tr>
@@ -174,7 +154,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_forum_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${title}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;${title}
 -->
 </div>
 
@@ -201,16 +181,16 @@ ${yaft_forums_label}
 		<th align="left"><div>${yaft_unread_label}</div></th>
 		<th align="left"><div>${yaft_last_message_label}</div></th>
 		<th align="left"><div>${yaft_options_label}</div></th>
-		{if yaftCurrentUserPermissions.forumDeleteAny}
+		{if yaft.currentUserPermissions.forumDeleteAny}
 		<th align="center"><input id="yaft_all_discussions_checkbox" type="checkbox"/></th>
 		{/if}
 	</tr>
 	</thead>
 	<tbody>
 	{for discussion in discussions}
-	{if !discussion.lockedForReadingAndUnavailable || yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == startupArgs.userId}
-   	<tr{if (yaftCurrentUserPermissions.viewInvisible || discussion.creatorId == startupArgs.userId) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
-		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return switchState('${startupArgs.viewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.allowAnonymousPosting}<br /><span class="yaft_small_graded_in_label"> - ${yaft_anonymous_allowed_label}</span>{/if}{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}
+	{if !discussion.lockedForReadingAndUnavailable || yaft.currentUserPermissions.viewInvisible || discussion.creatorId == yaft.startupArgs.userId}
+   	<tr{if (yaft.currentUserPermissions.viewInvisible || discussion.creatorId == yaft.startupArgs.userId) && (discussion.lockedForReadingAndUnavailable || discussion.lockedForWritingAndUnavailable)} class="yaftInvisible"{/if}">
+		<td style="max-width:250px;"><a href="${discussion.url}" title="${yaft_discussion_link_tooltip}" onClick="return yaft.switchState('${yaft.startupArgs.viewMode}',{'discussionId':'${discussion.id}'});">${discussion.subject}</a>{if discussion.allowAnonymousPosting}<br /><span class="yaft_small_graded_in_label"> - ${yaft_anonymous_allowed_label}</span>{/if}{if discussion.graded}<br /><span class="yaft_small_graded_in_label">(${yaft_graded_in_label}: ${discussion.assignment.name})</span>{/if}
 		{if discussion.groups.length > 0}
 		<br />
 		<span class="yaftForumDescription">${yaft_group_message}
@@ -230,17 +210,17 @@ ${yaft_forums_label}
 		<td>${discussion.unread}</td>
 		<td>${discussion.formattedLastMessageDate}</td>
 		<td align="center">
-		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == startupArgs.userId)}
-			<a href="#" onclick="return switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}">${yaft_edit_label}</a>&nbsp;
+		{if yaft.currentUserPermissions.discussionDeleteAny || (yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaft.startupArgs.userId)}
+			<a href="#" onclick="return yaft.switchState('startDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_edit_discussion_tooltip}">${yaft_edit_label}</a>&nbsp;
 		{/if}
-		{if yaftCurrentUserPermissions.discussionDeleteAny || (yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == startupArgs.userId)}
-			<a href="javascript:;" onclick="return YAFTUTILS.clearDiscussion('${discussion.id}','${discussion.subject}');" title="${yaft_clear_discussion_tooltip}">${yaft_clear_label}</a>&nbsp;
+		{if yaft.currentUserPermissions.discussionDeleteAny || (yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaft.startupArgs.userId)}
+			<a href="javascript:;" onclick="return yaft.utils.clearDiscussion('${discussion.id}','${discussion.subject}');" title="${yaft_clear_discussion_tooltip}">${yaft_clear_label}</a>&nbsp;
 		{/if}
-		{if yaftCurrentUserPermissions.discussionCreate && ((yaftCurrentUserPermissions.discussionDeleteOwn && discussion.creatorId == startupArgs.userId) || yaftCurrentUserPermissions.discussionDeleteAny)}
-		{if yaftCurrentForums.length > 1}<a href="#" onClick="return switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}">${yaft_move_discussion_label2}</a>{/if}
+		{if yaft.currentUserPermissions.discussionCreate && ((yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId == yaft.startupArgs.userId) || yaft.currentUserPermissions.discussionDeleteAny)}
+		{if yaft.currentForums.length > 1}<a href="#" onClick="return yaft.switchState('moveDiscussion',{'discussionId':'${discussion.id}'});" title="${yaft_move_discussion_tooltip}">${yaft_move_discussion_label2}</a>{/if}
 		{/if}
 		</td>
-		{if yaftCurrentUserPermissions.forumDeleteAny}
+		{if yaft.currentUserPermissions.forumDeleteAny}
         <td align="center"><input type="checkbox" class="yaft_bulk_option_candidate" id="${discussion.id}"/></td>
         {/if}
 	</tr>
@@ -252,13 +232,13 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_search_results_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_search_results_label}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_search_results_label}
 -->
 </div>
 
 <div id="yaft_search_results_content_template_old" style="display:none;"><!--
 {for result in results}
-        <a href="javascript:;" onClick="return switchState('minimal',{'forumId':'${result.forumId}','discussionId':'${result.discussionId}','messageId':'${result.messageId}'});">${result.title}</a>
+        <a href="javascript:;" onClick="return yaft.switchState('minimal',{'forumId':'${result.forumId}','discussionId':'${result.discussionId}','messageId':'${result.messageId}'});">${result.title}</a>
         <br />
 		{for fragment in result.contextFragments}
         <span style="font-size: 9pt;">... ${fragment} ...</span>
@@ -281,7 +261,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_move_discussion_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;${yaft_move_discussion_label}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum');">${yaft.currentForum.title}</a>-&gt;${yaft_move_discussion_label}
 -->
 </div>
 
@@ -292,34 +272,34 @@ ${yaft_forums_label}
 	<span>${yaft_move_discussion_instruction_three}</span>
 	<br />
 	<br />
-	<form id="yaft_move_discussion_form" action="/portal/tool/${startupArgs.placementId}" method="POST">
+	<form id="yaft_move_discussion_form" action="/portal/tool/${yaft.startupArgs.placementId}" method="POST">
 	<input type="hidden" name="function" value="moveDiscussion"/>
 	<input type="hidden" name="discussionId" value="${discussion.id}"/>
 	<input type="hidden" name="currentForumId" value="${discussion.forumId}"/>
 	<select name="forumId">
 	{for forum in forums}
-		{if forum.id != yaftCurrentForum.id}<option value="${forum.id}">${forum.title}</option>{/if}
+		{if forum.id != yaft.currentForum.id}<option value="${forum.id}">${forum.title}</option>{/if}
 	{/for}
 	</select>
 	<br />
 	<br />
 	<input type="submit" value="${yaft_move_label}"/>
-	<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
+	<input type="button" value="${yaft_cancel_label}" onClick="return yaft.switchState('forum');"/>
 	</form>
 -->
 </div>
 
 <div id="yaft_start_discussion_breadcrumb_template" style="display:none;"><!--
-<a href="#" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;${yaft_add_discussion_label}
+<a href="#" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum');">${yaft.currentForum.title}</a>-&gt;${yaft_add_discussion_label}
 -->
 </div>
 
 <div id="yaft_start_discussion_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
-	<form id="yaft_discussion_form" method="POST" action="/portal/tool/${startupArgs.placementId}/discussions">
+	<form id="yaft_discussion_form" method="POST" action="/portal/tool/${yaft.startupArgs.placementId}/discussions">
 		<input type="hidden" name="id" value="${discussion.id}"/>
-		<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
-		<input type="hidden" name="siteId" value="${startupArgs.siteId}"/>
+		<input type="hidden" name="forumId" value="${yaft.currentForum.id}"/>
+		<input type="hidden" name="siteId" value="${yaft.startupArgs.siteId}"/>
 		<h4>${yaft_type_your_message_label}</h4>
 		<br />
 		<span>${yaft_subject_label}: *</span>
@@ -332,7 +312,7 @@ ${yaft_forums_label}
 		<textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">${discussion.firstMessage.content}</textarea>
 		<br />
 		<br />
-        {if yaftCurrentUserPermissions.sendAlerts}
+        {if yaft.currentUserPermissions.sendAlerts}
 		<input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 		<br />
 		<br />
@@ -449,14 +429,14 @@ ${yaft_forums_label}
                     </select>
     <br />
     <br />
-    <a href="#" onclick="YAFTUTILS.clearDates();">${yaft_availability_clear_date_label}</a>
+    <a href="#" onclick="yaft.utils.clearDates();">${yaft_availability_clear_date_label}</a>
     </fieldset>
     <br />
 </div>
 
 <br />
 
-{if yaftGradebookAssignments && yaftGradebookAssignments.length > 0 }
+{if yaft.gradebookAssignments && yaft.gradebookAssignments.length > 0 }
 <a id="yaft_toggle_gradebook_options_link" href="javascript:;">${yaft_grading_label}</a>
 <br />
 <div id="yaft_gradebook_options" style="display:none;">
@@ -465,7 +445,7 @@ ${yaft_forums_label}
     <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>${yaft_grading_message}
     <br />
     <select id="yaft_assignment_selector" class="indnt4" name="assignmentId" style="display: none;">
-    {for gbAssignment in yaftGradebookAssignments}
+    {for gbAssignment in yaft.gradebookAssignments}
     <option value="${gbAssignment.id}">${gbAssignment.name}</option>
     {/for}
     </select>
@@ -477,7 +457,7 @@ ${yaft_forums_label}
 <br />
 	
 		<input type="submit" value="${yaft_save_label}"/>
-		<input type="button" value="${yaft_cancel_label}" onClick="return switchState('forum');"/>
+		<input type="button" value="${yaft_cancel_label}" onClick="return yaft.switchState('forum');"/>
 	
 	</form>
 </div>
@@ -485,7 +465,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_permissions_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_permissions_label}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_permissions_label}
 -->
 </div>
 
@@ -553,13 +533,13 @@ ${yaft_forums_label}
 </tbody>
 </table>
 <input id="yaft_permissions_save_button" type="button" value="${yaft_save_label}"/>
-<input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
+<input type="button" value="${yaft_cancel_label}" onclick="return yaft.switchState('forums');"/>
 </form>
 -->
 </div>
 
 <div id="yaft_discussion_breadcrumb_template"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;${subject} {if defined('assignment')}<span class="yaft_graded_in_label">(${yaft_graded_in_label}: ${assignment.name})</span>{/if}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum',{'forumId':'${yaft.currentForum.id}'});">${yaft.currentForum.title}</a>-&gt;${subject} {if defined('assignment')}<span class="yaft_graded_in_label">(${yaft_graded_in_label}: ${assignment.name})</span>{/if}
 -->
 </div>
 
@@ -568,17 +548,17 @@ ${yaft_forums_label}
 		<div class="yaft_unread_wrapper">
 	{/if}
 	{if status == 'DELETED'}
-		{if yaftCurrentUserPermissions.messageDeleteAny}
+		{if yaft.currentUserPermissions.messageDeleteAny}
 			<div class="yaft_message yaft_deleted_message">
 		{/if}
 	{else}
 		<div class="yaft_message">
 	{/if}
 		
-	{if (status != 'DELETED') || (status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny)}
+	{if (status != 'DELETED') || (status == 'DELETED' && yaft.currentUserPermissions.messageDeleteAny)}
 		<div style="margin:5px;overflow:hidden;">
             {if anonymous}
-                {if creatorId == startupArgs.userId || yaftCurrentUserPermissions.discussionViewAnonymous}
+                {if creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous}
 			    <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
                 {else}
 			    <img class="yaft_profile_image" src="/direct/profile/blank/image" width="35" />
@@ -588,10 +568,10 @@ ${yaft_forums_label}
             {/if}
 			<div style="margin-left:2px;overflow: hidden;">
 				<div style="float:left;">
-					<a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>{if anonymous && creatorId == startupArgs.userId}<span class="yaft_small_graded_in_label"> - ${yaft_anonymous_label}</span>{/if}
+					<a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>{if anonymous && creatorId == yaft.startupArgs.userId}<span class="yaft_small_graded_in_label"> - ${yaft_anonymous_label}</span>{/if}
 					<br/>
                     {if anonymous}
-                        {if creatorId == startupArgs.userId || yaftCurrentUserPermissions.discussionViewAnonymous}
+                        {if creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous}
 					    <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - ${formattedDate}</span>
                         {else}
 					    <span>by ${creatorDisplayName} - ${formattedDate}</span>
@@ -626,18 +606,18 @@ ${yaft_forums_label}
 			<div style="clear: left">${content}</div>
 			<br />
 			<div>
-				{if startupArgs.userId == creatorId && yaftCurrentUserPermissions.messageDeleteOwn}<span><a href="#" onClick="return switchState('editMessage',{'messageId':'${id}'});">${yaft_edit_label}</a></span>{/if}
-				{if yaftCurrentUserPermissions.messageCreate && status == 'READY'}
-					<span><a href="#" onClick="return switchState('reply',{'messageBeingRepliedTo':'${id}'});">${yaft_reply_label}</a></span>
+				{if yaft.startupArgs.userId == creatorId && yaft.currentUserPermissions.messageDeleteOwn}<span><a href="#" onClick="return yaft.switchState('editMessage',{'messageId':'${id}'});">${yaft_edit_label}</a></span>{/if}
+				{if yaft.currentUserPermissions.messageCreate && status == 'READY'}
+					<span><a href="#" onClick="return yaft.switchState('reply',{'messageBeingRepliedTo':'${id}'});">${yaft_reply_label}</a></span>
 				{/if}
-				{if parent && 'DELETED' != status && ( (yaftCurrentUserPermissions.messageDeleteOwn && startupArgs.userId == creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
-				{if status == 'DELETED' && yaftCurrentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return YAFTUTILS.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
-				{if children.length > 0 && startupArgs.viewMode != 'minimal'}<span><a class="yaft_collapse_expand_link" href="#" onclick="YAFTUTILS.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
-				{if startupArgs.userId != creatorId}
+				{if parent && 'DELETED' != status && ( (yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId == creatorId) || yaft.currentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return yaft.utils.deleteMessage('${id}');">${yaft_delete_label}</a></span>{/if}
+				{if status == 'DELETED' && yaft.currentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return yaft.utils.undeleteMessage('${id}');">${yaft_undelete_label}</a></span>{/if}
+				{if children.length > 0 && yaft.startupArgs.viewMode != 'minimal'}<span><a class="yaft_collapse_expand_link" href="#" onclick="yaft.utils.toggleMessage(this,'${id}');">${yaft_collapse_label}</a></span>{/if}
+				{if yaft.startupArgs.userId != creatorId}
 				{if defined('read') && read == true}
-					<span><a href="javascript:;" onClick="return YAFTUTILS.markMessageRead(YAFTUTILS.findMessage('${id}'),false);">${yaft_mark_message_unread_label}</a></span>
+					<span><a href="javascript:;" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('${id}'),false);">${yaft_mark_message_unread_label}</a></span>
 				{else}
-					<span><a href="#" onClick="return YAFTUTILS.markMessageRead(YAFTUTILS.findMessage('${id}'),true);">${yaft_mark_message_read_label}</a></span>
+					<span><a href="#" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('${id}'),true);">${yaft_mark_message_read_label}</a></span>
 				{/if}
 				{/if}
 			</div>
@@ -651,12 +631,12 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_discussion_content_template" style="display:none"><!--
-	{if lockedForReadingAndUnavailable && !yaftCurrentUserPermissions.viewInvisible && creatorId != startupArgs.userId}
+	{if lockedForReadingAndUnavailable && !yaft.currentUserPermissions.viewInvisible && creatorId != yaft.startupArgs.userId}
 	<h3>This discussion is not available at this time</h3>
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
+	<a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
 	<br />
 	<br />
 
@@ -674,13 +654,13 @@ ${yaft_forums_label}
 	
 	<br />
 	
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
+	<a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);">${yaft_mark_discussion_read_label}</a>
 	{/if}
 -->
 </div>
 
 <div id="yaft_edit_forum_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_add_forum_label}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;${yaft_add_forum_label}
 -->
 </div>
 
@@ -700,7 +680,7 @@ ${yaft_forums_label}
 <tr><td>${yaft_description_label}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="255" value="${forum.description}"/></td></tr>
 </table>
 <br />
-{if yaftCurrentUserPermissions.sendAlerts}
+{if yaft.currentUserPermissions.sendAlerts}
 <input type="checkbox" id="yaft_send_email_checkbox" value="true" checked/>${yaft_send_email_alert_label}
 <br />
 <br />
@@ -809,7 +789,7 @@ ${yaft_forums_label}
                     </select>
     <br />
     <br />
-    <a href="#" onclick="YAFTUTILS.clearDates();">${yaft_availability_clear_date_label}</a>
+    <a href="#" onclick="yaft.utils.clearDates();">${yaft_availability_clear_date_label}</a>
     </fieldset>
     <br />
 </div>
@@ -817,31 +797,31 @@ ${yaft_forums_label}
 <br />
 <br />
 <input type="button" id="yaft_forum_save_button" value="${yaft_save_label}"/>
-<input type="button" value="${yaft_cancel_label}" onclick="return switchState('forums');"/>
+<input type="button" value="${yaft_cancel_label}" onclick="return yaft.switchState('forums');"/>
 </form>
 </div>
 -->
 </div>
 
 <div id="yaft_message_view_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;<a href="/portal/tool/${startupArgs.placementId}/forums/${yaftCurrentForum.id}/discussions/${yaftCurrentDiscussion.id}/messageView" onClick="return switchState('minimal');">${yaftCurrentDiscussion.subject}</a>-&gt;${subject}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum');">${yaft.currentForum.title}</a>-&gt;<a href="/portal/tool/${yaft.startupArgs.placementId}/forums/${yaft.currentForum.id}/discussions/${yaft.currentDiscussion.id}/messageView" onClick="return yaft.switchState('minimal');">${yaft.currentDiscussion.subject}</a>-&gt;${subject}
 -->
 </div>
 
 <div id="yaft_message_view_content_template" style="display:none"><!--
-	{if lockedForReadingAndUnavailable && !yaftCurrentUserPermissions.viewInvisible && creatorId != startupArgs.userId}
+	{if lockedForReadingAndUnavailable && !yaft.currentUserPermissions.viewInvisible && creatorId != yaft.startupArgs.userId}
 	<h3>This discussion is not available at this time</h3>
 	{elseif 'DELETED' == status}
 	<h3>This discussion has been deleted</h3>
 	{else}
-	<a href="#" onClick="return YAFTUTILS.markCurrentDiscussionRead(true);"${yaft_mark_discussion_read_label}</a>
+	<a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);"${yaft_mark_discussion_read_label}</a>
     <br />
     <br />
 
 	{macro displayMinimum(message)}
 		{if message.status == 'READY'}
 			<div id="${message.id}_link" class="yaft_message_minimised">
-				<a href="#" title="Click to show the full message" onclick="yaftShowMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a></span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
+				<a href="#" title="Click to show the full message" onclick="yaft.showMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a></span> - <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
 				<img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
 				{for attachment in message.attachments}
 					<a onclick="window.open('${attachment.url}');" title="${attachment.name}">
@@ -859,7 +839,7 @@ ${yaft_forums_label}
 					{/if}
 					</a>
 				{/for}
-				{if message.parent && 'DELETED' != message.status && ( (yaftCurrentUserPermissions.messageDeleteOwn && startupArgs.userId == message.creatorId) || yaftCurrentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return YAFTUTILS.deleteMessage('${message.id}');">${yaft_delete_label}</a></span>{/if}
+				{if message.parent && 'DELETED' != message.status && ( (yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId == message.creatorId) || yaft.currentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return yaft.utils.deleteMessage('${message.id}');">${yaft_delete_label}</a></span>{/if}
 			</div>
 			<div class="yaft_full_message" id="${message.id}" style="display: none;overflow: auto;margin-top:5px;"></div>
 		{/if}
@@ -881,7 +861,7 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_edit_message_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum');">${yaftCurrentForum.title}</a>-&gt;<a href="${yaftCurrentDiscussion.url}" onClick="return switchState('discussion');">${yaftCurrentDiscussion.subject}</a>-&gt;{if editMode == 'EDIT'}${yaft_editing_label}{else}${yaft_replying_to_label}{/if}${subject}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum');">${yaft.currentForum.title}</a>-&gt;<a href="${yaft.currentDiscussion.url}" onClick="return yaft.switchState('discussion');">${yaft.currentDiscussion.subject}</a>-&gt;{if editMode == 'EDIT'}${yaft_editing_label}{else}${yaft_replying_to_label}{/if}${subject}
 -->
 </div>
 
@@ -902,7 +882,7 @@ ${yaft_forums_label}
 </div>
 <br />
 <div id="yaft_reply_container">
-	<form id="yaft_message_form" onSubmit="return YAFTUTILS.validateMessageSubmission('${D}{escape(subject)}');" action="/portal/tool/${startupArgs.placementId}/messages" method="POST">
+	<form id="yaft_message_form" onSubmit="return yaft.utils.validateMessageSubmission('${D}{escape(subject)}');" action="/portal/tool/${yaft.startupArgs.placementId}/messages" method="POST">
 	<h4>${yaft_type_your_message_label}</h4>
 	<br />
 	<span>${yaft_subject_label}: *</span>
@@ -915,7 +895,7 @@ ${yaft_forums_label}
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
 	<br />
 	<br />
-    {if yaftCurrentUserPermissions.sendAlerts}
+    {if yaft.currentUserPermissions.sendAlerts}
 	<input type="checkbox" id="yaft_send_email_checkbox" value="true" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 	<br />
 	<br />
@@ -927,18 +907,18 @@ ${yaft_forums_label}
 
 	<input type="hidden" name="function" value="createMessage"/>
 	<input id="yaft_anonymous_flag" type="hidden" name="anonymous" value="false" />
-	<input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
-	<input type="hidden" name="siteId" value="${startupArgs.siteId}"/>
-	<input type="hidden" name="discussionId" value="${yaftCurrentDiscussion.id}"/>
+	<input type="hidden" name="forumId" value="${yaft.currentForum.id}"/>
+	<input type="hidden" name="siteId" value="${yaft.startupArgs.siteId}"/>
+	<input type="hidden" name="discussionId" value="${yaft.currentDiscussion.id}"/>
 	<input type="hidden" name="messageBeingRepliedTo" value="${id}"/>
-    <input type="hidden" name="viewMode" value="${startupArgs.viewMode}"/>
+    <input type="hidden" name="viewMode" value="${yaft.startupArgs.viewMode}"/>
     <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
 	
 	<input type="submit" value="${yaft_publish_label}"/>
-    {if yaftCurrentDiscussion.allowAnonymousPosting}
+    {if yaft.currentDiscussion.allowAnonymousPosting}
     <input type="button" id="yaft_publish_anonymously_button" value="${yaft_publish_anonymously_label}"/>
     {/if}
-	<input type="button" value="${yaft_cancel_label}" onclick="return switchState('${startupArgs.viewMode}',{'messageId':'${id}'})"/>
+	<input type="button" value="${yaft_cancel_label}" onclick="return yaft.switchState('${yaft.startupArgs.viewMode}',{'messageId':'${id}'})"/>
 	
 	</form>
 </div>
@@ -947,7 +927,7 @@ ${yaft_forums_label}
 
 <div id="yaft_edit_message_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">
-	<form id="yaft_message_form" method="POST" action="/portal/tool/${startupArgs.placementId}/messages">
+	<form id="yaft_message_form" method="POST" action="/portal/tool/${yaft.startupArgs.placementId}/messages">
     <h4>Type your message</h4>
     <br />
     <span>${yaft_subject_label}</span>
@@ -960,7 +940,7 @@ ${yaft_forums_label}
 	<textarea name="content" id="yaft_message_editor" cols="100" rows="5">${content}</textarea>
 	<br />
 	<br />
-    {if yaftCurrentUserPermissions.sendAlerts}
+    {if yaft.currentUserPermissions.sendAlerts}
 	<input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>${yaft_send_email_alert_label}
 	<br />
 	<br />
@@ -972,7 +952,7 @@ ${yaft_forums_label}
 	    {if attachment.name != 'array'}
 		    <div id="file_${attachment_index}">
 		        <span>${attachment.name}</span>
-		        <a href="#" onclick="YAFTUTILS.removeAttachment('${attachment.resourceId}','${id}','file_${attachment_index}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+		        <a href="#" onclick="yaft.utils.removeAttachment('${attachment.resourceId}','${id}','file_${attachment_index}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
 		        <br />
 		    </div>
 	    {/if}
@@ -985,13 +965,13 @@ ${yaft_forums_label}
     <br/>
 
     <input type="submit" value="${yaft_save_label}"/>
-    <input type="button" value="${yaft_cancel_label}" onclick="return switchState('${startupArgs.viewMode}',{'messageId':'${id}'})"/>
+    <input type="button" value="${yaft_cancel_label}" onclick="return yaft.switchState('${yaft.startupArgs.viewMode}',{'messageId':'${id}'})"/>
 
-    <input type="hidden" name="forumId" value="${yaftCurrentForum.id}"/>
-	<input type="hidden" name="siteId" value="${startupArgs.siteId}"/>
-    <input type="hidden" name="discussionId" value="${yaftCurrentDiscussion.id}"/>
+    <input type="hidden" name="forumId" value="${yaft.currentForum.id}"/>
+	<input type="hidden" name="siteId" value="${yaft.startupArgs.siteId}"/>
+    <input type="hidden" name="discussionId" value="${yaft.currentDiscussion.id}"/>
     <input type="hidden" name="messageId" value="${id}"/>
-    <input type="hidden" name="viewMode" value="${startupArgs.viewMode}"/>
+    <input type="hidden" name="viewMode" value="${yaft.startupArgs.viewMode}"/>
     </form>
 </div>
 -->
@@ -1000,11 +980,11 @@ ${yaft_forums_label}
 <div id="yaft_authors_template" style="display:none;"><!--
 <table id="yaft_author_table" class="listHier">
     <thead>
-        <tr><th>${yaft_name_label}</th><th>${yaft_number_of_posts_label}</th>{if yaftCurrentUserPermissions.gradeAll && yaftCurrentDiscussion.graded}<th>${yaft_grade_label}</th>{/if}</tr>
+        <tr><th>${yaft_name_label}</th><th>${yaft_number_of_posts_label}</th>{if yaft.currentUserPermissions.gradeAll && yaft.currentDiscussion.graded}<th>${yaft_grade_label}</th>{/if}</tr>
     </thead>
     <tbody>
         {for author in authors}
-            <tr><td><a class="profile" rel="/direct/profile/${author.id}/formatted" href="javascript:;" onClick="switchState('author',{'id':'${author.id}','displayName':'${author.displayName}'});">${author.displayName}</a></td><td>${author.numberOfPosts}</td>{if yaftCurrentDiscussion.graded}<td>{if author.graded}${author.grade.grade}{/if}</td>{/if}</tr>
+            <tr><td><a class="profile" rel="/direct/profile/${author.id}/formatted" href="javascript:;" onClick="yaft.switchState('author',{'id':'${author.id}','displayName':'${author.displayName}'});">${author.displayName}</a></td><td>${author.numberOfPosts}</td>{if yaft.currentDiscussion.graded}<td>{if author.graded}${author.grade.grade}{/if}</td>{/if}</tr>
         {/for}
     </tbody>
 </table>
@@ -1012,17 +992,17 @@ ${yaft_forums_label}
 </div>
 
 <div id="yaft_discussion_authors_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;<a href="${yaftCurrentDiscussion.url}" onClick="return switchState('full',{'discussionId':'${id}'});">${subject}</a>-&gt;${yaft_authors_label}
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum',{'forumId':'${yaft.currentForum.id}'});">${yaft.currentForum.title}</a>-&gt;<a href="${yaft.currentDiscussion.url}" onClick="return yaft.switchState('full',{'discussionId':'${id}'});">${subject}</a>-&gt;${yaft_authors_label}
 -->
 </div>
 
 <div id="yaft_author_messages_breadcrumb_template" style="display:none;"><!--
-<a href="/portal/tool/${startupArgs.placementId}/forums" onClick="return switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaftCurrentForum.url}" onClick="return switchState('forum',{'forumId':'${yaftCurrentForum.id}'});">${yaftCurrentForum.title}</a>-&gt;<a href="${yaftCurrentDiscussion.url}" onClick="return switchState('full',{'discussionId':'${yaftCurrentDiscussion.id}'});">${yaftCurrentDiscussion.subject}</a>-&gt;<a href="/portal/tool/${startupArgs.placementId}/authors" onClick="return switchState('authors');">${yaft_authors_label}</a>-&gt;<a class="profile" rel="/direct/profile/${id}/formatted" href="javascript:;">${displayName}</a>
+<a href="/portal/tool/${yaft.startupArgs.placementId}/forums" onClick="return yaft.switchState('forums');">${yaft_forums_label}</a>-&gt;<a href="${yaft.currentForum.url}" onClick="return yaft.switchState('forum',{'forumId':'${yaft.currentForum.id}'});">${yaft.currentForum.title}</a>-&gt;<a href="${yaft.currentDiscussion.url}" onClick="return yaft.switchState('full',{'discussionId':'${yaft.currentDiscussion.id}'});">${yaft.currentDiscussion.subject}</a>-&gt;<a href="/portal/tool/${yaft.startupArgs.placementId}/authors" onClick="return yaft.switchState('authors');">${yaft_authors_label}</a>-&gt;<a class="profile" rel="/direct/profile/${id}/formatted" href="javascript:;">${displayName}</a>
 -->
 </div>
 
 <div id="yaft_author_messages_template" style="display:none"><!--
-    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
+    {if defined('assignment') && yaft.currentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
     <div id="yaft_author_nav_buttons">
     	<img id="yaft_previous_author_button" src="/library/image/silk/resultset_previous.png" title="${yaft_previous_author_tooltip}" alt="${yaft_previous_author_tooltip}"/>
     	<img id="yaft_next_author_button" src="/library/image/silk/resultset_next.png" title="${yaft_next_author_tooltip}" alt="${yaft_next_author_tooltip}" />
@@ -1065,7 +1045,7 @@ ${yaft_forums_label}
 		</div>
 		</div>
     {/for}
-    {if defined('assignment') && yaftCurrentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field2" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button2" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
+    {if defined('assignment') && yaft.currentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field2" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button2" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
 -->
 </div>
 
@@ -1074,7 +1054,7 @@ ${yaft_forums_label}
 </div> <!-- /portletBody-->
 
 <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
-<script type="text/javascript" src="/yaft-tool/lib/yaft.js"></script>
+<script type="text/javascript" src="/yaft-tool/js/yaft.js"></script>
 
 </body>
 </html>

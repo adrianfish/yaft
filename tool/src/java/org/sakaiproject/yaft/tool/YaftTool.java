@@ -87,7 +87,7 @@ public class YaftTool extends HttpServlet {
 		String isoLanguage = language;
 
         if(country != null && !country.equals("")) {
-            isoLanguage += "-" + country;
+            isoLanguage += "_" + country;
         }
         
 		VelocityContext ctx = new VelocityContext();
@@ -108,17 +108,16 @@ public class YaftTool extends HttpServlet {
 
 		String uri = request.getRequestURI();
 
+        if (uri.contains("/portal/pda/")) {
+            ctx.put("viewMode","minimal");
+            ctx.put("onPDAPortal", "true");
+        } else {
+            ctx.put("viewMode","full");
+            ctx.put("onPDAPortal","false");
+        }
+
 		if (pathInfo == null || pathInfo.length() < 1) {
 			// There's no path info, so this is the initial state
-			
-			if (uri.contains("/portal/pda/")) {
-				ctx.put("viewMode","minimal");
-				ctx.put("onPDAPortal","true");
-			} else {
-				ctx.put("viewMode","full");
-				ctx.put("onPDAPortal","false");
-			}
-			
 	        response.setStatus(HttpServletResponse.SC_OK);
 	        response.setContentType("text/html; charset=UTF-8");
 	        Writer writer = new BufferedWriter(response.getWriter());
