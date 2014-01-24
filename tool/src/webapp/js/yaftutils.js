@@ -584,7 +584,7 @@
                 }
 
                 $(document).ready(function () {
-                    attachProfilePopup();
+                    yaft.utils.attachProfilePopup();
                 });
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -639,7 +639,7 @@
                 }
                 yaft.utils.renderTrimpathTemplate('yaft_message_template', message, message.id);
                 $(document).ready(function () {
-                    attachProfilePopup();
+                    yaft.utils.attachProfilePopup();
                 });
             },
             error: function (xhr, textStatus, errorThrown) {
