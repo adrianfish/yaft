@@ -288,7 +288,7 @@
     yaft.utils.attachProfilePopup = function () {
 
         $('a.profile').cluetip({
-            width: '620px',
+            width: '640px',
             cluetipClass: 'yaft',
             sticky: true,
             dropShadow: false,
@@ -297,8 +297,7 @@
             closeText: '<img src="/library/image/silk/cross.png" alt="close" />',
             closePosition: 'top',
             showTitle: false,
-            hoverIntent: true,
-            ajaxSettings: {type: 'GET'}
+            hoverIntent: true
         });
     };
 
