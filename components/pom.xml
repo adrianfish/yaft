@@ -20,17 +20,17 @@
   	<properties>
     	<deploy.target>components</deploy.target>
   	</properties>
+
   	<dependencies>
-    <dependency>
-      <groupId>org.sakaiproject.yaft</groupId>
-      <artifactId>yaft-impl</artifactId>
-	  <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sakaiproject.yaft</groupId>
-          <artifactId>yaft-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+              <groupId>org.sakaiproject.yaft</groupId>
+              <artifactId>yaft-impl</artifactId>
+              <exclusions>
+                    <exclusion>
+                          <groupId>org.sakaiproject.yaft</groupId>
+                          <artifactId>yaft-api</artifactId>
+                    </exclusion>
+              </exclusions>
+        </dependency>
   	</dependencies>
 </project>

@@ -1,2 +1,6 @@
-tags
+.classpath
+.idea
+*.iml
+.project
 *.swp
+tags
