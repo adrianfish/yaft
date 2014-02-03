@@ -1,0 +1,57 @@
+<div id="yaft-get-started-instruction" class="textblock">
+    <p>{{translate 'forums_get_started'}}</p>
+</div>
+<div>
+    <div class="navIntraToolLink viewNav" style="float: right;">
+        <span><input type="button" id="yaft-delete-forums-button" value="{{translate 'delete_label'}}" disabled="disabled"/></span>
+    </div>
+</div>
+<table id="yaft_forum_table" class="listHier">
+    <thead>
+        <tr>
+            <th align="left"><div>{{translate 'forum_label'}}</div></th>
+            <th align="left"><div>{{translate 'discussions_label'}}</div></th>
+            <th><div>{{translate 'messages_label'}}</div></th>
+            <th><div>{{translate 'unread_label'}}</div></th>
+            <th><div>{{translate 'last_message_label'}}</div></th>
+            <th><div>{{translate 'options_label'}}</div></th>
+            <th align="center"><input id="yaft-all-fora-checkbox" type="checkbox" /></th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each fora}}
+        <tr class="yaftForumRow {{#if invisible}} yaftInvisible{{/if}}">
+            <td style="max-width: 200px;"><a href="{{url}}" title="{{translate 'forum_link_tooltip'}}" onClick="return yaft.switchState('forum',{'forumId':'{{id}}'});">{{title}}</a>
+            {{#if description.length}}
+            <br/>
+            <span class="yaftForumDescription">{{description}}</span>
+            {{/if}}
+            {{#if groups.length}}
+            <br />
+            <span class="yaftForumDescription">{{translate 'group_message'}}
+                {{#each groups}}
+                <span class="yaft_group_title">{{title}}<span>{{#unless last}},{{/unless}}
+                {{/each}}
+            </span>
+            {{/if}}
+            {{#if forum.start}}
+            <br />
+                <span id="yaft_availability_message" class="yaftForumDescription">{{translate 'availability_message1'}}{{formattedStartDate}}{{translate 'availability_message2'}}{{formattedEndDate}}</span>
+            {{/if}}
+            </td>
+            <td align="center">{{discussionCount}}</td>
+            <td align="center">{{messageCount}}</td>
+            <td align="center">{{unread}}</td>
+            <td>{{formattedLastMessageDate}}</td>
+            <td align="center">
+            {{#if canDelete}}
+                <a href="#" onclick="return yaft.switchState('editForum',{'forumId':'{{id}}'});" title="{{translate 'edit_forum_tooltip'}}">{{translate 'edit_label'}}</a>
+            {{/if}}
+            </td>
+            {{#if ../forumDeleteAny}}
+            <td align="center"><input type="checkbox" class="yaft_bulk_option_candidate" id="{{id}}"/></td>
+            {{/if}}
+        </tr>
+    {{/each}}
+    </tbody>
+</table>

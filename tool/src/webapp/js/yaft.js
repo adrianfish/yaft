@@ -60,14 +60,14 @@
                 $("#yaft_add_forum_link").hide();
             }
     
-            $("#yaft_breadcrumb").html(yaft_forums_label);
+            $("#yaft_breadcrumb").html(yaft.translations.forums_label);
             
             yaft.utils.setCurrentForums(/* render = */ true);
         } else if ('authors' === state) {
             $('#yaft_authors_view_link').show();
             $('#yaft_authors_view_link > span').addClass('current');
     
-            $("#yaft_breadcrumb").html(yaft_authors_label);
+            $("#yaft_breadcrumb").html(yaft.translations.authors_label);
             yaft.utils.getAuthors();
         } else if ('author' === state) {
             if (!arg.id) {
@@ -95,7 +95,7 @@
             $("#yaft_minimal_link").hide();
             $("#yaft_full_link").hide();
                  
-            yaft.utils.renderTrimpathTemplate('yaft_forum_breadcrumb_template', yaft.currentForum, 'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('forum_breadcrumb', {placementId: yaft.startupArgs.placementId, title: yaft.currentForum.title}, 'yaft_breadcrumb');
     
             yaft.utils.renderCurrentForumContent();
         } else if ('full' === state) {
@@ -131,7 +131,7 @@
             $("#yaft_authors_view_link").show();
             
             if (yaft.currentDiscussion) {
-                yaft.utils.renderTrimpathTemplate('yaft_discussion_breadcrumb_template',yaft.currentDiscussion,'yaft_breadcrumb');
+                yaft.utils.renderHandlebarsTemplate('discussion_breadcrumb', {placementId: yaft.startupArgs.placementId, discussion: yaft.currentDiscussion, forum: yaft.currentForum}, 'yaft_breadcrumb');
                 yaft.utils.renderTrimpathTemplate('yaft_discussion_content_template',yaft.currentDiscussion,'yaft_content');
     
                 if (!yaft.currentDiscussion.lockedForReadingAndUnavailable || yaft.currentUserPermissions.viewInvisible || yaft.currentDiscussion.creatorId === yaft.startupArgs.userId) {
@@ -195,7 +195,7 @@
                 message = yaft.currentDiscussion.firstMessage;
             }
     
-            yaft.utils.renderTrimpathTemplate('yaft_message_view_breadcrumb_template', yaft.currentDiscussion, 'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('message_view_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
     
             yaft.utils.renderTrimpathTemplate('yaft_message_view_content_template', yaft.currentDiscussion, 'yaft_content');
             yaft.utils.renderTrimpathTemplate('yaft_message_template', yaft.currentDiscussion.firstMessage, yaft.currentDiscussion.firstMessage.id);
@@ -222,7 +222,7 @@
     
             var siteGroups = yaft.utils.getGroupsForCurrentSite();
     
-            yaft.utils.renderTrimpathTemplate('yaft_edit_forum_breadcrumb_template', arg, 'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('edit_forum_breadcrumb', {placementId: yaft.startupArgs.placementId}, 'yaft_breadcrumb');
             yaft.utils.renderTrimpathTemplate('yaft_edit_forum_content_template',{'forum': forum, 'siteGroups': siteGroups}, 'yaft_content');
     
             this.setupAvailability(forum);
@@ -277,7 +277,7 @@
     
             var message = yaft.utils.findMessage(arg.messageId);
             message['editMode'] = 'EDIT';
-            yaft.utils.renderTrimpathTemplate('yaft_edit_message_breadcrumb_template',message,'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('edit_message_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion, replying: false, subject: message.subject}, 'yaft_breadcrumb');
             yaft.utils.renderTrimpathTemplate('yaft_edit_message_content_template',message,'yaft_content');
             
             var saveMessageOptions = { 
@@ -294,7 +294,7 @@
                     beforeSubmit: function (arr, $form, options) {
 
                         if ($('#yaft_message_editor').val() === '') {
-                            alert(yaft_missing_message_message);
+                            alert(yaft.translations.missing_message_message);
                             return false;
                         }
                                
@@ -331,7 +331,7 @@
             // We need to pass a few extra things to the template, so set them.
             messageBeingRepliedTo["mode"] = arg.mode;
             messageBeingRepliedTo["editMode"] = 'REPLY';
-            yaft.utils.renderTrimpathTemplate('yaft_edit_message_breadcrumb_template', messageBeingRepliedTo, 'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('edit_message_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion, replying: true, subject: messageBeingRepliedTo.subject}, 'yaft_breadcrumb');
             yaft.utils.renderTrimpathTemplate('yaft_reply_message_content_template', messageBeingRepliedTo, 'yaft_content');
     
             $('#yaft_publish_anonymously_button').click(function (e) {
@@ -355,7 +355,7 @@
                     beforeSubmit: function (arr, $form, options) {
     
                         if ($('#yaft_message_editor').val() === '') {
-                            alert(yaft_missing_message_message);
+                            alert(yaft.translations.missing_message_message);
                             return false;
                         }
                            
@@ -418,7 +418,7 @@
             
             var groups = yaft.utils.getGroupsForCurrentSite();
     
-            yaft.utils.renderTrimpathTemplate('yaft_start_discussion_breadcrumb_template',arg,'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('start_discussion_breadcrumb', {currentForumUrl: yaft.currentForum.url, currentForumTitle: yaft.currentForum.title}, 'yaft_breadcrumb');
             yaft.utils.renderTrimpathTemplate('yaft_start_discussion_content_template',{'discussion':discussion,'groups':groups},'yaft_content');
     
             if (discussion.allowAnonymousPosting) {
@@ -448,13 +448,13 @@
                         for (var i=0,j=arr.length;i<j;i++) {
                             if ('subject' === arr[i].name) {
                                 if (!arr[i].value || arr[i].value.length < 4) {
-                                    alert(yaft_subject_too_short);
+                                    alert(yaft.translations.subject_too_short);
                                     return false;
                                 }
                              }
                         }
                         if ($('#yaft_discussion_editor').val() === '') {
-                            alert(yaft_missing_message_message);
+                            alert(yaft.translations.missing_message_message);
                             return false;
                         }
                            
@@ -463,7 +463,7 @@
                     success: function (responseText, statusText, xhr) {
     
                         if (responseText.match(/^ERROR.*/)) {
-                            alert(yaft_failed_to_create_edit_discussion + ". Reason: " + responseText);
+                            alert(yaft.translations.failed_to_create_edit_discussion + ". Reason: " + responseText);
                         } else {
                             var discussion = yaft.utils.getDiscussion(responseText);
                             if (!arg || !arg.discussionId) {
@@ -480,7 +480,7 @@
                         }
                     },
                     error: function (xmlHttpRequest, textStatus, errorThrown) {
-                        alert(yaft_failed_to_create_edit_discussion);
+                        alert(yaft.translations.failed_to_create_edit_discussion);
                     }
                 }; 
      
@@ -557,7 +557,7 @@
                 yaft.sakai.setupWysiwygEditor(yaft.startupArgs.editor, 'yaft_discussion_editor', 800, 500);
             });
         } else if ('moveDiscussion' === state) {
-            yaft.utils.renderTrimpathTemplate('yaft_move_discussion_breadcrumb_template',arg,'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('move_discussion_breadcrumb', {placementId: yaft.startupArgs.placementId, currentForumUrl: yaft.currentForum.url, currentForumTitle: yaft.currentForum.title}, 'yaft_breadcrumb');
             
             yaft.utils.setCurrentForums();
             var discussion = null;
@@ -570,7 +570,7 @@
                     discussion = d;
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert(yaft_failed_to_get_discussion + errorThrown);
+                    alert(yaft.translations.failed_to_get_discussion + errorThrown);
                 }
             });
                     
@@ -596,7 +596,7 @@
     
             $('#yaft_permissions_link > span').addClass('current');
             var perms = yaft.utils.getSitePermissionMatrix();
-            yaft.utils.renderTrimpathTemplate('yaft_permissions_breadcrumb_template',arg,'yaft_breadcrumb');
+            yaft.utils.renderHandlebarsTemplate('permissions_breadcrumb', {placementId: yaft.startupArgs.placementId}, 'yaft_breadcrumb');
             yaft.utils.renderTrimpathTemplate('yaft_permissions_content_template',{'perms':perms},'yaft_content');
     
              $(document).ready(function () {
@@ -774,9 +774,9 @@
             });
         }
     });
-    
+
     // We need the toolbar in a template so we can swap in the translations
-    yaft.utils.renderTrimpathTemplate('yaft_toolbar_template', {}, 'yaft_toolbar');
+    yaft.utils.renderHandlebarsTemplate('toolbar', {}, 'yaft_toolbar');
 
     $('#yaft_home_link > span > a').click(function (e) {
         yaft.switchState('forums');
@@ -812,10 +812,6 @@
     // This is always showing in every state, so show it here.
     $('#yaft_home_link').show();
 
-    $('#yaft_search_field').change(function (e) {
-        yaft.utils.showSearchResults(e.target.value);
-    });
-    
     var data = yaft.utils.getCurrentUserData();
 
     yaft.gradebookAssignments = data.assignments ? data.assignments : [];
