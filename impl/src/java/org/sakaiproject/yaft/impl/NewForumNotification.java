@@ -20,14 +20,13 @@ import org.sakaiproject.yaft.api.Group;
 import org.sakaiproject.yaft.api.SakaiProxy;
 import org.sakaiproject.yaft.api.YaftFunctions;
 
-public class NewForumNotification extends SiteEmailNotification{
+public class NewForumNotification extends SiteEmailNotification {
 	
 	private static ResourceLoader rb = new ResourceLoader("org.sakaiproject.yaft.impl.bundle.newforumnotification");
 	
 	private SakaiProxy sakaiProxy = null;
 	
-	public NewForumNotification() {
-	}
+	public NewForumNotification() {}
 	
     public NewForumNotification(String siteId) {
         super(siteId);
@@ -37,42 +36,40 @@ public class NewForumNotification extends SiteEmailNotification{
     	this.sakaiProxy = sakaiProxy;
     }
     
-    protected String getFromAddress(Event event)
-    {
+    protected String getFromAddress(Event event) {
+
         String userEmail = "no-reply@" + ServerConfigurationService.getServerName();
         String userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-        String no_reply= "From: \"" + userDisplay + "\" <" + userEmail + ">";
-        String from= getFrom(event);
+        String no_reply = "From: \"" + userDisplay + "\" <" + userEmail + ">";
+        String from = getFrom(event);
         // get the message
         Reference ref = EntityManager.newReference(event.getResource());
         Forum msg = (Forum) ref.getEntity();
-        String userId=msg.getCreatorId();
+        String userId = msg.getCreatorId();
 
         //checks if "from" email id has to be included? and whether the notification is a delayed notification?. SAK-13512
-        if ((ServerConfigurationService.getString("emailFromReplyable@org.sakaiproject.event.api.NotificationService").equals("true")) && from.equals(no_reply) && userId !=null){
+        if ((ServerConfigurationService.getString("emailFromReplyable@org.sakaiproject.event.api.NotificationService").equals("true")) && from.equals(no_reply) && userId != null) {
 
-                try
-                {
-                    User u = UserDirectoryService.getUser(userId);
-                    userDisplay = u.getDisplayName();
-                    userEmail = u.getEmail();
-                    if ((userEmail != null) && (userEmail.trim().length()) == 0) userEmail = null;
+            try {
+                User u = UserDirectoryService.getUser(userId);
+                userDisplay = u.getDisplayName();
+                userEmail = u.getEmail();
+                if ((userEmail != null) && (userEmail.trim().length()) == 0) userEmail = null;
 
-                }
-                catch (UserNotDefinedException e)
-                {
-                }
+            } catch (UserNotDefinedException e) {
+            }
 
-                // some fallback positions
-                if (userEmail == null) userEmail = "no-reply@" + ServerConfigurationService.getServerName();
-                if (userDisplay == null) userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-                from="From: \"" + userDisplay + "\" <" + userEmail + ">";
+            // some fallback positions
+            if (userEmail == null) userEmail = "no-reply@" + ServerConfigurationService.getServerName();
+            if (userDisplay == null) userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
+            from = "From: \"" + userDisplay + "\" <" + userEmail + ">";
         }
 
         return from;
     }
 	
 	protected String plainTextContent(Event event) {
+
 		Reference ref = EntityManager.newReference(event.getResource());
         Forum forum = (Forum) ref.getEntity();
         
@@ -87,6 +84,7 @@ public class NewForumNotification extends SiteEmailNotification{
 	}
 	
 	protected String getSubject(Event event) {
+
 		Reference ref = EntityManager.newReference(event.getResource());
         Forum forum = (Forum) ref.getEntity();
         
@@ -97,25 +95,25 @@ public class NewForumNotification extends SiteEmailNotification{
 			e.printStackTrace();
 		}
         
-        return rb.getFormattedMessage("noti.subject", new Object[]{siteTitle, forum.getTitle()});
+        return rb.getFormattedMessage("noti.subject", new Object[] {siteTitle, forum.getTitle()});
 	}
 	
 	protected List<User> getRecipients(Event event) {
+
 		Reference ref = EntityManager.newReference(event.getResource());
         Forum forum = (Forum) ref.getEntity();
         
         List<User> users = new ArrayList<User>();
         
         List<Group> groups = forum.getGroups();
-        if(groups.size() > 0) {
+        if (groups.size() > 0) {
         	// This forum is limited to groups. Make sure the alert only goes
 		    // to the group members
 		    users = sakaiProxy.getGroupUsers(groups);
 		    
 		    // Maintainers need to get emails also.
 		    users.addAll(sakaiProxy.getCurrentSiteMaintainers());
-        }
-        else {
+        } else {
         	users = super.getRecipients(event);
         }
         
@@ -127,6 +125,7 @@ public class NewForumNotification extends SiteEmailNotification{
     }
 	
 	protected List getHeaders(Event event) {
+
         List rv = super.getHeaders(event);
         rv.add("Subject: " + getSubject(event));
         rv.add(getFromAddress(event));

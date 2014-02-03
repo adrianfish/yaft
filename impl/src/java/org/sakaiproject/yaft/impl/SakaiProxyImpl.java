@@ -88,6 +88,7 @@ import org.sakaiproject.yaft.api.YaftGBAssignment;
  * @author Adrian Fish (a.fish@lancaster.ac.uk)
  */
 public class SakaiProxyImpl implements SakaiProxy {
+
 	private Logger logger = Logger.getLogger(SakaiProxyImpl.class);
 
 	private ServerConfigurationService serverConfigurationService = null;
@@ -125,8 +126,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 	private GradebookService gradebookService;
 
 	public SakaiProxyImpl() {
-		if (logger.isDebugEnabled())
-			logger.debug("SakaiProxy()");
 
 		ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
 		serverConfigurationService = (ServerConfigurationService) componentManager.get(ServerConfigurationService.class);
@@ -169,22 +168,18 @@ public class SakaiProxyImpl implements SakaiProxy {
 		ne3.setAction(mn);
 	}
 
-	public boolean isAutoDDL() {
-		if (logger.isDebugEnabled())
-			logger.debug("isAutoDDL()");
+	public boolean isAutoDDL(){
 
 		String autoDDL = serverConfigurationService.getString("auto.ddl");
 		return autoDDL.equals("true");
 	}
 
 	public String getDbVendor() {
-		if (logger.isDebugEnabled())
-			logger.debug("getDbVendor()");
-
 		return sqlService.getVendor();
 	}
 
 	public Site getCurrentSite() {
+
 		try {
 			return siteService.getSite(getCurrentSiteId());
 		} catch (Exception e) {
@@ -194,6 +189,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public String getCurrentSiteId() {
+
 		Placement placement = toolManager.getCurrentPlacement();
 		if (placement == null) {
 			logger.warn("Current tool placement is null.");
@@ -204,18 +200,15 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public Connection borrowConnection() throws SQLException {
-		if (logger.isDebugEnabled())
-			logger.debug("borrowConnection()");
 		return sqlService.borrowConnection();
 	}
 
 	public void returnConnection(Connection connection) {
-		if (logger.isDebugEnabled())
-			logger.debug("returnConnection()");
 		sqlService.returnConnection(connection);
 	}
 
 	public String getDisplayNameForUser(String creatorId) {
+
 		try {
 			User sakaiUser = userDirectoryService.getUser(creatorId);
 			return sakaiUser.getDisplayName();
@@ -226,10 +219,12 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public void registerFunction(String function) {
+
 		List functions = functionManager.getRegisteredFunctions("yaft.");
 
-		if (!functions.contains(function))
+		if (!functions.contains(function)) {
 			functionManager.registerFunction(function, true);
+        }
 	}
 
 	public String getSakaiHomePath() {
@@ -237,6 +232,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean addCalendarEntry(String title, String description, String type, long startDate, long endDate) {
+
 		try {
 			Calendar cal = calendarService.getCalendar("/calendar/calendar/" + getCurrentSiteId() + "/main");
 			CalendarEventEdit edit = cal.addEvent();
@@ -246,7 +242,6 @@ public class SakaiProxyImpl implements SakaiProxy {
 			edit.setDisplayName(title);
 			edit.setType(type);
 			cal.commitEvent(edit);
-
 			return true;
 		} catch (Exception e) {
 			logger.error("Failed to add calendar entry. Returning false ...", e);
@@ -255,6 +250,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean removeCalendarEntry(String title, String description) {
+
 		try {
 			Calendar cal = calendarService.getCalendar("/calendar/calendar/" + getCurrentSiteId() + "/main");
 			List<CalendarEvent> events = cal.getEvents(null, null);
@@ -279,6 +275,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	private String getEmailForTheUser(String userId) {
+
 		try {
 			User sakaiUser = userDirectoryService.getUser(userId);
 			return sakaiUser.getEmail();
@@ -289,12 +286,11 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public User getCurrentUser() {
+
 		try {
 			return userDirectoryService.getCurrentUser();
 		} catch (Throwable t) {
-			logger.error("Exception caught whilst getting current user.", t);
-			if (logger.isDebugEnabled())
-				logger.debug("Returning null ...");
+			logger.error("Exception caught whilst getting current user. Returning null ...", t);
 			return null;
 		}
 	}
@@ -304,10 +300,12 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public String getCurrentPageId() {
+
 		Placement placement = toolManager.getCurrentPlacement();
 
-		if (placement instanceof ToolConfiguration)
+		if (placement instanceof ToolConfiguration) {
 			return ((ToolConfiguration) placement).getPageId();
+        }
 
 		return null;
 	}
@@ -317,26 +315,31 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public String getYaftPageId(String siteId) {
+
 		try {
 			Site site = siteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			return tc.getPageId();
 		} catch (Exception e) {
+            logger.error("Exception whilst getting the YAFT page id. Returning an empty string ...", e);
 			return "";
 		}
 	}
 
 	public String getYaftToolId(String siteId) {
+
 		try {
 			Site site = siteService.getSite(siteId);
 			ToolConfiguration tc = site.getToolForCommonId("sakai.yaft");
 			return tc.getId();
 		} catch (Exception e) {
+            logger.error("Exception whilst getting the YAFT tool id. Returning an empty string ...", e);
 			return "";
 		}
 	}
 
 	public String getDirectUrl(String siteId, String string) {
+
 		String portalUrl = getPortalUrl();
 
 		String pageId = null;
@@ -352,11 +355,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 		}
 
 		try {
-			// String url = portalUrl + "/site/" + siteId + "/page/" + pageId +
-			// "?toolstate-" + toolId + "=" + URLEncoder.encode(string,
-			// "UTF-8");
 			String url = portalUrl + "/directtool/" + toolId + string;
-
 			return url;
 		} catch (Exception e) {
 			logger.error("Caught exception whilst building direct URL.", e);
@@ -365,7 +364,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	private void enableSecurityAdvisor() {
+
 		securityService.pushAdvisor(new SecurityAdvisor() {
+
 			public SecurityAdvice isAllowed(String userId, String function, String reference) {
 				return SecurityAdvice.ALLOWED;
 			}
@@ -376,21 +377,20 @@ public class SakaiProxyImpl implements SakaiProxy {
 	 * Saves the file to Sakai's content hosting
 	 */
 	public String saveFile(String siteId, String creatorId, String name, String mimeType, byte[] fileData) throws Exception {
-		if (logger.isDebugEnabled())
-			logger.debug("saveFile(" + name + "," + mimeType + ",[BINARY FILE DATA])");
 
-		if (name == null | name.length() == 0)
+		if (name == null | name.length() == 0) {
 			throw new IllegalArgumentException("The name argument must be populated.");
+        }
 
-		if (name.endsWith(".doc"))
+		if (name.endsWith(".doc")) {
 			mimeType = "application/msword";
-		else if (name.endsWith(".xls"))
+        } else if (name.endsWith(".xls")) {
 			mimeType = "application/excel";
+        }
 
-		// String uuid = UUID.randomUUID().toString();
-
-		if (siteId == null)
+		if (siteId == null) {
 			siteId = getCurrentSiteId();
+        }
 
 		String id = "/group/" + siteId + "/yaft-files/" + name;
 
@@ -411,15 +411,18 @@ public class SakaiProxyImpl implements SakaiProxy {
 			// return resource.getId();
 			return name;
 		} catch (IdUsedException e) {
-			if (logger.isInfoEnabled())
+			if (logger.isInfoEnabled()) {
 				logger.info("A resource with id '" + id + "' exists already. Returning id without recreating ...");
+            }
 			return name;
 		}
 	}
 
 	public void getAttachment(String siteId, Attachment attachment) {
-		if (siteId == null)
+
+		if (siteId == null) {
 			siteId = getCurrentSiteId();
+        }
 
 		try {
 			enableSecurityAdvisor();
@@ -432,14 +435,12 @@ public class SakaiProxyImpl implements SakaiProxy {
 			attachment.setName(properties.getProperty(ResourceProperties.PROP_DISPLAY_NAME));
 			attachment.setUrl(resource.getUrl());
 		} catch (Exception e) {
-			if (logger.isDebugEnabled())
-				e.printStackTrace();
-
-			logger.error("Caught an exception with message '" + e.getMessage() + "'");
+			logger.error("Caught an exception with message '" + e.getMessage() + "'", e);
 		}
 	}
 
 	public void deleteFile(String resourceId) throws Exception {
+
 		enableSecurityAdvisor();
 		String id = "/group/" + getCurrentSiteId() + "/yaft-files/" + resourceId;
 		contentHostingService.removeResource(id);
@@ -450,10 +451,11 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public ToolConfiguration getFirstInstanceOfTool(String siteId, String toolId) {
+
 		try {
 			return siteService.getSite(siteId).getToolForCommonId(toolId);
 		} catch (IdUnusedException e) {
-			e.printStackTrace();
+			logger.warn("Exception while getting first instance of '" + toolId + "'. Returning null ...", e);
 			return null;
 		}
 	}
@@ -467,15 +469,17 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public void postEvent(String event, String reference) {
+
 		UsageSession usageSession = usageSessionService.getSession();
 		eventTrackingService.post(eventTrackingService.newEvent(event, reference, true), usageSession);
 	}
 
 	public Site getSite(String siteId) {
+
 		try {
 			return siteService.getSite(siteId);
 		} catch (IdUnusedException e) {
-			logger.error("No site with id of '" + siteId + "'. Returning null ...");
+			logger.warn("No site with id of '" + siteId + "'. Returning null ...");
 			return null;
 		}
 	}
@@ -485,6 +489,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public Set<String> getPermissionsForCurrentUserAndSite() {
+
 		String userId = getCurrentUser().getId();
 
 		if (userId == null) {
@@ -534,6 +539,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public Map<String, Set<String>> getPermsForCurrentSite() {
+
 		Map<String, Set<String>> perms = new HashMap<String, Set<String>>();
 
 		String userId = getCurrentUser().getId();
@@ -553,8 +559,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 				Set<String> functions = role.getAllowedFunctions();
 				Set<String> filteredFunctions = new TreeSet<String>();
 				for (String function : functions) {
-					if (function.startsWith("yaft"))
+					if (function.startsWith("yaft")) {
 						filteredFunctions.add(function);
+                    }
 				}
 
 				perms.put(role.getId(), filteredFunctions);
@@ -567,10 +574,12 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean setPermsForCurrentSite(Map<String, String[]> params) {
+
 		String userId = getCurrentUser().getId();
 
-		if (userId == null)
+		if (userId == null) {
 			throw new SecurityException("This action (setPerms) is not accessible to anon and there is no current user.");
+        }
 
 		String siteId = getCurrentSiteId();
 
@@ -597,8 +606,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 			boolean changed = false;
 
 			for (String name : params.keySet()) {
-				if (!name.contains(":"))
+				if (!name.contains(":")) {
 					continue;
+                }
 
 				String value = params.get(name)[0];
 
@@ -610,10 +620,11 @@ public class SakaiProxyImpl implements SakaiProxy {
 				}
 				String function = name.substring(name.indexOf(":") + 1);
 
-				if ("true".equals(value))
+				if ("true".equals(value)) {
 					role.allowFunction(function);
-				else
+                } else {
 					role.disallowFunction(function);
+                }
 
 				changed = true;
 			}
@@ -635,6 +646,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public List<SearchResult> searchInCurrentSite(String searchTerms) {
+
 		List<SearchResult> results = new ArrayList<SearchResult>();
 
 		List<String> contexts = new ArrayList<String>(1);
@@ -643,8 +655,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 		try {
 			SearchList sl = searchService.search(searchTerms, contexts, 0, 50, "normal", "normal");
 			for (SearchResult sr : sl) {
-				if ("Discussions".equals(sr.getTool()))
+				if ("Discussions".equals(sr.getTool())) {
 					results.add(sr);
+                }
 			}
 
 		} catch (Exception e) {
@@ -655,15 +668,18 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean isCurrentUserMemberOfAnyOfTheseGroups(List<Group> groups) {
+
 		String userId = getCurrentUser().getId();
 
 		for (Group group : groups) {
 			try {
 				AuthzGroup ag = authzGroupService.getAuthzGroup("/site/" + getCurrentSiteId() + "/group/" + group.getId());
 
-				if (ag.getMember(userId) != null)
+				if (ag.getMember(userId) != null) {
 					return true;
+                }
 			} catch (GroupNotDefinedException gnde) {
+                logger.warn("No group for id '/group/" + group.getId() + "'");
 			}
 		}
 
@@ -671,6 +687,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public List<User> getGroupUsers(List<Group> groups) {
+
 		List<User> users = new ArrayList<User>();
 
 		for (Group group : groups) {
@@ -686,7 +703,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 					}
 				}
 			} catch (GroupNotDefinedException e) {
-				logger.error("Forum group '" + groupId + "' not found.");
+                logger.warn("No group for id '" + groupId + "'");
 			}
 		}
 
@@ -699,8 +716,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 		Collection<org.sakaiproject.site.api.Group> sakaiGroups = getCurrentSite().getGroups();
 
-		for (org.sakaiproject.site.api.Group sakaiGroup : sakaiGroups)
+		for (org.sakaiproject.site.api.Group sakaiGroup : sakaiGroups) {
 			groups.add(new Group(sakaiGroup.getId(), sakaiGroup.getTitle()));
+        }
 
 		return groups;
 	}
@@ -710,6 +728,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public boolean scoreAssignment(int assignmentId, String studentId, String score) {
+
 		String siteId = this.getCurrentSiteId();
 
 		Assignment assignment = gradebookService.getAssignment(siteId, (long) assignmentId);
@@ -718,7 +737,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 			gradebookService.setAssignmentScoreString(siteId, assignment.getName(), studentId, score, "YAFT");
 			return true;
 		} catch (Exception e) {
-			logger.error("Failed to score assignment '" + assignment.getName() + "'", e);
+			logger.error("Failed to score assignment '" + assignment.getName() + "'. Returning false ...", e);
 			return false;
 		}
 	}
@@ -728,10 +747,11 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public List<YaftGBAssignment> getGradebookAssignments() {
+
 		List<YaftGBAssignment> yaftGBAssignments = new ArrayList<YaftGBAssignment>();
 		try {
 			List<Assignment> gbAssignments = gradebookService.getAssignments(getCurrentSiteId());
-			for(Assignment gbAss : gbAssignments) {
+			for (Assignment gbAss : gbAssignments) {
 				yaftGBAssignments.add(new YaftGBAssignment(gbAss.getId(),gbAss.getName(), gbAss.getPoints()));
 			}
 		} catch (GradebookNotFoundException gnfe) {
@@ -744,6 +764,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	}
 
 	public YaftGBAssignment getGradebookAssignment(int gradebookAssignmentId) {
+
 		try {
 			Assignment gbAss = gradebookService.getAssignment(getCurrentSiteId(), (long) gradebookAssignmentId);
 			return new YaftGBAssignment(gbAss.getId(),gbAss.getName(), gbAss.getPoints());
@@ -762,20 +783,21 @@ public class SakaiProxyImpl implements SakaiProxy {
 		try {
 			return gradebookService.getGradeDefinitionForStudentForItem(getCurrentSiteId(), (long) assignmentId, userId);
 		} catch (Exception e) {
-			logger.error("Failed to get grade for user", e);
+			logger.error("Failed to get grade for user '" + userId + "'. Returning null ...", e);
 			return null;
 		}
 	}
 
 	public List<User> getCurrentSiteMaintainers() {
+
 		Site currentSite = getCurrentSite();
 		Set<String> userIds = currentSite.getUsersHasRole(currentSite.getMaintainRole());
 		List<User> maintainers = new ArrayList<User>();
-		for(String userId : userIds) {
+		for (String userId : userIds) {
 			try {
 				maintainers.add(userDirectoryService.getUser(userId));
 			} catch (UserNotDefinedException e) {
-				logger.error("No users for id '" + userId + "'");
+				logger.error("No user for id '" + userId + "'");
 			}
 		}
 		return maintainers;
@@ -792,7 +814,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 	public boolean isCurrentUserMemberOfSite(String siteId) {
 		
 		Site site = null;
-		if(siteId == null) {
+		if (siteId == null) {
 			site = getCurrentSite();
 		} else {
 			try {
@@ -802,7 +824,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 			}
 		}
 		
-		if(site == null) return false;
+		if (site == null) return false;
 		
 		return (site.getMember(userDirectoryService.getCurrentUser().getId()) != null);
 	}
