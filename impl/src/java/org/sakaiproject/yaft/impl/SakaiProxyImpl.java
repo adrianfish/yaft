@@ -727,6 +727,10 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
 	}
 
+	public boolean userHasFunctionInCurrentSite(String userId, String function) {
+		return getCurrentSite().isAllowed(userId, function);
+	}
+
 	public boolean scoreAssignment(int assignmentId, String studentId, String score) {
 
 		String siteId = this.getCurrentSiteId();

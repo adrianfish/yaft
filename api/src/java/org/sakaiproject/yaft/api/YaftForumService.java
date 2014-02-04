@@ -22,9 +22,7 @@ import java.util.Map;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityProducer;
 
-public interface YaftForumService extends EntityProducer
-{
-	
+public interface YaftForumService extends EntityProducer {
 	
 	public static final String ENTITY_PREFIX = "yaft";
 	public static final String REFERENCE_ROOT = Entity.SEPARATOR + ENTITY_PREFIX;
@@ -68,11 +66,12 @@ public interface YaftForumService extends EntityProducer
 	public SakaiProxy getSakaiProxy();
 
 	public boolean addOrUpdateForum(Forum forum);
-	public boolean addOrUpdateForum(Forum forum,boolean sendEmail);
-	
-	public Discussion addDiscussion(String siteId, String forumId,Discussion discussion,boolean sendMail);
 
-	public boolean addOrUpdateMessage(String siteId, String forumId,Message message,boolean sendMail);
+	public boolean addOrUpdateForum(Forum forum, String userId, boolean sendMail) throws YaftSecurityException;
+	
+	public Discussion addDiscussion(String siteId, String forumId, String userId, Discussion discussion, boolean sendMail) throws YaftSecurityException;
+
+	public boolean addOrUpdateMessage(String siteId, String forumId, String userId, Message message,boolean sendMail) throws YaftSecurityException;
 
 	public List<Forum> getFora(boolean fully);
 
@@ -80,11 +79,11 @@ public interface YaftForumService extends EntityProducer
 
 	public List<Discussion> getForumDiscussions(String id,boolean fully);
 
-	public void deleteForum(String forumId);
+	public void deleteForum(String forumId, String siteId, String userId) throws YaftSecurityException;
 
-	public boolean deleteDiscussion(String discussionId);
+	public boolean deleteDiscussion(String discussionId, String siteId, String userId) throws YaftSecurityException;
 	
-	public void deleteMessage(Message messageId,String forumId);
+	public void deleteMessage(Message message, String siteId, String forumId, String userId) throws YaftSecurityException;
 	
 	public void undeleteMessage(Message messageId,String forumId);
 

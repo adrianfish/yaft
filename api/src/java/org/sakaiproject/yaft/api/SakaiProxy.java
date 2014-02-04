@@ -112,6 +112,8 @@ public interface SakaiProxy
 	public List<Group> getCurrentSiteGroups();
 
 	public boolean currentUserHasFunction(String function);
+
+	public boolean userHasFunctionInCurrentSite(String userId, String function);
 	
 	public boolean scoreAssignment(int assignmentId, String studentId,String score);
 
