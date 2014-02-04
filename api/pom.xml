@@ -45,18 +45,14 @@
 			<groupId>org.sakaiproject.search</groupId>
 			<artifactId>search-api</artifactId>
 		</dependency>
-
+        <dependency>
+            <groupId>org.sakaiproject.edu-services.gradebook</groupId>
+            <artifactId>gradebook-service-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
-		<dependency>
-    		<groupId>org.sakaiproject.edu-services.gradebook</groupId>
-    		<artifactId>gradebook-service-api</artifactId>
-    		<version>1.0.5</version>
-    		<scope>provided</scope>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>

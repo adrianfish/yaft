@@ -1,4 +1,6 @@
-tags
+.classpath
+.idea
+*.iml
+.project
 *.swp
-tarball
-yaft.tgz
+tags
