@@ -40,16 +40,18 @@ ${sakaiHtmlHead}
 
 <!-- HANDLEBARS TEMPLATES -->
 <script type="text/javascript" src="/yaft-tool/templates/toolbar.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/forums.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/forum_breadcrumb.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/forum.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/move_discussion_breadcrumb.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/move_discussion.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/start_discussion_breadcrumb.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/permissions_breadcrumb.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/discussion_breadcrumb.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/edit_forum_breadcrumb.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/message_view_breadcrumb.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/edit_message_breadcrumb.handlebars"></script>
-<script type="text/javascript" src="/yaft-tool/templates/forums.handlebars"></script>
-<script type="text/javascript" src="/yaft-tool/templates/forum.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/authors.handlebars"></script>
 
 <script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/yaftpermissions.js"></script>
@@ -74,30 +76,6 @@ ${sakaiHtmlHead}
 </div>
 
 <!--  Templates Start -->
-
-<div id="yaft_move_discussion_content_template" style="display:none"><!--
-    <span><b>${yaft.translations.move_discussion_instruction_one}'${discussion.subject}'${yaft.translations.move_discussion_instruction_two}</b></span>
-    <br />
-    <br />
-    <span>${yaft.translations.move_discussion_instruction_three}</span>
-    <br />
-    <br />
-    <form id="yaft_move_discussion_form" action="/portal/tool/${yaft.startupArgs.placementId}" method="POST">
-        <input type="hidden" name="function" value="moveDiscussion"/>
-        <input type="hidden" name="discussionId" value="${discussion.id}"/>
-        <input type="hidden" name="currentForumId" value="${discussion.forumId}"/>
-        <select name="forumId">
-        {for forum in forums}
-            {if forum.id != yaft.currentForum.id}<option value="${forum.id}">${forum.title}</option>{/if}
-        {/for}
-        </select>
-        <br />
-        <br />
-        <input type="submit" value="${yaft.translations.move_label}"/>
-        <input type="button" value="${yaft.translations.cancel_label}" onClick="return yaft.switchState('forum');"/>
-    </form>
--->
-</div>
 
 <div id="yaft_start_discussion_content_template" style="display:none;"><!--
 <div id="yaft_reply_container">

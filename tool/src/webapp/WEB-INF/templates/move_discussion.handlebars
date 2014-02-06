@@ -1,0 +1,20 @@
+<span><b>{{translate 'move_discussion_instruction_one'}}'{{discussion.subject}}'{{translate 'move_discussion_instruction_two'}}</b></span>
+<br />
+<br />
+<span>{{translate 'move_discussion_instruction_three'}}</span>
+<br />
+<br />
+<form id="yaft_move_discussion_form" action="/portal/tool/{{placementId}}" method="POST">
+    <input type="hidden" name="function" value="moveDiscussion"/>
+    <input type="hidden" name="discussionId" value="{{discussion.id}}"/>
+    <input type="hidden" name="currentForumId" value="{{discussion.forumId}}"/>
+    <select name="forumId">
+    {{#each forums}}
+        <option value="{{id}}">{{title}}</option>
+    {{/each}}
+    </select>
+    <br />
+    <br />
+    <input type="submit" value="{{translate 'move_label'}}"/>
+    <input type="button" value="{{translate 'cancel_label'}}" onClick="return yaft.switchState('forum');"/>
+</form>

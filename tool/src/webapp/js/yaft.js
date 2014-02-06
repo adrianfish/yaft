@@ -573,8 +573,13 @@
                     alert(yaft.translations.failed_to_get_discussion + errorThrown);
                 }
             });
+
+            var forumsMoveableTo = yaft.currentForums.filter(function (forum) {
+                if (forum.id != yaft.currentForum.id) return true
+                else return false;
+            });
                     
-            yaft.utils.renderTrimpathTemplate('yaft_move_discussion_content_template',{'forums':yaft.currentForums,'discussion':discussion},'yaft_content');
+            yaft.utils.renderHandlebarsTemplate('move_discussion',{placementId: yaft.startupArgs.placementId, forums: forumsMoveableTo,'discussion': discussion}, 'yaft_content');
             
             $(document).ready(function () {
 

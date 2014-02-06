@@ -1141,7 +1141,8 @@
 
         this.setCurrentAuthors();
         this.renderTrimpathTemplate('yaft_discussion_authors_breadcrumb_template', yaft.currentDiscussion, 'yaft_breadcrumb');
-        this.renderTrimpathTemplate('yaft_authors_template', {'authors': yaft.currentAuthors}, 'yaft_content');
+        var canGrade = yaft.currentUserPermissions.gradeAll && yaft.currentDiscussion.graded;
+        this.renderHandlebarsTemplate('authors', {authors: yaft.currentAuthors, currentDiscussion: yaft.currentDiscussion, 'canGrade': canGrade}, 'yaft_content');
 
         $(document).ready(function () {
 
