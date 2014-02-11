@@ -1,0 +1,95 @@
+<div>
+<span class="instruction">
+    {{translate 'create_forum_instruction'}}
+</span>
+<br />
+<br />
+</div>
+<div id="yaft_edit_forum_container">
+<form>
+<input id="yaft_id_field" type="hidden" name="id" value="{{forum.id}}"/>
+<table>
+<tr><td>{{translate 'forum_title_label'}}: *</td><td><input id="yaft_title_field" type="text" name="title" value="{{forum.title}}"/></td></tr>
+<tr><td>{{translate 'description_label'}}</td><td><input id="yaft_description_field" type="text" name="description" maxlength="255" value="{{forum.description}}"/></td></tr>
+</table>
+<br />
+{{#if canSendAlerts}}
+<input type="checkbox" id="yaft_send_email_checkbox" value="true" checked/>{{translate 'send_email_alert_label'}}
+<br />
+<br />
+{{/if}}
+{{#if siteGroups.length}}
+<a id="yaft_toggle_group_options_link" href="javascript:;">{{translate 'groups_box_label'}}</a>
+<br />
+<div id="yaft_group_options" style="display:none;">
+    <fieldset id="yaft_groups_fieldset">
+        <legend>{{translate 'groups_box_label'}}</legend>
+        <span class="instruction">{{translate 'limit_forum_to_groups_label'}}</span>
+        <br />
+        <br />
+        {{#each siteGroups}}
+        <input type="checkbox" class="yaft_group_checkbox" id="{{id}}" value="{{title}}"/>{{title}}
+        <br />
+        {{/each}}
+    </fieldset>
+</div>
+<br />
+{{/if}}
+
+<a id="yaft_toggle_availability_options_link" href="javascript:;">{{translate 'availability_label'}}</a>
+<br />
+<div id="yaft_availability_options" style="display:none;">
+    <fieldset id="yaft_availability_fieldset">
+        <legend>{{translate 'availability_label'}}</legend>
+        <input type="checkbox" id="yaft_lock_writing_checkbox" name="lockWriting" value="true"/>{{translate 'availability_lock_for_writing_label'}}
+        <br />
+        <input type="checkbox" id="yaft_lock_reading_checkbox" name="lockReading" value="true"/>{{translate 'availability_lock_for_reading_label'}}
+        <br />
+        <br />
+        <input type="hidden" name="startDate" id="yaft_start_date_millis"/>
+        <input type="hidden" name="endDate" id="yaft_end_date_millis"/>
+        <span>{{translate 'availability_except_between_label'}}</span>
+        <br />
+        <br />
+        <input id="yaft_start_date" type="text" name="startDate"/>
+        <select id="yaft_start_hours" name="startHour">
+            {{#each hours}}
+            <option>{{this}}</option>
+            {{/each}}
+        </select>
+        <span>:</span>
+        <select id="yaft_start_minutes" name="startMinute">
+            {{#each minutes}}
+            <option>{{this}}</option>
+            {{/each}}
+        </select>
+        <br />
+        <br />
+        <span>{{translate 'availability_except_between_and_label'}}</span>
+        <br />
+        <br />
+        <input id="yaft_end_date" type="text" name="endDate"/>
+        <select id="yaft_end_hours" name="endHour">
+            {{#each hours}}
+            <option>{{this}}</option>
+            {{/each}}
+        </select>
+        <span>:</span>
+        <select id="yaft_end_minutes" name="endMinute">
+            {{#each minutes}}
+            <option>{{this}}</option>
+            {{/each}}
+        </select>
+        <br />
+        <br />
+        <a href="#" onclick="yaft.utils.clearDates();">{{translate 'availability_clear_date_label'}}</a>
+    </fieldset>
+    <br />
+</div>
+
+<br />
+<br />
+<input type="button" id="yaft_forum_save_button" value="{{translate 'save_label'}}"/>
+<input type="button" value="{{translate 'cancel_label'}}" onclick="return yaft.switchState('forums');"/>
+</form>
+</div>

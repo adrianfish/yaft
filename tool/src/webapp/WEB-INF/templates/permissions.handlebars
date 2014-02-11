@@ -1,0 +1,65 @@
+<form>
+<table id="yaft_permissions_table">
+    <thead>
+        <tr>
+            <th></th>
+            <th width="5px"></th>
+            <th align="center" colspan="4">{{translate 'forum_label'}}</th>
+            <th width="5px"></th>
+            <th colspan="4">{{translate 'discussion_label'}}</th>
+            <th width="5px"></th>
+            <th colspan="3">{{translate 'message_label'}}</th>
+            <th width="5px"></th>
+            <th colspan="2">{{translate 'other_label'}}</th>
+        </tr>
+        <tr class="listHier">
+            <th align="left">{{translate 'role_label'}}</th>
+            <th style="background: white;"></th>
+            <th style="text-align:center;">{{translate 'permissions_create'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_own'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_any'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_view_groups'}}</th>
+            <th style="background: white;"></th>
+            <th style="text-align:center;">{{translate 'permissions_create'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_own'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_any'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_view_anonymous'}}</th>
+            <th style="background: white;"></th>
+            <th style="text-align:center;">{{translate 'permissions_create'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_own'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_delete_any'}}</th>
+            <th style="background: white;"></th>
+            <th style="text-align:center;">{{translate 'permissions_view_invisible'}}</th>
+            <th style="text-align:center;">{{translate 'permissions_modify_permissions'}}</th>
+            <th style="text-align:center;">sendAlerts</th>
+        </tr>
+    </thead>
+<tbody>
+{{#each perms}}
+<tr>
+    <td align="left">{{role}}</td>
+    <td></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_forum_create}}checked="checked"{{/if}}" id="{{role}}:yaft.forum.create"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_forum_deleteOwn}}checked="checked"{{/if}}" id="{{role}}:yaft.forum.deleteOwn"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_forum_deleteAny}}checked="checked"{{/if}}" id="{{role}}:yaft.forum.deleteAny"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_forum_viewGroups}}checked="checked"{{/if}}" id="{{role}}:yaft.forum.viewGroups"/></td>
+    <td></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_discussion_create}}checked="checked"{{/if}}" id="{{role}}:yaft.discussion.create"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_discussion_deleteOwn}}checked="checked"{{/if}}" id="{{role}}:yaft.discussion.deleteOwn"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_discussion_deleteAny}}checked="checked"{{/if}}" id="{{role}}:yaft.discussion.deleteAny"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_discussion_viewAnonymous}}checked="checked"{{/if}}" id="{{role}}:yaft.discussion.viewAnonymous"/></td>
+    <td></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_message_create}}checked="checked"{{/if}}" id="{{role}}:yaft.message.create"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_message_deleteOwn}}checked="checked"{{/if}}" id="{{role}}:yaft.message.deleteOwn"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_message_deleteAny}}checked="checked"{{/if}}" id="{{role}}:yaft.message.deleteAny"/></td>
+    <td></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_view_invisible}}checked="checked"{{/if}}" id="{{role}}:yaft.view.invisible"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_modify_permissions}}checked="checked"{{/if}}" id="{{role}}:yaft.modify.permissions"/></td>
+    <td align="center"><input type="checkbox" class="yaft_permission_checkbox" {{#if yaft_sendAlerts}}checked="checked"{{/if}}" id="{{role}}:yaft.sendAlerts"/></td>
+</tr>
+{{/each}}
+</tbody>
+</table>
+<input id="yaft_permissions_save_button" type="button" value="{{translate 'save_label'}}"/>
+<input type="button" value="{{translate 'cancel_label'}}" onclick="return yaft.switchState('forums');"/>
+</form>

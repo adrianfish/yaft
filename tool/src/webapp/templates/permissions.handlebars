@@ -1,0 +1,168 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['permissions'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n<tr>\n    <td align=\"left\">";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n    <td></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_forum_create), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.forum.create\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_forum_deleteOwn), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.forum.deleteOwn\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_forum_deleteAny), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.forum.deleteAny\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_forum_viewGroups), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.forum.viewGroups\"/></td>\n    <td></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_discussion_create), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.discussion.create\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_discussion_deleteOwn), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.discussion.deleteOwn\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_discussion_deleteAny), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.discussion.deleteAny\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_discussion_viewAnonymous), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.discussion.viewAnonymous\"/></td>\n    <td></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_message_create), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.message.create\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_message_deleteOwn), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.message.deleteOwn\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_message_deleteAny), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.message.deleteAny\"/></td>\n    <td></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_view_invisible), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.view.invisible\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_modify_permissions), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.modify.permissions\"/></td>\n    <td align=\"center\"><input type=\"checkbox\" class=\"yaft_permission_checkbox\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.yaft_sendAlerts), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" id=\"";
+  if (helper = helpers.role) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.role); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ":yaft.sendAlerts\"/></td>\n</tr>\n";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  
+  return "checked=\"checked\"";
+  }
+
+  buffer += "<form>\n<table id=\"yaft_permissions_table\">\n    <thead>\n        <tr>\n            <th></th>\n            <th width=\"5px\"></th>\n            <th align=\"center\" colspan=\"4\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "forum_label", options) : helperMissing.call(depth0, "translate", "forum_label", options)))
+    + "</th>\n            <th width=\"5px\"></th>\n            <th colspan=\"4\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "discussion_label", options) : helperMissing.call(depth0, "translate", "discussion_label", options)))
+    + "</th>\n            <th width=\"5px\"></th>\n            <th colspan=\"3\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "message_label", options) : helperMissing.call(depth0, "translate", "message_label", options)))
+    + "</th>\n            <th width=\"5px\"></th>\n            <th colspan=\"2\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "other_label", options) : helperMissing.call(depth0, "translate", "other_label", options)))
+    + "</th>\n        </tr>\n        <tr class=\"listHier\">\n            <th align=\"left\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "role_label", options) : helperMissing.call(depth0, "translate", "role_label", options)))
+    + "</th>\n            <th style=\"background: white;\"></th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_create", options) : helperMissing.call(depth0, "translate", "permissions_create", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_own", options) : helperMissing.call(depth0, "translate", "permissions_delete_own", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_any", options) : helperMissing.call(depth0, "translate", "permissions_delete_any", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_view_groups", options) : helperMissing.call(depth0, "translate", "permissions_view_groups", options)))
+    + "</th>\n            <th style=\"background: white;\"></th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_create", options) : helperMissing.call(depth0, "translate", "permissions_create", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_own", options) : helperMissing.call(depth0, "translate", "permissions_delete_own", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_any", options) : helperMissing.call(depth0, "translate", "permissions_delete_any", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_view_anonymous", options) : helperMissing.call(depth0, "translate", "permissions_view_anonymous", options)))
+    + "</th>\n            <th style=\"background: white;\"></th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_create", options) : helperMissing.call(depth0, "translate", "permissions_create", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_own", options) : helperMissing.call(depth0, "translate", "permissions_delete_own", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_delete_any", options) : helperMissing.call(depth0, "translate", "permissions_delete_any", options)))
+    + "</th>\n            <th style=\"background: white;\"></th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_view_invisible", options) : helperMissing.call(depth0, "translate", "permissions_view_invisible", options)))
+    + "</th>\n            <th style=\"text-align:center;\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "permissions_modify_permissions", options) : helperMissing.call(depth0, "translate", "permissions_modify_permissions", options)))
+    + "</th>\n            <th style=\"text-align:center;\">sendAlerts</th>\n        </tr>\n    </thead>\n<tbody>\n";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.perms), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</tbody>\n</table>\n<input id=\"yaft_permissions_save_button\" type=\"button\" value=\""
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "save_label", options) : helperMissing.call(depth0, "translate", "save_label", options)))
+    + "\"/>\n<input type=\"button\" value=\""
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "cancel_label", options) : helperMissing.call(depth0, "translate", "cancel_label", options)))
+    + "\" onclick=\"return yaft.switchState('forums');\"/>\n</form>\n";
+  return buffer;
+  });
+})();

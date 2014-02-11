@@ -4,7 +4,7 @@
     </thead>
     <tbody>
         {{#each authors}}
-            <tr><td><a class="profile" rel="/direct/profile/{{id}}/formatted" href="javascript:;" onClick="yaft.switchState('author',{'id':'{{id}}','displayName':'{{displayName}}'});">{{displayName}}</a></td><td>{{numberOfPosts}}</td><td>{{#if currentDiscussion.graded}}{{#if graded}}{{grade.grade}}{{/if}}{{/if}}</td></tr>
+            <tr><td><a class="profile" rel="/direct/profile/{{id}}/formatted" href="javascript:;" onClick="yaft.switchState('author',{'id':'{{id}}','displayName':'{{displayName}}'});">{{displayName}}</a></td><td>{{numberOfPosts}}</td><td>{{#if ../canGrade}}{{#if grade}}{{grade.grade}}{{/if}}{{/if}}</td></tr>
         {{/each}}
     </tbody>
 </table>

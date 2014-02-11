@@ -19,35 +19,20 @@
 
     var addFormattedDatesToFora = function () {
 
-        for (var i=0,j=yaft.currentForums.length;i<j;i++) {
-            var forum = yaft.currentForums[i];
+        $.each(yaft.currentForums, function (index, forum) {
+
             if (forum.start > -1) {
-                var d = new Date(forum.start);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                forum.formattedStartDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                forum.formattedStartDate = yaft.utils.formatDate(forum.start);
             }
             if (forum.end > -1) {
-                var d = new Date(forum.end);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                forum.formattedEndDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                forum.formattedEndDate = yaft.utils.formatDate(forum.end);
             }
             if (forum.lastMessageDate > -1) {
-                var d = new Date(forum.lastMessageDate);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                forum.formattedLastMessageDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                forum.formattedLastMessageDate = yaft.utils.formatDate(forum.lastMessageDate);
             } else {
                 forum.formattedLastMessageDate = 'n/a';
             }
-        }
+        });
     };
         
     yaft.utils.setCurrentForums = function (render) {
@@ -63,8 +48,8 @@
 
                 markReadMessagesInFora();
 
-                for (var i=0,j=forums.length;i<j;i++) {
-                    var forum = forums[i];
+                $.each(forums, function (index, forum) {
+
                     if ( (yaft.currentUserPermissions.viewInvisible || forum.creatorId === yaft.startupArgs.userId)
                             && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable) ) {
                         forum.invisible = true;
@@ -77,7 +62,7 @@
                     if (forum.groups && forum.groups.length > 0) {
                         forum.groups[forum.groups.length - 1].last = true;
                     }
-                }
+                });
 
                 addFormattedDatesToFora();
 
@@ -122,10 +107,11 @@
 
         var groups = '';
 
-        for (var i=0,j=groupBoxes.length;i<j;i++) {
-            groups += groupBoxes[i].id;
-            if (i<j) groups += ',';
-        }
+        $.each(groupBoxes, function (index, groupBox) {
+
+            groups += groupBox.id;
+            if (i < j) groups += ',';
+        });
 
         var forum = {
                 'siteId': yaft.startupArgs.siteId,
@@ -333,9 +319,9 @@
 
         var forumIds = [];
 
-        for (var i=0,j=candidates.length;i<j;i++) {
-            forumIds.push(candidates[i].id);
-        }
+        $.each(candidates, function (index, candidate) {
+            forumIds.push(candidate.id);
+        });
 
         $.ajax( {
             url: yaft.baseDataUrl + "forums/delete",
@@ -363,9 +349,9 @@
 
         var discussionIds = [];
 
-        for (var i=0,j=candidates.length;i<j;i++) {
-            discussionIds.push(candidates[i].id);
-        }
+        $.each(candidates, function (index, candidate) {
+            discussionIds.push(candidate.id);
+        });
 
         $.ajax({
             url: yaft.baseDataUrl + "discussions/delete",
@@ -493,8 +479,8 @@
 
                 currentForum = data.forum;
 
-                for (var i=0,j=currentForum.discussions.length;i<j;i++) {
-                    var discussion = currentForum.discussions[i];
+                $.each(currentForum.discussions, function (index, discussion) {
+
                     var count = data.counts[discussion.id];
                     if (count) {
                         discussion['unread'] = discussion.messageCount - count;
@@ -514,12 +500,12 @@
                             || (yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.startupArgs.userId)) {
                         discussion.canDelete = true;
                     }
-                    if (yaft.currentForums.length > 1 && yaft.currentUserPermissions.discussionCreate
+                    if (yaft.currentForums && yaft.currentForums.length > 1 && yaft.currentUserPermissions.discussionCreate
                             && ((yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.startupArgs.userId)
                                     || yaft.currentUserPermissions.discussionDeleteAny)) {
                         discussion.canMove = true;
                     }
-                }
+                });
             },
             error: function (xhr, textStatus, errorThrown) {}
         });
@@ -618,12 +604,15 @@
 
                 var message = yaft.utils.findMessage(messageId);
                 message.status = 'DELETED';
+                message.deleted = true;
                 if (message.id == yaft.currentDiscussion.firstMessage.id) {
                     message['isFirstMessage'] = true;
                 } else {
                     message['isFirstMessage'] = false;
                 }
-                yaft.utils.renderTrimpathTemplate('yaft_message_template', message, message.id);
+
+                yaft.renderMessage(message);
+
                 if (yaftViewMode === 'minimal') {
                     $('#' + message.id + '_link').hide();
                     $('#' + message.id).hide();
@@ -643,23 +632,18 @@
 
     yaft.utils.findForum = function (id) {
 
-        for (var i=0,j=yaft.currentForums.length;i<j;i++) {
-            if (yaft.currentForums[i].id == id) {
-                return yaft.currentForums[i];
-            }
-        }
+        $.each(yaft.currentForums, function (index, forum) {
+            if (forum.id == id) return forum;
+        });
 
         return null;
     };
 
     yaft.utils.findDiscussion = function (id) {
 
-        var discussions = yaft.currentForum.discussions;
-
-        for (var i=0,j=discussions.length;i<j;i++) {
-            if (discussions[i].id == id)
-                return discussions[i];
-        }
+        $.each(yaft.currentForum.discussions, function (index, discussion) {
+            if (discussion.id == id) return discussion;
+        });
 
         return null;
     };
@@ -679,11 +663,13 @@
                 var message = yaft.utils.findMessage(messageId);
                 message.status = 'READY';
                 if (message.id == yaft.currentDiscussion.firstMessage.id) {
-                    message['isFirstMessage'] = true;
+                    message.isFirstMessage = true;
                 } else {
-                    message['isFirstMessage'] = false;
+                    message.isFirstMessage = false;
                 }
-                yaft.utils.renderTrimpathTemplate('yaft_message_template', message, message.id);
+
+                yaft.renderMessage(message);
+
                 $(document).ready(function () {
                     yaft.utils.attachProfilePopup();
                 });
@@ -696,37 +682,46 @@
         return false;
     };
 
-    var getDescendantIds = function (messageId, testMessage, descendantIds) {
+    var getFlattenedDescendantMessages = function (ancestor) {
 
-        for (var i=0,j=testMessage.children.length;i<j;i++) {
-            descendantIds.push(testMessage.children[i].id);
-            getDescendantIds(messageId,testMessage.children[i],descendantIds);
-        }
+        var descendants = [];
+
+        var recurse = function (parent) {
+
+            $.each(parent.children, function (index, child) {
+
+                descendants.push(child);
+                recurse(child);
+            });
+        };
+
+        recurse(ancestor);
+
+        return descendants;
     };
     
     yaft.utils.toggleMessage = function (e, messageId) {
 
         var message = this.findMessage(messageId);
 
-        var descendantIds = new Array();
-        getDescendantIds(messageId, message, descendantIds);
+        var descendants = getFlattenedDescendantMessages(message);
 
         if (message.collapsed) {
-            for (var i=0,j=descendantIds.length;i<j;i++) {
-                $("#" + descendantIds[i] + ' .yaft_collapse_expand_link').html(yaft_collapse_label);
-                $("#" + descendantIds[i]).show();
-                var descendant = this.findMessage(descendantIds[i]);
-                descendant.collapsed = false;
-            }
+            $.each(descendants, function (index, descendant) {
 
-            e.innerHTML = yaft_collapse_label;
+                $("#" + descendant.id + ' .yaft_collapse_expand_link').html(yaft.translations.collapse_label);
+                $("#" + descendant.id).show();
+                descendant.collapsed = false;
+            });
+
+            e.innerHTML = yaft.translations.collapse_label;
             message.collapsed = false;
         } else {
-            for (var i=0,j=descendantIds.length;i<j;i++) {
-                $("#" + descendantIds[i]).hide();
-            }
+            $.each(descendants, function (index, descendant) {
+                $("#" + descendant.id).hide();
+            });
 
-            e.innerHTML = yaft_expand_label + ' (' + descendantIds.length + ')';
+            e.innerHTML = yaft.translations.expand_label + ' (' + descendants.length + ')';
             message.collapsed = true;
         }
     };
@@ -740,12 +735,12 @@
             cache: false,
             success: function (text, status) {
 
-                for (var i=0,j=yaft.currentForum.discussions.length;i<j;i++) {
-                    var discussion = yaft.currentForum.discussions[i];
+                $.each(yaft.currentForum.discussions, function (index, discussion) {
+
                     if (discussion.id == yaft.currentDiscussion.id) {
                         discussion['unread'] = 0;
                     }
-                }
+                });
                 
                 yaft.switchState('forum');
             },
@@ -782,7 +777,7 @@
                     }
                 }
 
-                yaft.utils.renderTrimpathTemplate('yaft_message_template', message, message.id);
+                yaft.renderMessage(message);
                     
             },
             error: function (xhr, status, error) {
@@ -853,11 +848,12 @@
             success: function (data, textStatus) {
 
                 // Switch the updated discussion into the current forum
-                for (var i=0,j=yaft.currentForum.discussions.length;i<j;i++) {
-                    if (yaft.currentForum.discussions[i].id === data.id) {
-                        yaft.currentForum.discussions[i] = data;
+                $.each(yaft.currentForum.discussions, function (index, discussion) {
+
+                    if (discussion.id === data.id) {
+                        discussion = data;
                     }
-                }
+                });
                 yaft.switchState('forum', {'forumId': yaft.currentForum.id});
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -906,8 +902,8 @@
         });
             
         if (readMessages != null) {
-            for (var i=0,j=yaft.currentForums.length;i<j;i++) {
-                var forum = yaft.currentForums[i];
+            $.each(yaft.currentForums, function (index, forum) {
+
                 var count = readMessages[forum.id];
                 if (count) {
                     forum['unread'] = forum.messageCount - count;
@@ -918,67 +914,42 @@
                 if (forum['unread'] < 0) {
                     forum['unread'] = 0;
                 }
-            }
+            });
         }
     };
 
     yaft.utils.addFormattedDatesToDiscussionsInCurrentForum = function () {
 
-        for (var i=0,j=yaft.currentForum.discussions.length;i<j;i++) {
-            var discussion = yaft.currentForum.discussions[i];
+        var self = this;
+
+        $.each(yaft.currentForum.discussions, function (index, discussion) {
+
             if (discussion.start > -1) {
-                var d = new Date(discussion.start);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                var formattedStartDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
-                discussion.formattedStartDate = formattedStartDate;
+                discussion.formattedStartDate = self.formatDate(discussion.start);
             }
             if (discussion.end > -1) {
-                var d = new Date(discussion.end);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                var formattedEndDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
-                discussion.formattedEndDate = formattedEndDate;
+                discussion.formattedEndDate = self.formatDate(discussion.end);
             }
             if (discussion.lastMessageDate > -1) {
-                var d = new Date(discussion.lastMessageDate);
-                var hours = d.getHours();
-                if (hours < 10)  hours = '0' + hours;
-                var minutes = d.getMinutes();
-                if (minutes < 10)  minutes = '0' + minutes;
-                discussion.formattedLastMessageDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+                discussion.formattedLastMessageDate = self.formatDate(discussion.lastMessageDate);
             } else {
                 discussion.formattedLastMessageDate = 'n/a';
             }
-        }
-    };
-
-    var contains = function (list, test) {
-
-        for (var i=0,j=list.length;i<j;i++) {
-            if (test == list[i]) {
-                return true;
-            }
-        }
-        
-        return false;
+        });
     };
 
     var markReadMessages = function (messages, readMessages) {
 
-        for (var i=0,j=messages.length;i<j;i++) {
-            if (contains(readMessages,messages[i].id) || messages[i].creatorId == yaft.startupArgs.userId) {
-                messages[i]["read"] = true;
+        $.each(messages, function (index, message) {
+
+            if ($.inArray(message.id, readMessages) || message.creatorId == yaft.startupArgs.userId) {
+                message.read = true;
             } else {
-                messages[i]["read"] = false;
+                message.read = false;
             }
 
-            markReadMessages(messages[i].children,readMessages);
-        }
+            markReadMessages(message.children, readMessages);
+        });
     };
     
     yaft.utils.markReadMessagesInCurrentDiscussion = function () {
@@ -990,12 +961,11 @@
             async: false,
             dataType: "json",
             cache: false,
-            success: function (read, textStatus) {
+            success: function (ids, textStatus) {
 
-                var ids = read;
-                for (var i=0,j=ids.length;i<j;i++) {
-                    readMessages.push(ids[i]);
-                }
+                $.each(ids, function (index, id) {
+                    readMessages.push(id);
+                });
             },
             error: function (xhr, textStatus, errorThrown) {
 
@@ -1009,7 +979,7 @@
         if (readMessages != null) {
             var firstMessage = yaft.currentDiscussion.firstMessage;
         
-            if (contains(readMessages,firstMessage.id) || firstMessage.creatorId == yaft.startupArgs.userId) {
+            if ($.inArray(firstMessage.id, readMessages) || firstMessage.creatorId == yaft.startupArgs.userId) {
                 firstMessage['read'] = true;
             } else {
                 firstMessage['read'] = false;
@@ -1021,25 +991,25 @@
 
     var recursiveFindMessage = function (messages, wantedId) {
 
-        for (var i=0,j=messages.length;i<j;i++) {
-            var message = messages[i];
-            if (message.id == wantedId) {
-                message["isFirstMessage"] = false;
-                return message;
+        var found = undefined;
+
+        $.each(messages, function (index, message) {
+
+            if (message.id === wantedId) {
+                message.isFirstMessage = false;
+                found = message;
             } else {
                 if (message.children.length > 0) {
                     var test = recursiveFindMessage(message.children,wantedId);
-                    if (test == null) {
-                        continue;
-                    } else {
-                        test["isFirstMessage"] = false;
-                          return test;
+                    if (null) {
+                        test.isFirstMessage = false;
+                        found = test;
                     }
                 }
             }
-        }
+        });
         
-        return null;
+        return found;
     };
 
     yaft.utils.findMessage = function (wantedId) {
@@ -1054,6 +1024,7 @@
                 return recursiveFindMessage(firstMessage.children,wantedId);
             }
         } else {
+            alert("No current discussion");
         }
     };
 
@@ -1090,10 +1061,11 @@
                 for (role in p) {
                     var permSet = {'role': role};
 
-                    for (var i=0,j=p[role].length;i<j;i++) {
-                        var perm = p[role][i].replace(/\./g,"_");
+                    $.each(p[role], function (index, perm) {
+
+                        perm = perm.replace(/\./g,"_");
                         eval("permSet." + perm + " = true");
-                    }
+                    });
 
                     perms.push(permSet);
                 }
@@ -1110,14 +1082,12 @@
 
         var boxes = $('.yaft_permission_checkbox');
         var myData = {};
-        for (var i=0,j=boxes.length;i<j;i++) {
-            var box = boxes[i];
-            if (box.checked) {
-                myData[box.id] = 'true';
-            } else {
-                myData[box.id] = 'false';
-            }
-        }
+
+        $.each(boxes, function (index, box) {
+
+            if (box.checked) myData[box.id] = 'true';
+            else myData[box.id] = 'false';
+        });
 
         $.ajax({
             url: yaft.baseDataUrl + "setPerms.json",
@@ -1140,7 +1110,7 @@
     yaft.utils.getAuthors = function () {
 
         this.setCurrentAuthors();
-        this.renderTrimpathTemplate('yaft_discussion_authors_breadcrumb_template', yaft.currentDiscussion, 'yaft_breadcrumb');
+        this.renderHandlebarsTemplate('authors_breadcrumb', {placementId: yaft.startupArgs.placementId, currentForum: yaft.currentForum, currentDiscussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
         var canGrade = yaft.currentUserPermissions.gradeAll && yaft.currentDiscussion.graded;
         this.renderHandlebarsTemplate('authors', {authors: yaft.currentAuthors, currentDiscussion: yaft.currentDiscussion, 'canGrade': canGrade}, 'yaft_content');
 
@@ -1181,6 +1151,33 @@
           });
     };
 
+    yaft.utils.getIconUrlForMimeType = function (mimeType, name) {
+
+        if (mimeType === 'application/pdf') {
+            return "/library/image/silk/page_white_acrobat.png";
+        } else if (mimeType.match(/excel$/)) {
+            return "/library/image/silk/page_white_excel.png";
+        } else if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+            return "/library/image/silk/page_white_excel.png";
+        } else if (mimeType === 'application/msword' || name.match(/\.docx?$/)) {
+            return "/library/image/silk/page_white_word.png";
+        } else if (mimeType.match(/powerpoint/)) {
+            return "/library/image/silk/page_white_powerpoint.png";
+        } else if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+            return "/library/image/silk/page_white_powerpoint.png";
+        } else if (mimeType === 'text/plain') {
+            return "/library/image/silk/page_white_text.png";
+        } else if (mimeType === 'text/html') {
+            return "/library/image/silk/html.png";
+        } else if (mimeType.match(/^image/)) {
+            return "/library/image/silk/picture.png";
+        } else if (mimeType.match(/^audio/)) {
+            return "/library/image/silk/sound.png";
+        } else {
+            return "/library/image/silk/error.png";
+        }
+    };
+
     yaft.utils.showAuthorPosts = function (authorId) {
 
         var author = null;
@@ -1189,11 +1186,9 @@
             this.setCurrentAuthors();
         }
 
-        for (var i=0,j=yaft.currentAuthors.length;i<j;i++) {
-            if (yaft.currentAuthors[i].id === authorId) {
-                author = yaft.currentAuthors[i];
-            }
-        }
+        $.each(yaft.currentAuthors, function (index, testAuthor) {
+            if (testAuthor.id === authorId) author = testAuthor;
+        });
 
         $.ajax({
             url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + yaft.currentDiscussion.id + "/authors/" + authorId + "/messages",
@@ -1201,13 +1196,23 @@
             cache: false,
             success: function (data, textStatus) {
 
-                var stuff = {'messages': data,'assignment': yaft.currentDiscussion.assignment, 'displayName': author.displayName};
+                $.each(data, function (index, message) {
 
-                if (author.grade) {
-                    stuff.grade = author.grade.grade;
-                }
+                    yaft.utils.recursivelyAddFormattedDatesToMessage(message);
 
-                yaft.utils.renderTrimpathTemplate('yaft_author_messages_template', stuff, 'yaft_content');
+                    $.each(message.attachments, function (index, attachment) {
+                        attachment.iconUrl = yaft.utils.getIconUrlForMimeType(attachment.mimeType);
+                    });
+                });
+
+                var stuff = {
+                                messages: data,
+                                assignment: yaft.currentDiscussion.assignment,
+                                displayName: author.displayName,
+                                grade: (author.grade) ? author.grade.grade : undefined,
+                                gradeable: yaft.currentDiscussion.assignment && yaft.currentUserPermissions.gradeAll };
+
+                yaft.utils.renderHandlebarsTemplate('author_messages', stuff, 'yaft_content');
 
                 $(document).ready(function () {
 
@@ -1257,13 +1262,14 @@
                     
                     $('#yaft_previous_author_button').click(function () {
 
-                        for (var i=0,j=yaft.currentAuthors.length;i<j;i++) {
-                            if (yaft.currentAuthors[i].id === authorId) {
-                                if (i > 0) {
-                                    yaft.utils.showAuthorPosts(yaft.currentAuthors[i - 1].id);
+                        $.each(yaft.currentAuthors, function (index, testAuthor) {
+
+                            if (testAuthor.id === authorId) {
+                                if (index > 0) {
+                                    yaft.utils.showAuthorPosts(yaft.currentAuthors[index - 1].id);
                                 }
                             }
-                        }
+                        });
                     });
 
                     $('#yaft_next_author_button').click(function () {
@@ -1285,30 +1291,32 @@
             }
         });
     };
+
+    yaft.utils.formatDate = function (time) {
+
+        var d = new Date(time);
+        var hours = d.getHours();
+        if (hours < 10)  hours = '0' + hours;
+        var minutes = d.getMinutes();
+        if (minutes < 10) minutes = '0' + minutes;
+        return d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+    };
     
     yaft.utils.addFormattedDatesToCurrentDiscussion = function () {
 
-        var d = new Date(yaft.currentDiscussion.firstMessage.createdDate);
-        var minutes = d.getMinutes();
-        if (minutes < 10) minutes = '0' + minutes;
-        var formattedCreatedDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + d.getHours() + ":" + minutes;
+        var formattedCreatedDate = this.formatDate(yaft.currentDiscussion.firstMessage.createdDate);
         yaft.currentDiscussion.firstMessage.formattedDate = formattedCreatedDate;
         
-        this.recursivelyAddFormattedDatesToChildMessages(yaft.currentDiscussion.firstMessage);
+        this.recursivelyAddFormattedDatesToMessage(yaft.currentDiscussion.firstMessage);
     };
     
-    yaft.utils.recursivelyAddFormattedDatesToChildMessages = function (parent) {
+    yaft.utils.recursivelyAddFormattedDatesToMessage = function (message) {
 
-        for (var i=0,j=parent.children.length;i<j;i++) {
-            var child = parent.children[i];
-            var d = new Date(child.createdDate);
-            var minutes = d.getMinutes();
-            if (minutes < 10) minutes = '0' + minutes;
-            var formattedCreatedDate = d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + d.getHours() + ":" + minutes;
-            child.formattedDate = formattedCreatedDate;
-            
-            this.recursivelyAddFormattedDatesToChildMessages(child);
-        }
+        message.formattedDate = this.formatDate(message.createdDate);
+
+        $.each(message.children, function (index, child) {
+            yaft.utils.recursivelyAddFormattedDatesToMessage(child);
+        });
     };
 
     yaft.utils.renderTrimpathTemplate = function (templateName, contextObject, output) {

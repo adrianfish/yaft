@@ -363,7 +363,7 @@ public class YaftPersistenceManager
 					statement.executeUpdate();
 				}
 			
-				if(!"DRAFT".equals(message.getStatus())) {
+				if(!message.isDraft()) {
 					markMessageRead(message.getId(), forumId, message.getDiscussionId(),connection);
 				
 					newStatements = sqlGenerator.getAddNewMessageToActiveDiscussionsStatements(message,connection);
@@ -514,56 +514,47 @@ public class YaftPersistenceManager
 		}
 	}
 
-	private List<Discussion> getForumDiscussions(String forumId,boolean fully,Connection connection) throws Exception
-	{
+	private List<Discussion> getForumDiscussions(String forumId,boolean fully,Connection connection) throws Exception {
+
 		List<Discussion> discussions = new ArrayList<Discussion>();
 
 		Statement st = null;
 		ResultSet rs = null;
 		
-		try
-		{
+		try {
 			String sql = sqlGenerator.getDiscussionsSelectStatement(forumId);
 			st = connection.createStatement();
 			rs = st.executeQuery(sql);
 			
-			while(rs.next())
-			{
+			while (rs.next()) {
 				Discussion discussion = getDiscussionFromResults(rs,fully,connection);
 			
-				if(!"DELETED".equals(discussion.getStatus()))
+				if (!"DELETED".equals(discussion.getStatus())) {
 					discussions.add(discussion);
+                }
 			}
 		
 			return securityManager.filterDiscussions(discussions);
-		}
-		finally
-		{
-			try
-			{
-				if(rs != null) rs.close();
-			}
-			catch(Exception e) {}
+		} finally {
+			try {
+				if (rs != null) rs.close();
+			} catch (Exception e) {}
 			
-			if(st != null)
-			{
-				try
-				{
+			if (st != null) {
+				try {
 					st.close();
-				}
-				catch(Exception e) {}
+				} catch (Exception e) {}
 			}
 		}
 	}
 	
-	private Discussion getDiscussionFromResults(ResultSet rs,boolean fully,Connection connection) throws Exception
-	{
+	private Discussion getDiscussionFromResults(ResultSet rs,boolean fully,Connection connection) throws Exception {
+
 		String discussionId = rs.getString(ColumnNames.DISCUSSION_ID);
 		String forumId = rs.getString(ColumnNames.FORUM_ID);
 		
 		Statement st = null;
-		try
-		{
+		try {
 			// Get the first message. It has the same id as the discussion.
 			st = connection.createStatement();
 			String sql = sqlGenerator.getMessageSelectStatement(discussionId);

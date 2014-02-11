@@ -1,0 +1,32 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['authors_breadcrumb'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+
+
+  buffer += "<a href=\"/portal/tool/";
+  if (helper = helpers.placementId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.placementId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "/forums\" onClick=\"return yaft.switchState('forums');\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "forums_label", options) : helperMissing.call(depth0, "translate", "forums_label", options)))
+    + "</a>-&gt;<a href=\""
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentForum)),stack1 == null || stack1 === false ? stack1 : stack1.url)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\" onClick=\"return yaft.switchState('forum',{'forumId':'"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentForum)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "'});\">"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentForum)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</a>-&gt;<a href=\""
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentDiscussion)),stack1 == null || stack1 === false ? stack1 : stack1.url)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\" onClick=\"return yaft.switchState('full',{'discussionId':'"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentDiscussion)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "'});\">"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.currentDiscussion)),stack1 == null || stack1 === false ? stack1 : stack1.subject)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</a>-&gt;"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "authors_label", options) : helperMissing.call(depth0, "translate", "authors_label", options)))
+    + "\n";
+  return buffer;
+  });
+})();
