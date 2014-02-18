@@ -238,6 +238,10 @@
             
         $(document).ready(function () {
 
+            if (discussions.length <= 0) {
+                $('#yaft-get-started-instruction').show();
+            }
+
             if (yaft.currentUserPermissions.forumDeleteAny) {
                 if (yaft.currentForum && yaft.currentForum.discussions.length > 0) {
                     $('#yaft-all-discussions-checkbox').show();
@@ -392,10 +396,7 @@
             if (yaft.currentUserPermissions.forumDeleteAny) {
                 // Only show the all fora box is there are any
                 if (yaft.currentForums.length > 0) {
-                    $('#yaft-delete-forums-button').show().click(function () {
-                        yaft.utils.deleteSelectedFora();
-                    });
-                    $('#yaft-all-fora-checkbox').show().click(function () {
+                    $('#yaft-all-fora-checkbox').show().click(function (e) {
 
                         if ($(this).prop('checked')) {
                             $('.yaft_bulk_option_candidate').prop('checked', true);
@@ -405,7 +406,12 @@
                             $('#yaft-delete-forums-button').prop('disabled', true).removeClass('enabled');
                         }
                     });
-                }
+
+                    $('#yaft-delete-forums-button').show().click(function () {
+                        alert('sdfsdf');
+                        yaft.utils.deleteSelectedFora();
+                    });
+               }
             }
 
             $('.yaft_bulk_option_candidate').click(function () {
@@ -440,9 +446,9 @@
         });
     };
     
-    yaft.utils.validateMessageSubmission = function (originalSubject) {
+    yaft.utils.validateReplySubject = function (originalSubject) {
 
-        originalSubject = unescape(originalSubject);
+        //originalSubject = unescape(originalSubject);
 
         var subject = $("#yaft_message_subject_field").val();
 
@@ -662,7 +668,9 @@
             success: function (text, textStatus) {
                 var message = yaft.utils.findMessage(messageId);
                 message.status = 'READY';
-                if (message.id == yaft.currentDiscussion.firstMessage.id) {
+                message.ready = true;
+                message.deleted = false;
+                if (message.id === yaft.currentDiscussion.firstMessage.id) {
                     message.isFirstMessage = true;
                 } else {
                     message.isFirstMessage = false;
@@ -1001,7 +1009,7 @@
             } else {
                 if (message.children.length > 0) {
                     var test = recursiveFindMessage(message.children,wantedId);
-                    if (null) {
+                    if (test != null) {
                         test.isFirstMessage = false;
                         found = test;
                     }
@@ -1201,7 +1209,7 @@
                     yaft.utils.recursivelyAddFormattedDatesToMessage(message);
 
                     $.each(message.attachments, function (index, attachment) {
-                        attachment.iconUrl = yaft.utils.getIconUrlForMimeType(attachment.mimeType);
+                        attachment.iconUrl = yaft.utils.getIconUrlForMimeType(attachment.mimeType, attachment.name);
                     });
                 });
 
@@ -1314,32 +1322,14 @@
 
         message.formattedDate = this.formatDate(message.createdDate);
 
+        message.canViewAuthor = message.creatorId === yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous;
+        message.canDelete = message.parent && 'DELETED' !== message.status
+                                && ((yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId === message.creatorId)
+                                        || yaft.currentUserPermissions.messageDeleteAny);
+
         $.each(message.children, function (index, child) {
             yaft.utils.recursivelyAddFormattedDatesToMessage(child);
         });
-    };
-
-    yaft.utils.renderTrimpathTemplate = function (templateName, contextObject, output) {
-
-        var templateNode = document.getElementById(templateName);
-        var firstNode = templateNode.firstChild;
-        var template = null;
-
-        if (firstNode && ( firstNode.nodeType === 8 || firstNode.nodeType === 4)) {
-            template = templateNode.firstChild.data.toString();
-        } else {
-            template = templateNode.innerHTML.toString();
-        }
-
-        var trimpathTemplate = TrimPath.parseTemplate(template,templateName);
-
-        var rendered = trimpathTemplate.process(contextObject);
-
-        if (output) {
-            document.getElementById(output).innerHTML = rendered;
-        }
-
-        return rendered;
     };
 
     yaft.utils.renderHandlebarsTemplate = function (name, context, output) {

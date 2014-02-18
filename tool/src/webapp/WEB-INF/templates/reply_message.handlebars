@@ -1,0 +1,56 @@
+<div style="border: solid black 1px;" class="yaft_message">
+    <div style="margin:5px;overflow:auto;">
+        <img style="float:left;margin-right:2px;" src="/direct/profile/{{originalMessage.creatorId}}/image" width="35" height="35"/>
+        <div style="margin-left:2px;overflow: auto;">
+            <div style="float:left;">
+                <span style="font-weight: bold">{{originalMessage.subject}}</span>
+                <br/>
+                <span>by {{originalMessage.creatorDisplayName}}</span> - <span>{{originalMessage.formattedDate}}</span>
+            </div>
+        </div>
+        <hr style="clear: left"/>
+        <div style="clear: left">{{{originalMessage.content}}}</div>
+    </div>
+</div>
+<br />
+<div id="yaft_reply_container">
+    <form id="yaft_message_form" action="/portal/tool/{{placementId}}/messages" method="POST">
+        <h4>{{translate 'type_your_message_label'}}</h4>
+        <br />
+        <span>{{translate 'subject_label'}}: *</span>
+        <br />
+        <input id="yaft_message_subject_field" name="subject" type="text" size="48"/>
+        <br />
+        <br />
+        <span>{{translate 'message_label'}}: *</span>
+        <br />
+        <textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
+        <br />
+        <br />
+        {{#if canSendAlerts}}
+        <input type="checkbox" id="yaft_send_email_checkbox" value="true" name="sendEmail" value="true" checked/>{{translate 'send_email_alert_label'}}
+        <br />
+        <br />
+        {{/if}}
+        <span>{{translate 'add_attachments_label'}}</span>
+        <br />
+        <input id="yaft_attachment" name="attachment" type="file" class="multi"/>
+        <br/>
+
+        <input type="hidden" name="function" value="createMessage"/>
+        <input id="yaft_anonymous_flag" type="hidden" name="anonymous" value="false" />
+        <input type="hidden" name="forumId" value="{{currentForumId}}"/>
+        <input type="hidden" name="siteId" value="{{siteId}}"/>
+        <input type="hidden" name="discussionId" value="{{currentDiscussionId}}"/>
+        <input type="hidden" name="messageBeingRepliedTo" value="{{originalMessage.id}}"/>
+        <input type="hidden" name="viewMode" value="{{viewMode}}"/>
+        <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
+        
+        <input type="submit" value="{{translate 'publish_label'}}"/>
+        {{#if canPostAnonymously}}
+        <input type="button" id="yaft_publish_anonymously_button" value="{{translate 'publish_anonymously_label'}}"/>
+        {{/if}}
+        <input type="button" value="{{translate 'cancel_label'}}" onclick="return yaft.switchState('{{viewMode}}',{'messageId':'{{originalMessage.id}}'})"/>
+        
+    </form>
+</div>

@@ -37,10 +37,9 @@ ${sakaiHtmlHead}
 <script type="text/javascript" src="/yaft-tool/js/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.datetimepicker.js"></script>
-<script type="text/javascript" src="/yaft-tool/js/trimpath-template-latest.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/handlebars.runtime-v1.3.0.js"></script>
 
-<!-- HANDLEBARS TEMPLATES -->
+<!-- HANDLEBARS TEMPLATES START -->
 <script type="text/javascript" src="/yaft-tool/templates/toolbar.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/forums.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/forum_breadcrumb.handlebars"></script>
@@ -62,6 +61,12 @@ ${sakaiHtmlHead}
 <script type="text/javascript" src="/yaft-tool/templates/edit_forum.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/permissions.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/message.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/reply_message.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/discussion.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/minimised_discussion.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/message_partial.handlebars"></script>
+<script type="text/javascript" src="/yaft-tool/templates/minimised_message_partial.handlebars"></script>
+<!-- HANDLEBARS TEMPLATES END -->
 
 <script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/yaftpermissions.js"></script>
@@ -72,312 +77,22 @@ ${sakaiHtmlHead}
 </head>
 <body>
 
-<div class="portletBody">
+    <div class="portletBody">
 
-<ul id="yaft_toolbar" class="navIntraTool actionToolBar" role="menu"></ul>
-
-<br />
-<div id="yaft_container">
-    <div id="yaft_breadcrumb"></div>
-    <br />
-    <div id="yaft_feedback_message"></div>
-    <br />
-    <div id="yaft_content"></div>
-</div>
-
-<!--  Templates Start -->
-
-<div id="yaft_message_template" style="display:none"><!--
-    {if !read}
-        <div class="yaft_unread_wrapper">
-    {/if}
-    {if status == 'DELETED'}
-        {if yaft.currentUserPermissions.messageDeleteAny}
-            <div class="yaft_message yaft_deleted_message">
-        {/if}
-    {else}
-        <div class="yaft_message">
-    {/if}
-        
-    {if (status != 'DELETED') || (status == 'DELETED' && yaft.currentUserPermissions.messageDeleteAny)}
-        <div style="margin:5px;overflow:hidden;">
-            {if anonymous}
-                {if creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous}
-                <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
-                {else}
-                <img class="yaft_profile_image" src="/direct/profile/blank/image" width="35" />
-                {/if}
-            {else}
-                <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted"><img class="yaft_profile_image" src="/direct/profile/${creatorId}/image" width="35"/></a>
-            {/if}
-            <div style="margin-left:2px;overflow: hidden;">
-                <div style="float:left;">
-                    <a id="message-${id}" name="message-${id}" href="${url}"><span style="font-weight: bold">${subject}</span></a>{if anonymous && (creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous)}<span class="yaft_small_graded_in_label"> - ${yaft.translations.anonymous_label}</span>{/if}
-                    <br/>
-                    {if anonymous}
-                        {if creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous}
-                        <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - ${formattedDate}</span>
-                        {else}
-                        <span>by ${creatorDisplayName} - ${formattedDate}</span>
-                        {/if}
-                    {else}
-                        <span>by <a href="javascript:;" class="profile" rel="/direct/profile/${creatorId}/formatted">${creatorDisplayName}</a> - <span>${formattedDate}</span>
-                    {/if}
-                </div>
-                <div style="float: right;">
-                    {if attachments.length > 0}
-                    <span>${yaft.translations.attachments_label}</span>
-                    {/if}
-                    {for attachment in attachments}
-                        <a onclick="window.open('${attachment.url}');" title="${attachment.name}">
-                        {if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'text/html'}<img src="/library/image/silk/html.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/^image/)}<img src="/library/image/silk/picture.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/^audio/)}<img src="/library/image/silk/sound.png" width="16" height="16" alt="${attachment.name}" />
-                        {else}<img src="/library/image/silk/error.png" width="16" height="16" alt="${attachment.name}" />
-                        {/if}
-                        </a>
-                    {/for}
-                </div>
-            </div>
-            <hr style="clear: left"/>
-            <div style="clear: left">${content}</div>
+        <ul id="yaft_toolbar" class="navIntraTool actionToolBar" role="menu"></ul>
+        <br />
+        <div id="yaft_container">
+            <div id="yaft_breadcrumb"></div>
             <br />
-            <div>
-                {if yaft.startupArgs.userId == creatorId && yaft.currentUserPermissions.messageDeleteOwn}<span><a href="#" onClick="return yaft.switchState('editMessage',{'messageId':'${id}'});">${yaft.translations.edit_label}</a></span>{/if}
-                {if yaft.currentUserPermissions.messageCreate && status == 'READY'}
-                    <span><a href="#" onClick="return yaft.switchState('reply',{'messageBeingRepliedTo':'${id}'});">${yaft.translations.reply_label}</a></span>
-                {/if}
-                {if parent && 'DELETED' != status && ( (yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId == creatorId) || yaft.currentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return yaft.utils.deleteMessage('${id}');">${yaft.translations.delete_label}</a></span>{/if}
-                {if status == 'DELETED' && yaft.currentUserPermissions.messageDeleteAny}<span><a href="#" onclick="return yaft.utils.undeleteMessage('${id}');">${yaft.translations.undelete_label}</a></span>{/if}
-                {if children.length > 0 && yaft.startupArgs.viewMode != 'minimal'}<span><a class="yaft_collapse_expand_link" href="#" onclick="yaft.utils.toggleMessage(this,'${id}');">${yaft.translations.collapse_label}</a></span>{/if}
-                {if yaft.startupArgs.userId != creatorId}
-                {if defined('read') && read == true}
-                    <span><a href="javascript:;" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('${id}'),false);">${yaft.translations.mark_message_unread_label}</a></span>
-                {else}
-                    <span><a href="#" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('${id}'),true);">${yaft.translations.mark_message_read_label}</a></span>
-                {/if}
-                {/if}
-            </div>
-        </div>
-        </div>
-    {/if}
-    {if !read}
-        </div>
-    {/if}
--->
-</div>
-
-<div id="yaft_discussion_content_template" style="display:none"><!--
-    {if lockedForReadingAndUnavailable && !yaft.currentUserPermissions.viewInvisible && creatorId != yaft.startupArgs.userId}
-    <h3>This discussion is not available at this time</h3>
-    {elseif 'DELETED' == status}
-    <h3>This discussion has been deleted</h3>
-    {else}
-    <a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);">${yaft.translations.mark_discussion_read_label}</a>
-    <br />
-    <br />
-
-    {macro display(message)}
-        <div id="${message.id}" style="overflow: auto;">
-        </div>
-        <div class="yaft_messages">
-        {for child in message.children}
-            ${D}{display(child)}
-        {/for}
-        </div>
-    {/macro}
-    
-    ${D}{display(firstMessage)}
-    
-    <br />
-    
-    <a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);">${yaft.translations.mark_discussion_read_label}</a>
-    {/if}
--->
-</div>
-
-<div id="yaft_message_view_content_template" style="display:none"><!--
-    {if lockedForReadingAndUnavailable && !yaft.currentUserPermissions.viewInvisible && creatorId != yaft.startupArgs.userId}
-    <h3>This discussion is not available at this time</h3>
-    {elseif 'DELETED' == status}
-    <h3>This discussion has been deleted</h3>
-    {else}
-    <a href="#" onClick="return yaft.utils.markCurrentDiscussionRead(true);"${yaft.translations.mark_discussion_read_label}</a>
-    <br />
-    <br />
-
-    {macro displayMinimum(message)}
-        {if message.status == 'READY'}
-            <div id="${message.id}_link" class="yaft_message_minimised">
-                <a href="#" title="Click to show the full message" onclick="yaft.showMessage('${message.id}')"><span style="font-weight: bold">${message.subject}</span></a></span> - <span>by 
-                {if message.anonymous}
-                    {if message.creatorId == yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous}
-                    <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
-                    {else}
-                    ${yaft.translations.anonymous_label}</span> at <span>${message.formattedDate}</span>
-                    {/if}
-                {else}
-                    <a href="javascript:;" class="profile" rel="/direct/profile/${message.creatorId}/formatted">${message.creatorDisplayName}</a></span> at <span>${message.formattedDate}</span>
-                {/if}
-                <img title="You've read this message" {if !message.read} style="display:none"{/if} class="messageReadFlag" id="${message.id}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
-                {for attachment in message.attachments}
-                    <a onclick="window.open('${attachment.url}');" title="${attachment.name}">
-                    {if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType == 'text/html'}<img src="/library/image/silk/html.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType.match(/^image/)}<img src="/library/image/silk/picture.png" width="16" height="16" alt="${attachment.name}" />
-                    {elseif attachment.mimeType.match(/^audio/)}<img src="/library/image/silk/sound.png" width="16" height="16" alt="${attachment.name}" />
-                    {else}<img src="/library/image/silk/error.png" width="16" height="16" alt="${attachment.name}" />
-                    {/if}
-                    </a>
-                {/for}
-                {if message.parent && 'DELETED' != message.status && ( (yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId == message.creatorId) || yaft.currentUserPermissions.messageDeleteAny)}<span><a href="#" onClick="return yaft.utils.deleteMessage('${message.id}');">${yaft.translations.delete_label}</a></span>{/if}
-            </div>
-            <div class="yaft_full_message" id="${message.id}" style="display: none;overflow: auto;margin-top:5px;"></div>
-        {/if}
-        
-        <div class="yaft_messages">
-        {for child in message.children}
-            {if message.status == 'DELETED'}
-                ${D}{displayMinimum(child)}
-            {else}
-                ${D}{displayMinimum(child)}
-            {/if}
-        {/for}
-        </div>
-    {/macro}
-    
-    ${D}{displayMinimum(firstMessage)}
-    {/if}
--->
-</div>
-
-<div id="yaft_reply_message_content_template" style="display:none;"><!--
-<div style="border: solid black 1px;" class="yaft_message">
-    <div style="margin:5px;overflow:auto;">
-        <img style="float:left;margin-right:2px;" src="/direct/profile/${creatorId}/image" width="35" height="35"/>
-        <div style="margin-left:2px;overflow: auto;">
-            <div style="float:left;">
-                <span style="font-weight: bold">${subject}</span>
-                <br/>
-                <span>by ${creatorDisplayName}</span> - <span>${formattedDate}</span>
-            </div>
-        </div>
-        <hr style="clear: left"/>
-        <div style="clear: left">${content}</div>
-    </div>
-</div>
-<br />
-<div id="yaft_reply_container">
-    <form id="yaft_message_form" onSubmit="return yaft.utils.validateMessageSubmission('${D}{escape(subject)}');" action="/portal/tool/${yaft.startupArgs.placementId}/messages" method="POST">
-    <h4>${yaft.translations.type_your_message_label}</h4>
-    <br />
-    <span>${yaft.translations.subject_label}: *</span>
-    <br />
-    <input id="yaft_message_subject_field" name="subject" type="text" size="48"/>
-    <br />
-    <br />
-    <span>${yaft.translations.message_label}: *</span>
-    <br />
-    <textarea name="content" id="yaft_message_editor" cols="100" rows="5"></textarea>
-    <br />
-    <br />
-    {if yaft.currentUserPermissions.sendAlerts}
-    <input type="checkbox" id="yaft_send_email_checkbox" value="true" name="sendEmail" value="true" checked/>${yaft.translations.send_email_alert_label}
-    <br />
-    <br />
-    {/if}
-    <span>${yaft.translations.add_attachments_label}</span>
-    <br />
-    <input id="yaft_attachment" name="attachment" type="file" class="multi"/>
-    <br/>
-
-    <input type="hidden" name="function" value="createMessage"/>
-    <input id="yaft_anonymous_flag" type="hidden" name="anonymous" value="false" />
-    <input type="hidden" name="forumId" value="${yaft.currentForum.id}"/>
-    <input type="hidden" name="siteId" value="${yaft.startupArgs.siteId}"/>
-    <input type="hidden" name="discussionId" value="${yaft.currentDiscussion.id}"/>
-    <input type="hidden" name="messageBeingRepliedTo" value="${id}"/>
-    <input type="hidden" name="viewMode" value="${yaft.startupArgs.viewMode}"/>
-    <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
-    
-    <input type="submit" value="${yaft.translations.publish_label}"/>
-    {if yaft.currentDiscussion.allowAnonymousPosting}
-    <input type="button" id="yaft_publish_anonymously_button" value="${yaft.translations.publish_anonymously_label}"/>
-    {/if}
-    <input type="button" value="${yaft.translations.cancel_label}" onclick="return yaft.switchState('${yaft.startupArgs.viewMode}',{'messageId':'${id}'})"/>
-    
-    </form>
-</div>
--->
-</div>
-
-<div id="yaft_messages_template" style="display:none"><!--
-    {if defined('assignment') && yaft.currentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
-    <div id="yaft_author_nav_buttons">
-        <img id="yaft_previous_author_button" src="/library/image/silk/resultset_previous.png" title="${yaft.translations.previous_author_tooltip}" alt="${yaft.translations.previous_author_tooltip}"/>
-        <img id="yaft_next_author_button" src="/library/image/silk/resultset_next.png" title="${yaft.translations.next_author_tooltip}" alt="${yaft.translations.next_author_tooltip}" />
-        <span>${yaft.translations.messages_by} <b>${displayName}</b></span>
-    </div>
-    {for message in messages}
-        <div class="yaft_message">
-        
-        <div style="margin:5px;overflow:hidden;">
-            <div style="margin-left:2px;overflow: hidden;">
-                <div style="float:left;">
-                    <a id="message-${message.id}" href="${message.url}"><span style="font-weight: bold">${message.subject}</span></a> - <span>${message.formattedDate}</span>
-                </div>
-                <div style="float: right;">
-                    {if message.attachments.length > 0}
-                    <span>Attachments: </span>
-                    <span>${yaft.translations.attachments_label}</span>
-                    {/if}
-                    {for attachment in message.attachments}
-                        <a onclick="window.open('${attachment.url}');" title="${attachment.name}">
-                        {if attachment.mimeType == 'application/pdf'}<img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/excel$/)}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}<img src="/library/image/silk/page_white_excel.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/msword' || attachment.name.match(/\.docx?$/)}<img src="/library/image/silk/page_white_word.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/powerpoint/)}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'}<img src="/library/image/silk/page_white_powerpoint.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'text/plain'}<img src="/library/image/silk/page_white_text.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType == 'text/html'}<img src="/library/image/silk/html.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/^image/)}<img src="/library/image/silk/picture.png" width="16" height="16" alt="${attachment.name}" />
-                        {elseif attachment.mimeType.match(/^audio/)}<img src="/library/image/silk/sound.png" width="16" height="16" alt="${attachment.name}" />
-                        {else}<img src="/library/image/silk/error.png" width="16" height="16" alt="${attachment.name}" />
-                        {/if}
-                        </a>
-                    {/for}
-                </div>
-            </div>
-            <hr style="clear: left"/>
-            <div style="clear: left">${message.content}</div>
+            <div id="yaft_feedback_message"></div>
             <br />
+            <div id="yaft_content"></div>
         </div>
-        </div>
-    {/for}
-    {if defined('assignment') && yaft.currentUserPermissions.gradeAll}Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field2" value="${grade}"/> / ${assignment.points}&nbsp;<input type="button" id="yaft_grade_button2" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />{/if}
--->
-</div>
 
-<!--  Templates End -->
+    </div> <!-- /portletBody-->
 
-</div> <!-- /portletBody-->
-
-<script type="text/javascript" src="/yaft-tool/js/yaft.js"></script>
-<link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
+    <script type="text/javascript" src="/yaft-tool/js/yaft.js"></script>
+    <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.cluetip.css" />
 
 </body>
 </html>

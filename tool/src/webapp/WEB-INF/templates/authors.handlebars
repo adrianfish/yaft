@@ -1,10 +1,10 @@
 <table id="yaft_author_table" class="listHier">
     <thead>
-        <tr><th>{{translate 'name_label'}}</th><th>{{translate 'number_of_posts_label'}}</th><th>{{#if canGrade}}{{translate 'grade_label'}}{{/if}}</th></tr>
+        <tr><th>{{translate 'name_label'}}</th><th>{{translate 'number_of_posts_label'}}</th>{{#if canGrade}}<th>{{translate 'grade_label'}}</th>{{/if}}</tr>
     </thead>
     <tbody>
         {{#each authors}}
-            <tr><td><a class="profile" rel="/direct/profile/{{id}}/formatted" href="javascript:;" onClick="yaft.switchState('author',{'id':'{{id}}','displayName':'{{displayName}}'});">{{displayName}}</a></td><td>{{numberOfPosts}}</td><td>{{#if ../canGrade}}{{#if grade}}{{grade.grade}}{{/if}}{{/if}}</td></tr>
+            <tr><td><a class="profile" rel="/direct/profile/{{id}}/formatted" href="javascript:;" onClick="yaft.switchState('author',{'id':'{{id}}','displayName':'{{displayName}}'});">{{displayName}}</a></td><td>{{numberOfPosts}}</td>{{#if ../canGrade}}<td>{{#if grade}}{{grade.grade}}{{/if}}</td>{{/if}}</tr>
         {{/each}}
     </tbody>
 </table>

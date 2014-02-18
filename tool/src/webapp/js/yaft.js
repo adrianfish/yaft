@@ -16,6 +16,9 @@
 
 (function ($) {
 
+    Handlebars.registerPartial('message', Handlebars.partials['message_partial']);
+    Handlebars.registerPartial('minimisedmessage', Handlebars.partials['minimised_message_partial']);
+
     yaft.fitFrame = function () {
 
         try {
@@ -43,15 +46,15 @@
 
         message.visible = message.status !== 'DELETED' || yaft.currentUserPermissions.messageDeleteAny;
         message.canSeeAuthorName = message.creatorId === yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous;
-        message.canEdit = yaft.startupArgs.userId === message.creatorId && yaft.currentUserPermissions.messageDeleteOwn;
+        message.canEdit = yaft.startupArgs.userId === message.creatorId && yaft.currentUserPermissions.messageCreate;
         message.canUndelete = message.status === 'DELETED' && yaft.currentUserPermissions.messageDeleteAny;
         message.canReply = yaft.currentUserPermissions.messageCreate && message.status === 'READY';
-        message.canDelete = message.parent && message.status !== 'DELETED' && (message.canEdit || yaft.currentUserPermissions.messageDeleteAny);
+        message.canDelete = (message.creatorId === yaft.startupArgs.userId && yaft.currentUserPermissions.messageDeleteOwn) || yaft.currentUserPermissions.messageDeleteAny;
         message.canExpand = message.children.length > 0 && yaft.startupArgs.viewMode != 'minimal';
         message.isMine = yaft.startupArgs.userId === message.creatorId;
 
         $.each(message.attachments, function (index, attachment) {
-            attachment.iconUrl = yaft.utils.getIconUrlForMimeType(attachment.mimeType);
+            attachment.iconUrl = yaft.utils.getIconUrlForMimeType(attachment.mimeType, attachment.name);
         });
 
         yaft.utils.renderHandlebarsTemplate('message', {
@@ -163,7 +166,12 @@
             
             if (yaft.currentDiscussion) {
                 yaft.utils.renderHandlebarsTemplate('discussion_breadcrumb', {placementId: yaft.startupArgs.placementId, discussion: yaft.currentDiscussion, forum: yaft.currentForum}, 'yaft_breadcrumb');
-                yaft.utils.renderTrimpathTemplate('yaft_discussion_content_template',yaft.currentDiscussion,'yaft_content');
+
+                yaft.currentDiscussion.hidden = yaft.currentDiscussion.lockedForReadingAndUnavailable && !yaft.currentUserPermissions.viewInvisible && yaft.currentDiscussion.creatorId !== yaft.startupArgs.userId;
+                yaft.currentDiscussion.deleted = yaft.currentDiscussion.status === 'DELETED';
+                yaft.currentDiscussion.visible = !yaft.currentDiscussion.hidden && !yaft.currentDiscussion.deleted;
+
+                yaft.utils.renderHandlebarsTemplate('discussion', yaft.currentDiscussion, 'yaft_content');
     
                 if (!yaft.currentDiscussion.lockedForReadingAndUnavailable || yaft.currentUserPermissions.viewInvisible || yaft.currentDiscussion.creatorId === yaft.startupArgs.userId) {
                     yaft.renderMessage(yaft.currentDiscussion.firstMessage);
@@ -180,6 +188,10 @@
             }
             
             $(document).ready(function () {
+
+                $('.yaft-mark-as-read-link').click(function (e) {
+                    return yaft.utils.markCurrentDiscussionRead(true);
+                });
     
                 yaft.utils.attachProfilePopup();
     
@@ -228,7 +240,7 @@
     
             yaft.utils.renderHandlebarsTemplate('message_view_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
     
-            yaft.utils.renderTrimpathTemplate('yaft_message_view_content_template', yaft.currentDiscussion, 'yaft_content');
+            yaft.utils.renderHandlebarsTemplate('minimised_discussion', yaft.currentDiscussion, 'yaft_content');
 
             this.renderMessage(yaft.currentDiscussion.firstMessage);
 
@@ -322,7 +334,6 @@
         } else if ('editMessage' === state) {
     
             var message = yaft.utils.findMessage(arg.messageId);
-            alert(message.id);
             message['editMode'] = 'EDIT';
             yaft.utils.renderHandlebarsTemplate('edit_message_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion, replying: false, subject: message.subject}, 'yaft_breadcrumb');
             var filteredAttachments = message.attachments.filter(function (attachment) {
@@ -390,7 +401,7 @@
             messageBeingRepliedTo["mode"] = arg.mode;
             messageBeingRepliedTo["editMode"] = 'REPLY';
             yaft.utils.renderHandlebarsTemplate('edit_message_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion, replying: true, subject: messageBeingRepliedTo.subject}, 'yaft_breadcrumb');
-            yaft.utils.renderTrimpathTemplate('yaft_reply_message_content_template', messageBeingRepliedTo, 'yaft_content');
+            yaft.utils.renderHandlebarsTemplate('reply_message', {placementId: yaft.startupArgs.placementId, siteId: yaft.startupArgs.siteId, viewMode: yaft.startupArgs.viewMode, originalMessage: messageBeingRepliedTo, canSendAlerts: yaft.currentUserPermissions.sendAlerts, canPostAnonymously: yaft.currentDiscussion.allowAnonymousPosting, currentForumId: yaft.currentForum.id, currentDiscussionId: yaft.currentDiscussion.id}, 'yaft_content');
     
             $('#yaft_publish_anonymously_button').click(function (e) {
     
@@ -411,6 +422,10 @@
                         yaft.switchState('full');
                     },
                     beforeSubmit: function (arr, $form, options) {
+
+                        if(!yaft.utils.validateReplySubject(messageBeingRepliedTo.subject)) {
+                            return false;
+                        }
     
                         if ($('#yaft_message_editor').val() === '') {
                             alert(yaft.translations.missing_message_message);
