@@ -22,6 +22,18 @@
         {{/if}}
         <input type="checkbox" id="yaft_allow_anonymous_posting_checkbox" name="allowAnonymousPosting" value="true" />{{translate 'allow_anonymous_posting_label'}}
         <br />
+        {{#if discussion.filteredAttachments.length}}
+        <fieldset id="yaft-current-attachments-fieldset">
+            <legend>{{translate 'current_attachments_label'}}</legend>
+            {{#each discussion.filteredAttachments}}
+            <div id="file_{{@index}}">
+                <span>{{name}}</span>
+                <a href="#" onclick="yaft.utils.removeAttachment('{{resourceId}}','{{../discussion.firstMessage.id}}','file_{{@index}}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+                <br />
+            </div>
+            {{/each}}
+        </fieldset>
+        {{/if}}
         <br />
         <span>{{translate 'add_attachments_label'}}</span>
         <br />
@@ -44,8 +56,6 @@
             <br />
         </div>
         {{/if}}
-
-        <br />
 
         <a id="yaft_toggle_availability_options_link" href="javascript:;">{{translate 'availability_label'}}</a>
         <br />

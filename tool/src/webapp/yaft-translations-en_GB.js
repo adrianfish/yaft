@@ -169,6 +169,7 @@ yaft.translations.discussions_get_started = "You haven't created any topics in t
 yaft.translations.previous_author_tooltip = "View the previous author's messages."
 yaft.translations.next_author_tooltip = "View the next author's messages."
 yaft.translations.messages_by = "Messages by";
+yaft.translations.on = 'on';
 
 Handlebars.registerHelper('translate', function (key) {
     return yaft.translations[key];

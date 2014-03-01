@@ -14,22 +14,23 @@
         <br />
         <br />
         {{#if canSendAlerts}}
-        <input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>{{translate 'send_email_alert_label'}}
-        <br />
+        <input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true"/>{{translate 'send_email_alert_label'}}
         <br />
         {{/if}}
-        <span id="current_attachments_label">{{translate 'current_attachments_label'}}</span>
-        <br />
-        <br />
-        {{#each filteredAttachments}}
-        <div id="file_{{@index}}">
-            <span>{{name}}</span>
-            <a href="#" onclick="yaft.utils.removeAttachment('{{resourceId}}','{{../message.id}}','file_{{@index}}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
-            <br />
-        </div>
-        {{/each}}
-        <br />
+        {{#if filteredAttachments.length}}
+        <fieldset id="yaft-current-attachments-fieldset">
+            <legend>{{translate 'current_attachments_label'}}</legend>
+            {{#each filteredAttachments}}
+            <div id="file_{{@index}}">
+                <span>{{name}}</span>
+                <a href="#" onclick="yaft.utils.removeAttachment('{{resourceId}}','{{../message.id}}','file_{{@index}}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+                <br />
+            </div>
+            {{/each}}
+        </fieldset>
+        {{/if}}
 
+        <br />
         <span>{{translate 'add_attachments_label'}}</span>
         <br />
         <input id="yaft_attachment" name="attachment" type="file" class="multi"/>

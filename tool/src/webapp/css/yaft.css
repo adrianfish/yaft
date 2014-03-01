@@ -264,3 +264,7 @@ th.yaftSortableTableHeaderSortDown {
 #yaft-all-discussions-checkbox {
     display: none;
 }
+
+#yaft-current-attachments {
+    border: black solid 2px;
+}

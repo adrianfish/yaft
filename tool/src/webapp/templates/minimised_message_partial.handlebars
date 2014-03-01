@@ -16,7 +16,7 @@ function program1(depth0,data) {
   if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "')\"><span style=\"font-weight: bold\">";
+    + "', true);\"><span style=\"font-weight: bold\">";
   if (helper = helpers.subject) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.subject); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -32,9 +32,6 @@ function program1(depth0,data) {
   buffer += escapeExpression(stack1)
     + "_read\" src=\"/library/image/silk/book_open.png\" width=\"16\" height=\"16\"/>\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.attachments), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.canDelete), {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </div>\n    <div class=\"yaft_full_message\" id=\"";
   if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -54,7 +51,7 @@ function program2(depth0,data) {
   }
 function program3(depth0,data) {
   
-  var buffer = "", stack1, helper;
+  var buffer = "", stack1, helper, options;
   buffer += "\n            <a href=\"javascript:;\" class=\"profile\" rel=\"/direct/profile/";
   if (helper = helpers.creatorId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.creatorId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
@@ -63,7 +60,9 @@ function program3(depth0,data) {
   if (helper = helpers.creatorDisplayName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.creatorDisplayName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</a></span> at <span>";
+    + "</a></span> "
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "on", options) : helperMissing.call(depth0, "translate", "on", options)))
+    + " <span>";
   if (helper = helpers.formattedDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.formattedDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -76,7 +75,9 @@ function program5(depth0,data) {
   var buffer = "", stack1, helper, options;
   buffer += "\n            "
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "anonymous_label", options) : helperMissing.call(depth0, "translate", "anonymous_label", options)))
-    + "</span> at <span>";
+    + "</span> "
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "on", options) : helperMissing.call(depth0, "translate", "on", options)))
+    + " <span>";
   if (helper = helpers.formattedDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.formattedDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -86,7 +87,7 @@ function program5(depth0,data) {
 
 function program7(depth0,data) {
   
-  var buffer = "", stack1, helper;
+  var buffer = "", stack1, helper, options;
   buffer += "\n            <a href=\"javascript:;\" class=\"profile\" rel=\"/direct/profile/";
   if (helper = helpers.creatorId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.creatorId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
@@ -95,7 +96,9 @@ function program7(depth0,data) {
   if (helper = helpers.creatorDisplayName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.creatorDisplayName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</a></span> at <span>";
+    + "</a></span> "
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "on", options) : helperMissing.call(depth0, "translate", "on", options)))
+    + " <span>";
   if (helper = helpers.formattedDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.formattedDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -130,19 +133,6 @@ function program11(depth0,data) {
 
 function program13(depth0,data) {
   
-  var buffer = "", stack1, helper, options;
-  buffer += "<span><a href=\"javascript:;\" onClick=\"return yaft.utils.deleteMessage('";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "');\">"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "delete_label", options) : helperMissing.call(depth0, "translate", "delete_label", options)))
-    + "</a></span>";
-  return buffer;
-  }
-
-function program15(depth0,data) {
-  
   var buffer = "", stack1;
   buffer += "\n    ";
   stack1 = self.invokePartial(partials.minimisedmessage, 'minimisedmessage', depth0, helpers, partials, data);
@@ -154,7 +144,7 @@ function program15(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.ready), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n<div class=\"yaft_messages\">\n";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.children), {hash:{},inverse:self.noop,fn:self.program(15, program15, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.children), {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n";
   return buffer;

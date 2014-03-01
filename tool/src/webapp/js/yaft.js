@@ -233,7 +233,7 @@
             
             var message = null;
             if (arg != null && arg.messageId != null) {
-                message = yaft.utils.findMessage(arg.messageId);
+                message = yaft.utils.findMessageInCurrentDiscussion(arg.messageId);
             } else {
                 message = yaft.currentDiscussion.firstMessage;
             }
@@ -333,7 +333,7 @@
             });
         } else if ('editMessage' === state) {
     
-            var message = yaft.utils.findMessage(arg.messageId);
+            var message = yaft.utils.findMessageInCurrentDiscussion(arg.messageId);
             message['editMode'] = 'EDIT';
             yaft.utils.renderHandlebarsTemplate('edit_message_breadcrumb', {placementId: yaft.startupArgs.placementId, forum: yaft.currentForum, discussion: yaft.currentDiscussion, replying: false, subject: message.subject}, 'yaft_breadcrumb');
             var filteredAttachments = message.attachments.filter(function (attachment) {
@@ -395,7 +395,7 @@
         } else if ('reply' === state) {
 
             // Look up the message that we are replying to in the current cache
-            var messageBeingRepliedTo = yaft.utils.findMessage(arg.messageBeingRepliedTo);
+            var messageBeingRepliedTo = yaft.utils.findMessageInCurrentDiscussion(arg.messageBeingRepliedTo);
                             
             // We need to pass a few extra things to the template, so set them.
             messageBeingRepliedTo["mode"] = arg.mode;
@@ -479,7 +479,7 @@
                                 'lockedForReading': yaft.currentForum.lockedForReading,
                                 'start': yaft.currentForum.startDate,
                                 'end': yaft.currentForum.endDate,
-                                'firstMessage': {'content': ''},
+                                'firstMessage': {content: '', attachments: []},
                                 'grade': false,
                                 'groups': [],
                                 'groupsInherited': (yaft.currentForum.groups.length > 0)
@@ -492,6 +492,9 @@
             var groups = yaft.utils.getGroupsForCurrentSite();
     
             yaft.utils.renderHandlebarsTemplate('start_discussion_breadcrumb', {currentForumUrl: yaft.currentForum.url, currentForumTitle: yaft.currentForum.title}, 'yaft_breadcrumb');
+            discussion.filteredAttachments = discussion.firstMessage.attachments.filter(function (attachment) {
+                return attachment.name !== 'array';
+            });
             yaft.utils.renderHandlebarsTemplate('start_discussion',{
                                                     placementId: yaft.startupArgs.placementId,
                                                     siteId: yaft.startupArgs.siteId,
@@ -552,6 +555,10 @@
                         } else {
                             var discussion = yaft.utils.getDiscussion(responseText);
                             if (!arg || !arg.discussionId) {
+                                // This is a new discussion
+                                discussion.unread = 0;
+                                discussion.canDelete = true;
+                                discussion.formattedLastMessageDate = yaft.utils.formatDate(Date.now());
                                 yaft.currentForum.discussions.push(discussion);
                             } else {
                                 $.each(yaft.currentForum.discussions, function (index, discussion) {
@@ -725,14 +732,17 @@
     /**
      *    Used when in the minimal view
      */
-    yaft.showMessage = function (messageId) {
+    yaft.showMessage = function (messageId, render) {
     
-        var message = yaft.utils.findMessage(messageId);
+        var message = yaft.utils.findMessageInCurrentDiscussion(messageId);
         $('.yaft_full_message').hide();
         $('.yaft_message_minimised').show();
-        $('#' + message.id).show();
-        $('#' + message.id + '_link').hide();
-        $('#' + message.id + ' .yaft_collapse_expand_link').hide();
+        if(render) {
+            this.renderMessage(message);
+        }
+        $('#' + messageId).show();
+        $('#' + messageId + '_link').hide();
+        $('#' + messageId + ' .yaft_collapse_expand_link').hide();
 
         $(document).ready(function () {
             yaft.fitFrame();

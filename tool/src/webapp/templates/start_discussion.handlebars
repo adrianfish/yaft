@@ -17,17 +17,49 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper, options;
+  buffer += "\n        <fieldset id=\"yaft-current-attachments-fieldset\">\n            <legend>"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "current_attachments_label", options) : helperMissing.call(depth0, "translate", "current_attachments_label", options)))
+    + "</legend>\n            ";
+  stack1 = helpers.each.call(depth0, ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.filteredAttachments), {hash:{},inverse:self.noop,fn:self.programWithDepth(4, program4, data, depth0),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        </fieldset>\n        ";
+  return buffer;
+  }
+function program4(depth0,data,depth1) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n            <div id=\"file_"
+    + escapeExpression(((stack1 = (data == null || data === false ? data : data.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\">\n                <span>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</span>\n                <a href=\"#\" onclick=\"yaft.utils.removeAttachment('";
+  if (helper = helpers.resourceId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.resourceId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "','"
+    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth1 && depth1.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.firstMessage)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "','file_"
+    + escapeExpression(((stack1 = (data == null || data === false ? data : data.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "');\" title=\"Delete attachment\"><img src=\"/library/image/silk/cross.png\" width=\"16\" height=\"16\"/></a>\n                <br />\n            </div>\n            ";
+  return buffer;
+  }
+
+function program6(depth0,data) {
+  
+  var buffer = "", stack1, helper, options;
   buffer += "\n        <a id=\"yaft_toggle_group_options_link\" href=\"javascript:;\">Groups</a>\n        <br />\n        <div id=\"yaft_group_options\" style=\"display:none;\">\n            <fieldset id=\"yaft_groups_fieldset\">\n                <legend>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "groups_box_label", options) : helperMissing.call(depth0, "translate", "groups_box_label", options)))
     + "</legend>\n                <span class=\"instruction\">"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "limit_discussion_to_groups_label", options) : helperMissing.call(depth0, "translate", "limit_discussion_to_groups_label", options)))
     + "</span>\n                <br />\n                <br />\n                ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.groups), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.groups), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n            </fieldset>\n            <br />\n        </div>\n        ";
   return buffer;
   }
-function program4(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n                <input type=\"checkbox\" id=\"";
@@ -46,7 +78,7 @@ function program4(depth0,data) {
   return buffer;
   }
 
-function program6(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = "";
   buffer += "\n                    <option>"
@@ -55,7 +87,7 @@ function program6(depth0,data) {
   return buffer;
   }
 
-function program8(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = "", stack1, helper, options;
   buffer += "\n        <a id=\"yaft_toggle_gradebook_options_link\" href=\"javascript:;\">"
@@ -65,12 +97,12 @@ function program8(depth0,data) {
     + "</legend>\n                <input id=\"yaft_grade_checkbox\" type=\"checkbox\" name=\"grade\" value=\"true\"/>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "grading_message", options) : helperMissing.call(depth0, "translate", "grading_message", options)))
     + "\n                <br />\n                <select id=\"yaft_assignment_selector\" class=\"indnt4\" name=\"assignmentId\" style=\"display: none;\">\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.gbAssignments), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.gbAssignments), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </select>\n            </fieldset>\n            <br />\n        </div>\n        ";
   return buffer;
   }
-function program9(depth0,data) {
+function program12(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n                    <option value=\"";
@@ -114,12 +146,15 @@ function program9(depth0,data) {
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        <input type=\"checkbox\" id=\"yaft_allow_anonymous_posting_checkbox\" name=\"allowAnonymousPosting\" value=\"true\" />"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "allow_anonymous_posting_label", options) : helperMissing.call(depth0, "translate", "allow_anonymous_posting_label", options)))
-    + "\n        <br />\n        <br />\n        <span>"
+    + "\n        <br />\n        ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.filteredAttachments)),stack1 == null || stack1 === false ? stack1 : stack1.length), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n        <br />\n        <span>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "add_attachments_label", options) : helperMissing.call(depth0, "translate", "add_attachments_label", options)))
     + "</span>\n        <br />\n        <input id=\"yaft_attachment\" name=\"attachment\" type=\"file\" class=\"multi\"/><br clear=\"all\"/>\n    \n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.hasGroups), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.hasGroups), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n        <br />\n\n        <a id=\"yaft_toggle_availability_options_link\" href=\"javascript:;\">"
+  buffer += "\n\n        <a id=\"yaft_toggle_availability_options_link\" href=\"javascript:;\">"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "availability_label", options) : helperMissing.call(depth0, "translate", "availability_label", options)))
     + "</a>\n        <br />\n        <div id=\"yaft_availability_options\" style=\"display:none;\">\n            <fieldset id=\"yaft_availability_fieldset\">\n                <legend>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "availability_label", options) : helperMissing.call(depth0, "translate", "availability_label", options)))
@@ -130,23 +165,23 @@ function program9(depth0,data) {
     + "\n                <br />\n                <br />\n                <input type=\"hidden\" name=\"startDate\" id=\"yaft_start_date_millis\"/>\n                <input type=\"hidden\" name=\"endDate\" id=\"yaft_end_date_millis\"/>\n                <span>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "availability_except_between_label", options) : helperMissing.call(depth0, "translate", "availability_except_between_label", options)))
     + "</span>\n                <br />\n                <br />\n                <input id=\"yaft_start_date\" type=\"text\" />\n                <select id=\"yaft_start_hours\">\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.hours), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.hours), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </select>\n                <span>:</span>\n                <select id=\"yaft_start_minutes\">\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.minutes), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.minutes), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </select>\n                <br />\n                <br />\n                <span>"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "availability_except_between_and_label", options) : helperMissing.call(depth0, "translate", "availability_except_between_and_label", options)))
     + "</span>\n                <br />\n                <br />\n                <input id=\"yaft_end_date\" type=\"text\" />\n                <select id=\"yaft_end_hours\">\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.hours), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.hours), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </select>\n                <span>:</span>\n                <select id=\"yaft_end_minutes\">\n                    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.minutes), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.minutes), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                </select>\n                <br />\n                <br />\n                <a href=\"javascript:;\" onclick=\"yaft.utils.clearDates();\">"
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "availability_clear_date_label", options) : helperMissing.call(depth0, "translate", "availability_clear_date_label", options)))
     + "</a>\n            </fieldset>\n            <br />\n        </div>\n\n        <br />\n\n        ";
-  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.gbAssignments)),stack1 == null || stack1 === false ? stack1 : stack1.length), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
+  stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 && depth0.gbAssignments)),stack1 == null || stack1 === false ? stack1 : stack1.length), {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n        <br />\n        <input type=\"submit\" value=\""
     + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "save_label", options) : helperMissing.call(depth0, "translate", "save_label", options)))

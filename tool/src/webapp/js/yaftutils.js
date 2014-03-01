@@ -240,42 +240,7 @@
 
             if (discussions.length <= 0) {
                 $('#yaft-get-started-instruction').show();
-            }
-
-            if (yaft.currentUserPermissions.forumDeleteAny) {
-                if (yaft.currentForum && yaft.currentForum.discussions.length > 0) {
-                    $('#yaft-all-discussions-checkbox').show();
-                }
-            }
-        
-            $('#yaft-delete-discussions-button').click(function () {
-                yaft.utils.deleteSelectedDiscussions();
-            });
-            $('.yaft_bulk_option_candidate').click(function () {
-
-                if ($(this).prop('checked')) {
-                    $('#yaft-delete-discussions-button').prop('disabled', false).addClass('enabled');
-                } else {
-                    // Only enable the delete button if no other discussion is checked
-                    if ($('.yaft_bulk_option_candidate:checked').length <= 0) {
-                        $('#yaft-delete-discussions-button').prop('disabled', true).removeClass('enabled');
-                    }
-                }
-            });
-
-            $('#yaft_all_discussions_checkbox').click(function () {
-
-                if ($(this).prop('checked')) {
-                    $('.yaft_bulk_option_candidate').prop('checked', true);
-                    $('#yaft-delete-discussions-button').prop('disabled', false).addClass('enabled');
-                } else {
-                    $('.yaft_bulk_option_candidate').prop('checked', false);
-                    $('#yaft-delete-discussions-button').prop('disabled', true).removeClass('enabled');
-                }
-            });
-                                    
-            // We need to check this as tablesorter complains at empty tbody
-            if (yaft.currentForum.discussions.length > 0) {
+            } else {
                 $("#yaft_discussion_table").tablesorter({
                     cssHeader: 'yaftSortableTableHeader',
                     cssAsc: 'yaftSortableTableHeaderSortUp',
@@ -288,6 +253,33 @@
                         },
                         sortList: [[0,0]],
                         widgets: ['zebra']
+                });
+
+                $('#yaft-delete-discussions-button').click(function () {
+                    yaft.utils.deleteSelectedDiscussions();
+                });
+
+                $('#yaft-all-discussions-checkbox').show().click(function (e) {
+
+                    if ($(this).prop('checked')) {
+                        $('.yaft_bulk_option_candidate').prop('checked', true);
+                        $('#yaft-delete-discussions-button').prop('disabled', false);
+                    } else {
+                        $('.yaft_bulk_option_candidate').prop('checked', false);
+                        $('#yaft-delete-discussions-button').prop('disabled', true);
+                    }
+                });
+
+                $('.yaft_bulk_option_candidate').click(function () {
+
+                    if ($(this).prop('checked')) {
+                        $('#yaft-delete-discussions-button').prop('disabled', false).addClass('enabled');
+                    } else {
+                        // Only enable the delete button if no other discussion is checked
+                        if ($('.yaft_bulk_option_candidate:checked').length <= 0) {
+                            $('#yaft-delete-discussions-button').prop('disabled', true).removeClass('enabled');
+                        }
+                    }
                 });
 
                 yaft.utils.attachProfilePopup();
@@ -391,42 +383,7 @@
 
             if (yaft.currentForums.length <= 0) {
                 $('#yaft-get-started-instruction').show();
-            }
-
-            if (yaft.currentUserPermissions.forumDeleteAny) {
-                // Only show the all fora box is there are any
-                if (yaft.currentForums.length > 0) {
-                    $('#yaft-all-fora-checkbox').show().click(function (e) {
-
-                        if ($(this).prop('checked')) {
-                            $('.yaft_bulk_option_candidate').prop('checked', true);
-                            $('#yaft-delete-forums-button').prop('disabled', false).addClass('enabled');
-                        } else {
-                            $('.yaft_bulk_option_candidate').prop('checked', false);
-                            $('#yaft-delete-forums-button').prop('disabled', true).removeClass('enabled');
-                        }
-                    });
-
-                    $('#yaft-delete-forums-button').show().click(function () {
-                        alert('sdfsdf');
-                        yaft.utils.deleteSelectedFora();
-                    });
-               }
-            }
-
-            $('.yaft_bulk_option_candidate').click(function () {
-
-                if ($(this).prop('checked')) {
-                    $('#yaft-delete-forums-button').prop('disabled', false).addClass('enabled');
-                } else {
-                    // Only enable the delete button if no other forum is checked
-                    if ($('.yaft_bulk_option_candidate:checked').length <= 0) {
-                        $('#yaft-delete-forums-button').prop('disabled', true).removeClass('enabled');
-                    }
-                }
-            });
-                 
-            if (yaft.currentForums.length > 0) {
+            } else {
                 $("#yaft_forum_table").tablesorter({
                     cssHeader: 'yaftSortableTableHeader',
                     cssAsc: 'yaftSortableTableHeaderSortUp',
@@ -439,6 +396,35 @@
                         },
                     sortList: [[0, 0]],
                     widgets: ['zebra']
+                });
+
+                if (yaft.currentUserPermissions.forumDeleteAny) {
+                    $('#yaft-all-fora-checkbox').show().click(function (e) {
+
+                        if ($(this).prop('checked')) {
+                            $('.yaft_bulk_option_candidate').prop('checked', true);
+                            $('#yaft-delete-forums-button').prop('disabled', false);
+                        } else {
+                            $('.yaft_bulk_option_candidate').prop('checked', false);
+                            $('#yaft-delete-forums-button').prop('disabled', true);
+                        }
+                    });
+
+                    $('#yaft-delete-forums-button').show().click(function () {
+                        yaft.utils.deleteSelectedFora();
+                    });
+                }
+
+                $('.yaft_bulk_option_candidate').click(function () {
+
+                    if ($(this).prop('checked')) {
+                        $('#yaft-delete-forums-button').prop('disabled', false);
+                    } else {
+                        // Only enable the delete button if no other forum is checked
+                        if ($('.yaft_bulk_option_candidate:checked').length <= 0) {
+                            $('#yaft-delete-forums-button').prop('disabled', true);
+                        }
+                    }
                 });
             }
             
@@ -608,7 +594,7 @@
             cache: false,
             success: function (text, textStatus) {
 
-                var message = yaft.utils.findMessage(messageId);
+                var message = yaft.utils.findMessageInCurrentDiscussion(messageId);
                 message.status = 'DELETED';
                 message.deleted = true;
                 if (message.id == yaft.currentDiscussion.firstMessage.id) {
@@ -638,20 +624,24 @@
 
     yaft.utils.findForum = function (id) {
 
-        $.each(yaft.currentForums, function (index, forum) {
-            if (forum.id == id) return forum;
+        var forum = null;
+
+        $.each(yaft.currentForums, function (index, testForum) {
+            if (testForum.id == id) forum = testForum;
         });
 
-        return null;
+        return forum;
     };
 
     yaft.utils.findDiscussion = function (id) {
 
-        $.each(yaft.currentForum.discussions, function (index, discussion) {
-            if (discussion.id == id) return discussion;
+        var discussion = null;
+
+        $.each(yaft.currentForum.discussions, function (index, testDiscussion) {
+            if (testDiscussion.id == id) discussion = testDiscussion;
         });
 
-        return null;
+        return discussion;
     };
     
     yaft.utils.undeleteMessage = function (messageId) {
@@ -666,7 +656,7 @@
             async : false,
             cache: false,
             success: function (text, textStatus) {
-                var message = yaft.utils.findMessage(messageId);
+                var message = yaft.utils.findMessageInCurrentDiscussion(messageId);
                 message.status = 'READY';
                 message.ready = true;
                 message.deleted = false;
@@ -710,7 +700,7 @@
     
     yaft.utils.toggleMessage = function (e, messageId) {
 
-        var message = this.findMessage(messageId);
+        var message = this.findMessageInCurrentDiscussion(messageId);
 
         var descendants = getFlattenedDescendantMessages(message);
 
@@ -884,7 +874,12 @@
             async: false,
             cache: false,
             success: function (text, textStatus) {
-                $("#" + elementId).remove();
+                var element = $("#" + elementId);
+                var siblingCount = element.siblings().length;
+                element.remove();
+                if (siblingCount  == 1) {
+                    $('#yaft-current-attachments-fieldset').remove();
+                }
             },
             error: function (xhr, textStatus, errorThrown) {
                 alert("Failed to delete attachment. Reason: " + errorThrown);
@@ -1020,7 +1015,7 @@
         return found;
     };
 
-    yaft.utils.findMessage = function (wantedId) {
+    yaft.utils.findMessageInCurrentDiscussion = function (wantedId) {
 
         if (yaft.currentDiscussion) {
             var firstMessage = yaft.currentDiscussion.firstMessage;
