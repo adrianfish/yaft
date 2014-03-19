@@ -67,7 +67,7 @@ public class YaftTool extends HttpServlet {
 		
 		String userId = null;
 		Session session = (Session) request.getAttribute(RequestFilter.ATTR_SESSION);
-		if(session != null) {
+		if (session != null) {
 			userId = session.getUserId();
 		} else {
 			// We are not logged in
@@ -86,8 +86,8 @@ public class YaftTool extends HttpServlet {
 		
 		String isoLanguage = language;
 
-        if(country != null && !country.equals("")) {
-            isoLanguage += "-" + country;
+        if (country != null && !country.equals("")) {
+            isoLanguage += "_" + country;
         }
         
 		VelocityContext ctx = new VelocityContext();
@@ -108,17 +108,16 @@ public class YaftTool extends HttpServlet {
 
 		String uri = request.getRequestURI();
 
+        if (uri.contains("/portal/pda/")) {
+            ctx.put("viewMode","minimal");
+            ctx.put("onPDAPortal", "true");
+        } else {
+            ctx.put("viewMode","full");
+            ctx.put("onPDAPortal","false");
+        }
+
 		if (pathInfo == null || pathInfo.length() < 1) {
 			// There's no path info, so this is the initial state
-			
-			if (uri.contains("/portal/pda/")) {
-				ctx.put("viewMode","minimal");
-				ctx.put("onPDAPortal","true");
-			} else {
-				ctx.put("viewMode","full");
-				ctx.put("onPDAPortal","false");
-			}
-			
 	        response.setStatus(HttpServletResponse.SC_OK);
 	        response.setContentType("text/html; charset=UTF-8");
 	        Writer writer = new BufferedWriter(response.getWriter());
@@ -136,7 +135,7 @@ public class YaftTool extends HttpServlet {
 				String part1 = parts[0];
 
 				if (part1.startsWith("forums")) {
-					doForumsGet(request, response, parts, siteId, placementId, locale,ctx);
+					doForumsGet(request, response, parts, userId, siteId, placementId, locale,ctx);
 				} else if ("authors".equals(part1)) {
 					if (parts.length == 1) {
 						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
@@ -206,17 +205,17 @@ public class YaftTool extends HttpServlet {
 				}
 
 				else if ("discussions".equals(part1)) {
-					doDiscussionsGet(request, response, parts, siteId, placementId, locale,ctx);
+					doDiscussionsGet(request, response, parts, userId, siteId, placementId, locale,ctx);
 				}
 
 				else if ("messages".equals(part1)) {
-					doMessagesGet(request, response, parts, siteId, placementId, locale,ctx);
+					doMessagesGet(request, response, parts, userId, siteId, placementId, locale,ctx);
 				}
 			}
 		}
 	}
 
-	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale,VelocityContext ctx) throws ServletException, IOException {
+	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale,VelocityContext ctx) throws ServletException, IOException {
 		String state = request.getParameter("state");
 
 		if (state == null)
@@ -295,18 +294,23 @@ public class YaftTool extends HttpServlet {
 				String forumOp = parts[2];
 
 				if ("delete".equals(forumOp)) {
-					yaftForumService.deleteForum(forumId);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain; charset=UTF-8");
-					response.getWriter().write("success");
-					response.getWriter().close();
+                    try {
+					    yaftForumService.deleteForum(forumId, siteId, userId);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType("text/plain; charset=UTF-8");
+                        response.getWriter().write("success");
+                        response.getWriter().close();
+                    } catch (YaftSecurityException yse) {
+                        logger.error(yse);
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    }
 					return;
 				}
 			}
 		}
 	}
 
-	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
+	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
 		if (parts.length >= 2) {
 			String discussionId = parts[1];
 
@@ -378,11 +382,15 @@ public class YaftTool extends HttpServlet {
 			} else {
 				String discussionOp = parts[2];
 				if ("delete".equals(discussionOp)) {
-					yaftForumService.deleteDiscussion(discussionId);
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("text/plain; charset=UTF-8");
-					response.getWriter().write("success");
-					response.getWriter().close();
+                    try {
+                        yaftForumService.deleteDiscussion(discussionId, siteId, userId);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType("text/plain; charset=UTF-8");
+                        response.getWriter().write("success");
+                        response.getWriter().close();
+                    } catch (YaftSecurityException yse) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    }
 					return;
 				} else if ("markRead".equals(discussionOp)) {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
@@ -444,7 +452,7 @@ public class YaftTool extends HttpServlet {
 		}
 	}
 
-	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
+	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
 		if (parts.length >= 2) {
 			String messageId = parts[1];
 
@@ -520,11 +528,16 @@ public class YaftTool extends HttpServlet {
 
 				return;
 			} else if ("delete".equals(messageOp)) {
-				yaftForumService.deleteMessage(message, forum.getId());
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain; charset=UTF-8");
-				response.getWriter().write("success");
-				response.getWriter().close();
+                try {
+                    yaftForumService.deleteMessage(message, siteId, forum.getId(), userId);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setContentType("text/plain; charset=UTF-8");
+                    response.getWriter().write("success");
+                    response.getWriter().close();
+                } catch (YaftSecurityException yse) {
+                    logger.error(yse);
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                }
 				return;
 			} else if ("undelete".equals(messageOp)) {
 				yaftForumService.undeleteMessage(message, forum.getId());
@@ -578,13 +591,15 @@ public class YaftTool extends HttpServlet {
 		String authorId = parts[3];
 		String points = parts[5];
 
-		if (sakaiProxy.scoreAssignment(Integer.parseInt(assignmentId), authorId, points)) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return;
-		} else {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
+		if (sakaiProxy.currentUserHasFunction("gradebook.gradeAll")) {
+            if (sakaiProxy.scoreAssignment(Integer.parseInt(assignmentId), authorId, points)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
 	}
 
 	private void doUserDataGet(HttpServletResponse response, String siteId) throws ServletException, IOException {
@@ -705,34 +720,39 @@ public class YaftTool extends HttpServlet {
 
 				boolean sendEmail = true;
 
-				if (sendEmailString != null)
+				if (sendEmailString != null) {
 					sendEmail = sendEmailString.equals("true");
-				else
+                } else {
 					sendEmail = false;
+                }
 
 				boolean lockWriting = true;
 				boolean lockReading = true;
 
-				if (lockWritingString != null)
+				if (lockWritingString != null) {
 					lockWriting = lockWritingString.equals("true");
-				else
+                } else {
 					lockWriting = false;
+                }
 
-				if (lockReadingString != null)
+				if (lockReadingString != null) {
 					lockReading = lockReadingString.equals("true");
-				else
+                } else {
 					lockReading = false;
+                }
 
 				Forum forum = new Forum();
 
-				if (id != null)
+				if (id != null) {
 					forum.setId(id);
+                }
 
 				if (groupsString != null && !"".equals(groupsString)) {
 					String[] groups = groupsString.split(",");
 					List<Group> list = new ArrayList<Group>();
-					for (String groupId : groups)
+					for (String groupId : groups) {
 						list.add(new Group(groupId, ""));
+                    }
 
 					forum.setGroups(list);
 				}
@@ -761,7 +781,7 @@ public class YaftTool extends HttpServlet {
 					}
 				}
 
-				if (yaftForumService.addOrUpdateForum(forum, sendEmail)) {
+				if (yaftForumService.addOrUpdateForum(forum, sakaiProxy.getCurrentUser().getId(), sendEmail)) {
 					response.setStatus(HttpServletResponse.SC_OK);
 					response.setContentType("text/plain; charset=UTF-8");
 					response.getWriter().write(forum.getId());
@@ -771,19 +791,25 @@ public class YaftTool extends HttpServlet {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					return;
 				}
+			} catch (YaftSecurityException yse) {
+				logger.error(yse);
+				response.sendError(HttpServletResponse.SC_FORBIDDEN);
+				return;
 			} catch (Exception e) {
 				logger.error("Caught exception whilst creating forum.", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}
-		} else if(parts.length >= 2) {
+		} else if (parts.length >= 2) {
 			String op = parts[1];
 			
-			if("delete".equals(op)) {
+			if ("delete".equals(op)) {
 				String[] forumIds = request.getParameterValues("forumIds[]");
 				
 				for(String forumId : forumIds) {
-					yaftForumService.deleteForum(forumId);
+                    try {
+					    yaftForumService.deleteForum(forumId, siteId, sakaiProxy.getCurrentUser().getId());
+                    } catch (YaftSecurityException yse) {}
 				}
 				
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -793,6 +819,7 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doDiscussionsPost(HttpServletRequest request, HttpServletResponse response, String[] parts) throws ServletException, IOException {
+
 		String siteId = sakaiProxy.getCurrentSiteId();
 
 		if (parts.length == 1) {
@@ -821,30 +848,34 @@ public class YaftTool extends HttpServlet {
 
 			boolean sendEmail = true;
 
-			if (sendEmailString != null)
+			if (sendEmailString != null) {
 				sendEmail = sendEmailString.equals("true");
-			else
+            } else {
 				sendEmail = false;
+            }
 
             boolean allowAnonymousPosting = true;
 
-            if (allowAnonymousPostingString != null)
+            if (allowAnonymousPostingString != null) {
                 allowAnonymousPosting = allowAnonymousPostingString.equals("true");
-            else
+            } else {
                 allowAnonymousPosting = false;
+            }
 
 			boolean lockWriting = true;
 			boolean lockReading = true;
 
-			if (lockWritingString != null)
+			if (lockWritingString != null) {
 				lockWriting = lockWritingString.equals("true");
-			else
+            } else {
 				lockWriting = false;
+            }
 
-			if (lockReadingString != null)
+			if (lockReadingString != null) {
 				lockReading = lockReadingString.equals("true");
-			else
+            } else {
 				lockReading = false;
+            }
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Subject: " + subject);
@@ -854,8 +885,9 @@ public class YaftTool extends HttpServlet {
 
 			Message message = new Message();
 
-			if (id != null)
+			if (id != null) {
 				message.setId(id);
+            }
 
 			String currentUserId = sakaiProxy.getCurrentUser().getId();
 
@@ -879,9 +911,10 @@ public class YaftTool extends HttpServlet {
 			
 			List<Group> groupsList = new ArrayList<Group>();
 			
-			if(groups != null && groups.length > 0) {
-				for (String groupId : groups)
+			if (groups != null && groups.length > 0) {
+				for (String groupId : groups) {
 					groupsList.add(new Group(groupId, ""));
+                }
 			}
 			
 			discussion.setGroups(groupsList);
@@ -923,27 +956,35 @@ public class YaftTool extends HttpServlet {
 				}
 			}
 
-			if (yaftForumService.addDiscussion(siteId, forumId, discussion, sendEmail) != null) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html; charset=UTF-8");
-				response.getWriter().write(discussion.getId());
-				response.getWriter().close();
-				return;
-			} else {
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html; charset=UTF-8");
-				response.getWriter().write("ERROR");
-				response.getWriter().close();
-				return;
-			}
-		} else if(parts.length >= 2) {
+            try {
+                if (yaftForumService.addDiscussion(siteId, forumId, sakaiProxy.getCurrentUser().getId(), discussion, sendEmail) != null) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setContentType("text/html; charset=UTF-8");
+                    response.getWriter().write(discussion.getId());
+                    response.getWriter().close();
+                    return;
+                } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setContentType("text/html; charset=UTF-8");
+                    response.getWriter().write("ERROR");
+                    response.getWriter().close();
+                    return;
+                }
+            } catch (YaftSecurityException yse) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+		} else if (parts.length >= 2) {
 			String op = parts[1];
 			
-			if("delete".equals(op)) {
+			if ("delete".equals(op)) {
 				String[] discussionIds = request.getParameterValues("discussionIds[]");
 				
-				for(String discussionId : discussionIds) {
-					yaftForumService.deleteDiscussion(discussionId);
+				for (String discussionId : discussionIds) {
+                    try {
+					    yaftForumService.deleteDiscussion(discussionId, siteId, sakaiProxy.getCurrentUser().getId());
+                    } catch (YaftSecurityException yse) {
+                        logger.error(yse);
+                    }
 				}
 				
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -1015,30 +1056,36 @@ public class YaftTool extends HttpServlet {
 
 			// If no message id has been supplied this must be a new message, so
 			// we set the message id to empty
-			if (messageId == null)
+			if (messageId == null) {
 				message.setId("");
+            }
 
-			if (messageBeingRepliedTo != null && messageBeingRepliedTo.length() > 0)
+			if (messageBeingRepliedTo != null && messageBeingRepliedTo.length() > 0) {
 				message.setParent(messageBeingRepliedTo);
-			else if (messageBeingRepliedTo == null || messageBeingRepliedTo.length() <= 0) {
+            } else if (messageBeingRepliedTo == null || messageBeingRepliedTo.length() <= 0) {
 				// This is a discussion, or top level message
 				message.setId(messageId);
 			}
 
-			if (yaftForumService.addOrUpdateMessage(siteId, forumId, message, sendEmail)) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/plain; charset=UTF-8");
-				response.getWriter().write("success");
-				response.getWriter().close();
-				return;
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return;
-			}
+            try {
+                if (yaftForumService.addOrUpdateMessage(siteId, forumId, sakaiProxy.getCurrentUser().getId(), message, sendEmail)) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setContentType("text/plain; charset=UTF-8");
+                    response.getWriter().write("success");
+                    response.getWriter().close();
+                    return;
+                } else {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
+            } catch (YaftSecurityException yse) {
+                logger.error(yse);
+            }
 		}
 	}
 
 	private void doPermsPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		if (sakaiProxy.setPermsForCurrentSite(request.getParameterMap())) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/plain; charset=UTF-8");
@@ -1052,6 +1099,7 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doSearchPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		String searchTerms = request.getParameter("searchTerms");
 
 		if (searchTerms == null || searchTerms.length() == 0)

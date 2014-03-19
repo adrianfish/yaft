@@ -13,84 +13,87 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#yaft_reply_container{
-	padding-left: 25px;
+#yaft_reply_container {
+    padding-left: 25px;
 }
 
-#yaft_edit_forum_container{
-	padding-left: 25px;
+#yaft_edit_forum_container {
+    padding-left: 25px;
 }
 
-#yaft_toolbar_items{
-	float: left;
+#yaft_toolbar_items {
+    float: left;
 }
 
 fieldset {
     border: solid 1px black;
-	padding: 5px;
-	}
-#yaft_toolbar{
+    padding: 5px;
+}
+
+#yaft_toolbar {
     padding: 0px;
 }
 
 /* This governs the horizontal distance of a child from its parent */
-.yaft_messages{margin-left: 20px;}
+.yaft_messages {
+    margin-left: 20px;
+}
 
-#yaft_search_bar{
-	float: right;
+#yaft_search_bar {
+    float: right;
 }
 
 .yaft_profile_image {
-	float: left;
-	margin-right: 2px;
+    float: left;
+    margin-right: 2px;
 }
 
 .yaft_unread_wrapper {
-	padding-left: 4px;
-	background-color: blue;
+    padding-left: 4px;
+    background-color: blue;
 }
 
-#yaft_container{
-	/*margin: 5px;*/
+#yaft_container {
+    /*margin: 5px;*/
 }
 
-.yaft_profile_popup{
-	display: none;
+.yaft_profile_popup {
+    display: none;
 }
 
-.yaft_profile_popup_img{
-	float: right;
-	padding-left: 2px;
+.yaft_profile_popup_img {
+    float: right;
+    padding-left: 2px;
 }
 
-.yaft_profile_popup_name{
-	width: 190px;
-	font-weight: bold;
-	font-size: bigger;
-	float: left;
-	padding-left: 5px;
+.yaft_profile_popup_name {
+    width: 190px;
+    font-weight: bold;
+    font-size: bigger;
+    float: left;
+    padding-left: 5px;
 }
 
-.yaft_profile_popup_name{
-	padding-left: 5px;
+.yaft_profile_popup_name {
+    padding-left: 5px;
 }
 
-.yaft_message{
-	margin-bottom: 10px;
-	overflow: auto;
-	border: solid black 1px;
-	background-color: white;
+.yaft_message {
+    margin-bottom: 10px;
+    overflow: auto;
+    border: solid black 1px;
+    background-color: white;
 }
 
 #yaft_feedback_message {
-	color: red;
-	font-weight:bold;
+    color: red;
+    font-weight:bold;
 }
 
-.yaft_deleted_message{
-	display: none;
-	filter:alpha(opacity=50);
-	opacity: 0.5;
+.yaft_deleted_message {
+    display: none;
+    filter:alpha(opacity=50);
+    opacity: 0.5;
 }
 
 th.yaftSortableTableHeader { 
@@ -108,77 +111,94 @@ th.yaftSortableTableHeaderSortDown {
     background-image: url(../images/desc.gif); 
 } 
 
-.yaftForumDescription{
-	font-style: italic;
-	font-size: 8pt;
-	color: #666;
+.yaftForumDescription {
+    font-style: italic;
+    font-size: 8pt;
+    color: #666;
 }
 
-.yaftInvisible{
-	background-color: orange !important;
+.yaftInvisible {
+    background-color: orange !important;
 }
 
-.yaftAlert{
-	display: none;
-	color: red;
-	font-weight: bold;
+.yaftAlert {
+    display: none;
+    color: red;
+    font-weight: bold;
 }
 
-.cluetip-yaft {
-	padding: 10px;
-	border: black solid 1px;
-	background-color: white;
+/* CLUETIP START */
+#cluetip-yaft {
+    padding: 10px;
+    border: black solid 1px;
+    background-color: white;
 }
 
 .clue-right-yaft .cluetip-arrows {
-  background-image: url(../images/darrowleft.gif);
-}
-.clue-left-yaft .cluetip-arrows {
-  background-image: url(../images/darrowright.gif);
-  left: 100%;
-  margin-right: -11px;
-}
-.clue-top-yaft .cluetip-arrows {
-  background-image: url(../images/darrowdown.gif);
-  top: 100%;
-  left: 50%;
-  margin-left: -11px;
-  height: 11px;
-  width: 22px;  
-}  
-.clue-bottom-yaft .cluetip-arrows {
-  background-image: url(../images/darrowup.gif);
-  top: -11px;
-  left: 50%;
-  margin-left: -11px;
-  height: 11px;
-  width: 22px;
-}
-.cluetip-yaft div#cluetip-close {
-	text-align: right;
-	margin: 0 5px 5px;
-	color: #900;
+    background-image: url(../images/darrowleft.gif);
+    background-color: transparent;
+    border: 0px;
 }
 
-#yaft_content table td { padding: 3px; }
+.clue-left-yaft .cluetip-arrows {
+    background-image: url(../images/darrowright.gif);
+    left: 100%;
+    margin-right: -11px;
+    background-color: transparent;
+    border: 0px;
+}
+
+.clue-top-yaft .cluetip-arrows {
+    background-image: url(../images/darrowdown.gif);
+    top: 100%;
+    left: 50%;
+    margin-left: -11px;
+    height: 11px;
+    width: 22px;  
+    background-color: transparent;
+    border: 0px;
+}
+
+.clue-bottom-yaft .cluetip-arrows {
+    background-image: url(../images/darrowup.gif);
+    top: -11px;
+    left: 50%;
+    margin-left: -11px;
+    height: 11px;
+    width: 22px;
+    background-color: transparent;
+    border: 0px;
+}
+
+.cluetip-yaft div.cluetip-close {
+    text-align: right;
+    margin: 0 5px 5px;
+    color: #900;
+}
+/* CLUETIP END */
+
+#yaft_content table td {
+    padding: 3px;
+}
+
 #yaft_content table tr.odd td {
-	background-color: #FFFFC0;
+    background-color: #FFFFC0;
 }
 
 #yaft_forum_table {
     width: 100%;
 }
 
-#yaft_forum_table th div{
-	margin-right: 15px;
+#yaft_forum_table th div {
+    margin-right: 15px;
 }
 
 #yaft_discussion_table {
     width: 100%;
 }
 
-#yaft_discussion_table th div{
-	margin-right: 15px;
+#yaft_discussion_table th div {
+    margin-right: 15px;
 }
 
 #yaft_author_table {
@@ -186,11 +206,11 @@ th.yaftSortableTableHeaderSortDown {
 }
 
 .yaft_group_title {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .yaft_odd_row {
-	background-color: #FFFFC0;
+    background-color: #FFFFC0;
 }
 
 .yaft_graded_in_label {

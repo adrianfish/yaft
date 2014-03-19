@@ -181,4 +181,88 @@ public class YaftSecurityManager
 		
 		return discussion;
 	}
+
+    public boolean canUserAddOrUpdateForumInCurrentSite(String userId, Forum forum) {
+
+		boolean isNew = (forum.getId().length() == 0);
+
+        if (isNew) {
+            if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_CREATE)) {
+                return true;
+            }
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_OWN) &&  forum.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canUserAddDiscussionInCurrentSite(String userId, Discussion discussion) {
+
+		boolean isNew = (discussion.getId().length() == 0);
+
+        if (isNew) {
+            if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_DISCUSSION_CREATE)) {
+                return true;
+            }
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_DISCUSSION_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_DISCUSSION_DELETE_OWN) &&  discussion.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canUserAddOrUpdateMessageInCurrentSite(String userId, Message message) {
+
+		boolean isNew = (message.getId().length() == 0);
+
+        if (isNew) {
+            if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_MESSAGE_CREATE)) {
+                return true;
+            }
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_MESSAGE_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_MESSAGE_DELETE_OWN) &&  message.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canUserDeleteForumInCurrentSite(String userId, Forum forum) {
+
+	    if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_OWN) &&  forum.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canUserDeleteDiscussionInCurrentSite(String userId, Discussion discussion) {
+
+	    if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_DISCUSSION_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_DISCUSSION_DELETE_OWN) &&  discussion.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canUserDeleteMessageInCurrentSite(String userId, Message message) {
+
+	    if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_MESSAGE_DELETE_ANY)) {
+            return true;
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_MESSAGE_DELETE_OWN) &&  message.getCreatorId().equals(userId)) {
+            return true;
+        }
+
+        return false;
+    }
 }
