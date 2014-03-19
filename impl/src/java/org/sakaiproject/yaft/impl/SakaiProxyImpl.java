@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.sakaiproject.authz.api.AuthzGroup;
@@ -388,11 +389,13 @@ public class SakaiProxyImpl implements SakaiProxy {
 			mimeType = "application/excel";
         }
 
+		String uuid = UUID.randomUUID().toString();
+
 		if (siteId == null) {
 			siteId = getCurrentSiteId();
         }
 
-		String id = "/group/" + siteId + "/yaft-files/" + name;
+		String id = "/group/" + siteId + "/yaft-files/" + uuid;
 
 		try {
 			enableSecurityAdvisor();
@@ -409,12 +412,12 @@ public class SakaiProxyImpl implements SakaiProxy {
 			contentHostingService.commitResource(resource, NotificationService.NOTI_NONE);
 
 			// return resource.getId();
-			return name;
+			return uuid;
 		} catch (IdUsedException e) {
 			if (logger.isInfoEnabled()) {
 				logger.info("A resource with id '" + id + "' exists already. Returning id without recreating ...");
-            }
-			return name;
+			}
+			return uuid;
 		}
 	}
 
