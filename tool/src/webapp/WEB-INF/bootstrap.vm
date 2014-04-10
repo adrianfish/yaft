@@ -38,8 +38,10 @@ ${sakaiHtmlHead}
 <script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/jquery.datetimepicker.js"></script>
 <script type="text/javascript" src="/yaft-tool/js/handlebars.runtime-v1.3.0.js"></script>
+<script type="text/javascript" src="/yaft-tool/templates/all.handlebars"></script>
 
 <!-- HANDLEBARS TEMPLATES START -->
+<!--
 <script type="text/javascript" src="/yaft-tool/templates/toolbar.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/forums.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/forum_breadcrumb.handlebars"></script>
@@ -66,6 +68,7 @@ ${sakaiHtmlHead}
 <script type="text/javascript" src="/yaft-tool/templates/minimised_discussion.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/message_partial.handlebars"></script>
 <script type="text/javascript" src="/yaft-tool/templates/minimised_message_partial.handlebars"></script>
+-->
 <!-- HANDLEBARS TEMPLATES END -->
 
 <script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
