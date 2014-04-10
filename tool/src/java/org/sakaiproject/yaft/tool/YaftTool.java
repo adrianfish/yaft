@@ -994,10 +994,11 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doMessagesPost(HttpServletRequest request, HttpServletResponse response, String[] parts) throws ServletException, IOException {
+
 		String siteId = sakaiProxy.getCurrentSiteId();
 
 		if (parts.length == 1) {
-			String status = (String) request.getParameter("status");
+            String status = (String) request.getParameter("status");
 			String subject = (String) request.getParameter("subject");
 			String content = (String) request.getParameter("content");
 			String forumId = (String) request.getParameter("forumId");
@@ -1009,7 +1010,7 @@ public class YaftTool extends HttpServlet {
 			String sendEmailString = (String) request.getParameter("sendEmail");
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Status: " + status);
+                logger.debug("Status: " + status);
 				logger.debug("Subject: " + subject);
 				logger.debug("Content: " + content);
 				logger.debug("Forum ID: " + forumId);
@@ -1045,7 +1046,7 @@ public class YaftTool extends HttpServlet {
 			String currentUserId = sakaiProxy.getCurrentUser().getId();
 
 			Message message = new Message();
-			message.setStatus(status);
+            message.setStatus(status);
 			message.setSubject(subject);
 			message.setContent(content);
 			message.setSiteId(siteId);

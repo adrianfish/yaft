@@ -43,7 +43,7 @@
         yaft.fitFrame();
     };
     
-    yaft.sakai.setupCKEditor = function(textarea_id, width, height) {
+    yaft.sakai.setupCKEditor = function (textarea_id, width, height) {
 
         var instance = CKEDITOR.instances[textarea_id];
         if (typeof instance !== 'undefined') {
@@ -55,7 +55,7 @@
         CKEDITOR.instances[textarea_id].on('instanceReady',function (e) { yaft.fitFrame(); });
     };
     
-    yaft.sakai.setupWysiwygEditor = function(editorId,textarea_id,width,height) {
+    yaft.sakai.setupWysiwygEditor = function (editorId,textarea_id,width,height) {
 
         if ('FCKeditor' === editorId) {
             this.setupFCKEditor(textarea_id,width,height);
@@ -64,7 +64,7 @@
         }
     };
     
-    yaft.sakai.getWysiwygEditor = function(editorId,textarea_id) {
+    yaft.sakai.getWysiwygEditor = function (editorId,textarea_id) {
 
         if ('FCKeditor' === editorId) {
             return FCKeditorAPI.GetInstance(textarea_id);
@@ -73,7 +73,7 @@
         }
     };
     
-    yaft.sakai.getEditorData = function(editorId,textarea_id) {
+    yaft.sakai.getEditorData = function (editorId,textarea_id) {
 
         if ('FCKeditor' === editorId) {
             return this.getWysiwygEditor(editorId,textarea_id).GetData();
@@ -84,7 +84,7 @@
         }
     };
 
-    yaft.sakai.updateEditorElement = function(editorId,textarea_id) {
+    yaft.sakai.updateEditorElement = function (editorId,textarea_id) {
 
         if ('FCKeditor' === editorId) {
             return this.getWysiwygEditor(editorId,textarea_id).UpdateLinkedField();

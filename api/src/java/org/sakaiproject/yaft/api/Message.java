@@ -37,6 +37,10 @@ import lombok.Setter;
 
 public class Message implements Entity {
 
+    public static String READY = "READY";
+    public static String DELETED = "DELETED";
+    public static String DRAFT = "DRAFT";
+
 	private static final String CDATA_SUFFIX = "]]>";
 	private static final String CDATA_PREFIX = "<![CDATA[";
 	
@@ -61,7 +65,7 @@ public class Message implements Entity {
     @Getter @Setter
     private boolean anonymous = false;
     @Getter @Setter
-	private String status = "DRAFT";
+	private String status = DRAFT;
     @Getter @Setter
 	private List<Attachment> attachments = new ArrayList<Attachment>();
 	private String url = "";
@@ -113,6 +117,18 @@ public class Message implements Entity {
 			e.printStackTrace();
 		}
 	}
+
+    public boolean isDeleted() {
+        return status.equals(DELETED);
+    }
+
+    public boolean isReady() {
+        return status.equals(READY);
+    }
+
+    public boolean isDraft() {
+        return status.equals(DRAFT);
+    }
 
 	/** START Entity IMPLEMENTATION */
 

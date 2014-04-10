@@ -470,12 +470,12 @@ public class YaftPersistenceManager {
 		} finally {
 			try {
 				if (rs != null) rs.close();
-			} catch(Exception e) {}
+			} catch (Exception e) {}
 			
 			if (st != null) {
 				try {
 					st.close();
-				} catch(Exception e) {}
+				} catch (Exception e) {}
 			}
 		}
 	}

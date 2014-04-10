@@ -1,0 +1,70 @@
+{{#unless message.read}}
+<div class="yaft_unread_wrapper">
+{{/unless}}
+{{#if message.deleted}}
+    {{#if canDeleteAny}}
+    <div class="yaft_message yaft_deleted_message">
+    {{/if}}
+{{else}}
+<div class="yaft_message">
+{{/if}}
+
+{{#if message.visible}}
+<div style="margin:5px;overflow:hidden;">
+    {{#if message.anonymous}}
+        {{#if message.canSeeAuthorName}}
+        <a href="javascript:;" class="profile" rel="/direct/profile/{{message.creatorId}}/formatted"><img class="yaft_profile_image" src="/direct/profile/{{message.creatorId}}/image" width="35"/></a>
+        {{else}}
+        <img class="yaft_profile_image" src="/direct/profile/blank/image" width="35" />
+        {{/if}}
+    {{else}}
+        <a href="javascript:;" class="profile" rel="/direct/profile/{{message.creatorId}}/formatted"><img class="yaft_profile_image" src="/direct/profile/{{message.creatorId}}/image" width="35"/></a>
+    {{/if}}
+    <div style="margin-left:2px;overflow: hidden;">
+        <div style="float:left;">
+            <a id="message-{{message.id}}" name="message-{{message.id}}" href="{{message.url}}"><span style="font-weight: bold">{{message.subject}}</span></a>{{#if message.anonymous}}{{#if message.canSeeAuthorName}}<span class="yaft_small_graded_in_label"> - {{translate 'anonymous_label'}}</span>{{/if}}{{/if}}
+            <br/>
+            {{#if message.anonymous}}
+                {{#if canSeeAuthorName}}
+                <span>by <a href="javascript:;" class="profile" rel="/direct/profile/{{message.creatorId}}/formatted">{{message.creatorDisplayName}}</a> - {{message.formattedDate}}</span>
+                {{else}}
+                <span>by {{message.creatorDisplayName}} - {{message.formattedDate}}</span>
+                {{/if}}
+            {{else}}
+                <span>by <a href="javascript:;" class="profile" rel="/direct/profile/{{message.creatorId}}/formatted">{{message.creatorDisplayName}}</a> - <span>{{message.formattedDate}}</span>
+            {{/if}}
+        </div>
+        <div style="float: right;">
+            {{#if message.attachments.length}}
+            <span>{{translate 'attachments_label'}}</span>
+            {{/if}}
+            {{#each message.attachments}}
+                <a onclick="window.open('{{url}}');" title="{{name}}"><img src="{{iconUrl}}" width="16" height="16" alt="{{name}}" /></a>
+            {{/each}}
+        </div>
+    </div>
+    <hr style="clear: left"/>
+    <div style="clear: left">{{{message.content}}}</div>
+    <br />
+    <div>
+        {{#if message.canEdit}}<span><a href="#" onClick="return yaft.switchState('editMessage',{'messageId':'{{message.id}}'});">{{translate 'edit_label'}}</a></span>{{/if}}
+        {{#if message.canReply}}
+        <span><a href="#" onClick="return yaft.switchState('reply',{'messageBeingRepliedTo':'{{message.id}}'});">{{translate 'reply_label'}}</a></span>
+        {{/if}}
+        {{#if message.canDelete}}<span><a href="#" onClick="return yaft.utils.deleteMessage('{{message.id}}');">{{translate 'delete_label'}}</a></span>{{/if}}
+        {{#if message.canUndelete}}<span><a href="#" onclick="return yaft.utils.undeleteMessage('{{message.id}}');">{{translate 'undelete_label'}}</a></span>{{/if}}
+        {{#if message.canExpand}}<span><a class="yaft_collapse_expand_link" href="#" onclick="yaft.utils.toggleMessage(this,'{{message.id}}');">{{translate 'collapse_label'}}</a></span>{{/if}}
+        {{#unless message.isMine}}
+            {{#if message.read}}
+            <span><a href="javascript:;" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('{{message.id}}'),false);">{{translate 'mark_message_unread_label'}}</a></span>
+            {{else}}
+            <span><a href="#" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('{{message.id}}'),true);">{{translate 'mark_message_read_label'}}</a></span>
+            {{/if}}
+        {{/unless}}
+    </div>
+</div>
+</div>
+{{/if}}
+{{#unless message.read}}
+</div>
+{{/unless}}

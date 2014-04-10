@@ -248,3 +248,23 @@ th.yaftSortableTableHeaderSortDown {
 #yaft_author_nav_buttons {
     padding-bottom: 5px;
 }
+
+#yaft-get-started-instruction {
+    display: none;
+}
+
+#yaft-delete-forums-button {
+    display: none;
+}
+
+#yaft-all-fora-checkbox {
+    display: none;
+}
+
+#yaft-all-discussions-checkbox {
+    display: none;
+}
+
+#yaft-current-attachments {
+    border: black solid 2px;
+}

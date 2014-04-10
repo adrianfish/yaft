@@ -1,0 +1,25 @@
+{{#if ready}}
+    <div id="{{id}}_link" class="yaft_message_minimised">
+        <a href="javascript:;" title="Click to show the full message" onclick="yaft.showMessage('{{id}}', true);"><span style="font-weight: bold">{{subject}}</span></a></span> - <span>by 
+        {{#if anonymous}}
+            {{#if canViewAuthor}}
+            <a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></span> {{translate 'on'}} <span>{{formattedDate}}</span>
+            {{else}}
+            {{translate 'anonymous_label'}}</span> {{translate 'on'}} <span>{{formattedDate}}</span>
+            {{/if}}
+        {{else}}
+            <a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></span> {{translate 'on'}} <span>{{formattedDate}}</span>
+        {{/if}}
+        <img title="You've read this message" {{#unless read}} style="display:none"{{/unless}} class="messageReadFlag" id="{{id}}_read" src="/library/image/silk/book_open.png" width="16" height="16"/>
+        {{#each attachments}}
+            <a onclick="window.open('{{url}}');" title="{{name}}"><img src="/library/image/silk/page_white_acrobat.png" width="16" height="16" alt="{{iconUrl}}" /></a>
+        {{/each}}
+    </div>
+    <div class="yaft_full_message" id="{{id}}" style="display: none;overflow: auto;margin-top:5px;"></div>
+{{/if}}
+
+<div class="yaft_messages">
+{{#each children}}
+    {{> minimisedmessage}}
+{{/each}}
+</div>

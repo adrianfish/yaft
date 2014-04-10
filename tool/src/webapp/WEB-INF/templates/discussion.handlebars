@@ -1,0 +1,17 @@
+{{#if hidden}}
+<h3>This discussion is not available at this time</h3>
+{{/if}}
+{{#if deleted}}
+<h3>This discussion has been deleted</h3>
+{{/if}}
+{{#if visible}}
+<a href="javascript:;" class="yaft-mark-as-read-link">{{translate 'mark_discussion_read_label'}}</a>
+<br />
+<br />
+
+{{> message firstMessage}}
+
+<br />
+
+<a href="javascript:;" class="yaft-mark-as-read-link">{{translate 'mark_discussion_read_label'}}</a>
+{{/if}}

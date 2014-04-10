@@ -1,0 +1,48 @@
+<div id="yaft_reply_container">
+    <form id="yaft_message_form" method="POST" action="/portal/tool/{{placementId}}/messages">
+        <h4>Type your message</h4>
+        <br />
+        <input name="status" type="hidden" size="48" value="{{message.status}}"/>
+        <span>{{translate 'subject_label'}}</span>
+        <br />
+        <input name="subject" type="text" size="48" value="{{message.subject}}"/>
+        <br />
+        <br />
+        <span>{{translate 'message_label'}}: *</span>
+        <br />
+        <textarea name="content" id="yaft_message_editor" cols="100" rows="5">{{message.content}}</textarea>
+        <br />
+        <br />
+        {{#if canSendAlerts}}
+        <input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true"/>{{translate 'send_email_alert_label'}}
+        <br />
+        {{/if}}
+        {{#if filteredAttachments.length}}
+        <fieldset id="yaft-current-attachments-fieldset">
+            <legend>{{translate 'current_attachments_label'}}</legend>
+            {{#each filteredAttachments}}
+            <div id="file_{{@index}}">
+                <span>{{name}}</span>
+                <a href="#" onclick="yaft.utils.removeAttachment('{{resourceId}}','{{../message.id}}','file_{{@index}}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+                <br />
+            </div>
+            {{/each}}
+        </fieldset>
+        {{/if}}
+
+        <br />
+        <span>{{translate 'add_attachments_label'}}</span>
+        <br />
+        <input id="yaft_attachment" name="attachment" type="file" class="multi"/>
+        <br/>
+
+        <input type="submit" value="{{translate 'save_label'}}"/>
+        <input type="button" value="{{translate 'cancel_label'}}" onclick="return yaft.switchState('{{viewMode}}',{'messageId':'{{message.id}}'})"/>
+
+        <input type="hidden" name="forumId" value="{{currentForumId}}"/>
+        <input type="hidden" name="siteId" value="{{siteId}}"/>
+        <input type="hidden" name="discussionId" value="{{currentDiscussionId}}"/>
+        <input type="hidden" name="messageId" value="{{message.id}}"/>
+        <input type="hidden" name="viewMode" value="{{viewMode}}"/>
+    </form>
+</div>

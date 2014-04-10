@@ -298,7 +298,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 				childrenPS.setString(2, message.getId());
 				statements.add(childrenPS);
 
-				if (message.getStatus().equals("READY")) {
+				if (message.isReady()) {
 					statements.add(getIncrementDiscussionMessageCountStatement(message, connection));
 					statements.add(getIncrementForumMessageCountStatement(forumId, message, connection));
 				}
@@ -427,8 +427,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		String discussionId = message.getDiscussionId();
 		List<String> statements = new ArrayList<String>();
 		statements.add("UPDATE YAFT_MESSAGE SET STATUS = 'DELETED' WHERE MESSAGE_ID  = '" + messageId + "'");
-		if("READY".equals(message.getStatus()))
-		{
+		if (message.isReady()) {
 			statements.add("UPDATE YAFT_FORUM SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE FORUM_ID = '" + forumId + "'");
 			statements.add("UPDATE YAFT_DISCUSSION SET MESSAGE_COUNT = MESSAGE_COUNT - 1 WHERE DISCUSSION_ID = '" + discussionId + "'");
 			statements.add("UPDATE YAFT_DISCUSSION SET LAST_MESSAGE_DATE = (SELECT MAX(CREATED_DATE) FROM YAFT_MESSAGE WHERE STATUS <> 'DELETED' AND DISCUSSION_ID = '" + discussionId + "') WHERE DISCUSSION_ID = '" + discussionId + "'");

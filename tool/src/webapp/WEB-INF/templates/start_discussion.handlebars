@@ -1,0 +1,135 @@
+<div id="yaft_reply_container">
+    <form id="yaft_discussion_form" method="POST" action="/portal/tool/{{placementId}}/discussions">
+        <input type="hidden" name="id" value="{{discussion.id}}"/>
+        <input type="hidden" name="forumId" value="{{currentForumId}}"/>
+        <input type="hidden" name="siteId" value="{{siteId}}"/>
+        <h4>{{translate 'type_your_message_label'}}</h4>
+        <br />
+        <span>{{translate 'subject_label'}}: *</span>
+        <br />
+        <input id="yaft_subject_field" name="subject" type="text" size="48" value="{{discussion.subject}}"/>
+        <br />
+        <br />
+        <span>{{translate 'message_label'}}: *</span>
+        <br />
+        <textarea name="content" id="yaft_discussion_editor" cols="100" rows="5">{{discussion.firstMessage.content}}</textarea>
+        <br />
+        <br />
+        {{#if canSendAlerts}}
+        <input type="checkbox" id="yaft_send_email_checkbox" name="sendEmail" value="true" checked/>{{translate 'send_email_alert_label'}}
+        <br />
+        <br />
+        {{/if}}
+        <input type="checkbox" id="yaft_allow_anonymous_posting_checkbox" name="allowAnonymousPosting" value="true" />{{translate 'allow_anonymous_posting_label'}}
+        <br />
+        {{#if discussion.filteredAttachments.length}}
+        <fieldset id="yaft-current-attachments-fieldset">
+            <legend>{{translate 'current_attachments_label'}}</legend>
+            {{#each discussion.filteredAttachments}}
+            <div id="file_{{@index}}">
+                <span>{{name}}</span>
+                <a href="#" onclick="yaft.utils.removeAttachment('{{resourceId}}','{{../discussion.firstMessage.id}}','file_{{@index}}');" title="Delete attachment"><img src="/library/image/silk/cross.png" width="16" height="16"/></a>
+                <br />
+            </div>
+            {{/each}}
+        </fieldset>
+        {{/if}}
+        <br />
+        <span>{{translate 'add_attachments_label'}}</span>
+        <br />
+        <input id="yaft_attachment" name="attachment" type="file" class="multi"/><br clear="all"/>
+    
+        {{#if hasGroups}}
+        <a id="yaft_toggle_group_options_link" href="javascript:;">Groups</a>
+        <br />
+        <div id="yaft_group_options" style="display:none;">
+            <fieldset id="yaft_groups_fieldset">
+                <legend>{{translate 'groups_box_label'}}</legend>
+                <span class="instruction">{{translate 'limit_discussion_to_groups_label'}}</span>
+                <br />
+                <br />
+                {{#each groups}}
+                <input type="checkbox" id="{{id}}" class="yaft_group_checkbox" name="groups" value="{{id}}"/>{{title}}
+                <br />
+                {{/each}}
+            </fieldset>
+            <br />
+        </div>
+        {{/if}}
+
+        <a id="yaft_toggle_availability_options_link" href="javascript:;">{{translate 'availability_label'}}</a>
+        <br />
+        <div id="yaft_availability_options" style="display:none;">
+            <fieldset id="yaft_availability_fieldset">
+                <legend>{{translate 'availability_label'}}</legend>
+                <input type="checkbox" id="yaft_lock_writing_checkbox" onclick="if($('#yaft_lock_reading_checkbox').attr('checked')) return false;" name="lockWriting" value="true"/>{{translate 'availability_lock_for_writing_label'}}
+                <br />
+                <input type="checkbox" id="yaft_lock_reading_checkbox" onclick="$('#yaft_lock_writing_checkbox').attr('checked',true);" name="lockReading" value="true"/>{{translate 'availability_lock_for_reading_label'}}
+                <br />
+                <br />
+                <input type="hidden" name="startDate" id="yaft_start_date_millis"/>
+                <input type="hidden" name="endDate" id="yaft_end_date_millis"/>
+                <span>{{translate 'availability_except_between_label'}}</span>
+                <br />
+                <br />
+                <input id="yaft_start_date" type="text" />
+                <select id="yaft_start_hours">
+                    {{#each hours}}
+                    <option>{{this}}</option>
+                    {{/each}}
+                </select>
+                <span>:</span>
+                <select id="yaft_start_minutes">
+                    {{#each minutes}}
+                    <option>{{this}}</option>
+                    {{/each}}
+                </select>
+                <br />
+                <br />
+                <span>{{translate 'availability_except_between_and_label'}}</span>
+                <br />
+                <br />
+                <input id="yaft_end_date" type="text" />
+                <select id="yaft_end_hours">
+                    {{#each hours}}
+                    <option>{{this}}</option>
+                    {{/each}}
+                </select>
+                <span>:</span>
+                <select id="yaft_end_minutes">
+                    {{#each minutes}}
+                    <option>{{this}}</option>
+                    {{/each}}
+                </select>
+                <br />
+                <br />
+                <a href="javascript:;" onclick="yaft.utils.clearDates();">{{translate 'availability_clear_date_label'}}</a>
+            </fieldset>
+            <br />
+        </div>
+
+        <br />
+
+        {{#if gbAssignments.length}}
+        <a id="yaft_toggle_gradebook_options_link" href="javascript:;">{{translate 'grading_label'}}</a>
+        <br />
+        <div id="yaft_gradebook_options" style="display:none;">
+            <fieldset id="yaft_grading_fieldset" style="display: none;">
+                <legend>{{translate 'grading_label'}}</legend>
+                <input id="yaft_grade_checkbox" type="checkbox" name="grade" value="true"/>{{translate 'grading_message'}}
+                <br />
+                <select id="yaft_assignment_selector" class="indnt4" name="assignmentId" style="display: none;">
+                    {{#each gbAssignments}}
+                    <option value="{{id}}">{{name}}</option>
+                    {{/each}}
+                </select>
+            </fieldset>
+            <br />
+        </div>
+        {{/if}}
+
+        <br />
+        <input type="submit" value="{{translate 'save_label'}}"/>
+        <input type="button" value="{{translate 'cancel_label'}}" onClick="return yaft.switchState('forum');"/>
+    </form>
+</div>

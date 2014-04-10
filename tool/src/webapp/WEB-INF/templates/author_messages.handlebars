@@ -1,0 +1,37 @@
+{{#if gradeable}}
+Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field" value="{{grade}}"/> / {{assignment.points}}&nbsp;<input type="button" id="yaft_grade_button" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span>
+<br />
+<br />
+{{/if}}
+<div id="yaft_author_nav_buttons">
+    <img id="yaft_previous_author_button" src="/library/image/silk/resultset_previous.png" title="{{translate 'previous_author_tooltip'}}" alt="{{translate 'previous_author_tooltip'}}"/>
+    <img id="yaft_next_author_button" src="/library/image/silk/resultset_next.png" title="{{translate 'next_author_tooltip'}}" alt="{{translate 'next_author_tooltip'}}" />
+    <span>{{translate 'messages_by'}} <b>{{displayName}}</b></span>
+</div>
+{{#each messages}}
+<div class="yaft_message">
+
+<div style="margin:5px;overflow:hidden;">
+    <div style="margin-left:2px;overflow: hidden;">
+        <div style="float:left;">
+            <a id="message-{{id}}" href="{{url}}"><span style="font-weight: bold">{{subject}}</span></a> - <span>{{formattedDate}}</span>
+        </div>
+        <div style="float: right;">
+            {{#if attachments.length}}
+            <span>Attachments: </span>
+            <span>{{translate 'attachments_label'}}</span>
+            {{/if}}
+            {{#each attachments}}
+                <a onclick="window.open('{{url}}');" title="{{name}}"><img src="{{iconUrl}}" width="16" height="16" alt="{{name}}" /></a>
+            {{/each}}
+        </div>
+    </div>
+    <hr style="clear: left"/>
+    <div style="clear: left">{{{content}}}</div>
+    <br />
+</div>
+</div>
+{{/each}}
+{{#if gradeable}}
+Grade: <input type="text" class="yaft_grade_field" id="yaft_grade_field2" value="{{grade}}"/> / {{assignment.points}}&nbsp;<input type="button" id="yaft_grade_button2" value="Apply Grade"/><span class="yaft_grade_success_message">Grade Updated!</span><br /><br />
+{{/if}}

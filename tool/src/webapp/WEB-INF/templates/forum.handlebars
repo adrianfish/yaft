@@ -1,0 +1,63 @@
+<div id="yaft_forum_description">{{description}}</div>
+<div id="yaft-get-started-instruction" class="textblock">
+    <p>{{translate 'discussions_get_started'}}</p>
+</div>
+<div>
+    <div class="navIntraToolLink viewNav" style="float: right;">
+        <span>
+            <input type="button" id="yaft-delete-discussions-button" value="{{translate 'delete_label'}}" disabled="disabled"/>
+        <span>
+    </div>
+</div>
+<table id="yaft_discussion_table" class="listHier">
+    <thead>
+        <tr>
+            <th align="left"><div>{{translate 'discussion_label'}}</div></th>
+            <th align="left"><div>{{translate 'started_by_label'}}</div></th>
+            <th align="left"><div>{{translate 'messages_label'}}</div></th>
+            <th align="left"><div>{{translate 'unread_label'}}</div></th>
+            <th align="left"><div>{{translate 'last_message_label'}}</div></th>
+            <th align="left"><div>{{translate 'options_label'}}</div></th>
+            <th align="center"><input id="yaft-all-discussions-checkbox" type="checkbox"/></th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each discussions}}
+        <tr{{#if invisible}} class="yaftInvisible"{{/if}}">
+            <td style="max-width:250px;"><a href="{{url}}" title="{{translate 'discussion_link_tooltip'}}" onClick="return yaft.switchState('{{../viewMode}}',{'discussionId':'{{id}}'});">{{subject}}</a>{{#if allowAnonymousPosting}}<br /><span class="yaft_small_graded_in_label"> - {{translate 'anonymous_allowed_label'}}</span>{{/if}}{{#if graded}}<br /><span class="yaft_small_graded_in_label">({{translate 'graded_in_label'}}: {{assignment.name}})</span>{{/if}}
+                {{#if groups.length}}
+                <br />
+                <span class="yaftForumDescription">{{translate 'group_message'}}
+                {{#each groups}}
+                <span class="yaft_group_title">{{title}}<span>
+                {{#unless last}},{{/unless}}
+                {{/each}}
+                </span>
+                {{/if}}
+                {{#if formattedStartDate}}
+                <br />
+                <span id="yaft_availability_message" class="yaftForumDescription">{{translate 'availability_message1'}}{{formattedStartDate}}{{translate 'availability_message2'}}{{formattedEndDate}}</span>
+                {{/if}}
+            </td>
+            <td><a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></td>
+            <td>{{messageCount}}</td>
+            <td>{{unread}}</td>
+            <td>{{formattedLastMessageDate}}</td>
+            <td align="center">
+                {{#if canDelete}}
+                <a href="javascript;" onclick="return yaft.switchState('startDiscussion',{'discussionId':'{{id}}'});" title="{{translate 'edit_discussion_tooltip'}}">{{translate 'edit_label'}}</a>&nbsp;
+                <a href="javascript:;" onclick="return yaft.utils.clearDiscussion('{{id}}','{{subject}}');" title="{{translate 'clear_discussion_tooltip'}}">{{translate 'clear_label'}}</a>&nbsp;
+                {{/if}}
+                {{#if canMove}}
+                    <a href="javascript;" onClick="return yaft.switchState('moveDiscussion',{'discussionId':'{{id}}'});" title="{{translate 'move_discussion_tooltip'}}">{{translate 'move_discussion_label2'}}</a>
+                {{/if}}
+            </td>
+            <td align="center">
+            {{#if ../discussionDeleteAny}}
+                <input type="checkbox" class="yaft_bulk_option_candidate" id="{{id}}"/>
+            {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
