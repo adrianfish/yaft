@@ -234,7 +234,9 @@
             }
         });
 
-        this.renderHandlebarsTemplate('forum', {discussions: discussions, viewMode: yaft.startupArgs.viewMode, discussionDeleteAny: yaft.currentUserPermissions.discussionDeleteAny}, 'yaft_content');
+        this.renderTemplate('forum', { discussions: discussions,
+                                        viewMode: yaft.startupArgs.viewMode,
+                                        discussionDeleteAny: yaft.currentUserPermissions.discussionDeleteAny }, 'yaft_content');
             
         $(document).ready(function () {
 
@@ -377,7 +379,7 @@
             
         });
 
-        this.renderHandlebarsTemplate('forums', {'fora': fora, forumDeleteAny: yaft.currentUserPermissions.forumDeleteAny}, 'yaft_content');
+        this.renderTemplate('forums', {'fora': fora, forumDeleteAny: yaft.currentUserPermissions.forumDeleteAny}, 'yaft_content');
 
         $(document).ready(function () {
 
@@ -1113,9 +1115,9 @@
     yaft.utils.getAuthors = function () {
 
         this.setCurrentAuthors();
-        this.renderHandlebarsTemplate('authors_breadcrumb', {placementId: yaft.startupArgs.placementId, currentForum: yaft.currentForum, currentDiscussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
+        this.renderTemplate('authors_breadcrumb', {placementId: yaft.startupArgs.placementId, currentForum: yaft.currentForum, currentDiscussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
         var canGrade = yaft.currentUserPermissions.gradeAll && yaft.currentDiscussion.graded;
-        this.renderHandlebarsTemplate('authors', {authors: yaft.currentAuthors, currentDiscussion: yaft.currentDiscussion, 'canGrade': canGrade}, 'yaft_content');
+        this.renderTemplate('authors', {authors: yaft.currentAuthors, currentDiscussion: yaft.currentDiscussion, 'canGrade': canGrade}, 'yaft_content');
 
         $(document).ready(function () {
 
@@ -1215,7 +1217,7 @@
                                 grade: (author.grade) ? author.grade.grade : undefined,
                                 gradeable: yaft.currentDiscussion.assignment && yaft.currentUserPermissions.gradeAll };
 
-                yaft.utils.renderHandlebarsTemplate('author_messages', stuff, 'yaft_content');
+                yaft.utils.renderTemplate('author_messages', stuff, 'yaft_content');
 
                 $(document).ready(function () {
 
@@ -1327,7 +1329,7 @@
         });
     };
 
-    yaft.utils.renderHandlebarsTemplate = function (name, context, output) {
+    yaft.utils.renderTemplate = function (name, context, output) {
 
         var template = Handlebars.templates[name];
         document.getElementById(output).innerHTML = template(context);

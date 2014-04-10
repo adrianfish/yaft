@@ -1332,31 +1332,6 @@ function program45(depth0,data) {
   buffer += "\n";
   return buffer;
   });
-templates['message_partial'] = template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); partials = this.merge(partials, Handlebars.partials); data = data || {};
-  var buffer = "", stack1, helper, self=this, functionType="function", escapeExpression=this.escapeExpression;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\n        ";
-  stack1 = self.invokePartial(partials.message, 'message', depth0, helpers, partials, data);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
-  return buffer;
-  }
-
-  buffer += "<div id=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" style=\"overflow: auto;\"></div>\n<div class=\"yaft_messages\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.children), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</div>\n";
-  return buffer;
-  });
 templates['message_view_breadcrumb'] = template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1426,6 +1401,102 @@ function program5(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.visible), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n";
+  return buffer;
+  });
+templates['move_discussion'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n        <option value=\"";
+  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">";
+  if (helper = helpers.title) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.title); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</option>\n    ";
+  return buffer;
+  }
+
+  buffer += "<span><b>"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_one", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_one", options)))
+    + "'"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.subject)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "'"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_two", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_two", options)))
+    + "</b></span>\n<br />\n<br />\n<span>"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_three", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_three", options)))
+    + "</span>\n<br />\n<br />\n<form id=\"yaft_move_discussion_form\" action=\"/portal/tool/";
+  if (helper = helpers.placementId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.placementId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" method=\"POST\">\n    <input type=\"hidden\" name=\"function\" value=\"moveDiscussion\"/>\n    <input type=\"hidden\" name=\"discussionId\" value=\""
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\"/>\n    <input type=\"hidden\" name=\"currentForumId\" value=\""
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.forumId)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\"/>\n    <select name=\"forumId\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.forums), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    </select>\n    <br />\n    <br />\n    <input type=\"submit\" value=\""
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_label", options) : helperMissing.call(depth0, "translate", "move_label", options)))
+    + "\"/>\n    <input type=\"button\" value=\""
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "cancel_label", options) : helperMissing.call(depth0, "translate", "cancel_label", options)))
+    + "\" onClick=\"return yaft.switchState('forum');\"/>\n</form>\n";
+  return buffer;
+  });
+templates['move_discussion_breadcrumb'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+
+
+  buffer += "<a href=\"/portal/tool/";
+  if (helper = helpers.placementId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.placementId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "/forums\" onClick=\"return yaft.switchState('forums');\">"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "forums_label", options) : helperMissing.call(depth0, "translate", "forums_label", options)))
+    + "</a>-&gt;<a href=\"";
+  if (helper = helpers.currentForumUrl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.currentForumUrl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" onClick=\"return yaft.switchState('forum');\">";
+  if (helper = helpers.currentForumTitle) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.currentForumTitle); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</a>-&gt;"
+    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_label", options) : helperMissing.call(depth0, "translate", "move_discussion_label", options)))
+    + "\n";
+  return buffer;
+  });
+templates['message_partial'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); partials = this.merge(partials, Handlebars.partials); data = data || {};
+  var buffer = "", stack1, helper, self=this, functionType="function", escapeExpression=this.escapeExpression;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n        ";
+  stack1 = self.invokePartial(partials.message, 'message', depth0, helpers, partials, data);
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    ";
+  return buffer;
+  }
+
+  buffer += "<div id=\"";
+  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" style=\"overflow: auto;\"></div>\n<div class=\"yaft_messages\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.children), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</div>\n";
   return buffer;
   });
 templates['minimised_message_partial'] = template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1575,77 +1646,6 @@ function program13(depth0,data) {
   stack1 = helpers.each.call(depth0, (depth0 && depth0.children), {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n";
-  return buffer;
-  });
-templates['move_discussion'] = template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n        <option value=\"";
-  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">";
-  if (helper = helpers.title) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.title); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</option>\n    ";
-  return buffer;
-  }
-
-  buffer += "<span><b>"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_one", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_one", options)))
-    + "'"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.subject)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "'"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_two", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_two", options)))
-    + "</b></span>\n<br />\n<br />\n<span>"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_instruction_three", options) : helperMissing.call(depth0, "translate", "move_discussion_instruction_three", options)))
-    + "</span>\n<br />\n<br />\n<form id=\"yaft_move_discussion_form\" action=\"/portal/tool/";
-  if (helper = helpers.placementId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.placementId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" method=\"POST\">\n    <input type=\"hidden\" name=\"function\" value=\"moveDiscussion\"/>\n    <input type=\"hidden\" name=\"discussionId\" value=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"/>\n    <input type=\"hidden\" name=\"currentForumId\" value=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.discussion)),stack1 == null || stack1 === false ? stack1 : stack1.forumId)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\"/>\n    <select name=\"forumId\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.forums), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </select>\n    <br />\n    <br />\n    <input type=\"submit\" value=\""
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_label", options) : helperMissing.call(depth0, "translate", "move_label", options)))
-    + "\"/>\n    <input type=\"button\" value=\""
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "cancel_label", options) : helperMissing.call(depth0, "translate", "cancel_label", options)))
-    + "\" onClick=\"return yaft.switchState('forum');\"/>\n</form>\n";
-  return buffer;
-  });
-templates['move_discussion_breadcrumb'] = template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
-
-
-  buffer += "<a href=\"/portal/tool/";
-  if (helper = helpers.placementId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.placementId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "/forums\" onClick=\"return yaft.switchState('forums');\">"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "forums_label", options) : helperMissing.call(depth0, "translate", "forums_label", options)))
-    + "</a>-&gt;<a href=\"";
-  if (helper = helpers.currentForumUrl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.currentForumUrl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" onClick=\"return yaft.switchState('forum');\">";
-  if (helper = helpers.currentForumTitle) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.currentForumTitle); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</a>-&gt;"
-    + escapeExpression((helper = helpers.translate || (depth0 && depth0.translate),options={hash:{},data:data},helper ? helper.call(depth0, "move_discussion_label", options) : helperMissing.call(depth0, "translate", "move_discussion_label", options)))
-    + "\n";
   return buffer;
   });
 templates['permissions'] = template(function (Handlebars,depth0,helpers,partials,data) {
