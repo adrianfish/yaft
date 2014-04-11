@@ -36,9 +36,6 @@ import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.util.RequestFilter;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.yaft.api.*;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 
 /**
  * This servlet handles all of the REST type stuff. At some point this may all
@@ -54,8 +51,6 @@ public class YaftTool extends HttpServlet {
 
 	private SakaiProxy sakaiProxy;
 	
-	private Template bootstrapTemplate = null;
-
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if (logger.isDebugEnabled()) {
@@ -74,13 +69,11 @@ public class YaftTool extends HttpServlet {
 			throw new ServletException("getCurrentUser returned null.");
 		}
 
-		String siteId = sakaiProxy.getCurrentSiteId();
-		String placementId = (String) request.getAttribute(Tool.PLACEMENT_ID);
-		
-		String sakaiHtmlHead = (String) request.getAttribute("sakai.html.head");
 
-		// We need to pass the language code to the JQuery code in the pages.
-		Locale locale = (new ResourceLoader(userId)).getLocale();
+		ResourceLoader rl = new ResourceLoader(userId, "org.sakaiproject.yaft.tool.bundle.ui");
+		
+		Locale locale = rl.getLocale();
+
 		String language = locale.getLanguage();
 		String country = locale.getCountry();
 		
@@ -89,45 +82,40 @@ public class YaftTool extends HttpServlet {
         if (country != null && !country.equals("")) {
             isoLanguage += "_" + country;
         }
+
+        // These go in a separate variable
+        String[] months = rl.getString("months").split(",");
         
-		VelocityContext ctx = new VelocityContext();
+		String sakaiHtmlHead = (String) request.getAttribute("sakai.html.head");
+		request.setAttribute("sakaiHtmlHead",sakaiHtmlHead);
 		
-		// This is needed so certain trimpath variables don't get parsed.
-		ctx.put("D", "$");
-       
-		ctx.put("sakaiHtmlHead",sakaiHtmlHead);
-		
-	    ctx.put("userId",userId);
-	    ctx.put("siteId",siteId);
-	    ctx.put("state","forums");
-	    ctx.put("placementId",placementId);
-	    ctx.put("isoLanguage",isoLanguage);
-	    ctx.put("editor",sakaiProxy.getWysiwygEditor());
+	    request.setAttribute("userId",userId);
+
+		String siteId = sakaiProxy.getCurrentSiteId();
+	    request.setAttribute("siteId",siteId);
+
+	    request.setAttribute("state","forums");
+		String placementId = (String) request.getAttribute(Tool.PLACEMENT_ID);
+	    request.setAttribute("placementId", placementId);
+	    request.setAttribute("isoLanguage",isoLanguage);
+	    request.setAttribute("editor",sakaiProxy.getWysiwygEditor());
+        request.setAttribute("i18n", rl);
+	    request.setAttribute("months", months);
 
 		String pathInfo = request.getPathInfo();
 
 		String uri = request.getRequestURI();
 
         if (uri.contains("/portal/pda/")) {
-            ctx.put("viewMode","minimal");
-            ctx.put("onPDAPortal", "true");
+            request.setAttribute("viewMode","minimal");
+            request.setAttribute("onPDAPortal", "true");
         } else {
-            ctx.put("viewMode","full");
-            ctx.put("onPDAPortal","false");
+            request.setAttribute("viewMode","full");
+            request.setAttribute("onPDAPortal","false");
         }
 
 		if (pathInfo == null || pathInfo.length() < 1) {
-			// There's no path info, so this is the initial state
-	        response.setStatus(HttpServletResponse.SC_OK);
-	        response.setContentType("text/html; charset=UTF-8");
-	        Writer writer = new BufferedWriter(response.getWriter());
-	        try {
-	        	bootstrapTemplate.merge(ctx,writer);
-			} catch (Exception e) {
-				logger.error("Failed to merge template. Returning 500.",e);
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
-	        writer.close();
+            request.getRequestDispatcher("/WEB-INF/bootstrap.jsp").include(request, response);	
 		} else {
 			String[] parts = pathInfo.substring(1).split("/");
 
@@ -135,7 +123,7 @@ public class YaftTool extends HttpServlet {
 				String part1 = parts[0];
 
 				if (part1.startsWith("forums")) {
-					doForumsGet(request, response, parts, userId, siteId, placementId, locale,ctx);
+					doForumsGet(request, response, parts, userId, siteId, placementId, locale);
 				} else if ("authors".equals(part1)) {
 					if (parts.length == 1) {
 						List<Author> authors = yaftForumService.getAuthorsForCurrentSite();
@@ -205,17 +193,17 @@ public class YaftTool extends HttpServlet {
 				}
 
 				else if ("discussions".equals(part1)) {
-					doDiscussionsGet(request, response, parts, userId, siteId, placementId, locale,ctx);
+					doDiscussionsGet(request, response, parts, userId, siteId, placementId, locale);
 				}
 
 				else if ("messages".equals(part1)) {
-					doMessagesGet(request, response, parts, userId, siteId, placementId, locale,ctx);
+					doMessagesGet(request, response, parts, userId, siteId, placementId, locale);
 				}
 			}
 		}
 	}
 
-	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale,VelocityContext ctx) throws ServletException, IOException {
+	private void doForumsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale) throws ServletException, IOException {
 		String state = request.getParameter("state");
 
 		if (state == null)
@@ -253,19 +241,9 @@ public class YaftTool extends HttpServlet {
 					if (!forumId.endsWith(".json")) {
 						forumId = forumId.substring(0, forumId.length() - 5);
 						
-						ctx.put("forumId",forumId);
-						ctx.put("state","forum");
-				        
-						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("text/html; charset=UTF-8");
-						Writer writer = new BufferedWriter(response.getWriter());
-						try {
-							bootstrapTemplate.merge(ctx,writer);
-						} catch (Exception e) {
-							logger.error("Failed to merge template. Returning 500.",e);
-							response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-						}
-						writer.close();
+						request.setAttribute("forumId",forumId);
+						request.setAttribute("state","forum");
+                        request.getRequestDispatcher("/WEB-INF/bootstrap.jsp").include(request, response);	
 						return;
 					}
 					
@@ -310,7 +288,8 @@ public class YaftTool extends HttpServlet {
 		}
 	}
 
-	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
+	private void doDiscussionsGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale) throws ServletException, IOException {
+
 		if (parts.length >= 2) {
 			String discussionId = parts[1];
 
@@ -349,20 +328,10 @@ public class YaftTool extends HttpServlet {
 				if (isHtmlRequest) {
 					Forum forum = yaftForumService.getForumContainingMessage(discussionId);
 					
-				    ctx.put("discussionId",discussionId);
-				    ctx.put("forumId",forum.getId());
-				    ctx.put("state","full");
-				        
-				    response.setStatus(HttpServletResponse.SC_OK);
-				    response.setContentType("text/html; charset=UTF-8");
-				    Writer writer = new BufferedWriter(response.getWriter());
-				    try {
-				    	bootstrapTemplate.merge(ctx,writer);
-					} catch (Exception e) {
-						logger.error("Failed to merge template. Returning 500.",e);
-						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					}
-				    writer.close();
+				    request.setAttribute("discussionId",discussionId);
+				    request.setAttribute("forumId",forum.getId());
+				    request.setAttribute("state","full");
+                    request.getRequestDispatcher("/WEB-INF/bootstrap.jsp").include(request, response);	
 					return;
 				}
 				
@@ -452,7 +421,7 @@ public class YaftTool extends HttpServlet {
 		}
 	}
 
-	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale, VelocityContext ctx) throws ServletException, IOException {
+	private void doMessagesGet(HttpServletRequest request, HttpServletResponse response, String[] parts, String userId, String siteId, String placementId, Locale locale) throws ServletException, IOException {
 		if (parts.length >= 2) {
 			String messageId = parts[1];
 
@@ -469,21 +438,11 @@ public class YaftTool extends HttpServlet {
 			if (parts.length == 2) {
 				if (isHtmlRequest) {
 					
-				    ctx.put("forumId",forum.getId());
-				    ctx.put("discussionId",message.getDiscussionId());
-				    ctx.put("state","full");
-				    ctx.put("messageId",messageId);
-				        
-				    response.setStatus(HttpServletResponse.SC_OK);
-				    response.setContentType("text/html; charset=UTF-8");				    
-				    Writer writer = new BufferedWriter(response.getWriter());
-				    try {
-						bootstrapTemplate.merge(ctx,writer);
-					} catch (Exception e) {
-						logger.error("Failed to merge template. Returning 500.",e);
-						response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					}
-				    writer.close();
+				    request.setAttribute("forumId",forum.getId());
+				    request.setAttribute("discussionId",message.getDiscussionId());
+				    request.setAttribute("state","full");
+				    request.setAttribute("messageId",messageId);
+                    request.getRequestDispatcher("/WEB-INF/bootstrap.jsp").include(request, response);	
 					return;
 				}
 
@@ -1177,13 +1136,6 @@ public class YaftTool extends HttpServlet {
 			ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
 			yaftForumService = (YaftForumService) componentManager.get(YaftForumService.class);
 			sakaiProxy = yaftForumService.getSakaiProxy();
-			VelocityEngine ve = new VelocityEngine();
-            Properties props = new Properties();
-            props.setProperty("file.resource.loader.path",config.getServletContext().getRealPath("/WEB-INF"));
-            props.setProperty(VelocityEngine.INPUT_ENCODING, "UTF-8");
-            props.setProperty(VelocityEngine.OUTPUT_ENCODING, "UTF-8");
-            ve.init(props);            
-            bootstrapTemplate = ve.getTemplate("bootstrap.vm");
 		} catch (Throwable t) {
 			throw new ServletException("Failed to initialise YaftTool servlet.", t);
 		}

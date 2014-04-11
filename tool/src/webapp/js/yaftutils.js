@@ -50,12 +50,12 @@
 
                 $.each(forums, function (index, forum) {
 
-                    if ( (yaft.currentUserPermissions.viewInvisible || forum.creatorId === yaft.startupArgs.userId)
+                    if ( (yaft.currentUserPermissions.viewInvisible || forum.creatorId === yaft.userId)
                             && (forum.lockedForReadingAndUnavailable || forum.lockedForWritingAndUnavailable) ) {
                         forum.invisible = true;
                     }
 
-                    if (yaft.currentUserPermissions.forumDeleteAny || (yaft.currentUserPermissions.forumDeleteOwn && forum.creatorId === yaft.startupArgs.userId)) {
+                    if (yaft.currentUserPermissions.forumDeleteAny || (yaft.currentUserPermissions.forumDeleteOwn && forum.creatorId === yaft.userId)) {
                         forum.canDelete = true;
                     }
 
@@ -114,7 +114,7 @@
         });
 
         var forum = {
-                'siteId': yaft.startupArgs.siteId,
+                'siteId': yaft.siteId,
                 'id': $('#yaft_id_field').val(),
                 'startDate': startDate,
                 'endDate': endDate,
@@ -128,7 +128,7 @@
             };
            
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/forums",
+            url: "/portal/tool/" + yaft.placementId + "/forums",
             dataType: "text",
             type: 'POST',
             'data': forum,
@@ -182,7 +182,7 @@
         var groups = null;
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/siteGroups",
+            url: "/portal/tool/" + yaft.placementId + "/siteGroups",
             dataType: "json",
             cache: false,
             async: false,
@@ -199,7 +199,7 @@
     yaft.utils.clearActiveDiscussionsForCurrentUser = function () {
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/activeDiscussions/clear",
+            url: "/portal/tool/" + yaft.placementId + "/activeDiscussions/clear",
             dataType: "text",
             cache: false,
             async: false,
@@ -229,13 +229,13 @@
 
             if (!discussion.lockedForReadingAndUnavailable
                     || yaft.currentUserPermissions.viewInvisible
-                    || discussion.creatorId === yaft.startupArgs.userId) {
+                    || discussion.creatorId === yaft.userId) {
                 return true;
             }
         });
 
         this.renderTemplate('forum', { discussions: discussions,
-                                        viewMode: yaft.startupArgs.viewMode,
+                                        viewMode: yaft.viewMode,
                                         discussionDeleteAny: yaft.currentUserPermissions.discussionDeleteAny }, 'yaft_content');
             
         $(document).ready(function () {
@@ -249,7 +249,7 @@
                     cssDesc: 'yaftSortableTableHeaderSortDown',
                     headers:
                         {
-                            4: {sorter: "isoDate"},
+                            4: {sorter: "yaftDate"},
                             5: {sorter: false},
                             6: {sorter: false}
                         },
@@ -373,7 +373,7 @@
 
             if (!forum.lockedForReadingAndUnavailable
                     || yaft.currentUserPermissions.viewInvisible
-                    || forum.creatorId === yaft.startupArgs.userId) {
+                    || forum.creatorId === yaft.userId) {
                 return true;
             }
             
@@ -392,7 +392,7 @@
                     cssDesc: 'yaftSortableTableHeaderSortDown',
                     headers:
                         {
-                            4: {sorter: 'isoDate'},
+                            4: {sorter: 'yaftDate'},
                             5: {sorter: false},
                             6: {sorter: false}
                         },
@@ -491,11 +491,11 @@
                         discussion.groups[discussion.groups.length - 1].last = true;
                     }
                     if (yaft.currentUserPermissions.discussionDeleteAny
-                            || (yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.startupArgs.userId)) {
+                            || (yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.userId)) {
                         discussion.canDelete = true;
                     }
                     if (yaft.currentForums && yaft.currentForums.length > 1 && yaft.currentUserPermissions.discussionCreate
-                            && ((yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.startupArgs.userId)
+                            && ((yaft.currentUserPermissions.discussionDeleteOwn && discussion.creatorId === yaft.userId)
                                     || yaft.currentUserPermissions.discussionDeleteAny)) {
                         discussion.canMove = true;
                     }
@@ -532,7 +532,7 @@
         var discussion = null;
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/discussionContainingMessage?messageId=" + messageId,
+            url: "/portal/tool/" + yaft.placementId + "/discussions/discussionContainingMessage?messageId=" + messageId,
             dataType: "json",
             cache: false,
             async: false,
@@ -552,7 +552,7 @@
         var forum = null;
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/forumContainingMessage?messageId=" + messageId,
+            url: "/portal/tool/" + yaft.placementId + "/forumContainingMessage?messageId=" + messageId,
             dataType: "json",
             cache: false,
             async: false,
@@ -590,7 +590,7 @@
         }
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/messages/" + messageId + "/delete",
+            url: "/portal/tool/" + yaft.placementId + "/messages/" + messageId + "/delete",
             dateType: "text",
             async: false,
             cache: false,
@@ -653,7 +653,7 @@
         }
         
         $.ajax( {
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/messages/" + messageId + "/undelete",
+            url: "/portal/tool/" + yaft.placementId + "/messages/" + messageId + "/undelete",
             dateType: "text",
             async : false,
             cache: false,
@@ -729,7 +729,7 @@
     yaft.utils.markCurrentDiscussionRead = function (read) {
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + yaft.currentDiscussion.id + "/markRead",
+            url: "/portal/tool/" + yaft.placementId + "/discussions/" + yaft.currentDiscussion.id + "/markRead",
             dateType: "text",
             async: false,
             cache: false,
@@ -761,7 +761,7 @@
         var func = read ? 'markRead' : 'markUnRead';
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/messages/" + message.id + "/" + func,
+            url: "/portal/tool/" + yaft.placementId + "/messages/" + message.id + "/" + func,
             dateType: "text",
             async: false,
             cache: false,
@@ -797,7 +797,7 @@
         }
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/forums/" + forumId + "/delete",
+            url: "/portal/tool/" + yaft.placementId + "/forums/" + forumId + "/delete",
             dateType: "text",
             async: false,
             cache: false,
@@ -819,7 +819,7 @@
         }
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + discussionId + "/delete",
+            url: "/portal/tool/" + yaft.placementId + "/discussions/" + discussionId + "/delete",
             dateType: "text",
             async: false,
             cache: false,
@@ -841,7 +841,7 @@
         }
         
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + discussionId + "/clear",
+            url: "/portal/tool/" + yaft.placementId + "/discussions/" + discussionId + "/clear",
             dateType: "json",
             async: false,
             cache: false,
@@ -871,7 +871,7 @@
         }
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/messages/" + messageId + "/attachments/" + attachmentId + "/delete",
+            url: "/portal/tool/" + yaft.placementId + "/messages/" + messageId + "/attachments/" + attachmentId + "/delete",
             dateType: "text",
             async: false,
             cache: false,
@@ -947,7 +947,7 @@
 
         $.each(messages, function (index, message) {
 
-            if ($.inArray(message.id, readMessages) || message.creatorId == yaft.startupArgs.userId) {
+            if ($.inArray(message.id, readMessages) || message.creatorId == yaft.userId) {
                 message.read = true;
             } else {
                 message.read = false;
@@ -984,7 +984,7 @@
         if (readMessages != null) {
             var firstMessage = yaft.currentDiscussion.firstMessage;
         
-            if ($.inArray(firstMessage.id, readMessages) || firstMessage.creatorId == yaft.startupArgs.userId) {
+            if ($.inArray(firstMessage.id, readMessages) || firstMessage.creatorId == yaft.userId) {
                 firstMessage['read'] = true;
             } else {
                 firstMessage['read'] = false;
@@ -1115,7 +1115,7 @@
     yaft.utils.getAuthors = function () {
 
         this.setCurrentAuthors();
-        this.renderTemplate('authors_breadcrumb', {placementId: yaft.startupArgs.placementId, currentForum: yaft.currentForum, currentDiscussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
+        this.renderTemplate('authors_breadcrumb', {placementId: yaft.placementId, currentForum: yaft.currentForum, currentDiscussion: yaft.currentDiscussion}, 'yaft_breadcrumb');
         var canGrade = yaft.currentUserPermissions.gradeAll && yaft.currentDiscussion.graded;
         this.renderTemplate('authors', {authors: yaft.currentAuthors, currentDiscussion: yaft.currentDiscussion, 'canGrade': canGrade}, 'yaft_content');
 
@@ -1136,7 +1136,7 @@
     yaft.utils.setCurrentAuthors = function () {
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + yaft.currentDiscussion.id + "/authors",
+            url: "/portal/tool/" + yaft.placementId + "/discussions/" + yaft.currentDiscussion.id + "/authors",
             dataType: "json",
             cache: false,
             async: false,
@@ -1196,7 +1196,7 @@
         });
 
         $.ajax({
-            url: "/portal/tool/" + yaft.startupArgs.placementId + "/discussions/" + yaft.currentDiscussion.id + "/authors/" + authorId + "/messages",
+            url: "/portal/tool/" + yaft.placementId + "/discussions/" + yaft.currentDiscussion.id + "/authors/" + authorId + "/messages",
             dateType: "json",
             cache: false,
             success: function (data, textStatus) {
@@ -1228,7 +1228,7 @@
                         var gradePoints = $('#yaft_grade_field').val();
 
                         $.ajax({
-                            url: "/portal/tool/" + yaft.startupArgs.placementId + "/assignments/" + yaft.currentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
+                            url: "/portal/tool/" + yaft.placementId + "/assignments/" + yaft.currentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
                             dateType: "text",
                             cache: false,
                             success: function (data, xtextStatus) {
@@ -1249,7 +1249,7 @@
                         var gradePoints = $('#yaft_grade_field2').val();
 
                         $.ajax({
-                            url: "/portal/tool/" + yaft.startupArgs.placementId + "/assignments/" + yaft.currentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
+                            url: "/portal/tool/" + yaft.placementId + "/assignments/" + yaft.currentDiscussion.assignment.id + "/authors/" + authorId + "/grade/" + gradePoints,
                             dateType: "text",
                             cache: false,
                             success: function (data, textStatus) {
@@ -1304,7 +1304,7 @@
         if (hours < 10)  hours = '0' + hours;
         var minutes = d.getMinutes();
         if (minutes < 10) minutes = '0' + minutes;
-        return d.getDate() + " " + yaft.translations.month_names[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
+        return d.getDate() + " " + yaft.i18n.months[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
     };
     
     yaft.utils.addFormattedDatesToCurrentDiscussion = function () {
@@ -1319,9 +1319,9 @@
 
         message.formattedDate = this.formatDate(message.createdDate);
 
-        message.canViewAuthor = message.creatorId === yaft.startupArgs.userId || yaft.currentUserPermissions.discussionViewAnonymous;
+        message.canViewAuthor = message.creatorId === yaft.userId || yaft.currentUserPermissions.discussionViewAnonymous;
         message.canDelete = message.parent && 'DELETED' !== message.status
-                                && ((yaft.currentUserPermissions.messageDeleteOwn && yaft.startupArgs.userId === message.creatorId)
+                                && ((yaft.currentUserPermissions.messageDeleteOwn && yaft.userId === message.creatorId)
                                         || yaft.currentUserPermissions.messageDeleteAny);
 
         $.each(message.children, function (index, child) {
