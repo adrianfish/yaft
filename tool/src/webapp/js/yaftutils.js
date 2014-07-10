@@ -111,7 +111,6 @@
 
             groups += groupBox.id;
             if (index < (groupBoxes.length - 1)) groups += ',';
-			alert(groups);
         });
 
         var forum = {
