@@ -50,7 +50,7 @@ yaft.renderMessage = function (message) {
     message.canEdit = yaft.userId === message.creatorId && yaft.currentUserPermissions.messageCreate;
     message.canUndelete = message.status === 'DELETED' && yaft.currentUserPermissions.messageDeleteAny;
     message.canReply = yaft.currentUserPermissions.messageCreate && message.status === 'READY';
-    message.canDelete = (message.creatorId === yaft.userId && yaft.currentUserPermissions.messageDeleteOwn) || yaft.currentUserPermissions.messageDeleteAny;
+    message.canDelete = message.parent && ((message.creatorId === yaft.userId && yaft.currentUserPermissions.messageDeleteOwn) || yaft.currentUserPermissions.messageDeleteAny);
     message.canExpand = message.children.length > 0 && yaft.viewMode != 'minimal';
     message.isMine = yaft.userId === message.creatorId;
 
