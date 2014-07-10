@@ -115,6 +115,7 @@ public class YaftTool extends HttpServlet {
         }
 
 		if (pathInfo == null || pathInfo.length() < 1) {
+			response.setContentType("text/html");
             request.getRequestDispatcher("/WEB-INF/bootstrap.jsp").include(request, response);	
 		} else {
 			String[] parts = pathInfo.substring(1).split("/");

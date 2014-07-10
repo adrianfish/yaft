@@ -30,7 +30,7 @@
             if (forum.lastMessageDate > -1) {
                 forum.formattedLastMessageDate = yaft.utils.formatDate(forum.lastMessageDate);
             } else {
-                forum.formattedLastMessageDate = 'n/a';
+                forum.formattedLastMessageDate = '-';
             }
         });
     };
@@ -938,7 +938,7 @@
             if (discussion.lastMessageDate > -1) {
                 discussion.formattedLastMessageDate = self.formatDate(discussion.lastMessageDate);
             } else {
-                discussion.formattedLastMessageDate = 'n/a';
+                discussion.formattedLastMessageDate = '-';
             }
         });
     };

@@ -941,9 +941,9 @@ yaft.setupAvailability = function (element) {
         },
         format: function (s) {
 
-            //if (s === yaft.i18n.none_yet) {
-            //    return 0;
-            //}
+            if (s === '-') {
+                return 0;
+            }
 
             var matches = s.match(/^([\d]{1,2}) (\w+) ([\d]{4}) \@ ([\d]{2}):([\d]{2}).*$/);
             var d = new Date(matches[3], yaft.monthMappings[matches[2]], matches[1], matches[4], matches[5], 0);
