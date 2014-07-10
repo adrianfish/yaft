@@ -110,7 +110,8 @@
         $.each(groupBoxes, function (index, groupBox) {
 
             groups += groupBox.id;
-            if (i < j) groups += ',';
+            if (index < (groupBoxes.length - 1)) groups += ',';
+			alert(groups);
         });
 
         var forum = {
@@ -309,7 +310,7 @@
 
     yaft.utils.deleteSelectedFora  = function () {
     
-        if (!confirm(yaft.translations.delete_selected_fora_message)) {
+        if (!confirm(yaft.i18n.delete_selected_fora_message)) {
             return;
         }
         
@@ -339,7 +340,7 @@
     
     yaft.utils.deleteSelectedDiscussions  = function () {
     
-        if (!confirm(yaft.translations.delete_selected_discussions_message)) {
+        if (!confirm(yaft.i18n.delete_selected_discussions_message)) {
             return;
         }
         
@@ -443,7 +444,7 @@
         if (subject) {
             return true;
         } else {
-            if (confirm(yaft.translations.empty_message_subject_message)) {
+            if (confirm(yaft.i18n.empty_message_subject_message)) {
                 if (originalSubject.match(/^Re: /) == null) {
                     $("#yaft_message_subject_field").val('Re: ' + originalSubject);
                 } else {
@@ -585,7 +586,7 @@
     
     yaft.utils.deleteMessage = function (messageId) {
 
-        if (!confirm(yaft.translations.delete_message_message)) {
+        if (!confirm(yaft.i18n.delete_message_message)) {
             return false;
         }
         
@@ -648,7 +649,7 @@
     
     yaft.utils.undeleteMessage = function (messageId) {
 
-        if (!confirm(yaft.translations.undelete_message_message)) {
+        if (!confirm(yaft.i18n.undelete_message_message)) {
             return false;
         }
         
@@ -709,19 +710,19 @@
         if (message.collapsed) {
             $.each(descendants, function (index, descendant) {
 
-                $("#" + descendant.id + ' .yaft_collapse_expand_link').html(yaft.translations.collapse_label);
+                $("#" + descendant.id + ' .yaft_collapse_expand_link').html(yaft.i18n.collapse_label);
                 $("#" + descendant.id).show();
                 descendant.collapsed = false;
             });
 
-            e.innerHTML = yaft.translations.collapse_label;
+            e.innerHTML = yaft.i18n.collapse_label;
             message.collapsed = false;
         } else {
             $.each(descendants, function (index, descendant) {
                 $("#" + descendant.id).hide();
             });
 
-            e.innerHTML = yaft.translations.expand_label + ' (' + descendants.length + ')';
+            e.innerHTML = yaft.i18n.expand_label + ' (' + descendants.length + ')';
             message.collapsed = true;
         }
     };
@@ -792,7 +793,7 @@
     
     yaft.utils.deleteForum = function (forumId, forumTitle) {
 
-        if (!confirm(yaft.translations.delete_forum_message_one + "'" + forumTitle + "'" + yaft.translations.delete_forum_message_two)) {
+        if (!confirm(yaft.i18n.delete_forum_message_one + "'" + forumTitle + "'" + yaft.i18n.delete_forum_message_two)) {
             return false;
         }
         
@@ -814,7 +815,7 @@
     
     yaft.utils.deleteDiscussion = function (discussionId, discussionTitle) {
 
-        if (!confirm(yaft.translations.delete_discussion_message_one + "'" + discussionTitle + "'" + yaft.translations.delete_discussion_message_two)) {
+        if (!confirm(yaft.i18n.delete_discussion_message_one + "'" + discussionTitle + "'" + yaft.i18n.delete_discussion_message_two)) {
             return false;
         }
         
@@ -836,7 +837,7 @@
 
     yaft.utils.clearDiscussion = function (discussionId,discussionTitle) {
 
-        if (!confirm(yaft.translations.clear_discussion_message_one + "'" + discussionTitle + "'" + yaft.translations.clear_discussion_message_two)) {
+        if (!confirm(yaft.i18n.clear_discussion_message_one + "'" + discussionTitle + "'" + yaft.i18n.clear_discussion_message_two)) {
             return false;
         }
         
@@ -866,7 +867,7 @@
     
     yaft.utils.removeAttachment = function (attachmentId, messageId, elementId) {
 
-        if (!confirm(yaft.translations.delete_attachment_message)) {
+        if (!confirm(yaft.i18n.delete_attachment_message)) {
             return;
         }
 
