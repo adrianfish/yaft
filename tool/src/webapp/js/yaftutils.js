@@ -717,11 +717,16 @@
             e.innerHTML = yaft.i18n.collapse_label;
             message.collapsed = false;
         } else {
+			var numOfUndeletedDescendants = 0;
             $.each(descendants, function (index, descendant) {
+
+				if (!descendant.deleted) {
+                    numOfUndeletedDescendants += 1;
+                }
                 $("#" + descendant.id).hide();
             });
 
-            e.innerHTML = yaft.i18n.expand_label + ' (' + descendants.length + ')';
+            e.innerHTML = yaft.i18n.expand_label + ' (' + numOfUndeletedDescendants + ')';
             message.collapsed = true;
         }
     };
