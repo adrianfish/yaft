@@ -52,8 +52,7 @@ yaft.renderMessage = function (message) {
     message.canReply = yaft.currentUserPermissions.messageCreate && message.status === 'READY';
 
     // A message can only be deleted if it is not the topmost (discussion) message and we have permission.
-    message.canDelete = message.hasParent && ((message.creatorId === yaft.userId && yaft.currentUserPermissions.messageDeleteOwn) || yaft.currentUserPermissions.messageDeleteAny);
-
+    message.canDelete = message.parent && ((message.creatorId === yaft.userId && yaft.currentUserPermissions.messageDeleteOwn) || yaft.currentUserPermissions.messageDeleteAny);
     message.canExpand = message.children.length > 0 && yaft.viewMode != 'minimal';
     message.isMine = yaft.userId === message.creatorId;
 
