@@ -551,7 +551,7 @@ public class YaftTool extends HttpServlet {
 		String authorId = parts[3];
 		String points = parts[5];
 
-		if (sakaiProxy.currentUserHasFunction("gradebook.gradeAll")) {
+		if (sakaiProxy.currentUserHasFunctionInCurrentSite("gradebook.gradeAll")) {
             if (sakaiProxy.scoreAssignment(Integer.parseInt(assignmentId), authorId, points)) {
                 response.setStatus(HttpServletResponse.SC_OK);
             } else {
@@ -563,6 +563,7 @@ public class YaftTool extends HttpServlet {
 	}
 
 	private void doUserDataGet(HttpServletResponse response, String siteId) throws ServletException, IOException {
+
 		Set<String> perms = sakaiProxy.getPermissionsForCurrentUserAndSite();
 
 		JSONArray permsData = JSONArray.fromObject(perms);
@@ -570,7 +571,7 @@ public class YaftTool extends HttpServlet {
 		JSONObject data = new JSONObject();
 		data.accumulate("permissions", permsData);
 
-		if (sakaiProxy.currentUserHasFunction("gradebook.editAssignments")) {
+		if (sakaiProxy.currentUserHasFunctionInCurrentSite("gradebook.editAssignments")) {
 			List<YaftGBAssignment> assignments = sakaiProxy.getGradebookAssignments();
 			//JsonConfig config = new JsonConfig();
 			//config.setExcludes(new String[] { "dueDate" });

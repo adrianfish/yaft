@@ -44,6 +44,7 @@ import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
+import org.sakaiproject.delegatedaccess.logic.ProjectLogic;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityProducer;
@@ -125,6 +126,8 @@ public class SakaiProxyImpl implements SakaiProxy {
 
 	private GradebookService gradebookService;
 
+	private ProjectLogic projectLogic;
+
 	public SakaiProxyImpl() {
 
 		ComponentManager componentManager = org.sakaiproject.component.cover.ComponentManager.getInstance();
@@ -145,6 +148,7 @@ public class SakaiProxyImpl implements SakaiProxy {
 		usageSessionService = (UsageSessionService) componentManager.get(UsageSessionService.class);
 		searchService = (SearchService) componentManager.get(SearchService.class);
 		gradebookService = (GradebookService) componentManager.get("org_sakaiproject_service_gradebook_GradebookService");
+		projectLogic = (ProjectLogic) componentManager.get(ProjectLogic.class);
 		
 		NotificationEdit ne = notificationService.addTransientNotification();
 		ne.setResourceFilter(YaftForumService.REFERENCE_ROOT);
@@ -505,33 +509,45 @@ public class SakaiProxyImpl implements SakaiProxy {
 		} else {
 			Site site = null;
 			AuthzGroup siteHelperRealm = null;
+            String siteId = getCurrentSiteId();
 
 			try {
-				site = siteService.getSite(getCurrentSiteId());
+				site = siteService.getSite(siteId);
 				siteHelperRealm = authzGroupService.getAuthzGroup("!site.helper");
 			} catch (Exception e) {
 				// This should probably be logged but not rethrown.
 			}
 
-			Role currentUserRole = site.getUserRole(userId);
+            String[] delegatedAccess = projectLogic.getCurrentUsersAccessToSite("/site/" + siteId);
 
-			Role siteHelperRole = siteHelperRealm.getRole(currentUserRole.getId());
+			Role currentUserRole = null;
+            if (delegatedAccess != null) {
+                currentUserRole = site.getRole(delegatedAccess[1]);
+            } else {
+			    currentUserRole = site.getUserRole(userId);
+            }
 
-			Set<String> functions = currentUserRole.getAllowedFunctions();
+            if (currentUserRole != null) {
+                Role siteHelperRole = siteHelperRealm.getRole(currentUserRole.getId());
 
-			if (siteHelperRole != null) {
-				// Merge in all the functions from the same role in !site.helper
-				functions.addAll(siteHelperRole.getAllowedFunctions());
-			}
+                Set<String> functions = currentUserRole.getAllowedFunctions();
 
-			for (String function : functions) {
-				if (function.startsWith("yaft") || "gradebook.gradeAll".equals(function)) {
-					filteredFunctions.add(function);
-				}
-			}
+                if (siteHelperRole != null) {
+                    // Merge in all the functions from the same role in !site.helper
+                    functions.addAll(siteHelperRole.getAllowedFunctions());
+                }
 
-            if (functions.contains("site.upd")) {
-                filteredFunctions.add(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
+                for (String function : functions) {
+                    if (function.startsWith("yaft") || "gradebook.gradeAll".equals(function)) {
+                        filteredFunctions.add(function);
+                    }
+                }
+
+                if (functions.contains("site.upd")) {
+                    filteredFunctions.add(YaftFunctions.YAFT_MODIFY_PERMISSIONS);
+                }
+            } else {
+                logger.warn("Failed to get current user role in site. An empty permissions set will be returned ...");
             }
 		}
 
@@ -723,12 +739,16 @@ public class SakaiProxyImpl implements SakaiProxy {
 		return groups;
 	}
 
-	public boolean currentUserHasFunction(String function) {
-		return getCurrentSite().isAllowed(getCurrentUser().getId(), function);
+	public boolean currentUserHasFunctionInCurrentSite(String function) {
+
+		String siteId = getCurrentSiteId();
+		return securityService.unlock(function, "/site/" + siteId);
 	}
 
 	public boolean userHasFunctionInCurrentSite(String userId, String function) {
-		return getCurrentSite().isAllowed(userId, function);
+
+		String siteId = getCurrentSiteId();
+		return securityService.unlock(userId, function, "/site/" + siteId);
 	}
 
 	public boolean scoreAssignment(int assignmentId, String studentId, String score) {
