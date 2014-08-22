@@ -12,43 +12,41 @@ import org.sakaiproject.yaft.api.Message;
 import org.sakaiproject.yaft.api.YaftFunctions;
 import org.sakaiproject.util.ResourceLoader;
 
-public class YaftSecurityManager
-{
+public class YaftSecurityManager {
+
 	private SakaiProxy sakaiProxy;
 
     private ResourceLoader messages = new ResourceLoader("org.sakaiproject.yaft.impl.bundle.Messages");
 	
-	public YaftSecurityManager(SakaiProxy sakaiProxy)
-	{
+	public YaftSecurityManager(SakaiProxy sakaiProxy) {
 		this.sakaiProxy = sakaiProxy;
 	}
 	
-	public List<Forum> filterFora(List<Forum> fora,String siteId)
-	{
-		if("IndexManager".equals(Thread.currentThread().getName())) {
+	public List<Forum> filterFora(List<Forum> fora, String siteId) {
+
+		if ("IndexManager".equals(Thread.currentThread().getName())) {
 			return fora;
 		}
 		
-		if(siteId == null || siteId.length() == 0) {
+		if (siteId == null || siteId.length() == 0) {
 			siteId = sakaiProxy.getCurrentSiteId();
 		}
 		
 		List<Forum> filtered = new ArrayList<Forum>();
 		
-		for(Forum forum : fora)
-		{
-			if(filterForum(forum, siteId) == null)
+		for (Forum forum : fora) {
+			if (filterForum(forum, siteId) == null) {
 				continue;
-			
+            }
 			filtered.add(forum);
 		}
 		
 		return filtered;
 	}
 	
-	public List<Discussion> filterDiscussions(List<Discussion> discussions)
-	{
-		if("IndexManager".equals(Thread.currentThread().getName())) {
+	public List<Discussion> filterDiscussions(List<Discussion> discussions) {
+
+		if ("IndexManager".equals(Thread.currentThread().getName())) {
 			return discussions;
 		}
 		
@@ -67,30 +65,32 @@ public class YaftSecurityManager
 		return filtered;
 	}
 
-	public Forum filterForum(Forum forum,String siteId)
-	{
-		if("IndexManager".equals(Thread.currentThread().getName())) {
+	public Forum filterForum(Forum forum,String siteId) {
+
+		if ("IndexManager".equals(Thread.currentThread().getName())) {
 			return forum;
 		}
 		
-		if(forum == null) return null;
+		if (forum == null) return null;
 		
-		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
+		if (siteId == null) siteId = sakaiProxy.getCurrentSiteId();
 		
-		if(!forum.getSiteId().equals(siteId))
+		if (!forum.getSiteId().equals(siteId)) {
 			return null;
+        }
 		
 		// Is the current user a member of the site?
-		if(!sakaiProxy.isCurrentUserSuperUser() && !sakaiProxy.isCurrentUserMemberOfSite(siteId)) {
-			return null;
+		if (!sakaiProxy.isCurrentUserSuperUser()) {
+            if (!sakaiProxy.isCurrentUserMemberOfSite(siteId)) {
+			    return null;
+            }
 		}
 		
 		List<Group> groups = forum.getGroups();
 			
-		if(groups.size() > 0
+		if (groups.size() > 0
 				&& !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups)
-				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
-		{
+				&& !sakaiProxy.currentUserHasFunctionInCurrentSite(YaftFunctions.YAFT_FORUM_VIEW_GROUPS)) {
 			return null;
 		}
 		
@@ -122,7 +122,7 @@ public class YaftSecurityManager
 			
 		if(groups.size() > 0
 				&& !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups)
-				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
+				&& !sakaiProxy.currentUserHasFunctionInCurrentSite(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
 		{
 			return null;
 		}
@@ -137,7 +137,7 @@ public class YaftSecurityManager
 
         if(message.isAnonymous()
                 && !sakaiProxy.getCurrentUser().getId().equals(message.getCreatorId())
-				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_DISCUSSION_VIEW_ANONYMOUS)) {
+				&& !sakaiProxy.currentUserHasFunctionInCurrentSite(YaftFunctions.YAFT_DISCUSSION_VIEW_ANONYMOUS)) {
             message.setCreatorDisplayName(messages.getString("anonymous"));
         }
 
@@ -166,15 +166,15 @@ public class YaftSecurityManager
 		if(discussion == null) return null;
 		
 		// Is the current user a member of the site?
-		if(!sakaiProxy.isCurrentUserSuperUser() && !sakaiProxy.isCurrentUserMemberOfSite(discussion.getSiteId())) {
+		if (!sakaiProxy.isCurrentUserSuperUser() && !sakaiProxy.isCurrentUserMemberOfSite(discussion.getSiteId())) {
 			return null;
 		}
 		
 		List<Group> groups = discussion.getGroups();
 			
-		if(groups.size() > 0
+		if (groups.size() > 0
 				&& !sakaiProxy.isCurrentUserMemberOfAnyOfTheseGroups(groups)
-				&& !sakaiProxy.currentUserHasFunction(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
+				&& !sakaiProxy.currentUserHasFunctionInCurrentSite(YaftFunctions.YAFT_FORUM_VIEW_GROUPS))
 		{
 			return null;
 		}
@@ -192,7 +192,7 @@ public class YaftSecurityManager
             }
         } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_ANY)) {
             return true;
-        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_OWN) &&  forum.getCreatorId().equals(userId)) {
+        } else if (sakaiProxy.userHasFunctionInCurrentSite(userId, YaftFunctions.YAFT_FORUM_DELETE_OWN) && forum.getCreatorId().equals(userId)) {
             return true;
         }
 
