@@ -32,6 +32,7 @@
         <link rel="stylesheet" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
         <link rel="stylesheet" type="text/css" href="/yaft-tool/css/jquery.datetimepicker.css" />
         <link rel="stylesheet" type="text/css" href="/yaft-tool/css/yaft.css" />
+        <script type="text/javascript" src="/yaft-tool/js/es5-shim.min.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/jquery-1.9.1.min.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/jquery-ui-1.10.4.custom.min.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/jquery.cluetip.min.js"></script>
