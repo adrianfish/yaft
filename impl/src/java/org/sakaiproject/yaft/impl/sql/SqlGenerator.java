@@ -113,6 +113,8 @@ public interface SqlGenerator
 
 	String getDiscussionGroupsSelectStatement(String discussionId);
 
+	String getForumGroupsByDiscussionSelectStatement(String discussionId);
+	
 	List<String> getClearDiscussionStatements(String forumId, String discussionId);
 
 	PreparedStatement getSelectSiteForaStatement(String siteId, Connection connection) throws Exception;
