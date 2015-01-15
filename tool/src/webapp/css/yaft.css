@@ -121,10 +121,14 @@ th.yaftSortableTableHeaderSortDown {
     background-color: orange !important;
 }
 
-.yaftAlert {
-    display: none;
-    color: red;
-    font-weight: bold;
+tr.yaftInvisible td{
+	background-color: orange !important;
+}
+
+.yaftAlert{
+	display: none;
+	color: red;
+	font-weight: bold;
 }
 
 /* CLUETIP START */
