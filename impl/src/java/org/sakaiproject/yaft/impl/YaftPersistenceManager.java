@@ -643,6 +643,15 @@ public class YaftPersistenceManager {
 		message.setStatus(rs.getString(ColumnNames.STATUS));
 		message.setCreatorDisplayName(sakaiProxy.getDisplayNameForUser(creatorId));
 		
+		// Parent forum groups take precedence over child discussions
+		List<Group> groups = getForumGroupsForDiscussion(message.getDiscussionId(), connection);
+		if(groups.size() == 0) {
+			groups = getGroupsForDiscussion(message.getDiscussionId(), connection);
+		}
+		if (groups.size() > 0) {
+			message.setGroups(groups);
+		}
+		
 		String sql = sqlGenerator.getMessageAttachmentsSelectStatement(message.getId());
 		
 		ResultSet rs2 = null;
@@ -1771,6 +1780,34 @@ public class YaftPersistenceManager {
 				} catch (SQLException ignore) {}
 			}
 			if (st != null) {
+				try {
+					st.close();
+				} catch (SQLException ignore) {}
+			}
+		}
+	}
+
+	private List<Group> getForumGroupsForDiscussion(String discussionId, Connection conn) throws Exception{
+		
+		Statement st = null;
+		ResultSet groupsRS = null;
+		
+		try {
+			st = conn.createStatement();
+			String groupsSql = sqlGenerator.getForumGroupsByDiscussionSelectStatement(discussionId);
+			groupsRS = st.executeQuery(groupsSql);
+			List<Group> groups = new ArrayList<Group>();
+			while(groupsRS.next()) {
+				groups.add(new Group(groupsRS.getString("GROUP_ID"),groupsRS.getString("TITLE")));
+			}
+			return groups;
+		} finally {
+			if(groupsRS != null) {
+				try {
+					groupsRS.close();
+				} catch (SQLException ignore) {}
+			}
+			if(st != null) {
 				try {
 					st.close();
 				} catch (SQLException ignore) {}
