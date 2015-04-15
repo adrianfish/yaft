@@ -39,7 +39,15 @@
                 <span id="yaft_availability_message" class="yaftForumDescription">{{translate 'availability_message1'}}{{formattedStartDate}}{{translate 'availability_message2'}}{{formattedEndDate}}</span>
                 {{/if}}
             </td>
-            <td><a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></td>
+            {{#if anonymous}}
+                {{#if canSeeAuthorName}}
+                <td><a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></td>
+                {{else}}
+                <td>{{creatorDisplayName}}</td>
+                {{/if}}
+            {{else}}
+                <td><a href="javascript:;" class="profile" rel="/direct/profile/{{creatorId}}/formatted">{{creatorDisplayName}}</a></td>
+            {{/if}}
             <td>{{messageCount}}</td>
             <td>{{unread}}</td>
             <td>{{formattedLastMessageDate}}</td>

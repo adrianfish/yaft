@@ -507,6 +507,7 @@ yaft.switchState = function (state, arg) {
                                                 canSendAlerts: yaft.currentUserPermissions.sendAlerts,
                                                 discussion: discussion,
                                                 gbAssignments: yaft.gradebookAssignments,
+                                                canPostAnonymously: true,
                                                 hasGroups: !discussion.groupsInherited && groups.length > 0,
                                                 groups: groups }, 'yaft_content');
 
@@ -594,6 +595,13 @@ yaft.switchState = function (state, arg) {
         this.setupAvailability(discussion);
 
         $(document).ready(function () {
+
+            $('#yaft_publish_anonymously_button').click(function (e) {
+
+                $('#yaft_anonymous_flag').val('true');
+                $('#yaft_discussion_form').submit();
+                return false;
+            });
 
             // If this discussion is already group limited, show the groups options.
             if (discussion.groups.length > 0) {

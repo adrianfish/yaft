@@ -314,7 +314,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 				insertMessagePS.setString(5, message.getSubject());
 				insertMessagePS.setString(6, message.getContent());
 				insertMessagePS.setString(7, message.getCreatorId());
-				insertMessagePS.setBoolean(8, false);
+				insertMessagePS.setBoolean(8, message.isAnonymous());
 				insertMessagePS.setTimestamp(9, new Timestamp(message.getCreatedDate()));
 
 				insertSql = "INSERT INTO YAFT_DISCUSSION (DISCUSSION_ID,LAST_MESSAGE_DATE,MESSAGE_COUNT,STATUS,LOCKED_FOR_WRITING,LOCKED_FOR_READING) VALUES(?,?,1,'READY',0,0)";

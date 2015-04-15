@@ -227,12 +227,16 @@
 
         var discussions = yaft.currentForum.discussions.filter(function (discussion) {
 
+            discussion.canSeeAuthorName
+                = discussion.creatorId === yaft.userId || yaft.currentUserPermissions.discussionViewAnonymous;
+
             if (!discussion.lockedForReadingAndUnavailable
                     || yaft.currentUserPermissions.viewInvisible
                     || discussion.creatorId === yaft.userId) {
                 return true;
             }
         });
+
 
         this.renderTemplate('forum', { discussions: discussions,
                                         viewMode: yaft.viewMode,
