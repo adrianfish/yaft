@@ -788,12 +788,8 @@ public class YaftTool extends HttpServlet {
 			String subject = (String) request.getParameter("subject");
 			String content = (String) request.getParameter("content");
 			String forumId = (String) request.getParameter("forumId");
-			String sendEmailString = (String) request.getParameter("sendEmail");
-            String allowAnonymousPostingString = (String) request.getParameter("allowAnonymousPosting");
 			String startDate = (String) request.getParameter("startDate");
 			String endDate = (String) request.getParameter("endDate");
-			String lockWritingString = (String) request.getParameter("lockWriting");
-			String lockReadingString = (String) request.getParameter("lockReading");
 
 			String grade = (String) request.getParameter("grade");
 			
@@ -807,41 +803,27 @@ public class YaftTool extends HttpServlet {
 				return;
 			}
 
-			boolean sendEmail = true;
+			String anonymousFlagString = (String) request.getParameter("anonymous");
+			boolean anonymousFlag = (anonymousFlagString != null) ? anonymousFlagString.equals("true") : false;
 
-			if (sendEmailString != null) {
-				sendEmail = sendEmailString.equals("true");
-            } else {
-				sendEmail = false;
-            }
+			String sendEmailString = (String) request.getParameter("sendEmail");
+			boolean sendEmail = (sendEmailString != null) ? sendEmailString.equals("true") : false;
 
-            boolean allowAnonymousPosting = true;
+            String allowAnonymousPostingString = (String) request.getParameter("allowAnonymousPosting");
+            boolean allowAnonymousPosting
+                = (allowAnonymousPostingString != null) ? allowAnonymousPostingString.equals("true") : false;
 
-            if (allowAnonymousPostingString != null) {
-                allowAnonymousPosting = allowAnonymousPostingString.equals("true");
-            } else {
-                allowAnonymousPosting = false;
-            }
+			String lockWritingString = (String) request.getParameter("lockWriting");
+			boolean lockWriting = (lockWritingString != null) ? lockWritingString.equals("true") : false;
 
-			boolean lockWriting = true;
-			boolean lockReading = true;
-
-			if (lockWritingString != null) {
-				lockWriting = lockWritingString.equals("true");
-            } else {
-				lockWriting = false;
-            }
-
-			if (lockReadingString != null) {
-				lockReading = lockReadingString.equals("true");
-            } else {
-				lockReading = false;
-            }
+			String lockReadingString = (String) request.getParameter("lockReading");
+			boolean lockReading = (lockReadingString != null) ? lockReadingString.equals("true") : false;
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Subject: " + subject);
 				logger.debug("Content: " + content);
 				logger.debug("Forum ID: " + forumId);
+				logger.debug("anonymous: " + anonymousFlagString);
 			}
 
 			Message message = new Message();
@@ -857,6 +839,7 @@ public class YaftTool extends HttpServlet {
 			message.setSiteId(siteId);
 			message.setCreatorId(currentUserId);
 			message.setAttachments(getAttachments(request));
+			message.setAnonymous(anonymousFlag);
 
 			// The first messages in discussions always have the same id as the
 			// discussion
@@ -968,7 +951,6 @@ public class YaftTool extends HttpServlet {
 			String messageBeingRepliedTo = (String) request.getParameter("messageBeingRepliedTo");
 			String discussionId = (String) request.getParameter("discussionId");
 			String anonymousFlagString = (String) request.getParameter("anonymous");
-			String sendEmailString = (String) request.getParameter("sendEmail");
 
 			if (logger.isDebugEnabled()) {
                 logger.debug("Status: " + status);
@@ -990,19 +972,10 @@ public class YaftTool extends HttpServlet {
 			if (viewMode == null || viewMode.length() <= 0)
 				viewMode = "full";
 
-			boolean anonymousFlag = true;
+			final boolean anonymousFlag = (anonymousFlagString != null) ? anonymousFlagString.equals("true") : false;
 
-			if (anonymousFlagString != null)
-				anonymousFlag = anonymousFlagString.equals("true");
-			else
-				anonymousFlag = false;
-
-			boolean sendEmail = true;
-
-			if (sendEmailString != null)
-				sendEmail = sendEmailString.equals("true");
-			else
-				sendEmail = false;
+			String sendEmailString = (String) request.getParameter("sendEmail");
+			final boolean sendEmail = (sendEmailString != null) ? sendEmailString.equals("true") : false;
 
 			String currentUserId = sakaiProxy.getCurrentUser().getId();
 

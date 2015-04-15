@@ -112,6 +112,10 @@ public class Discussion implements Entity {
 	public String getPlacementId() {
 		return firstMessage.getPlacementId();
 	}
+
+    public boolean isAnonymous() {
+		return firstMessage.isAnonymous();
+    }
 	
 	public Element toXml(Document doc,Stack stack) {
 
