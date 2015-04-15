@@ -41,9 +41,9 @@
         <script type="text/javascript" src="/yaft-tool/js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/jquery.form.min.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/jquery.datetimepicker.js"></script>
-        <script type="text/javascript" src="/yaft-tool/js/handlebars.runtime-v1.3.0.js"></script>
-        <script type="text/javascript" src="/yaft-tool/templates/partials.handlebars"></script>
-        <script type="text/javascript" src="/yaft-tool/templates/templates.handlebars"></script>
+        <script type="text/javascript" src="/yaft-tool/js/handlebars.runtime-v2.0.0.js"></script>
+        <script type="text/javascript" src="/yaft-tool/templates/partials.js"></script>
+        <script type="text/javascript" src="/yaft-tool/templates/templates.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/sakaiutils.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/yaftpermissions.js"></script>
         <script type="text/javascript" src="/yaft-tool/js/yaftutils.js"></script>
