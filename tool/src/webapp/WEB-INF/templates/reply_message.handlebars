@@ -46,10 +46,10 @@
         <input type="hidden" name="viewMode" value="{{viewMode}}"/>
         <input id="yaft_message_status_field" type="hidden" name="status" value="READY"/>
         
-        <input type="submit" value="{{translate 'publish_label'}}"/>
         {{#if canPostAnonymously}}
         <input type="button" id="yaft_publish_anonymously_button" value="{{translate 'publish_anonymously_label'}}"/>
         {{/if}}
+        <input type="submit" value="{{translate 'publish_label'}}"/>
         <input type="button" value="{{translate 'cancel_label'}}" onclick="return yaft.switchState('{{viewMode}}',{'messageId':'{{originalMessage.id}}'})"/>
         
     </form>
