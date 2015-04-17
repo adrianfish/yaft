@@ -384,28 +384,34 @@ public class YaftTool extends HttpServlet {
 					response.getWriter().close();
 					return;
 				} else if ("authors".equals(discussionOp)) {
-					if (parts.length == 3) {
-						List<Author> authors = yaftForumService.getAuthorsForDiscussion(discussionId);
-						JSONArray data = JSONArray.fromObject(authors);
-						response.setStatus(HttpServletResponse.SC_OK);
-						response.setContentType("application/json; charset=UTF-8");
-						response.getWriter().write(data.toString());
-						return;
-					} else if (parts.length == 5) {
-						String authorId = parts[3];
-						String authorOp = parts[4];
+                    // We disallow author download on anonymous discussions
+                    if (yaftForumService.isAnonymousDiscussion(discussionId)) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        return;
+                    } else {
+                        if (parts.length == 3) {
+                            List<Author> authors = yaftForumService.getAuthorsForDiscussion(discussionId);
+                            JSONArray data = JSONArray.fromObject(authors);
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json; charset=UTF-8");
+                            response.getWriter().write(data.toString());
+                            return;
+                        } else if (parts.length == 5) {
+                            String authorId = parts[3];
+                            String authorOp = parts[4];
 
-						if ("messages".equals(authorOp)) {
-							List<Message> messages = yaftForumService.getMessagesForAuthorInDiscussion(authorId, discussionId);
-							JsonConfig config = new JsonConfig();
-							config.setExcludes(new String[] { "properties", "reference" });
-							JSONArray data = JSONArray.fromObject(messages, config);
-							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("application/json; charset=UTF-8");
-							response.getWriter().write(data.toString());
-							return;
-						}
-					}
+                            if ("messages".equals(authorOp)) {
+                                List<Message> messages = yaftForumService.getMessagesForAuthorInDiscussion(authorId, discussionId);
+                                JsonConfig config = new JsonConfig();
+                                config.setExcludes(new String[] { "properties", "reference" });
+                                JSONArray data = JSONArray.fromObject(messages, config);
+                                response.setStatus(HttpServletResponse.SC_OK);
+                                response.setContentType("application/json; charset=UTF-8");
+                                response.getWriter().write(data.toString());
+                                return;
+                            }
+                        }
+                    }
 				} else if ("clear".equals(discussionOp)) {
 					yaftForumService.clearDiscussion(discussionId);
 					Discussion discussion = yaftForumService.getDiscussion(discussionId,false);

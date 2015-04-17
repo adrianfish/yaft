@@ -130,7 +130,7 @@
         <input id="yaft_anonymous_flag" type="hidden" name="anonymous" value="false" />
         <input type="submit" value="{{translate 'publish_label'}}"/>
         {{#if canPostAnonymously}}
-        <input type="button" id="yaft_publish_anonymously_button" value="{{translate 'publish_anonymously_label'}}"/>
+        <input type="button" id="yaft_publish_anonymously_button" value="{{translate 'publish_anonymously_label'}}" disabled="disabled"/>
         {{/if}}
         <input type="button" value="{{translate 'cancel_label'}}" onClick="return yaft.switchState('forum');"/>
     </form>

@@ -825,8 +825,17 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 	@Override
 	public PreparedStatement getSelectSiteForaStatement(String siteId, Connection connection) throws Exception {
+
 		PreparedStatement st = connection.prepareStatement("SELECT * FROM YAFT_FORUM WHERE SITE_ID = ?");
 		st.setString(1,siteId);
 		return st;
 	}
+
+	public PreparedStatement getIsAnonymousDiscussionStatement(String discussionId, Connection connection) throws Exception {
+
+		PreparedStatement st = connection.prepareStatement(
+                "SELECT ALLOW_ANONYMOUS FROM YAFT_DISCUSSION WHERE DISCUSSION_ID = ?");
+        st.setString(1, discussionId);
+        return st;
+    }
 } 
