@@ -118,4 +118,6 @@ public interface SqlGenerator
 	List<String> getClearDiscussionStatements(String forumId, String discussionId);
 
 	PreparedStatement getSelectSiteForaStatement(String siteId, Connection connection) throws Exception;
+
+	PreparedStatement getIsAnonymousDiscussionStatement(String discussionId, Connection connection) throws Exception;
 }

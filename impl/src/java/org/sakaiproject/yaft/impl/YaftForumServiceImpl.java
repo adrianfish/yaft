@@ -663,6 +663,10 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	public boolean clearDiscussion(String discussionId) {
 		return persistenceManager.clearDiscussion(discussionId);
 	}
+
+	public boolean isAnonymousDiscussion(String discussionId) {
+		return persistenceManager.isAnonymousDiscussion(discussionId);
+    }
 	
 	private List<Forum> getForaForSite(String siteId) {
 		return persistenceManager.getForaForSite(siteId);

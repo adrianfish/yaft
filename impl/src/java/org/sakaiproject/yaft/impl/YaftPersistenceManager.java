@@ -2178,14 +2178,10 @@ public class YaftPersistenceManager {
 			while(rs.next()) {
 				fora.add(getForumFromResults(rs, connection));
 			}
+            rs.close();
 		} catch(Exception e) {
 			logger.warn("Caught exception whilst getting fora for site " + siteId + ". Reason: " + e.getMessage() + ". An empty list will be returned.");
 		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (Exception e) {}
-			}
 			if (statement != null) {
 				try {
 					statement.close();
@@ -2196,4 +2192,35 @@ public class YaftPersistenceManager {
 		}
 		return fora;
 	}
+
+    public boolean isAnonymousDiscussion(String discussionId) {
+
+		Connection connection = null;
+		PreparedStatement statement = null;
+
+		try {
+			connection = sakaiProxy.borrowConnection();
+			statement = sqlGenerator.getIsAnonymousDiscussionStatement(discussionId, connection);
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+                return rs.getBoolean("ALLOW_ANONYMOUS");
+			} else {
+                logger.error("Failed to test discussion '" + discussionId
+                                    + "' for anonmity. Returning true as the safest option ...");
+                return true;
+            }
+		} catch(Exception e) {
+                logger.error("Caught exception whilst testing discussion '" + discussionId
+                                    + "' for anonmity. Returning true as the safest option ...", e);
+                return true;
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (Exception e) {}
+			}
+			
+			sakaiProxy.returnConnection(connection);
+		}
+    }
 }

@@ -165,7 +165,7 @@ yaft.switchState = function (state, arg) {
         $("#yaft_add_forum_link").hide();
         $("#yaft_minimal_link").show();
         $("#yaft_full_link").hide();
-        $("#yaft_authors_view_link").show();
+        $("#yaft_authors_view_link").toggle(!yaft.currentDiscussion.allowAnonymousPosting);
         
         if (yaft.currentDiscussion) {
             yaft.utils.renderTemplate('discussion_breadcrumb', {placementId: yaft.placementId, discussion: yaft.currentDiscussion, forum: yaft.currentForum}, 'yaft_breadcrumb');
@@ -232,7 +232,7 @@ yaft.switchState = function (state, arg) {
 
         $("#yaft_add_discussion_link").hide();
         $("#yaft_show_deleted_link").hide();
-        $("#yaft_authors_view_link").show();
+        $("#yaft_authors_view_link").toggle(!yaft.currentDiscussion.allowAnonymousPosting);
         
         var message = null;
         if (arg != null && arg.messageId != null) {
@@ -510,10 +510,6 @@ yaft.switchState = function (state, arg) {
                                                 canPostAnonymously: true,
                                                 hasGroups: !discussion.groupsInherited && groups.length > 0,
                                                 groups: groups }, 'yaft_content');
-
-        if (discussion.allowAnonymousPosting) {
-            $('#yaft_allow_anonymous_posting_checkbox').prop('checked', true);
-        }
         
         var saveDiscussionOptions = { 
                 dataType: 'html',
@@ -595,6 +591,14 @@ yaft.switchState = function (state, arg) {
         this.setupAvailability(discussion);
 
         $(document).ready(function () {
+
+            $('#yaft_allow_anonymous_posting_checkbox').change(function (e) {
+                $('#yaft_publish_anonymously_button').prop('disabled', !$(this).prop('checked'));
+            });
+
+            if (discussion.allowAnonymousPosting) {
+                $('#yaft_allow_anonymous_posting_checkbox').prop('checked', true);
+            }
 
             $('#yaft_publish_anonymously_button').click(function (e) {
 
