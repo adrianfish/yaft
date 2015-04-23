@@ -37,52 +37,40 @@ public class NewMessageNotification extends SiteEmailNotification {
     
     protected String getFromAddress(Event event) {
 
-        String userEmail = "no-reply@" + ServerConfigurationService.getServerName();
-        String userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-        String no_reply = "From: \"" + userDisplay + "\" <" + userEmail + ">";
-        String from = getFrom(event);
-        // get the message
-        Reference ref = EntityManager.newReference(event.getResource());
+		Reference ref = EntityManager.newReference(event.getResource());
         Message msg = (Message) ref.getEntity();
-        String userId = msg.getCreatorId();
 
-        //checks if "from" email id has to be included? and whether the notification is a delayed notification?. SAK-13512
-        if ((ServerConfigurationService.getString("emailFromReplyable@org.sakaiproject.event.api.NotificationService").equals("true")) && from.equals(no_reply) && userId !=null) {
-                try {
-                    User u = UserDirectoryService.getUser(userId);
-                    userDisplay = u.getDisplayName();
-                    userEmail = u.getEmail();
-                    if ((userEmail != null) && (userEmail.trim().length()) == 0) userEmail = null;
-
-                }
-                catch (UserNotDefinedException e)
-                {
-                }
-
-                // some fallback positions
-                if (userEmail == null) userEmail = "no-reply@" + ServerConfigurationService.getServerName();
-                if (userDisplay == null) userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-                from ="From: \"" + userDisplay + "\" <" + userEmail + ">";
+        if (msg.isAnonymous()) {
+            // If this is an anonymous message, override the default.
+            String noReplyAddress = "no-reply@" + ServerConfigurationService.getServerName();
+            String noReplyUser = ServerConfigurationService.getString("ui.service", "Sakai");
+            return "From: \"" + noReplyUser + "\" <" + noReplyAddress + ">";
+        } else {
+            return getFrom(event);
         }
-
-        return from;
     }
     
 	protected String plainTextContent(Event event) {
+
 		Reference ref = EntityManager.newReference(event.getResource());
         Message message = (Message) ref.getEntity();
-        
+
 		String creatorName = "";
-		try {
-			creatorName = UserDirectoryService.getUser(message.getCreatorId()).getDisplayName();
-		} catch (UserNotDefinedException e) {
-			e.printStackTrace();
-		}
+        if (message.isAnonymous()) {
+            creatorName = "Anonymous";
+        } else {
+            try {
+                creatorName = UserDirectoryService.getUser(message.getCreatorId()).getDisplayName();
+            } catch (UserNotDefinedException e) {
+                e.printStackTrace();
+            }
+        }
 		
 		return rb.getFormattedMessage("noti.neworupdatedmessage", new Object[]{creatorName,message.getSubject(),ServerConfigurationService.getServerUrl() + message.getUrl()});
 	}
 	
 	protected String getSubject(Event event) {
+
 		Reference ref = EntityManager.newReference(event.getResource());
         Message message = (Message) ref.getEntity();
         

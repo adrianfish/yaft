@@ -37,46 +37,34 @@ public class NewDiscussionNotification extends SiteEmailNotification {
     
     protected String getFromAddress(Event event) {
 
-        String userEmail = "no-reply@" + ServerConfigurationService.getServerName();
-        String userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-        String no_reply = "From: \"" + userDisplay + "\" <" + userEmail + ">";
-        String from = getFrom(event);
-        // get the message
-        Reference ref = EntityManager.newReference(event.getResource());
-        Discussion msg = (Discussion) ref.getEntity();
-        String userId = msg.getCreatorId();
+		Reference ref = EntityManager.newReference(event.getResource());
+        Discussion discussion = (Discussion) ref.getEntity();
 
-        //checks if "from" email id has to be included? and whether the notification is a delayed notification?. SAK-13512
-        if ((ServerConfigurationService.getString("emailFromReplyable@org.sakaiproject.event.api.NotificationService").equals("true")) && from.equals(no_reply) && userId !=null){
-
-                try {
-                    User u = UserDirectoryService.getUser(userId);
-                    userDisplay = u.getDisplayName();
-                    userEmail = u.getEmail();
-                    if ((userEmail != null) && (userEmail.trim().length()) == 0) userEmail = null;
-                } catch (UserNotDefinedException e) {
-                }
-
-                // some fallback positions
-                if (userEmail == null) userEmail = "no-reply@" + ServerConfigurationService.getServerName();
-                if (userDisplay == null) userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
-                from="From: \"" + userDisplay + "\" <" + userEmail + ">";
+        if (discussion.isAnonymous()) {
+            // If this is an anonymous first message, override the default.
+            String noReplyAddress = "no-reply@" + ServerConfigurationService.getServerName();
+            String noReplyUser = ServerConfigurationService.getString("ui.service", "Sakai");
+            return "From: \"" + noReplyUser + "\" <" + noReplyAddress + ">";
+        } else {
+            return getFrom(event);
         }
-
-        return from;
     }
     
 	protected String plainTextContent(Event event) {
 
 		Reference ref = EntityManager.newReference(event.getResource());
         Discussion discussion = (Discussion) ref.getEntity();
-        
-		String creatorName = "";
-		try {
-			creatorName = UserDirectoryService.getUser(discussion.getCreatorId()).getDisplayName();
-		} catch (UserNotDefinedException e) {
-			e.printStackTrace();
-		}
+
+        String creatorName = "";
+        if (discussion.isAnonymous()) {
+            creatorName = "Anonymous";
+        } else {
+            try {
+                creatorName = UserDirectoryService.getUser(discussion.getCreatorId()).getDisplayName();
+            } catch (UserNotDefinedException e) {
+                e.printStackTrace();
+            }
+        }
 		
 		return rb.getFormattedMessage("noti.neworupdateddiscussion", new Object[]{creatorName,discussion.getSubject(),ServerConfigurationService.getServerUrl() + discussion.getUrl()});
 	}
