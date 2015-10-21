@@ -954,7 +954,7 @@
 
     var markReadMessages = function (messages, readMessages) {
 
-        $.each(messages, function (index, message) {
+        messages.forEach(function (message) {
 
             if ($.inArray(message.id, readMessages) || message.creatorId == yaft.userId) {
                 message.read = true;
@@ -968,18 +968,24 @@
     
     yaft.utils.markReadMessagesInCurrentDiscussion = function () {
 
-        var readMessages = [];
-            
         $.ajax( {
             url: yaft.baseDataUrl + "discussions/" + yaft.currentDiscussion.id + "/readMessages.json",
-            async: false,
             dataType: "json",
             cache: false,
+            async: false,
             success: function (ids, textStatus) {
 
-                $.each(ids, function (index, id) {
-                    readMessages.push(id);
-                });
+                if (ids.length > 0) {
+                    var firstMessage = yaft.currentDiscussion.firstMessage;
+
+                    if ($.inArray(firstMessage.id, ids) || firstMessage.creatorId == yaft.userId) {
+                        firstMessage.read = true;
+                    } else {
+                        firstMessage.read = false;
+                    }
+
+                    markReadMessages(firstMessage.children, ids);
+                }
             },
             error: function (xhr, textStatus, errorThrown) {
 
@@ -989,18 +995,6 @@
                 }
             }
         });
-            
-        if (readMessages != null) {
-            var firstMessage = yaft.currentDiscussion.firstMessage;
-        
-            if ($.inArray(firstMessage.id, readMessages) || firstMessage.creatorId == yaft.userId) {
-                firstMessage['read'] = true;
-            } else {
-                firstMessage['read'] = false;
-            }
-        
-            markReadMessages(firstMessage.children,readMessages);
-        }
     };
 
     var recursiveFindMessage = function (messages, wantedId) {
