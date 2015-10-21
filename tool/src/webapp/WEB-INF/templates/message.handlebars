@@ -56,9 +56,9 @@
         {{#if message.canExpand}}<span><a class="yaft_collapse_expand_link" href="#" onclick="yaft.utils.toggleMessage(this,'{{message.id}}');">{{translate 'collapse_label'}}</a></span>{{/if}}
         {{#unless message.isMine}}
             {{#if message.read}}
-            <span><a href="javascript:;" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('{{message.id}}'),false);">{{translate 'mark_message_unread_label'}}</a></span>
+            <span><a href="javascript:;" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessageInCurrentDiscussion('{{message.id}}'),false);">{{translate 'mark_message_unread_label'}}</a></span>
             {{else}}
-            <span><a href="#" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessage('{{message.id}}'),true);">{{translate 'mark_message_read_label'}}</a></span>
+            <span><a href="#" onClick="return yaft.utils.markMessageRead(yaft.utils.findMessageInCurrentDiscussion('{{message.id}}'),true);">{{translate 'mark_message_read_label'}}</a></span>
             {{/if}}
         {{/unless}}
     </div>
