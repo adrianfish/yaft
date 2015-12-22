@@ -59,7 +59,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 
 		List<String> statements = new ArrayList<String>();
 		
-		statements.add("CREATE TABLE YAFT_FORUM (FORUM_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,CREATOR_ID " + VARCHAR + "(99) NOT NULL,TITLE " + VARCHAR + "(255) NOT NULL,DESCRIPTION " + VARCHAR + "(255),DISCUSSION_COUNT " + INT + " NOT NULL,MESSAGE_COUNT " + INT + " NOT NULL,LAST_MESSAGE_DATE " + DATETIME + ",START_DATE " + DATETIME + ",END_DATE " + DATETIME + ",LOCKED_FOR_WRITING " + BOOL + " NOT NULL,LOCKED_FOR_READING " + BOOL + " NOT NULL,STATUS " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_forum_pk PRIMARY KEY (FORUM_ID))");
+		statements.add("CREATE TABLE YAFT_FORUM (FORUM_ID CHAR(36) NOT NULL,SITE_ID " + VARCHAR + "(99) NOT NULL,CREATOR_ID " + VARCHAR + "(99) NOT NULL,TITLE " + VARCHAR + "(255) NOT NULL,DESCRIPTION " + VARCHAR + "(255),CREATED_DATE " + DATETIME + " NOT NULL,DISCUSSION_COUNT " + INT + " NOT NULL,MESSAGE_COUNT " + INT + " NOT NULL,LAST_MESSAGE_DATE " + DATETIME + ",START_DATE " + DATETIME + ",END_DATE " + DATETIME + ",LOCKED_FOR_WRITING " + BOOL + " NOT NULL,LOCKED_FOR_READING " + BOOL + " NOT NULL,STATUS " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_forum_pk PRIMARY KEY (FORUM_ID))");
 		
 		statements.add("CREATE TABLE YAFT_FORUM_GROUP (FORUM_ID CHAR(36) NOT NULL,GROUP_ID " + VARCHAR + "(36) NOT NULL,CONSTRAINT yaft_forum_group_pk PRIMARY KEY (FORUM_ID,GROUP_ID))");
 
@@ -172,7 +172,7 @@ public class DefaultSqlGenerator implements SqlGenerator
 		{
 			forum.setId(UUID.randomUUID().toString());
 
-			String insertSql = "INSERT INTO YAFT_FORUM (FORUM_ID,SITE_ID,CREATOR_ID,TITLE,DESCRIPTION,START_DATE,END_DATE,LOCKED_FOR_WRITING,LOCKED_FOR_READING,STATUS,MESSAGE_COUNT,DISCUSSION_COUNT) VALUES(?,?,?,?,?,?,?,?,?,?,0,0)";
+			String insertSql = "INSERT INTO YAFT_FORUM (FORUM_ID,SITE_ID,CREATOR_ID,TITLE,DESCRIPTION,CREATED_DATE,START_DATE,END_DATE,LOCKED_FOR_WRITING,LOCKED_FOR_READING,STATUS,MESSAGE_COUNT,DISCUSSION_COUNT) VALUES(?,?,?,?,?,?,?,?,?,?,?,0,0)";
 
 			long start = forum.getStart();
 			long end = forum.getEnd();
@@ -183,22 +183,23 @@ public class DefaultSqlGenerator implements SqlGenerator
 			ps.setString(3, forum.getCreatorId());
 			ps.setString(4, forum.getTitle());
 			ps.setString(5, forum.getDescription());
+            ps.setTimestamp(6, new Timestamp(forum.getCreatedDate()));
 
 			if (start > -1 && end > -1)
 			{
-				ps.setTimestamp(6, new Timestamp(start));
-				ps.setTimestamp(7, new Timestamp(end));
+				ps.setTimestamp(7, new Timestamp(start));
+				ps.setTimestamp(8, new Timestamp(end));
 			}
 			else
 			{
-				ps.setNull(6, Types.NULL);
 				ps.setNull(7, Types.NULL);
+				ps.setNull(8, Types.NULL);
 			}
 
-			ps.setBoolean(8, forum.isLockedForWriting());
-			ps.setBoolean(9, forum.isLockedForReading());
+			ps.setBoolean(9, forum.isLockedForWriting());
+			ps.setBoolean(10, forum.isLockedForReading());
 
-			ps.setString(10, forum.getStatus());
+			ps.setString(11, forum.getStatus());
 			
 			statements.add(ps);
 			

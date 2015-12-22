@@ -699,14 +699,16 @@ public class YaftPersistenceManager {
 		return message;
 	}
 	
-	private Forum getForumFromResults(ResultSet rs, Connection conn) throws Exception
-	{
+	private Forum getForumFromResults(ResultSet rs, Connection conn) throws Exception {
+
 		Forum forum = new Forum();
 		forum.setId(rs.getString(ColumnNames.FORUM_ID));
 		forum.setSiteId(rs.getString(ColumnNames.SITE_ID));
 		forum.setTitle(rs.getString(ColumnNames.TITLE));
 		forum.setCreatorId(rs.getString(ColumnNames.CREATOR_ID));
 		forum.setDescription(rs.getString(ColumnNames.DESCRIPTION));
+		forum.setCreatedDate(rs.getTimestamp(ColumnNames.CREATED_DATE).getTime());
+
 		Timestamp ts = rs.getTimestamp(ColumnNames.LAST_MESSAGE_DATE);
 		if (ts != null)
 			forum.setLastMessageDate(ts.getTime());

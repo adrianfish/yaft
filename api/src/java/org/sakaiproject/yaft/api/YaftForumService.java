@@ -54,7 +54,7 @@ public interface YaftForumService extends EntityProducer {
 	 * @return The Discussions in the specified forum
 	 */
 	public Forum getForum(String forumId,String state);
-	
+
 	public Forum getUnfilteredForum(String forumId, String state);
 	
 	public Forum getForumForTitle(String title,String state,String siteId);
@@ -92,6 +92,8 @@ public interface YaftForumService extends EntityProducer {
 	public void deleteAttachment(String attachmentId, String messageId);
 
 	public Message getMessage(String messageId);
+
+	public Message getUnfilteredMessage(String messageId);
 
 	public Forum getForumContainingMessage(String messageId);
 

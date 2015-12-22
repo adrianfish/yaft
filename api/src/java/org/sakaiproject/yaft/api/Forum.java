@@ -47,6 +47,9 @@ public class Forum implements Entity {
 	private String description = "";
 
     @Getter @Setter
+	private long createdDate;
+
+    @Getter @Setter
 	private int discussionCount = 0;
 
     @Getter @Setter
@@ -89,6 +92,7 @@ public class Forum implements Entity {
 	
 	public Forum() {
 		id = UUID.randomUUID().toString();
+		createdDate = new Date().getTime();
 	}
 	
 	public void setSiteId(String siteId) {

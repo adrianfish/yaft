@@ -101,7 +101,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	public Forum getForum(String forumId, String state) {
 
         logger.debug("getForum()");
-		return securityManager.filterForum(persistenceManager.getForum(forumId, state),null);
+        return securityManager.filterForum(persistenceManager.getForum(forumId, state),null);
 	}
 	
 	public Forum getUnfilteredForum(String forumId, String state) {
@@ -238,6 +238,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
                     
                     // SiteStats/Search etc event
                     sakaiProxy.postEvent(YAFT_DISCUSSION_CREATED_SS, discussion.getReference());
+                    System.out.println("REF: " + discussion.getReference());
                 }
 
                 if (sendMail && sakaiProxy.canCurrentUserSendAlerts()) {
@@ -342,6 +343,10 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 
 	public Message getMessage(String messageId) {
 		return securityManager.filterMessage(persistenceManager.getMessage(messageId));
+	}
+
+	public Message getUnfilteredMessage(String messageId) {
+		return persistenceManager.getMessage(messageId);
 	}
 
 	public Forum getForumContainingMessage(String messageId) {
