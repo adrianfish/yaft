@@ -521,7 +521,7 @@ public class SakaiProxyImpl implements SakaiProxy {
             String[] delegatedAccess = projectLogic.getCurrentUsersAccessToSite("/site/" + siteId);
 
 			Role currentUserRole = null;
-            if (delegatedAccess != null) {
+            if (delegatedAccess != null && delegatedAccess.length >= 2) {
                 currentUserRole = site.getRole(delegatedAccess[1]);
             } else {
 			    currentUserRole = site.getUserRole(userId);
