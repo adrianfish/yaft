@@ -31,7 +31,7 @@ public class YaftForumEntityType extends YaftDashboardEntityType{
         String forumId = entityReference.substring(entityReference.lastIndexOf("/") + 1);
         Forum forum;
         try {
-            forum = forumService.getForum(forumId, ForumPopulatedStates.EMPTY);
+            forum = forumService.getUnfilteredForum(forumId, ForumPopulatedStates.EMPTY);
         } catch (Exception e) {
             return null;
         }

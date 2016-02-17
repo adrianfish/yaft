@@ -113,7 +113,7 @@ public class YaftForumServiceImpl implements YaftForumService, EntityTransferrer
 	public Discussion getDiscussion(String discussionId, boolean fully) {
 		return securityManager.filterDiscussion(persistenceManager.getDiscussion(discussionId, fully), null);
 	}
-	
+
 	public Discussion getUnfilteredDiscussion(String discussionId, boolean fully) {
 		return persistenceManager.getDiscussion(discussionId, fully);
 	}

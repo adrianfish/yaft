@@ -848,8 +848,11 @@ public class SakaiProxyImpl implements SakaiProxy {
 			}
 		}
 		
-		if (site == null) return false;
-		
+		if (site == null) {
+            logger.warn("Failed to look up site. Returning false ...");
+            return false;
+        }
+
 		return (site.getMember(userDirectoryService.getCurrentUser().getId()) != null);
 	}
 

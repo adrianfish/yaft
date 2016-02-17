@@ -90,13 +90,13 @@ public abstract class YaftDashboardEntityType implements DashboardEntityInfo {
             Site site = SiteService.getSite(siteId);
 
             if (type.equals("forums")) {
-                Forum forum = forumService.getForum(id, ForumPopulatedStates.EMPTY);
+                Forum forum = forumService.getUnfilteredForum(id, ForumPopulatedStates.EMPTY);
                 users.addAll(getUsers(forum.getGroups(), site));
             } else if (type.equals("discussions")) {
-                Discussion discussion = forumService.getDiscussion(id, false);
+                Discussion discussion = forumService.getUnfilteredDiscussion(id, false);
                 users.addAll(getUsers(discussion.getGroups(), site));
             } else if (type.equals("messages")) {
-                Discussion discussion = forumService.getDiscussion(forumService.getMessage(id).getDiscussionId(), false);
+                Discussion discussion = forumService.getUnfilteredDiscussion(forumService.getMessage(id).getDiscussionId(), false);
                 users.addAll(getUsers(discussion.getGroups(), site));
             }
 

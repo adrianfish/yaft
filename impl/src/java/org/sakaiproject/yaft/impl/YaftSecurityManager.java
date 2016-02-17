@@ -110,9 +110,9 @@ public class YaftSecurityManager {
 		}
 		
 		if(discussion == null) return null;
-		
+
 		if(siteId == null) siteId = sakaiProxy.getCurrentSiteId();
-		
+
 		// Is the current user a member of the site?
 		if(!sakaiProxy.isCurrentUserSuperUser() && !sakaiProxy.isCurrentUserMemberOfSite(siteId)) {
 			return null;
