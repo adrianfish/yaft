@@ -59,12 +59,4 @@
         <property name="expandByDefault"><value>true</value></property>
     </bean>
 
-    <bean id="org.sakaiproject.yaft.dashboard.YaftDashboardIntegration"
-        class="org.sakaiproject.yaft.dashboard.YaftDashboardIntegration"
-        init-method="init">
-        <property name="forumService"><ref bean="org.sakaiproject.yaft.api.YaftForumService"/></property>
-        <property name="dashboardLogic"><ref bean="org.sakaiproject.dash.logic.DashboardLogic"/></property>
-        <property name="userDirectoryService"><ref bean="org.sakaiproject.user.api.UserDirectoryService"/></property>
-    </bean>
-
 </beans>
