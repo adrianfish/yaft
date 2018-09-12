@@ -13,7 +13,7 @@
   	<parent>
     	<artifactId>yaft</artifactId>
     	<groupId>org.sakaiproject.yaft</groupId>
-    	<version>12-SNAPSHOT</version>
+    	<version>19-SNAPSHOT</version>
   	</parent>
   
 	<dependencies>
