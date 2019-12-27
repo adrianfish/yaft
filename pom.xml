@@ -9,12 +9,12 @@
   	<groupId>org.sakaiproject.yaft</groupId>
   	<artifactId>yaft</artifactId>
   	<packaging>pom</packaging>
-    <version>19-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
 
 	<parent>
         <groupId>org.sakaiproject</groupId>
         <artifactId>master</artifactId>
-        <version>19-SNAPSHOT</version>
+        <version>21-SNAPSHOT</version>
         <relativePath>../master/pom.xml</relativePath>
     </parent>
 
